@@ -1,9 +1,11 @@
+package org.dotNative.globalKeyListner;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import jni.keyboard.KeyboardEvent;
-import jni.keyboard.KeyboardEventListener;
-import jni.keyboard.KeyboardHook;
+import org.dotNative.globalKeyListner.KeyboardEvent;
+import org.dotNative.globalKeyListner.KeyboardEventListener;
+import org.dotNative.globalKeyListner.KeyboardHook;
 
 //Should go GPL
 

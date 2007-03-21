@@ -1,5 +1,4 @@
-package jni.keyboard;
-
+package org.dotNative.globalKeyListner;
 
 //KeyboardEvent.java
 import java.util.EventObject;
