@@ -7,6 +7,6 @@ import java.util.EventListener;
 
 
 public interface KeyboardEventListener extends EventListener {
-	public void GlobalKeyPressed( KeyboardEvent event );
-	public void GlobalKeyReleased( KeyboardEvent event );
+	public void globalKeyPressed( KeyboardEvent event );
+	public void globalKeyReleased( KeyboardEvent event );
 }

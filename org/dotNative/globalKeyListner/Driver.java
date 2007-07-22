@@ -19,11 +19,11 @@ public class Driver implements KeyboardEventListener {
 		} catch( IOException ex ) {}
 	}
  
-	public void GlobalKeyPressed( KeyboardEvent event )	{
+	public void globalKeyPressed( KeyboardEvent event )	{
 		System.out.println( "Key Pressed: " + event.getVirtualKeyCode() );
 	}
  
-	public void GlobalKeyReleased( KeyboardEvent event ) {
+	public void globalKeyReleased( KeyboardEvent event ) {
 		System.out.println( "Key Released: " + event.getVirtualKeyCode() );
 	}
 }

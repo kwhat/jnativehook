@@ -42,7 +42,7 @@ public class KeyboardHook {
 		Object[] listeners = listenerList.getListenerList();
 		for ( int i = 0; i < listeners.length; i += 2 ) {
 			if ( listeners[ i ] == KeyboardEventListener.class ) {
-				( (KeyboardEventListener)listeners[i + 1] ).GlobalKeyPressed( event );
+				( (KeyboardEventListener)listeners[i + 1] ).globalKeyPressed( event );
 			}
 		}
 	}
@@ -52,7 +52,7 @@ public class KeyboardHook {
 		Object[] listeners = listenerList.getListenerList();
 		for ( int i = 0; i < listeners.length; i += 2 ) {
 			if ( listeners[ i ] == KeyboardEventListener.class ) {
-				( (KeyboardEventListener)listeners[i + 1] ).GlobalKeyReleased( event );
+				( (KeyboardEventListener)listeners[i + 1] ).globalKeyReleased( event );
 			}
 		}
 	}
