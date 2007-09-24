@@ -16,8 +16,8 @@
  */
 
 //g++ -o libGlobalKeyListener.so -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
-//g++ -m32 -o libGlobalKeyListener.so -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
-//g++ -m64 -fPIC -o libGlobalKeyListener.so -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
+//g++ -m32 -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
+//g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
 
 
 #include <stdio.h>
@@ -28,7 +28,7 @@
 #include <X11/StringDefs.h>
 #include <X11/Xutil.h>
 #include <X11/Shell.h>
-#include "jni_keyboard_PollThread.h"
+#include "org_dotnative_globalkeylistner_PollThread.h"
 
 char *TranslateKeyCode(XEvent *ev);
 Display  *d;
@@ -86,13 +86,14 @@ JNIEXPORT void NotifyJava(JNIEnv *env, jobject obj) {
 	jmethodID mid;
 	
 	mid = env->GetMethodID(cls, "Callback", "(ZIZZ)V");
-	if (mid == NULL)
+	if (mid == NULL) {
 			return;
+	}
 	
 	env->CallVoidMethod(obj, mid, (jboolean)bKeyDown, (jint)(iKeyCode), (jboolean)(FALSE), (jboolean)(FALSE));
 }
 
-JNIEXPORT void JNICALL Java_jni_keyboard_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistner_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
 	snoop_all_windows(DefaultRootWindow(d), KeyPressMask | KeyReleaseMask, TRUE);
 	XNextEvent(d, &xev);
 	

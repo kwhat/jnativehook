@@ -1,4 +1,4 @@
-package org.dotnative.globalkeylistner;
+package org.dotnative.globalkeylistener;
 
 //Imports
 import java.util.EventListener;

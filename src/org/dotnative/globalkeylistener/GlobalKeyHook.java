@@ -1,4 +1,4 @@
-package org.dotnative.globalkeylistner;
+package org.dotnative.globalkeylistener;
 
 
 //KeyboardHook.java
@@ -14,6 +14,24 @@ public class GlobalKeyHook {
 		//Add the applications current path to the library path so
 		//we dont have to pass dirty arguments to the vm on the cli
 		System.setProperty("java.library.path", System.getProperty("user.dir", new File("").getAbsolutePath()) + System.getProperty("path.separator", ":") + System.getProperty("java.library.path", ""));
+		Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+		objSysPath.setAccessible(true);
+		if (objSysPath != null) {
+			objSysPath.set(System.class.getClassLoader(), null);
+		}
+		//Linux: libGlobalKeyListener.so
+		//Mac OSX: libGlobalKeyListener.so ?
+		//Windows: GlobalKeyListener.dll
+		System.loadLibrary("GlobalKeyListener");
+		
+		( new PollThread(this) ).start();
+	}
+	
+	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+		//Dynamic Loading of Library
+		//Add the applications current path to the library path so
+		//we dont have to pass dirty arguments to the vm on the cli
+		System.setProperty("java.library.path", sLibPath + System.getProperty("path.separator", ":") + System.getProperty("java.library.path", ""));
 		Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
 		objSysPath.setAccessible(true);
 		if (objSysPath != null) {
