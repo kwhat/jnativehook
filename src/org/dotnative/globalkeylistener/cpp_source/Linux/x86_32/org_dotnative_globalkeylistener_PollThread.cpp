@@ -24,6 +24,7 @@
 #include <jni.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
 #include <X11/Xutil.h>
@@ -31,7 +32,7 @@
 #include "org_dotnative_globalkeylistener_PollThread.h"
 
 char *TranslateKeyCode(XEvent *ev);
-Display  *d;
+Display  *disp;
 XEvent xev;
 bool bRunning;
 
@@ -46,7 +47,7 @@ unsigned int iXNumbWindows;
 void __attribute__ ((constructor)) Init(void);
 void __attribute__ ((destructor)) Cleanup(void);
 
-int XErrIgnore(Display *d, XErrorEvent *e) {
+int XErrIgnore(Display *disp, XErrorEvent *e) {
 	return 0;
 }
 
@@ -55,7 +56,7 @@ void snoop_all_windows(Window root_window, unsigned long type, bool bRootWindow)
 	unsigned int nchildren, i;
 	int stat;
 	
-	stat = XQueryTree(d, root_window, &root_return, &parent, &children, &nchildren);
+	stat = XQueryTree(disp, root_window, &root_return, &parent, &children, &nchildren);
 	
 	if (stat == FALSE) {
 		//I have no idea why this happens but it does on occasion
@@ -67,16 +68,17 @@ void snoop_all_windows(Window root_window, unsigned long type, bool bRootWindow)
 		if (bRootWindow) {
 			iXNumbWindows = nchildren;
 		}
-		XSelectInput(d, root_return, type);
+		XSelectInput(disp, root_return, type);
 		
 		for(i = 0; i < nchildren; i++) {
-			XSelectInput(d, children[i], type);
+			XSelectInput(disp, children[i], type);
 			snoop_all_windows(children[i], type, FALSE);
 		}
 	}
 	
-	if (children)
+	if (children) {
 		XFree((char *)children);
+	}
 }
 
 
@@ -94,8 +96,8 @@ JNIEXPORT void NotifyJava(JNIEnv *env, jobject obj) {
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistener_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
-	snoop_all_windows(DefaultRootWindow(d), KeyPressMask | KeyReleaseMask, TRUE);
-	XNextEvent(d, &xev);
+	snoop_all_windows(DefaultRootWindow(disp), KeyPressMask | KeyReleaseMask, TRUE);
+	XNextEvent(disp, &xev);
 	
 	iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
 	switch (xev.type) {
@@ -117,8 +119,8 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistener_PollThread_checkKeyb
 
 void Init() {
 	//fprintf(stderr, "Loading JNI Keyboard Driver\n");
-	d = XOpenDisplay(NULL);
-	if (d == NULL) {
+	disp = XOpenDisplay(NULL);
+	if (disp == NULL) {
 		fprintf(stderr, "Can't open display: %s\n", XDisplayName(NULL));
 		//TODO NEED TO KILL PROGRAM AT THIS POINT
 		//exit(10);
@@ -127,18 +129,20 @@ void Init() {
 	//This is suppose to handle our BadWindow Error
 	//but it doesnt work and apperently it slows the
 	//system... Bad Idea
-	//XSynchronize(d, TRUE);
+	//XSynchronize(disp, TRUE);
 	
 	XSetErrorHandler(XErrIgnore);
-	XAutoRepeatOff(d);
+	//XAutoRepeatOff(disp);
+	
+	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
 	
 	//Tell the Plug we have zero windows open.
 	iXNumbWindows = 0;
 }
  
 void Cleanup() {
-	XAutoRepeatOn(d);
-	XFlush(d);
-	XSync(d, FALSE);
+	XAutoRepeatOn(disp);
+	XFlush(disp);
+	XSync(disp, FALSE);
 	//fprintf(stderr, "Jni Keyboard Driver Unloaded\n");
 }
