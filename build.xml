@@ -82,7 +82,7 @@
 		</jar>
 		
 		<echo>Creating client init script.</echo>
-		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistner/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
+		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistener/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
 		
 		
 		<echo>Cleaning old build structure.</echo>

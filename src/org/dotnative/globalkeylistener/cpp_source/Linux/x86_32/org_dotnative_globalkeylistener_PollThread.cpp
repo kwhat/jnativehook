@@ -28,7 +28,7 @@
 #include <X11/StringDefs.h>
 #include <X11/Xutil.h>
 #include <X11/Shell.h>
-#include "org_dotnative_globalkeylistner_PollThread.h"
+#include "org_dotnative_globalkeylistener_PollThread.h"
 
 char *TranslateKeyCode(XEvent *ev);
 Display  *d;
@@ -93,7 +93,7 @@ JNIEXPORT void NotifyJava(JNIEnv *env, jobject obj) {
 	env->CallVoidMethod(obj, mid, (jboolean)bKeyDown, (jint)(iKeyCode), (jboolean)(FALSE), (jboolean)(FALSE));
 }
 
-JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistner_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistener_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
 	snoop_all_windows(DefaultRootWindow(d), KeyPressMask | KeyReleaseMask, TRUE);
 	XNextEvent(d, &xev);
 	
