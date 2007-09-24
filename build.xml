@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project default="jar" basedir=".">
+	<!-- Project Settings -->
+	<property name="project.name" value="dotNative"/>
+	<property name="project.key.name" value="Global Key Listener"/>
+	<property name="project.version" value="0.9.45"/>
+	<property name="project.src" value="src"/>
+	
+	
+	<!-- Path Settings -->
+	<property name="dir.dist" value="dist"/>
+	<property name="dir.classes" value="${dir.dist}/build"/>
+	
+	<property name="dir.key" value="${dir.dist}/KeyListener"/>
+	
+	
+	<!-- Compiler Settings -->
+	<property name="javac.optimize" value="true"/>
+	<property name="javac.debug" value="on"/>
+	<property name="javac.source" value="1.5"/>
+	<property name="javac.target" value="1.5"/>
+	
+	<target name="setenv" description="prepares the environment">
+		<echo>Cleaning old build structure</echo>
+		<delete includeemptydirs="true">
+			<fileset dir="${dir.dist}" includes="**/*"/>
+		</delete>
+		
+		<echo>Creating build structure</echo>
+		<mkdir dir="${dir.dist}"/>
+		<mkdir dir="${dir.classes}"/>
+		
+		<mkdir dir="${dir.key}"/>
+		
+		<path id="classpath">
+			<pathelement location="${dir.classes}"/>
+			<!--
+			<fileset dir="${project.lib}">
+				<include name="*.jar"/>
+			</fileset>
+			-->
+		</path>
+	</target>
+	
+	<target name="compile" depends="setenv" description="Compiles the classes">
+		<echo>Compiling ${project.key.name} project source code</echo>
+		<javac srcdir="${project.src}"
+			destdir="${dir.classes}"
+			classpathref="classpath"
+			debug="${javac.debug}"
+			optimize="${javac.optimize}"
+			deprecation="false"
+			source="${javac.source}"
+			target="${javac.target}"
+		/>
+	</target>
+	
+	<target name="jar" depends="compile" description="Creates a war file">
+		<!--
+		<copy overwrite="true" todir="${project.build}/${dir.images}">
+			<fileset dir="${project.web}/${dir.images}">
+				<include name="*.jpg"/>
+				<include name="*.gif"/>
+				<include name="*.png"/>
+			</fileset>
+		</copy>
+		-->
+		
+		<echo>Creating ${project.key.name} jar files.</echo>
+		<jar jarfile="${dir.key}/dotNative-GlobalKeyListener.jar" basedir="${dir.classes}">
+			<include name="org/dotnative/globalkeylistener/**"/>
+			<!-- <exclude name="org/dotnative/globalkeylistener/Driver.class"/> -->
+			<manifest>
+				<attribute name="Main-Class" value="org.dotnative.globalkeylistener.Driver"/>
+				<section name="org/dotNative">
+					<attribute name="Implementation-Title" value="${project.name} ${project.key.name} Library"/>
+					<attribute name="Implementation-Version" value="1.0"/> 
+					<attribute name="Implementation-Vendor" value="1st Leg Development"/>
+				</section>
+			</manifest>
+		</jar>
+		
+		<echo>Creating client init script.</echo>
+		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistner/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
+		
+		
+		<echo>Cleaning old build structure.</echo>
+		<delete includeemptydirs="true">
+			<fileset dir="${dir.classes}" includes="**"/>
+		</delete>
+	</target>
+</project>
