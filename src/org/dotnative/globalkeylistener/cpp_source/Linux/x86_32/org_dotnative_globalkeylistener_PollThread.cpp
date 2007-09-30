@@ -15,8 +15,7 @@
  *	and who made it. Thanks, and happy hooking!
  */
 
-//g++ -o libGlobalKeyListener.so -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
-//g++ -m32 -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
+//g++ -m32 -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.12/include -I/opt/sun-jdk-1.5.0.12/include/linux ./org_dotnative_globalkeylistener_PollThread.cpp
 //g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
 
 
@@ -80,7 +79,6 @@ void snoop_all_windows(Window root_window, unsigned long type, bool bRootWindow)
 		XFree((char *)children);
 	}
 }
-
 
 //Call Back function to java
 JNIEXPORT void NotifyJava(JNIEnv *env, jobject obj) {
