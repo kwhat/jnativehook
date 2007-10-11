@@ -1,12 +1,12 @@
-package org.dotnative.globalkeylistener;
+package org.dotnative.globalhook.keyboard;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.dotnative.globalkeylistener.GlobalKeyEvent;
-import org.dotnative.globalkeylistener.GlobalKeyHook;
-import org.dotnative.globalkeylistener.GlobalKeyListener;
+import org.dotnative.globalhook.keyboard.GlobalKeyEvent;
+import org.dotnative.globalhook.keyboard.GlobalKeyHook;
+import org.dotnative.globalhook.keyboard.GlobalKeyListener;
 
 //Should go GPL
 
@@ -16,10 +16,12 @@ public class Driver implements GlobalKeyListener {
 		GlobalKeyHook objKeyHook = new GlobalKeyHook();
 		objKeyHook.addEventListener(new Driver());
 		
+		/*
 		BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
 		try{
 			br.readLine();
 		} catch( IOException ex ) {}
+		*/
 	}
 	
 	public void globalKeyPressed( GlobalKeyEvent event )	{

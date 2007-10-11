@@ -1,4 +1,4 @@
-package org.dotnative.globalkeylistener;
+package org.dotnative.globalhook.keyboard;
 
 
 //KeyboardHook.java
