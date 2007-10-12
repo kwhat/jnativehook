@@ -3,12 +3,10 @@ package org.dotnative.globalhook.keyboard;
 
 //KeyboardHook.java
 //This class appears to handle all of our event listening
-
 import java.io.File;
 import java.lang.reflect.Field;
 
-
-public class GlobalKeyHook {
+public class GlobalKeyHook extends Thread {
 	public GlobalKeyHook() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		//Dynamic Loading of Library
 		//Add the applications current path to the library path so
@@ -24,7 +22,7 @@ public class GlobalKeyHook {
 		//Windows: GlobalKeyListener.dll
 		System.loadLibrary("GlobalKeyListener");
 		
-		( new PollThread(this) ).start();
+		this.start();
 	}
 	
 	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
@@ -42,7 +40,7 @@ public class GlobalKeyHook {
 		//Windows: GlobalKeyListener.dll
 		System.loadLibrary("GlobalKeyListener");
 		
-		( new PollThread(this) ).start();
+		this.start();
 	}
 	
 	protected javax.swing.event.EventListenerList listenerList = new javax.swing.event.EventListenerList();
@@ -56,55 +54,32 @@ public class GlobalKeyHook {
 	}
 	
 	//Notify Listners Key Down
-	void keyPressed(GlobalKeyEvent event) {
+	void fireKeyPressed(GlobalKeyEvent event) {
 		Object[] listeners = listenerList.getListenerList();
 		for ( int i = 0; i < listeners.length; i += 2 ) {
 			if ( listeners[ i ] == GlobalKeyListener.class ) {
-				( (GlobalKeyListener)listeners[i + 1] ).globalKeyPressed( event );
+				( (GlobalKeyListener)listeners[i + 1] ).keyPressed( event );
 			}
 		}
 	}
 	
 	//Notify Listners Key Up
-	void keyReleased(GlobalKeyEvent event) {
+	void fireKeyReleased(GlobalKeyEvent event) {
 		Object[] listeners = listenerList.getListenerList();
 		for ( int i = 0; i < listeners.length; i += 2 ) {
 			if ( listeners[ i ] == GlobalKeyListener.class ) {
-				( (GlobalKeyListener)listeners[i + 1] ).globalKeyReleased( event );
+				( (GlobalKeyListener)listeners[i + 1] ).keyReleased( event );
 			}
 		}
 	}
-}
-
-class PollThread extends Thread {
-	public native void checkKeyboardChanges();
-	private GlobalKeyHook kbh;
- 
-	public PollThread( GlobalKeyHook kh ) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		kbh = kh;
-	}
- 
-	public void run() {
-		//for(;;) {
-		while (true) {
-			checkKeyboardChanges();
-			yield();
-		}
-	}
 	
-	/*
-	 * ts = Transition State (Aka Key Down)
-	 * vk = Virtual Key Code
-	 * ap = Alt Pressed
-	 * ek = Extended Key
-	 */
-	void Callback( boolean ts, int vk, boolean ap, boolean ek ) {
-		GlobalKeyEvent event = new GlobalKeyEvent( this, ts, vk, ap, ek );
-		if( ts ) {
-			kbh.keyPressed( event );
-		}
-		else {
-			kbh.keyReleased( event );
+	//Notify Listners Key Up
+	void fireKeyTyped(GlobalKeyEvent event) {
+		Object[] listeners = listenerList.getListenerList();
+		for ( int i = 0; i < listeners.length; i += 2 ) {
+			if ( listeners[ i ] == GlobalKeyListener.class ) {
+				( (GlobalKeyListener)listeners[i + 1] ).keyPressed( event );
+			}
 		}
 	}
 }

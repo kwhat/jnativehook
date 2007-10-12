@@ -1,11 +1,11 @@
 package org.dotnative.globalhook.keyboard;
 
 //Imports
+import java.awt.event.KeyEvent;
 import java.util.EventListener;
 
-//KeyboardEventListener.java
-
 public interface GlobalKeyListener extends EventListener {
-	public void globalKeyPressed(GlobalKeyEvent objEvent);
-	public void globalKeyReleased(GlobalKeyEvent objEvent);
+	public void keyPressed(KeyEvent objEvent);
+	public void keyReleased(KeyEvent objEvent);
+	public void keyTyped(KeyEvent objEvent);
 }

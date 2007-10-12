@@ -1,10 +1,6 @@
 package org.dotnative.globalhook.keyboard;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.dotnative.globalhook.keyboard.GlobalKeyEvent;
+import java.awt.event.KeyEvent;
 import org.dotnative.globalhook.keyboard.GlobalKeyHook;
 import org.dotnative.globalhook.keyboard.GlobalKeyListener;
 
@@ -15,20 +11,17 @@ public class Driver implements GlobalKeyListener {
 		//GlobalKeyHook objKeyHook = new GlobalKeyHook("/home/kwhat/workspace/dotNative/dist/");
 		GlobalKeyHook objKeyHook = new GlobalKeyHook();
 		objKeyHook.addEventListener(new Driver());
-		
-		/*
-		BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) );
-		try{
-			br.readLine();
-		} catch( IOException ex ) {}
-		*/
 	}
 	
-	public void globalKeyPressed( GlobalKeyEvent event )	{
-		System.out.println("Key Pressed: " + event.getVirtualKeyCode());
+	public void keyPressed(KeyEvent objEvent) {
+		System.out.println("Key Pressed: " + objEvent.getKeyCode());
 	}
-	
-	public void globalKeyReleased( GlobalKeyEvent event ) {
-		System.out.println("Key Released: " + event.getVirtualKeyCode());
+
+	public void keyReleased(KeyEvent objEvent) {
+		System.out.println("Key Released: " + objEvent.getKeyCode());
+	}
+
+	public void keyTyped(KeyEvent objEvent) {
+		System.out.println("Key Typed: " + objEvent.getKeyCode());
 	}
 }
