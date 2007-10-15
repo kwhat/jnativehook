@@ -69,10 +69,10 @@
 		
 		<echo>Creating ${project.key.name} jar files.</echo>
 		<jar jarfile="${dir.key}/dotNative-GlobalKeyListener.jar" basedir="${dir.classes}">
-			<include name="org/dotnative/globalkeylistener/**"/>
+			<include name="org/dotnative/globalhook/keyboard/**"/>
 			<!-- <exclude name="org/dotnative/globalkeylistener/Driver.class"/> -->
 			<manifest>
-				<attribute name="Main-Class" value="org.dotnative.globalkeylistener.Driver"/>
+				<attribute name="Main-Class" value="org.dotnative.globalhook.keyboard.Driver"/>
 				<section name="org/dotNative">
 					<attribute name="Implementation-Title" value="${project.name} ${project.key.name} Library"/>
 					<attribute name="Implementation-Version" value="1.0"/> 
@@ -81,9 +81,10 @@
 			</manifest>
 		</jar>
 		
+		<!--
 		<echo>Creating client init script.</echo>
 		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistener/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
-		
+		-->
 		
 		<echo>Cleaning old build structure.</echo>
 		<delete includeemptydirs="true">

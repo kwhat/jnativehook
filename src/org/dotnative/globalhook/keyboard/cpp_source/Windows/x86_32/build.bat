@@ -1,0 +1,1 @@
+g++ -Wall -D_JNI_IMPLEMENTATION_ -Wl,--kill-at -IC:/Java/jdk1.6.0_03/include -IC:/Java/jdk1.6.0_03/include/win32 -shared org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o GlobalKeyListener.dll

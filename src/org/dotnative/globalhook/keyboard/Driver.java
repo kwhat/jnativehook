@@ -11,6 +11,7 @@ public class Driver implements GlobalKeyListener {
 		//GlobalKeyHook objKeyHook = new GlobalKeyHook("/home/kwhat/workspace/dotNative/dist/");
 		GlobalKeyHook objKeyHook = new GlobalKeyHook();
 		objKeyHook.addEventListener(new Driver());
+		System.out.println("Driver Started");
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
