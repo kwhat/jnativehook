@@ -18,16 +18,17 @@
 //g++ -m32 -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.12/include -I/opt/sun-jdk-1.5.0.12/include/linux ./org_dotnative_globalkeylistener_PollThread.cpp
 //g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
 
-
-#include <stdio.h>
 #include <jni.h>
-#include <X11/X.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <X11/Xlib.h>
+#include <X11/Xproto.h>
+#include <X11/X.h>
+#include <X11/extensions/Xevie.h>
+#include <X11/Xutil.h>
 #include <X11/XKBlib.h>
 #include <X11/Intrinsic.h>
-#include <X11/StringDefs.h>
-#include <X11/Xutil.h>
-#include <X11/Shell.h>
 #include "org_dotnative_globalkeylistener_PollThread.h"
 
 char *TranslateKeyCode(XEvent *ev);
