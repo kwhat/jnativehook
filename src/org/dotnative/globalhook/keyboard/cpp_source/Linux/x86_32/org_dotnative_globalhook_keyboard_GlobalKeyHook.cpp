@@ -15,8 +15,19 @@
  *	and who made it. Thanks, and happy hooking!
  */
 
-//g++ -m32 -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.12/include -I/opt/sun-jdk-1.5.0.12/include/linux ./org_dotnative_globalkeylistener_PollThread.cpp
-//g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
+// Use XEvie
+/*
+emerge -av libXevie
+
+Section "Extensions"
+    ...
+    Option         "XEVIE" "Enable"
+    ...
+EndSection
+
+*/
+//g++ -m32 -march=i586 -shared -lX11 -lXevie -I/opt/sun-jdk-1.5.0.12/include -I/opt/sun-jdk-1.5.0.12/include/linux ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o libGlobalKeyListener.so
+//g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -lXevie -I/opt/sun-jdk-1.5.0.08/include -I/opt/sun-jdk-1.5.0.08/include/linux ./jni_keyboard_PollThread.cpp
 
 #include <jni.h>
 #include <stdio.h>
@@ -31,117 +42,90 @@
 #include <X11/Intrinsic.h>
 #include "org_dotnative_globalkeylistener_PollThread.h"
 
-char *TranslateKeyCode(XEvent *ev);
+//Instance Variables
 Display  *disp;
 XEvent xev;
-bool bRunning;
+JavaVM * jvm = NULL;
+jobject hookObj = NULL;
+jmethodID fireKeyPressed_ID = NULL;
+jmethodID fireKeyReleased_ID = NULL;
+jmethodID fireKeyTyped_ID = NULL;
+DWORD hookThreadId = 0;
 
-//Last Key Statem
-bool bKeyDown;
-int iKeyCode;
-int iKeyState;
-int iKeyTime;
-unsigned int iXNumbWindows;
-
-//Dll Main
+//Dll Main Constructor and Deconstructor
 void __attribute__ ((constructor)) Init(void);
 void __attribute__ ((destructor)) Cleanup(void);
 
-int XErrIgnore(Display *disp, XErrorEvent *e) {
-	return 0;
-}
-
-void snoop_all_windows(Window root_window, unsigned long type, bool bRootWindow) {
-	Window parent, root_return, *children;
-	unsigned int nchildren, i;
-	int stat;
-	
-	stat = XQueryTree(disp, root_window, &root_return, &parent, &children, &nchildren);
-	
-	if (stat == FALSE) {
-		//I have no idea why this happens but it does on occasion
-		//fprintf(stderr, "Can't query window tree...\n");
-		return;
-	}
-	
-	if ( (bRootWindow && iXNumbWindows < nchildren) || !bRootWindow) {
-		if (bRootWindow) {
-			iXNumbWindows = nchildren;
-		}
-		XSelectInput(disp, root_return, type);
+void MsgLoop() {
+	while (TRUE) {
+		XNextEvent(disp, &xev);
 		
-		for(i = 0; i < nchildren; i++) {
-			XSelectInput(disp, children[i], type);
-			snoop_all_windows(children[i], type, FALSE);
-		}
-	}
-	
-	if (children) {
-		XFree((char *)children);
-	}
-}
-
-//Call Back function to java
-JNIEXPORT void NotifyJava(JNIEnv *env, jobject obj) {
-	jclass cls = env->GetObjectClass(obj);
-	jmethodID mid;
-	
-	mid = env->GetMethodID(cls, "Callback", "(ZIZZ)V");
-	if (mid == NULL) {
-			return;
-	}
-	
-	env->CallVoidMethod(obj, mid, (jboolean)bKeyDown, (jint)(iKeyCode), (jboolean)(FALSE), (jboolean)(FALSE));
-}
-
-JNIEXPORT void JNICALL Java_org_dotnative_globalkeylistener_PollThread_checkKeyboardChanges(JNIEnv *env, jobject obj) {
-	snoop_all_windows(DefaultRootWindow(disp), KeyPressMask | KeyReleaseMask, TRUE);
-	XNextEvent(disp, &xev);
-	
-	iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
-	switch (xev.type) {
-		case KeyPress:
-			bKeyDown = TRUE;
-		break;
+		iKeyCode = xev.xkey.keycode;
+		//iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
+		iKeyState = xev.xkey.state;
+		iKeyTime = xev.xkey.time;
+		int iKeyType = xev.type;
 		
-		case KeyRelease:
-			bKeyDown = FALSE;
-		break;
+		switch (iKeyType) {
+			case KeyPress:
+				//bKeyDown = TRUE;
+				fprintf(stderr, "Press");
+			break;
+			
+			case KeyRelease:
+				//bKeyDown = FALSE;
+				fprintf(stderr, "Release");
+			break;
+		}
+		
+		fprintf(stderr, "Key: %i %i %i\n", iKeyCode, xev.type, iKeyTime);
+
+		XevieSendEvent(disp, &xev, XEVIE_UNMODIFIED);
 	}
-	//iKeyCode = xev.xkey.keycode;
-	iKeyState = xev.xkey.state;
-	iKeyTime = xev.xkey.time;
-	
-	NotifyJava(env, obj);
 }
 
-
-void Init() {
-	//fprintf(stderr, "Loading JNI Keyboard Driver\n");
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_registerHook(JNIEnv * env, jobject obj) {
 	disp = XOpenDisplay(NULL);
 	if (disp == NULL) {
+		//We couldnt hook a display so we need to die.
 		fprintf(stderr, "Can't open display: %s\n", XDisplayName(NULL));
-		//TODO NEED TO KILL PROGRAM AT THIS POINT
-		//exit(10);
+		exit(1);
 	}
 	
-	//This is suppose to handle our BadWindow Error
-	//but it doesnt work and apperently it slows the
-	//system... Bad Idea
-	//XSynchronize(disp, TRUE);
+	if(XevieStart(disp)) {
+		printf("XevieStart(disp) finished \n");
+	}
+	else {
+		printf("XevieStart(dpy) failed, only one client is allowed to do event interception\n");
+		exit(1);
+	}
 	
-	XSetErrorHandler(XErrIgnore);
-	//XAutoRepeatOff(disp);
+	//Setup all the jni hook call back pointers.
+	hookObj = env->NewGlobalRef(obj);
+	jclass cls = env->GetObjectClass(hookObj);
+	fireKeyPressed_ID = env->GetMethodID(cls, "fireKeyPressed", "(JIIC)V");
+	fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
+	fireKeyTyped_ID = env->GetMethodID(cls, "fireKeyTyped", "(JIIC)V");
+	env->GetJavaVM(&jvm);
+	hookThreadId = GetCurrentThreadId();
 	
+	//Set the mask for what we want to listen to with Xevie
+	XevieSelectInput(disp, KeyPressMask | KeyReleaseMask);
+	
+	//Make sure we can detect when the button is being held down.
 	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
-	
-	//Tell the Plug we have zero windows open.
-	iXNumbWindows = 0;
+}
+
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unregisterHook(JNIEnv *env, jobject object) {
+	XevieEnd(disp);
+}
+
+void Init() {
+	//Do Notihing
+	//fprintf(stderr, "Jni Keyboard Driver Loaded\n");
 }
  
 void Cleanup() {
-	XAutoRepeatOn(disp);
-	XFlush(disp);
-	XSync(disp, FALSE);
+	//Do Notihing
 	//fprintf(stderr, "Jni Keyboard Driver Unloaded\n");
 }

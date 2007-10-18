@@ -13,19 +13,6 @@ jmethodID fireKeyReleased_ID = NULL;
 jmethodID fireKeyTyped_ID = NULL;
 DWORD hookThreadId = 0;
 
-extern "C" BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
-	switch (reason) {
-		case DLL_PROCESS_ATTACH:
-			printf("C++: DllMain - DLL_PROCESS_ATTACH.\n");
-			hInst = _hInst;
-		break;
-		default:
-		break;
-	}
-	
-	return TRUE;
-}
-
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JNIEnv * env;
 	KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
@@ -95,4 +82,17 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unre
 	
 	printf("C++: Java_HookTest_unRegisterHook - call PostThreadMessage.\n");
 	PostThreadMessage(hookThreadId, WM_QUIT, 0, 0L);
+}
+
+extern "C" BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
+	switch (reason) {
+		case DLL_PROCESS_ATTACH:
+			printf("C++: DllMain - DLL_PROCESS_ATTACH.\n");
+			hInst = _hInst;
+		break;
+		default:
+		break;
+	}
+	
+	return TRUE;
 }
