@@ -80,7 +80,7 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unre
 	if (hookThreadId == 0)
 		return;
 	
-	printf("C++: Java_HookTest_unRegisterHook - call PostThreadMessage.\n");
+	printf("C++: unregisterHook - call PostThreadMessage.\n");
 	PostThreadMessage(hookThreadId, WM_QUIT, 0, 0L);
 }
 
