@@ -12,11 +12,11 @@ import javax.swing.event.EventListenerList;
 public class GlobalKeyHook {
 	private EventListenerList objEventListeners;
 	
-	public GlobalKeyHook() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	public GlobalKeyHook() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
 		this(System.getProperty("user.dir", new File("").getAbsolutePath()));
 	}
 	
-	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
 		objEventListeners = new EventListenerList();
 		
 		//Dynamic Loading of Library

@@ -7,7 +7,7 @@ import org.dotnative.globalhook.keyboard.GlobalKeyListener;
 //Should go GPL
 
 public class Driver implements GlobalKeyListener {
-	public static void main(String[] args) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	public static void main(String[] args) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
 		//GlobalKeyHook objKeyHook = new GlobalKeyHook("/home/kwhat/workspace/dotNative/dist/");
 		GlobalKeyHook objKeyHook = new GlobalKeyHook();
 		objKeyHook.addEventListener(new Driver());

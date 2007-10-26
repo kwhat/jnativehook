@@ -55,11 +55,31 @@ jobject hookObj = NULL;
 jmethodID fireKeyPressed_ID = NULL;
 jmethodID fireKeyReleased_ID = NULL;
 jmethodID fireKeyTyped_ID = NULL;
+jclass objExceptionClass = NULL;
 pthread_t hookThreadId = 0;
 
-//Dll Main Constructor and Deconstructor
+//Shared Object Constructor and Deconstructor
 void __attribute__ ((constructor)) Init(void);
 void __attribute__ ((destructor)) Cleanup(void);
+
+void throwException(JNIEnv * env, char * sMessage) {
+	if (objExceptionClass != NULL) {
+		#ifdef DEBUG
+		printf("C++ Exception: %s\n", sMessage);
+		#endif
+		
+		env->ThrowNew(objExceptionClass, sMessage);
+		//env->ExceptionDescribe();
+		//env->DeleteLocalRef(objExceptionClass);
+	}
+	else {
+		//Unable to find exception class
+		
+		#ifdef DEBUG
+		printf("C++: Unable to locate exception class.\n");
+		#endif
+	}
+}
 
 void MsgLoop(JNIEnv * env) {
 	while (TRUE) {
@@ -94,13 +114,25 @@ void MsgLoop(JNIEnv * env) {
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_registerHook(JNIEnv * env, jobject obj) {
+	//Setup exception handleing
+	objExceptionClass = env->FindClass("org/dotnative/globalhook/keyboard/GlobalKeyException");
+	//objExceptionClass = (jclass) env->NewGlobalRef(env->FindClass("java/lang/Exception"));
+	
 	disp = XOpenDisplay(NULL);
-	if (disp == NULL) {
+	if (disp == NULL || TRUE) {
 		//We couldnt hook a display so we need to die.
-		#ifdef DEBUG
-		fprintf(stderr, "Can't open display: %s\n", XDisplayName(NULL));
-		#endif
-		exit(1);
+		char * str1 = "Could not open display";
+		char * str2 = XDisplayName(NULL);
+		char * str3 = (char *) calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
+		
+		strcat(str3, str1);
+		strcat(str3, str2);
+		
+		throwException(env, str3);
+		free(str3);
+		
+		//Naturaly exit so jni exception is thrown.
+		return;
 	}
 	
 	if(XevieStart(disp)) {
@@ -109,10 +141,11 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 		#endif
 	}
 	else {
-		#ifdef DEBUG
-		printf("C++: XevieStart(disp) failed, only one client is allowed to do event interception\n");
-		#endif
-		exit(1);
+		//We had an error hooking the Xevie package.
+		throwException(env, "XevieStart(disp) failed, only one client is allowed to do event interception.");
+		
+		//Naturaly exit so jni exception is thrown.
+		return;
 	}
 	
 	//Setup all the jni hook call back pointers.
@@ -155,8 +188,6 @@ void Init() {
 }
  
 void Cleanup() {
-	//Do Notihing
-	
 	#ifdef DEBUG
 	printf("C++: Init - Shared Object Process Detach.\n");
 	#endif
