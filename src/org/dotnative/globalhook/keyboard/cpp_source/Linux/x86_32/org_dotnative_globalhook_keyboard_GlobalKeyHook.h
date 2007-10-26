@@ -23,6 +23,22 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unregisterHook
   (JNIEnv *, jobject);
 
+/*
+ * Class:     org_dotnative_globalhook_keyboard_GlobalKeyHook
+ * Method:    unregisterHook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_startHook
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_dotnative_globalhook_keyboard_GlobalKeyHook
+ * Method:    unregisterHook
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_stopHook
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

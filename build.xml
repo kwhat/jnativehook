@@ -70,7 +70,8 @@
 		<echo>Creating ${project.key.name} jar files.</echo>
 		<jar jarfile="${dir.key}/dotNative-GlobalKeyListener.jar" basedir="${dir.classes}">
 			<include name="org/dotnative/globalhook/keyboard/**"/>
-			<!-- <exclude name="org/dotnative/globalkeylistener/Driver.class"/> -->
+			<include name="org/dotnative/globalhook/GlobalScreen.class"/>
+			<!-- <exclude name="org/dotnative/globalhook/keyboard/Driver.class"/> -->
 			<manifest>
 				<attribute name="Main-Class" value="org.dotnative.globalhook.keyboard.Driver"/>
 				<section name="org/dotNative">

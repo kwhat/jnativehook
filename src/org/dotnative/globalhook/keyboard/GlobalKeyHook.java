@@ -6,11 +6,16 @@ package org.dotnative.globalhook.keyboard;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import javax.swing.event.EventListenerList;
 
+import org.dotnative.globalhook.GlobalScreen;
+
 public class GlobalKeyHook {
 	private EventListenerList objEventListeners;
+	private ArrayList<Integer> objKeysDown;
+	private GlobalScreen objScreen;
 	
 	public GlobalKeyHook() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
 		this(System.getProperty("user.dir", new File("").getAbsolutePath()));
@@ -18,6 +23,8 @@ public class GlobalKeyHook {
 	
 	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
 		objEventListeners = new EventListenerList();
+		objKeysDown = new ArrayList<Integer>();
+		objScreen = new GlobalScreen();
 		
 		//Dynamic Loading of Library
 		//Add the applications current path to the library path so
@@ -33,10 +40,15 @@ public class GlobalKeyHook {
 		//Windows: GlobalKeyListener.dll
 		System.loadLibrary("GlobalKeyListener");
 		
-		//Register the hook inside a thread.
+		//Register the hook.
+		registerHook();
+		
 		new Thread() {
 			public void run() {
-				registerHook();
+				//Start hook should block untill stopHook is called.
+				startHook();
+				stopHook();
+				unregisterHook();
 			}
 		}.start();
 	}
@@ -50,37 +62,48 @@ public class GlobalKeyHook {
 	}
 	
 	//Notify Listners Key Down
-	void fireKeyPressed(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
+	@SuppressWarnings("unused")
+	private void fireKeyPressed(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
+		int iCharIndex = objKeysDown.indexOf(iKeyCode);
+		
+		if (iCharIndex == -1) {
+			objKeysDown.add(iKeyCode);
+		}
+		
 		Object[] objListeners = objEventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if (objListeners[i] == GlobalKeyListener.class) {
-				System.out.println(iWhen + "\t" + iModifiers + "\t" + iKeyCode + "\t" + cKeyChar);
-				((GlobalKeyListener) objListeners[i + 1]).keyPressed( new GlobalKeyEvent(null, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, (char)iKeyCode) );
+				switch (iCharIndex) {
+					case -1:
+						((GlobalKeyListener) objListeners[i + 1]).keyPressed( new GlobalKeyEvent(objScreen, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, (char)iKeyCode) );
+					default:
+						((GlobalKeyListener) objListeners[i + 1]).keyTyped( new GlobalKeyEvent(objScreen, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, (char)iKeyCode) );
+				}
 			}
 		}
 	}
 	
 	//Notify Listners Key Up
+	@SuppressWarnings("unused")
 	void fireKeyReleased(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
+		int iCharIndex = objKeysDown.indexOf(iKeyCode);
+		
+		if (iCharIndex >= 0) {
+			objKeysDown.remove(iCharIndex);
+		}
+		
 		Object[] objListeners = objEventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == GlobalKeyListener.class ) {
-				( (GlobalKeyListener)objListeners[i + 1] ).keyReleased( new GlobalKeyEvent(null, KeyEvent.KEY_RELEASED, iWhen, iModifiers, iKeyCode, cKeyChar) );
-			}
-		}
-	}
-	
-	//Notify Listners Key Up
-	void fireKeyTyped(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
-		Object[] objListeners = objEventListeners.getListenerList();
-		for ( int i = 0; i < objListeners.length; i += 2 ) {
-			if ( objListeners[i] == GlobalKeyListener.class ) {
-				( (GlobalKeyListener)objListeners[i + 1] ).keyPressed( new GlobalKeyEvent(null, KeyEvent.KEY_TYPED, iWhen, iModifiers, iKeyCode, cKeyChar) );
+				( (GlobalKeyListener)objListeners[i + 1] ).keyReleased( new GlobalKeyEvent(objScreen, KeyEvent.KEY_RELEASED, iWhen, iModifiers, iKeyCode, cKeyChar) );
 			}
 		}
 	}
 	
 	//These are basically the constructors and deconstructors for the hook.
-	native void registerHook();
-	native void unregisterHook();
+	private native void registerHook() throws GlobalKeyException;
+	private native void unregisterHook();
+	
+	private native void startHook();
+	private native void stopHook();
 }

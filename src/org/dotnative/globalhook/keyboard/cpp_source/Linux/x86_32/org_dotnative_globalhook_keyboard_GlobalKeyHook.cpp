@@ -48,13 +48,13 @@ g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -lXevie -I/o
 //#include <X11/Xproto.h>
 
 //Instance Variables
+bool bRunning = TRUE;
 Display  *disp;
 XEvent xev;
 JavaVM * jvm = NULL;
 jobject hookObj = NULL;
 jmethodID fireKeyPressed_ID = NULL;
 jmethodID fireKeyReleased_ID = NULL;
-jmethodID fireKeyTyped_ID = NULL;
 jclass objExceptionClass = NULL;
 pthread_t hookThreadId = 0;
 
@@ -81,8 +81,15 @@ void throwException(JNIEnv * env, char * sMessage) {
 	}
 }
 
-void MsgLoop(JNIEnv * env) {
-	while (TRUE) {
+void MsgLoop() {
+	JNIEnv * env = NULL;
+	jvm->AttachCurrentThread((void **)(&env), NULL);
+	
+	//jclass cls = env->GetObjectClass(hookObj);
+	//fireKeyPressed_ID = env->GetMethodID(cls, "fireKeyPressed", "(JIIC)V");
+	//fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
+	
+	while (bRunning) {
 		XNextEvent(disp, &xev);
 		
 		//unsigned int iKeyCode = xev.xkey.keycode;
@@ -116,10 +123,9 @@ void MsgLoop(JNIEnv * env) {
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_registerHook(JNIEnv * env, jobject obj) {
 	//Setup exception handleing
 	objExceptionClass = env->FindClass("org/dotnative/globalhook/keyboard/GlobalKeyException");
-	//objExceptionClass = (jclass) env->NewGlobalRef(env->FindClass("java/lang/Exception"));
 	
 	disp = XOpenDisplay(NULL);
-	if (disp == NULL || TRUE) {
+	if (disp == NULL) {
 		//We couldnt hook a display so we need to die.
 		char * str1 = "Could not open display";
 		char * str2 = XDisplayName(NULL);
@@ -153,7 +159,6 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 	jclass cls = env->GetObjectClass(hookObj);
 	fireKeyPressed_ID = env->GetMethodID(cls, "fireKeyPressed", "(JIIC)V");
 	fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
-	fireKeyTyped_ID = env->GetMethodID(cls, "fireKeyTyped", "(JIIC)V");
 	env->GetJavaVM(&jvm);
 	hookThreadId = pthread_self();
 	
@@ -162,20 +167,35 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 	
 	//Make sure we can detect when the button is being held down.
 	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
-	
+}
+
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_startHook(JNIEnv * env, jobject obj) {
 	//Call listener
-	MsgLoop(env);
+	
+	#ifdef DEBUG
+	printf("C++: MsgLoop() start successful.\n");
+	#endif
+	
+	MsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unregisterHook(JNIEnv *env, jobject object) {
 	XevieEnd(disp);
 	#ifdef DEBUG
-	printf("C++: XevieEnd(disp) successful\n");
+	printf("C++: XevieEnd(disp) successful.\n");
 	#endif
 	
 	pthread_cancel(hookThreadId);
 	#ifdef DEBUG
-	printf("C++: pthread_cancel(hookThreadId) successful\n");
+	printf("C++: pthread_cancel(hookThreadId) successful.\n");
+	#endif
+}
+
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_stopHook(JNIEnv * env, jobject obj) {
+	bRunning = FALSE;
+	
+	#ifdef DEBUG
+	printf("C++: MsgLoop() stop successful.\n");
 	#endif
 }
 

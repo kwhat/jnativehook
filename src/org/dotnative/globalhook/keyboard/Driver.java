@@ -7,11 +7,16 @@ import org.dotnative.globalhook.keyboard.GlobalKeyListener;
 //Should go GPL
 
 public class Driver implements GlobalKeyListener {
+	GlobalKeyHook objKeyHook;
+	
 	public static void main(String[] args) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
-		//GlobalKeyHook objKeyHook = new GlobalKeyHook("/home/kwhat/workspace/dotNative/dist/");
-		GlobalKeyHook objKeyHook = new GlobalKeyHook();
-		objKeyHook.addEventListener(new Driver());
+		new Driver();
 		System.out.println("Driver Started");
+	}
+	
+	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
+		objKeyHook = new GlobalKeyHook();
+		objKeyHook.addEventListener(this);
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
