@@ -51,6 +51,7 @@ g++ -m64 -fPIC -o libGlobalKeyListener.so -march=i586 -shared -lX11 -lXevie -I/o
 bool bRunning = TRUE;
 Display  *disp;
 XEvent xev;
+XEvent xev_next;
 JavaVM * jvm = NULL;
 jobject hookObj = NULL;
 jmethodID fireKeyPressed_ID = NULL;
@@ -85,10 +86,6 @@ void MsgLoop() {
 	JNIEnv * env = NULL;
 	jvm->AttachCurrentThread((void **)(&env), NULL);
 	
-	//jclass cls = env->GetObjectClass(hookObj);
-	//fireKeyPressed_ID = env->GetMethodID(cls, "fireKeyPressed", "(JIIC)V");
-	//fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
-	
 	while (bRunning) {
 		XNextEvent(disp, &xev);
 		
@@ -108,11 +105,19 @@ void MsgLoop() {
 			break;
 			
 			case KeyRelease:
-				#ifdef DEBUG
-				printf("C++: MsgLoop - Key released\n");
-				#endif
+				//This code is if XkbSetDetectableAutoRepeat, but it seems to fail regardless with Xevie.
+				unsigned int iQueue = XEventsQueued(xev.xkey.display, QueuedAfterReading);
+				if (iQueue) {
+					XPeekEvent (xev.xkey.display, &xev_next);
+				}
 				
-				env->CallVoidMethod(hookObj, fireKeyReleased_ID, (jlong) iKeyTime, (jint) iKeyType, (jint) iKeyCode, (jchar) char(iKeyCode));
+				if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time != xev.xkey.time) { 
+					#ifdef DEBUG
+					printf("C++: MsgLoop - Key released\n");
+					#endif
+					
+					env->CallVoidMethod(hookObj, fireKeyReleased_ID, (jlong) iKeyTime, (jint) iKeyType, (jint) iKeyCode, (jchar) char(iKeyCode));
+				}
 			break;
 		}
 		
@@ -140,6 +145,8 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
+	//Make sure we can detect when the button is being held down.
+	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
 	
 	if(XevieStart(disp)) {
 		#ifdef DEBUG
@@ -153,6 +160,8 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
+	//Set the mask for what we want to listen to with Xevie
+	XevieSelectInput(disp, KeyPressMask | KeyReleaseMask);
 	
 	//Setup all the jni hook call back pointers.
 	hookObj = env->NewGlobalRef(obj);
@@ -161,12 +170,6 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 	fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
 	env->GetJavaVM(&jvm);
 	hookThreadId = pthread_self();
-	
-	//Set the mask for what we want to listen to with Xevie
-	XevieSelectInput(disp, KeyPressMask | KeyReleaseMask);
-	
-	//Make sure we can detect when the button is being held down.
-	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_startHook(JNIEnv * env, jobject obj) {
