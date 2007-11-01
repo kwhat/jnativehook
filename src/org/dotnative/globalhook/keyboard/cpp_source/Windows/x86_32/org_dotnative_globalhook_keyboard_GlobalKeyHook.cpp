@@ -5,15 +5,36 @@
 #include <jni.h>
 #include "org_dotnative_globalhook_keyboard_GlobalKeyHook.h"
 
+//Instance Variables
+bool bRunning = TRUE;
+HHOOK hookHandle = NULL;
 HINSTANCE hInst = NULL;
 JavaVM * jvm = NULL;
 jobject hookObj = NULL;
 jmethodID fireKeyPressed_ID = NULL;
 jmethodID fireKeyReleased_ID = NULL;
-jmethodID fireKeyTyped_ID = NULL;
+jclass objExceptionClass = NULL;
 DWORD hookThreadId = 0;
 
+void throwException(JNIEnv * env, char * sMessage) {
+	if (objExceptionClass != NULL) {
+		#ifdef DEBUG
+		printf("C++ Exception: %s\n", sMessage);
+		#endif
+		
+		env->ThrowNew(objExceptionClass, sMessage);
+	}
+	else {
+		//Unable to find exception class
+		
+		#ifdef DEBUG
+		printf("C++: Unable to locate exception class.\n");
+		#endif
+	}
+}
+
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	printf("Call LowLevel\n");
 	JNIEnv * env;
 	KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
 	
@@ -21,20 +42,30 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		switch (wParam) {
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
-				printf("C++: LowLevelKeyboardProc - Key pressed\n");
+				#ifdef DEBUG
+				printf("C++: MsgLoop - Key pressed\n");
+				#endif
+				
 				env->CallVoidMethod(hookObj, fireKeyPressed_ID, (jlong) p->time, (jint) p->flags, (jint) p->vkCode, (jchar) char(p->vkCode));
 			break;
+			
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
-				printf("C++: LowLevelKeyboardProc - Key released\n");
+				#ifdef DEBUG
+				printf("C++: MsgLoop - Key released\n");
+				#endif
+				
 				env->CallVoidMethod(hookObj, fireKeyReleased_ID, (jlong) p->time, (jint) p->flags, (jint) p->vkCode, (jchar) char(p->vkCode));
 			break;
+			
 			default:
 			break;
 		}
 	}
 	else {
-		printf("C++: LowLevelKeyboardProc - Error on the attach current thread.\n");
+		#ifdef DEBUG
+		printf("C++: MsgLoop - Error on the attach current thread.\n");
+		#endif
 	}
 	
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
@@ -42,54 +73,104 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 void MsgLoop() {
 	MSG message;
-
-	while (GetMessage(&message, NULL, 0, 0)) {
+	
+	printf("TEST1");
+	while (bRunning && GetMessage(&message, NULL, 0, 0)) {
+		printf("TEST2");
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
+	printf("TEST3");
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_registerHook(JNIEnv * env, jobject obj) {
-	HHOOK hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
+	//Setup exception handleing
+	objExceptionClass = env->FindClass("org/dotnative/globalhook/keyboard/GlobalKeyException");
 	
-	if (hookHandle == NULL) {
-		printf("C++: Java_HookTest_registerHook - Hook failed!\n");
-		return;
+	hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
+	
+	if (hookHandle != NULL) {
+		#ifdef DEBUG
+		printf("C++: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful\n");
+		#endif
+		
+		UnhookWindowsHookEx(hookHandle);
 	}
 	else {
-		printf("C++: Java_HookTest_registerHook - Hook successful\n");
+		#ifdef DEBUG
+		printf("C++: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed\n");
+		#endif
+		
+		throwException(env, "Failed to hook keyboared using SetWindowsHookEx");
+		
+		//Naturaly exit so jni exception is thrown.
+		return;
 	}
 	
 	hookObj = env->NewGlobalRef(obj);
 	jclass cls = env->GetObjectClass(hookObj);
 	fireKeyPressed_ID = env->GetMethodID(cls, "fireKeyPressed", "(JIIC)V");
 	fireKeyReleased_ID = env->GetMethodID(cls, "fireKeyReleased", "(JIIC)V");
-	fireKeyTyped_ID = env->GetMethodID(cls, "fireKeyTyped", "(JIIC)V");
 	env->GetJavaVM(&jvm);
 	hookThreadId = GetCurrentThreadId();
+}
+
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_startHook(JNIEnv * env, jobject obj) {
+	//Call listener
+	hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
+	
+	#ifdef DEBUG
+	printf("C++: MsgLoop() start successful.\n");
+	#endif
 	
 	MsgLoop();
-	
-	if (!UnhookWindowsHookEx(hookHandle))
-		printf("C++: Java_HookTest_registerHook - Unhook failed\n");
-	else
-		printf("C++: Java_HookTest_registerHook - Unhook successful\n");
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_unregisterHook(JNIEnv *env, jobject object) {
-	if (hookThreadId == 0)
-		return;
+	if (!UnhookWindowsHookEx(hookHandle)) {
+		#ifdef DEBUG
+		printf("C++: Java_HookTest_registerHook - Unhook failed\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		printf("C++: Java_HookTest_registerHook - Unhook successful\n");
+		#endif
+	}
 	
-	printf("C++: unregisterHook - call PostThreadMessage.\n");
-	PostThreadMessage(hookThreadId, WM_QUIT, 0, 0L);
+	if (hookThreadId != 0) {
+		#ifdef DEBUG
+		printf("C++: unregisterHook - call PostThreadMessage.\n");
+		#endif
+		
+		PostThreadMessage(hookThreadId, WM_QUIT, 0, 0L);
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_stopHook(JNIEnv * env, jobject obj) {
+	bRunning = FALSE;
+	
+	#ifdef DEBUG
+	printf("C++: MsgLoop() stop successful.\n");
+	#endif
 }
 
 extern "C" BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
-			printf("C++: DllMain - DLL_PROCESS_ATTACH.\n");
+			#ifdef DEBUG
+			printf("C++: DllMain - DLL Process attach.\n");
+			#endif
+			
 			hInst = _hInst;
 		break;
+		
+		case DLL_PROCESS_DETACH:
+			#ifdef DEBUG
+			printf("C++: DllMain - DLL Process Detach.\n");
+			#endif
+		break;
+		
 		default:
 		break;
 	}

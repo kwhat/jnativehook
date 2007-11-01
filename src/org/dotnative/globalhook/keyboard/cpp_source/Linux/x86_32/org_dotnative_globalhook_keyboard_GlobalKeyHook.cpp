@@ -111,7 +111,7 @@ void MsgLoop() {
 					XPeekEvent (xev.xkey.display, &xev_next);
 				}
 				
-				if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time != xev.xkey.time) { 
+				if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time - xev.xkey.time <= 1) { 
 					#ifdef DEBUG
 					printf("C++: MsgLoop - Key released\n");
 					#endif
@@ -130,7 +130,12 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 	objExceptionClass = env->FindClass("org/dotnative/globalhook/keyboard/GlobalKeyException");
 	
 	disp = XOpenDisplay(NULL);
-	if (disp == NULL) {
+	if (disp != NULL) {
+		#ifdef DEBUG
+		printf("C++: XOpenDisplay(NULL) successful\n");
+		#endif
+	}
+	else {
 		//We couldnt hook a display so we need to die.
 		char * str1 = "Could not open display";
 		char * str2 = XDisplayName(NULL);
@@ -146,7 +151,7 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_regi
 		return;
 	}
 	//Make sure we can detect when the button is being held down.
-	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
+	//XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
 	
 	if(XevieStart(disp)) {
 		#ifdef DEBUG
