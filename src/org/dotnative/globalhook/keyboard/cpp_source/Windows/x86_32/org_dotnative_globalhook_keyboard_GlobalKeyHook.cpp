@@ -74,13 +74,10 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 void MsgLoop() {
 	MSG message;
 	
-	printf("TEST1");
 	while (bRunning && GetMessage(&message, NULL, 0, 0)) {
-		printf("TEST2");
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
-	printf("TEST3");
 }
 
 JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_registerHook(JNIEnv * env, jobject obj) {
