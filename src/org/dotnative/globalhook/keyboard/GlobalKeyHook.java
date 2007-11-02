@@ -17,11 +17,11 @@ public class GlobalKeyHook {
 	private ArrayList<Integer> objKeysDown;
 	private GlobalScreen objScreen;
 	
-	public GlobalKeyHook() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
+	public GlobalKeyHook() throws GlobalKeyException {
 		this(System.getProperty("user.dir", new File("").getAbsolutePath()));
 	}
 	
-	public GlobalKeyHook(String sLibPath) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GlobalKeyException {
+	public GlobalKeyHook(String sLibPath) throws GlobalKeyException {
 		objEventListeners = new EventListenerList();
 		objKeysDown = new ArrayList<Integer>();
 		objScreen = new GlobalScreen();
@@ -30,11 +30,21 @@ public class GlobalKeyHook {
 		//Add the applications current path to the library path so
 		//we dont have to pass dirty arguments to the vm on the cli
 		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
-		Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-		objSysPath.setAccessible(true);
-		if (objSysPath != null) {
-			objSysPath.set(System.class.getClassLoader(), null);
+		
+		try {
+			//Try to load the library.
+			Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+			objSysPath.setAccessible(true);
+			if (objSysPath != null) {
+				objSysPath.set(System.class.getClassLoader(), null);
+			}
 		}
+		catch (Exception e) {
+			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException 
+			throw new GlobalKeyException(e.getMessage());
+		}
+		
+		
 		//Linux: libGlobalKeyListener.so
 		//Mac OSX: libGlobalKeyListener.so ?
 		//Windows: GlobalKeyListener.dll
