@@ -38,17 +38,16 @@ public class GlobalKeyHook {
 			if (objSysPath != null) {
 				objSysPath.set(System.class.getClassLoader(), null);
 			}
+			
+			//Linux: libGlobalKeyListener.so
+			//Mac OSX: libGlobalKeyListener.so ?
+			//Windows: GlobalKeyListener.dll
+			System.loadLibrary("GlobalKeyListener");
 		}
-		catch (Exception e) {
-			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException 
+		catch (Throwable e) {
+			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError
 			throw new GlobalKeyException(e.getMessage());
 		}
-		
-		
-		//Linux: libGlobalKeyListener.so
-		//Mac OSX: libGlobalKeyListener.so ?
-		//Windows: GlobalKeyListener.dll
-		System.loadLibrary("GlobalKeyListener");
 		
 		//Register the hook.
 		registerHook();
