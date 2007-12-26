@@ -12,13 +12,14 @@ ifeq ($(OSNAME), Linux)
 	MARCH=$(shell uname -m)
 	LIBS=$(shell pkg-config x11 --libs) $(shell pkg-config xevie --libs)
 	
-	ifeq ($(pathsubst %_64,,$(MARCH)),)
-		MARCH=k8
-		BITS=64
+	TMP=i386 i486 i586 i686
+	ifeq ($(patsubst i%86,i586,$(MARCH)),i586)
+		MARCH=i586
+		BITS=32
 	else
-		ifeq ($(pathsubst %86,,$(MARCH)),)
-			MARCH=i586
-			BITS=32
+		ifeq ($(MARCH),x86_64)
+			MARCH=k8
+			BITS=64
 		else
 			die "Cannot determine system architecture!"
 		endif
