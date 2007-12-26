@@ -12,7 +12,6 @@ ifeq ($(OSNAME), Linux)
 	MARCH=$(shell uname -m)
 	LIBS=$(shell pkg-config x11 --libs) $(shell pkg-config xevie --libs)
 	
-	TMP=i386 i486 i586 i686
 	ifeq ($(patsubst i%86,i586,$(MARCH)),i586)
 		MARCH=i586
 		BITS=32
@@ -55,8 +54,13 @@ ifeq ($(OSNAME), Windows_NT)
 endif
 
 
-all:
-	$(CC) $(CFLAGS) -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalKeyListener.so
+all: clean build
 
+build:
+	$(CC) $(CFLAGS) -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalKeyListener.so
+	
+debug:
+	$(CC) $(CFLAGS) -DDEBUG -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalKeyListener.so
+	
 clean:
-	rm -rf *.so
+	rm -rvf ./x86_$(BITS)/*.so

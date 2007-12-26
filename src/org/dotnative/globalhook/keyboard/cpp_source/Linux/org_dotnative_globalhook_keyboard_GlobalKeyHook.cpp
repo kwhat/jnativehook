@@ -91,7 +91,7 @@ void MsgLoop() {
 		
 		//unsigned int iKeyCode = xev.xkey.keycode;
 		unsigned int iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
-		unsigned int iKeyState = xev.xkey.state;
+		//unsigned int iKeyState = xev.xkey.state;
 		unsigned long iKeyTime = xev.xkey.time;
 		int iKeyType = xev.type;
 		
