@@ -6,10 +6,9 @@ package org.dotnative.globalhook.keyboard;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-
 import javax.swing.event.EventListenerList;
-
 import org.dotnative.globalhook.GlobalScreen;
 
 public class GlobalKeyHook {
@@ -18,18 +17,40 @@ public class GlobalKeyHook {
 	private GlobalScreen objScreen;
 	
 	public GlobalKeyHook() throws GlobalKeyException {
-		this(System.getProperty("user.dir", new File("").getAbsolutePath()));
+		//Setup default loction to the pwd.
+		String sLibPath = System.getProperty("user.dir", new File("").getAbsolutePath());
+		
+		try {
+			//Try to locate our jar file.
+			File objFile = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
+			
+			sLibPath = objFile.getPath();
+			if (objFile.isFile()) {
+				//Make sure we got a folder not a file.
+				sLibPath = sLibPath.substring(0, sLibPath.length() - objFile.getName().length());
+			}
+		}
+		catch (URISyntaxException e) { /* Do Nothing */ }
+		
+		//Set the new lib path to system property.
+		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
+		
+		init();
 	}
 	
 	public GlobalKeyHook(String sLibPath) throws GlobalKeyException {
+		//Dynamic Loading of Library
+		//Add the applications current path to the library path so
+		//we can find the binary lib
+		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
+		
+		init();
+	}
+	
+	private void init() throws GlobalKeyException {
 		objEventListeners = new EventListenerList();
 		objKeysDown = new ArrayList<Integer>();
 		objScreen = new GlobalScreen();
-		
-		//Dynamic Loading of Library
-		//Add the applications current path to the library path so
-		//we dont have to pass dirty arguments to the vm on the cli
-		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
 		
 		try {
 			//Try to load the library.
