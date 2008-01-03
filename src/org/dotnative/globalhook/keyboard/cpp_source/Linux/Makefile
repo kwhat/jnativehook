@@ -4,13 +4,14 @@ MARCH=
 BITS=
 
 LIBS=
-INCLUDES=-I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
+INCLUDES=
 
 OSNAME = $(shell uname -s)
 ifeq ($(OSNAME), Linux)
 	PLATFORM=linux
 	MARCH=$(shell uname -m)
 	LIBS=$(shell pkg-config x11 --libs) $(shell pkg-config xevie --libs)
+	INCLUDES=-I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
 	
 	ifeq ($(patsubst i%86,i586,$(MARCH)),i586)
 		MARCH=i586
@@ -26,14 +27,19 @@ ifeq ($(OSNAME), Linux)
 endif
 
 
-ifeq ($(OSNAME), SunOS)
-	PLATFORM = solaris
-	JCT_PLATFORM = solaris
-	ARCH = $(shell uname -p)
-	ifeq ($(ARCH), i386)
-		ARCH=i586
+ifeq ($(OSNAME), Darwin)
+	PLATFORM=osx
+	MARCH=$(shell uname -p)
+	INCLUDES=-I/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Headers
+	
+	ifeq ($(MARCH),powerpc)
+		#64 bit? ppc
+		
+	else
+		die "Cannot determine system architecture!"	
 	endif
 endif
+
 
 ifeq ($(OSNAME), Windows_NT)
 	PLATFORM = windows
@@ -50,6 +56,17 @@ ifeq ($(OSNAME), Windows_NT)
 				ARCH=i586
 			endif
 		endif
+	endif
+endif
+
+
+ifeq ($(OSNAME), SunOS)
+	PLATFORM=solaris
+	JCT_PLATFORM = solaris
+	ARCH = $(shell uname -p)
+	
+	ifeq ($(ARCH), i386)
+		ARCH=i586
 	endif
 endif
 
