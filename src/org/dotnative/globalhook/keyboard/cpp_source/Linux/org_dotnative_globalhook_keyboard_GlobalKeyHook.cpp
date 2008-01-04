@@ -90,7 +90,8 @@ void MsgLoop() {
 		XNextEvent(disp, &xev);
 		
 		//unsigned int iKeyCode = xev.xkey.keycode;
-		unsigned int iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
+		//unsigned int iKeyCode = XLookupKeysym(&xev.xkey, xev.xkey.state);
+		unsigned int iKeyCode = XLookupKeysym(&xev.xkey, 0);
 		//unsigned int iKeyState = xev.xkey.state;
 		unsigned long iKeyTime = xev.xkey.time;
 		int iKeyType = xev.type;
@@ -98,7 +99,7 @@ void MsgLoop() {
 		switch (iKeyType) {
 			case KeyPress:
 				#ifdef DEBUG
-				printf("C++: MsgLoop - Key pressed\n");
+				printf("C++: MsgLoop - Key pressed (%i)\n", iKeyCode);
 				#endif
 				
 				env->CallVoidMethod(hookObj, fireKeyPressed_ID, (jlong) iKeyTime, (jint) iKeyType, (jint) iKeyCode, (jchar) char(iKeyCode));
@@ -113,7 +114,7 @@ void MsgLoop() {
 				
 				if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time - xev.xkey.time <= 1) { 
 					#ifdef DEBUG
-					printf("C++: MsgLoop - Key released\n");
+					printf("C++: MsgLoop - Key released(%i)\n", iKeyCode);
 					#endif
 					
 					env->CallVoidMethod(hookObj, fireKeyReleased_ID, (jlong) iKeyTime, (jint) iKeyType, (jint) iKeyCode, (jchar) char(iKeyCode));
