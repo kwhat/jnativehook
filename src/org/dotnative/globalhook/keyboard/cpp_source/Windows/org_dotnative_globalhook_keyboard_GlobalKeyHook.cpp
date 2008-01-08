@@ -34,7 +34,6 @@ void throwException(JNIEnv * env, char * sMessage) {
 }
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	printf("Call LowLevel\n");
 	JNIEnv * env;
 	KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
 	
