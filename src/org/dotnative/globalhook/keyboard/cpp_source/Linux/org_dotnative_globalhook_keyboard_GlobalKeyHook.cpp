@@ -107,12 +107,18 @@ void MsgLoop() {
 			
 			case KeyRelease:
 				//This code is if XkbSetDetectableAutoRepeat, but it seems to fail regardless with Xevie.
+				
 				unsigned int iQueue = XEventsQueued(xev.xkey.display, QueuedAfterReading);
 				if (iQueue) {
 					XPeekEvent (xev.xkey.display, &xev_next);
 				}
 				
-				if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time - xev.xkey.time <= 1) { 
+				//if (xev_next.type == KeyPress) { printf("KeyPress"); } else { printf("KeyPress"); }
+				//printf(" %i != %i",xev_next.xkey.keycode,xev.xkey.keycode);
+				//printf(" Time Offset %li\n", xev_next.xkey.time - xev.xkey.time);
+				
+				//if (!iQueue || xev_next.type != KeyPress || xev_next.xkey.keycode != xev.xkey.keycode || xev_next.xkey.time - xev.xkey.time <= 1) { 
+				if (!iQueue || xev_next.type != KeyPress && xev_next.xkey.keycode != xev.xkey.keycode && xev_next.xkey.time - xev.xkey.time <= 1) {
 					#ifdef DEBUG
 					printf("C++: MsgLoop - Key released(%i)\n", iKeyCode);
 					#endif
@@ -209,7 +215,7 @@ JNIEXPORT void JNICALL Java_org_dotnative_globalhook_keyboard_GlobalKeyHook_stop
 }
 
 void Init() {
-	//Do Notihing
+	//Do Nothing
 	
 	#ifdef DEBUG
 	printf("C++: Init - Shared Object Process Attach.\n");
@@ -217,6 +223,8 @@ void Init() {
 }
  
 void Cleanup() {
+	//Do Nothing
+	
 	#ifdef DEBUG
 	printf("C++: Init - Shared Object Process Detach.\n");
 	#endif

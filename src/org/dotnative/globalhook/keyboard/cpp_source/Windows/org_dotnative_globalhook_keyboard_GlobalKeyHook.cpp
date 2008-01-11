@@ -42,7 +42,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
 				#ifdef DEBUG
-				printf("C++: MsgLoop - Key pressed\n");
+				printf("C++: MsgLoop - Key pressed (%i)\n", p->vkCode);
 				#endif
 				
 				env->CallVoidMethod(hookObj, fireKeyPressed_ID, (jlong) p->time, (jint) p->flags, (jint) p->vkCode, (jchar) char(p->vkCode));
@@ -51,7 +51,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
 				#ifdef DEBUG
-				printf("C++: MsgLoop - Key released\n");
+				printf("C++: MsgLoop - Key released (%i)\n", p->vkCode);
 				#endif
 				
 				env->CallVoidMethod(hookObj, fireKeyReleased_ID, (jlong) p->time, (jint) p->flags, (jint) p->vkCode, (jchar) char(p->vkCode));
