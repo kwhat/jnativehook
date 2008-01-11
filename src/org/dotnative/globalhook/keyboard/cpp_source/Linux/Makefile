@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -O3 -shared -fPIC
+CFLAGS=-Wall -O3 -fno-strict-aliasing -shared -fPIC
 MARCH=
 BITS=
 
