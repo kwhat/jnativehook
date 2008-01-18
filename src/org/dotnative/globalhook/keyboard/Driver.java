@@ -21,14 +21,14 @@ public class Driver implements GlobalKeyListener {
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
-		System.out.println("Key Pressed: " + objEvent.getKeyCode());
+		System.out.println("Key Pressed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
 
 	public void keyReleased(KeyEvent objEvent) {
-		System.out.println("Key Released: " + objEvent.getKeyCode());
+		System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
 
 	public void keyTyped(KeyEvent objEvent) {
-		System.out.println("Key Typed: " + objEvent.getKeyCode());
+		System.out.println("Key Typed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
 }
