@@ -105,9 +105,11 @@ public class GlobalKeyHook {
 			if (objListeners[i] == GlobalKeyListener.class) {
 				switch (iCharIndex) {
 					case -1:
-						((GlobalKeyListener) objListeners[i + 1]).keyPressed( new GlobalKeyEvent(objScreen, KeyEvent.KEY_TYPED, iWhen, iModifiers, iKeyCode, (char)iKeyCode) );
+						//TODO Figure out why KeyEvent.KEY_TYPED doesnt work.
+						//((GlobalKeyListener) objListeners[i + 1]).keyPressed( new GlobalKeyEvent(objScreen, KeyEvent.KEY_TYPED, iWhen, iModifiers, iKeyCode, cKeyChar) );
+						((GlobalKeyListener) objListeners[i + 1]).keyPressed( new GlobalKeyEvent(objScreen, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, cKeyChar) );
 					default:
-						((GlobalKeyListener) objListeners[i + 1]).keyTyped( new GlobalKeyEvent(objScreen, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, (char)iKeyCode) );
+						((GlobalKeyListener) objListeners[i + 1]).keyTyped( new GlobalKeyEvent(objScreen, KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, cKeyChar) );
 				}
 			}
 		}
