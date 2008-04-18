@@ -60,10 +60,10 @@ public class GlobalKeyHook {
 				objSysPath.set(System.class.getClassLoader(), null);
 			}
 			
-			//Linux: libGlobalKeyListener.so
-			//Mac OSX: libGlobalKeyListener.so ?
-			//Windows: GlobalKeyListener.dll
-			System.loadLibrary("GlobalKeyListener");
+			//Linux: libGlobalHook_Keyboard.so
+			//Mac OSX: libGlobalHook_Keyboard.so ?
+			//Windows: GlobalHook_Keyboard.dll
+			System.loadLibrary("GlobalHook_Keyboard");
 		}
 		catch (Throwable e) {
 			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError

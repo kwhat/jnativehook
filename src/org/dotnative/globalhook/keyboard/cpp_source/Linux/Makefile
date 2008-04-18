@@ -74,10 +74,10 @@ endif
 all: clean build
 
 build:
-	$(CC) $(CFLAGS) -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalKeyListener.so
+	$(CC) $(CFLAGS) -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalHook_Keyboard.so
 	
 debug:
-	$(CC) $(CFLAGS) -DDEBUG -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalKeyListener.so
+	$(CC) $(CFLAGS) -DDEBUG -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalHook_Keyboard.so
 	
 clean:
 	rm -rvf ./x86_$(BITS)/*.so
