@@ -3,14 +3,17 @@
 <project default="jar" basedir=".">
 	<!-- Project Settings -->
 	<property name="project.name" value="dotNative"/>
+	<property name="project.vendor" value="1st Leg Development"/>
 	<property name="project.keyboard.name" value="Global Hook Keyboard"/>
-	<property name="project.version" value="0.9.68"/>
+	<property name="project.keyboard.version" value="0.9.93"/>
 	<property name="project.src" value="src"/>
 	
 	
 	<!-- Path Settings -->
 	<property name="dir.dist" value="dist"/>
-	<property name="dir.classes" value="${dir.dist}/build"/>
+	<property name="dir.classes" value="${dir.dist}/build/classes"/>
+	<property name="dir.jars" value="${dir.dist}/build/jars"/>
+	
 	
 	<!-- Compiler Settings -->
 	<property name="javac.optimize" value="true"/>
@@ -18,15 +21,19 @@
 	<property name="javac.source" value="1.6"/>
 	<property name="javac.target" value="1.6"/>
 	
-	<target name="setenv" description="prepares the environment">
-		<echo>Cleaning old build structure</echo>
+	
+	<target name="clean" description="prepares the environment">
+		<echo>Cleaning old build structure...</echo>
 		<delete includeemptydirs="true">
 			<fileset dir="${dir.dist}" includes="**/*"/>
 		</delete>
 		
-		<echo>Creating build structure</echo>
+		
+		<echo>Creating build folders...</echo>
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.classes}"/>
+		<mkdir dir="${dir.jars}"/>
+		
 		
 		<!-- Create Linux Branch -->
 		<mkdir dir="${dir.dist}/Linux/x86_32"/>
@@ -48,8 +55,9 @@
 		</path>
 	</target>
 	
-	<target name="compile" depends="setenv" description="Compiles the classes">
-		<echo>Compiling ${project.key.name} project source code</echo>
+	
+	<target name="compile" depends="clean" description="Compiles the classes">
+		<echo>Compiling ${project.keyboard.name}...</echo>
 		<javac srcdir="${project.src}"
 			destdir="${dir.classes}"
 			classpathref="classpath"
@@ -60,6 +68,7 @@
 			target="${javac.target}"
 		/>
 	</target>
+	
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
 		<!--
@@ -72,8 +81,9 @@
 		</copy>
 		-->
 		
-		<echo>Creating ${project.key.name} Keyboard jar file.</echo>
-		<jar jarfile="${dir.classes}/libGlobalHook_Keyboard.jar" basedir="${dir.classes}">
+		
+		<echo>Creating libGlobalHook_Keyboard.jar...</echo>
+		<jar jarfile="${dir.jars}/libGlobalHook_Keyboard.jar" basedir="${dir.classes}">
 			<include name="org/dotnative/globalhook/keyboard/**"/>
 			<include name="org/dotnative/globalhook/GlobalScreen.class"/>
 			<!-- <exclude name="org/dotnative/globalhook/keyboard/Driver.class"/> -->
@@ -81,17 +91,26 @@
 				<attribute name="Main-Class" value="org.dotnative.globalhook.keyboard.Driver"/>
 				<section name="org/dotNative">
 					<attribute name="Implementation-Title" value="${project.name} ${project.keyboard.name} Library"/>
-					<attribute name="Implementation-Version" value="1.0"/> 
-					<attribute name="Implementation-Vendor" value="1st Leg Development"/>
+					<attribute name="Implementation-Version" value="${project.keyboard.version}"/> 
+					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
 				</section>
 			</manifest>
 		</jar>
 		
+		
+		<!--
+		<echo>Creating client init script.</echo>
+		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistener/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
+		-->
+	</target>
+	
+	
+	<target name="package" depends="jar" description="Builds the server binaries">
 		<!-- Copy Files To Dist Locations -->
-		<echo>Copying files to Linux branch..</echo>
+		<echo>Copying files to Linux branch...</echo>
 		<copy 
 			overwrite="true" 
-			file="${dir.classes}/libGlobalHook_Keyboard.jar" 
+			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
 			todir="${dir.dist}/Linux/x86_32"
 		/>
 		<copy 
@@ -102,7 +121,7 @@
 		
 		<copy 
 			overwrite="true" 
-			file="${dir.classes}/libGlobalHook_Keyboard.jar" 
+			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
 			todir="${dir.dist}/Linux/x86_64"
 		/>
 		<copy 
@@ -118,7 +137,7 @@
 		<echo>Copying files to Windows branch..</echo>
 		<copy 
 			overwrite="true" 
-			file="${dir.classes}/libGlobalHook_Keyboard.jar" 
+			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
 			todir="${dir.dist}/Windows/x86_32"
 		/>
 		
@@ -127,15 +146,9 @@
 			file="src/org/dotnative/globalhook/keyboard/cpp_source/Windows/x86_32/GlobalHook_Keyboard.dll" 
 			todir="${dir.dist}/Windows/x86_32"
 		/>
-		
-		<!--
-		<echo>Creating client init script.</echo>
-		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistener/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
-		-->
-		
-		<echo>Cleaning old build structure.</echo>
-		<delete includeemptydirs="true">
-			<fileset dir="${dir.classes}" includes="**"/>
-		</delete>
+	</target>
+	
+	
+	<target name="all" depends="package" description="builds all targets">
 	</target>
 </project>
