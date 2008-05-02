@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project default="jar" basedir=".">
+<project default="all" basedir=".">
 	<!-- Project Settings -->
 	<property name="project.name" value="dotNative"/>
 	<property name="project.vendor" value="1st Leg Development"/>
