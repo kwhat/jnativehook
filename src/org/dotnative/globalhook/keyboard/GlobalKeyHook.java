@@ -116,7 +116,6 @@ public class GlobalKeyHook {
 	}
 	
 	//Notify Listners Key Up
-	@SuppressWarnings("unused")
 	void fireKeyReleased(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
 		int iCharIndex = objKeysDown.indexOf(iKeyCode);
 		
