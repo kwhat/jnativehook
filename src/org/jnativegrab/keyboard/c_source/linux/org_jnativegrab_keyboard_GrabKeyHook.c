@@ -61,10 +61,11 @@ void throwException(JNIEnv * env, char * sMessage) {
 	}
 	else {
 		//Unable to find exception class
-		
 		#ifdef DEBUG
 		printf("Native: Unable to locate exception class.\n");
 		#endif
+		
+		//FIXME Terminate with error.  Maybe throw xerror
 	}
 }
 
