@@ -23,11 +23,11 @@ public class Driver implements GrabKeyListener {
 	public void keyPressed(KeyEvent objEvent) {
 		System.out.println("Key Pressed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
-
+	
 	public void keyReleased(KeyEvent objEvent) {
 		System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
-
+	
 	public void keyTyped(KeyEvent objEvent) {
 		System.out.println("Key Typed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}

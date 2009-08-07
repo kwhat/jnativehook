@@ -1,19 +1,26 @@
 package org.jnativegrab.keyboard;
 
+//Imports
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import javax.swing.event.EventListenerList;
-
 import org.jnativegrab.GlobalScreen;
 
 public class GrabKeyHook {
+	//Instance Variables
 	private EventListenerList objEventListeners;
 	private ArrayList<Integer> objKeysDown;
 	private GlobalScreen objScreen;
 	
+	/**
+	 * Default Constructor
+	 *
+	 * This will attempt to locate the native shared objects by 
+	 * looking in the same location as the calling jar.  
+	 */
 	public GrabKeyHook() throws GrabKeyException {
 		//Setup default location to the pwd.
 		String sLibPath = System.getProperty("user.dir", new File("").getAbsolutePath());
@@ -30,25 +37,27 @@ public class GrabKeyHook {
 		}
 		catch (URISyntaxException e) { /* Do Nothing */ }
 		
+		loadLibrary(sLibPath);
+	}
+	
+	/**
+	 * Overloaded Constructor
+	 *
+	 * This allows the programmer to specify the explicit location 
+	 * of the native libraries. 
+	 * 
+	 * @param sLibPath the location to look for the native library.
+	 */
+	public GrabKeyHook(String sLibPath) throws GrabKeyException {
+		loadLibrary(sLibPath);
+	}
+	
+	/**
+	 * Attempts to load the native library based on the system path.
+	 */
+	private void loadLibrary(String sLibPath) throws GrabKeyException {
 		//Set the new lib path to system property.
 		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
-		
-		init();
-	}
-	
-	public GrabKeyHook(String sLibPath) throws GrabKeyException {
-		//Dynamic Loading of Library
-		//Add the applications current path to the library path so
-		//we can find the binary lib
-		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
-		
-		init();
-	}
-	
-	private void init() throws GrabKeyException {
-		objEventListeners = new EventListenerList();
-		objKeysDown = new ArrayList<Integer>();
-		objScreen = new GlobalScreen();
 		
 		try {
 			//Try to load the library.
@@ -58,22 +67,27 @@ public class GrabKeyHook {
 				objSysPath.set(System.class.getClassLoader(), null);
 			}
 			
-			//Linux: libGlobalHook_Keyboard.so
-			//Mac OSX: libGlobalHook_Keyboard.so ?
-			//Windows: GlobalHook_Keyboard.dll
-			System.loadLibrary("GlobalHook_Keyboard");
+			//Linux: libJNativeGrab_Keyboard.so
+			//Mac OSX: libJNativeGrab_Keyboard.so ?
+			//Windows: JNativeGrab_Keyboard.dll
+			System.loadLibrary("JNativeGrab_Keyboard");
 		}
 		catch (Throwable e) {
 			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError
 			throw new GrabKeyException(e.getMessage());
 		}
 		
+		//Setup instance variables.
+		objEventListeners = new EventListenerList();
+		objKeysDown = new ArrayList<Integer>();
+		objScreen = new GlobalScreen();
+		
 		//Register the hook.
 		registerHook();
 		
 		new Thread() {
 			public void run() {
-				//Start hook should block untill stopHook is called.
+				//Start hook should block until stopHook is called.
 				startHook();
 				stopHook();
 				unregisterHook();
@@ -89,7 +103,7 @@ public class GrabKeyHook {
 		objEventListeners.remove(GrabKeyListener.class, objListener);
 	}
 	
-	//Notify Listners Key Down
+	//Notify Listeners Key Down
 	@SuppressWarnings("unused")
 	private void fireKeyPressed(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
 		int iCharIndex = objKeysDown.indexOf(iKeyCode);

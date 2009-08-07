@@ -1,6 +1,6 @@
 /*
- *	dotNative - GlobalKeyHook - 09/08/06
- *  Alex Barker
+ *	JNativeGrab - GlobalKeyHook - 09/08/06
+ *  Alexander Barker
  *  
  *	JNI Interface for setting a Keyboard Hook and monitoring
  *	it with java.
