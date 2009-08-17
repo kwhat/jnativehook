@@ -23,11 +23,9 @@ typedef enum { FALSE, TRUE } bool;
 
 #include <stdlib.h>
 #include <string.h>
-
 #include <pthread.h>
 
 #include <X11/Xlib.h>
-#include <X11/keysym.h>
 
 #include <jni.h>
 #include "org_jnativegrab_keyboard_GrabKeyHook.h"
@@ -85,7 +83,7 @@ void MsgLoop() {
 		switch (xev.type) {
 			case KeyPress:
 				#ifdef DEBUG
-				printf("Native: MsgLoop - Key pressed (%i)\n", iKeyCode);
+				printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
 				#endif
 
 				(*env)->CallVoidMethod(env, hookObj, fireKeyPressed_ID, (jlong) xev.xkey.time, (jint) xev.xkey.state, (jint) xev.xkey.keycode, (jchar) xev.xkey.keycode);
@@ -93,7 +91,7 @@ void MsgLoop() {
 
 			case KeyRelease:
 				#ifdef DEBUG
-				printf("Native: MsgLoop - Key released(%i)\n", iKeyCode);
+				printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
 				#endif
 
 				(*env)->CallVoidMethod(env, hookObj, fireKeyReleased_ID, (jlong) xev.xkey.time, (jint) xev.xkey.state, (jint) xev.xkey.keycode, (jchar) xev.xkey.keycode);
@@ -104,16 +102,33 @@ void MsgLoop() {
 
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject obj, jobject event) {
 	jclass event_cls = (*env)->GetObjectClass(env, event);
-	jmethodID mid = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
-	jint ikeycode = (*env)->CallIntMethod(env, event, mid);
+	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
+	jint ikeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
 
-	//Attempt the grab the native key.
-	//XGrabKey(disp, keycode, modifiers, default_win, True, GrabModeAsync, GrabModeAsync);
+	jmethodID getModifiers_ID = (*env)->GetMethodID(env, event_cls, "getModifiers", "()I");
+	jint imodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
+
+	KeySym sym = JKeycodeToXKeysym((KeyCode) ikeycode);
+	KeyCode code = XKeysymToKeycode(disp, sym);
+
+	//Attempt to grab the native key.
+	XGrabKey(disp, code, 0, default_win, True, GrabModeAsync, GrabModeAsync);
 }
 
 
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject object, jobject event) {
-	//XUngrabKey(disp, keycode, modifiers, default_win);
+	jclass event_cls = (*env)->GetObjectClass(env, event);
+	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
+	jint ikeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
+
+	jmethodID getModifiers_ID = (*env)->GetMethodID(env, event_cls, "getModifiers", "()I");
+	jint imodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
+
+	KeySym sym = JKeycodeToXKeysym((KeyCode) ikeycode);
+	KeyCode code = XKeysymToKeycode(disp, sym);
+
+	//Attempt to ungrab the native key.
+	XUngrabKey(disp, code, 0, default_win);
 
 	#ifdef DEBUG
 	printf("Native: XUngrabKey successful.\n");
@@ -197,8 +212,6 @@ void Init() {
 	#ifdef DEBUG
 	printf("Native: Init - Shared Object Process Attach.\n");
 	#endif
-
-	JNIEnv * env = NULL;
 }
 
 void Cleanup() {

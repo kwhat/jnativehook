@@ -1,4 +1,4 @@
-//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/MouseEvent.java.htm
+//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/MouseEvent.java
 
 #define JNOBUTTON			0	//AnyButton
 #define JBUTTON1			1

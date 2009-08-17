@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project default="all" basedir=".">
+<project default="all" basedir="." xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
+	<property file="build.properties"/>
+	<property environment="os"/>
+	
 	<!-- Project Settings -->
-	<property name="project.name" value="dotNative"/>
-	<property name="project.vendor" value="1st Leg Development"/>
-	<property name="project.keyboard.name" value="Global Hook Keyboard"/>
+	<property name="project.name" value="JNativeGrap"/>
+	<property name="project.vendor" value="1stleg Development"/>
+	<property name="project.keyboard.name" value="JGrabKey"/>
 	<property name="project.keyboard.version" value="0.9.93"/>
 	<property name="project.src" value="src"/>
 	
@@ -13,14 +16,34 @@
 	<property name="dir.dist" value="dist"/>
 	<property name="dir.classes" value="${dir.dist}/build/classes"/>
 	<property name="dir.jars" value="${dir.dist}/build/jars"/>
+	<property name="dir.objs" value="${dir.dist}/build/objs"/>
 	
 	
 	<!-- Compiler Settings -->
 	<property name="javac.optimize" value="true"/>
-	<property name="javac.debug" value="on"/>
 	<property name="javac.source" value="1.6"/>
 	<property name="javac.target" value="1.6"/>
 	
+	
+	<target name="os-detection">
+		<condition property="isMac">
+			<os family="mac"/>
+		</condition>	
+	</target>
+	
+	<target name="Mac" if="isMac" depends="os-detection">
+		<echo>MacOS X</echo>
+	</target>
+	<target name="Win" unless="isMac" depends="os-detection">
+		<echo>Win</echo>
+	</target>
+	
+	<target name="showOS">
+		<echo>${os.name}-${os.arch}</echo>
+		<antcall target="Mac"/>
+		<antcall target="Win"/>
+	</target>
+
 	
 	<target name="clean" description="prepares the environment">
 		<echo>Cleaning old build structure...</echo>
@@ -33,7 +56,7 @@
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.classes}"/>
 		<mkdir dir="${dir.jars}"/>
-		
+		<mkdir dir="${dir.objs}"/>
 		
 		<!-- Create Linux Branch -->
 		<mkdir dir="${dir.dist}/Linux/x86_32"/>
@@ -61,12 +84,47 @@
 		<javac srcdir="${project.src}"
 			destdir="${dir.classes}"
 			classpathref="classpath"
-			debug="${javac.debug}"
+			debug="${project.debug}"
 			optimize="${javac.optimize}"
 			deprecation="false"
 			source="${javac.source}"
 			target="${javac.target}"
 		/>
+		
+		<echo>Compiling C source...</echo>
+		<cpptasks:cc multithreaded="true"
+			optimize="speed"
+			link="shared" 
+			outtype="shared"
+			outfile="${dir.dist}/JNativeGrab_Keyboard"
+			objdir="${dir.objs}"
+			
+			debug="${project.debug}"
+			warnings="diagnostic"
+		>
+			<includepath location="${basedir}/src/org/jnativegrab/keyboard/c_source"/>
+			<sysincludepath location="${os.JAVA_HOME}/include"/>
+			<sysincludepath location="${os.JAVA_HOME}/include/linux"/>
+			
+			<compiler name="gcc">
+				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/linux" includes="*.c"/>
+				
+				<compilerparam value="-m32"/>
+				<compilerparam value="-march=i586"/>
+				<compilerparam value="-fPIC"/>
+				<compilerparam value="-Wall"/>
+				<compilerparam value="-O3"/>
+				<compilerparam value="-lX11"/>
+				<compilerarg value="-DDEBUG"/>
+				<compilerarg value="-fno-strict-aliasing"/>
+			</compiler>
+			<linker name="gcc"/>
+			<versioninfo
+				companyname="${project.vendor}"
+				productname="${project.keyboard.name}"
+				productversion="${project.keyboard.version}"
+			/>
+		</cpptasks:cc>
 	</target>
 	
 	

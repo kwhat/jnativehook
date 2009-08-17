@@ -1,6 +1,6 @@
 #include "JKeyConvert.h"
 
-KeySym JKeycodeToXKeysym(KeyCode key) {
+KeySym JKeycodeToXKeysym(jint key) {
 	switch (key) {
 		case JK_ENTER:				return XK_Return;
 		case JK_BACK_SPACE:			return XK_BackSpace;
@@ -133,92 +133,83 @@ KeySym JKeycodeToXKeysym(KeyCode key) {
 
 		case JK_DEAD_GRAVE:			return XK_dead_grave;
 		case JK_DEAD_ACUTE:			return XK_dead_acute;
-		case JK_DEAD_CIRCUMFLEX			return XK_dead_circumflex;
-		case JK_DEAD_TILDE			return XK_dead_tilde;
-		case JK_DEAD_MACRON			return XK_dead_macron;
-		case JK_DEAD_BREVE			return XK_dead_breve;
-		case JK_DEAD_ABOVEDOT			return XK_dead_abovedot;
-		case JK_DEAD_DIAERESIS			return XK_dead_diaeresis;
-		case JK_DEAD_ABOVERING			return XK_dead_abovering;
-		case JK_DEAD_DOUBLEACUTE		return XK_dead_doubleacute;
-		case JK_DEAD_CARON			return XK_dead_caron;
-		case JK_DEAD_CEDILLA			return XK_dead_cedilla;
-		case JK_DEAD_OGONEK			return XK_dead_ogonek;
-		case JK_DEAD_IOTA			return XK_dead_iota;
-		case JK_DEAD_VOICED_SOUND		return XK_dead_voiced_sound;
-		case JK_DEAD_SEMIVOICED_SOUND		return XK_dead_semivoiced_sound;
+		case JK_DEAD_CIRCUMFLEX:			return XK_dead_circumflex;
+		case JK_DEAD_TILDE:			return XK_dead_tilde;
+		case JK_DEAD_MACRON:			return XK_dead_macron;
+		case JK_DEAD_BREVE:			return XK_dead_breve;
+		case JK_DEAD_ABOVEDOT:			return XK_dead_abovedot;
+		case JK_DEAD_DIAERESIS:			return XK_dead_diaeresis;
+		case JK_DEAD_ABOVERING:			return XK_dead_abovering;
+		case JK_DEAD_DOUBLEACUTE:		return XK_dead_doubleacute;
+		case JK_DEAD_CARON:			return XK_dead_caron;
+		case JK_DEAD_CEDILLA:			return XK_dead_cedilla;
+		case JK_DEAD_OGONEK:			return XK_dead_ogonek;
+		case JK_DEAD_IOTA:			return XK_dead_iota;
+		case JK_DEAD_VOICED_SOUND:		return XK_dead_voiced_sound;
+		case JK_DEAD_SEMIVOICED_SOUND:		return XK_dead_semivoiced_sound;
 
-		case JK_AMPERSAND			return XK_ampersand;
-		case JK_ASTERISK			return XK_asterisk;
-		case JK_QUOTEDBL			return XK_quotedbl;
-		case JK_LESS				return XK_less;
-		case JK_GREATER				return XK_greater;
-		case JK_BRACELEFT			return XK_braceleft;
-		case JK_BRACERIGHT			return XK_braceright;
+		case JK_AMPERSAND:			return XK_ampersand;
+		case JK_ASTERISK:			return XK_asterisk;
+		case JK_QUOTEDBL:			return XK_quotedbl;
+		case JK_LESS:				return XK_less;
+		case JK_GREATER:				return XK_greater;
+		case JK_BRACELEFT:			return XK_braceleft;
+		case JK_BRACERIGHT:			return XK_braceright;
 
-		case JK_AT				return XK_at;
-		case JK_COLON				return XK_colon;
-		case JK_CIRCUMFLEX			return XK_asciicircum;
-		case JK_DOLLAR				return XK_dollar;
-		case JK_EURO_SIGN			return XK_EuroSign;
-		case JK_EXCLAMATION_MARK		return XK_exclam;
-		case JK_INVERTED_EXCLAMATION_MARK	return XK_exclamdown;
-		case JK_LEFT_PARENTHESIS		return XK_parenleft;
-		case JK_NUMBER_SIGN			return XK_numbersign;
-		case JK_PLUS				return XK_plus;
-		case JK_RIGHT_PARENTHESIS		return XK_parenright;
-		case JK_UNDERSCORE			return XK_underscore;
+		case JK_AT:				return XK_at;
+		case JK_COLON:				return XK_colon;
+		case JK_CIRCUMFLEX:			return XK_asciicircum;
+		case JK_DOLLAR:				return XK_dollar;
+		case JK_EURO_SIGN:			return XK_EuroSign;
+		case JK_EXCLAMATION_MARK:		return XK_exclam;
+		case JK_INVERTED_EXCLAMATION_MARK:	return XK_exclamdown;
+		case JK_LEFT_PARENTHESIS:		return XK_parenleft;
+		case JK_NUMBER_SIGN:			return XK_numbersign;
+		case JK_PLUS:				return XK_plus;
+		case JK_RIGHT_PARENTHESIS:		return XK_parenright;
+		case JK_UNDERSCORE:			return XK_underscore;
 
-		case JK_WINDOWS				return XK_Super_L;		//FIXME R and L
-		case JK_CONTEXT_MENU			return XK_Menu;
+		case JK_WINDOWS:				return XK_Super_L;		//FIXME R and L
+		case JK_CONTEXT_MENU:			return XK_Menu;
 
 		/* for input method support on Asian Keyboards */
-		case JK_FINAL				return XK_Cancel;		//Unknown Win32 API
-		case JK_CONVERT				return XK_Henkan;
-		case JK_NONCONVERT			return XK_Muhenkan;
-		case JK_ACCEPT				return XK_VoidSymbol;		//Japanese keyboard: kakutei?
-		case JK_MODECHANGE			return XK_Mode_switch;		//Unknown Win32 API
-		case JK_KANA				return XK_Kana_Lock;
-		case JK_KANJI				return XK_Kanji;
-		case JK_ALPHANUMERIC			return XK_Eisu_Shift;
-		case JK_KATAKANA			return XK_Katakana;
-		case JK_HIRAGANA			return XK_Hiragana;
-		case JK_FULL_WIDTH			return XK_Zenkaku;
-		case JK_HALF_WIDTH			return XK_Hankaku;
-		case JK_ROMAN_CHARACTERS		return XK_Romaji;
-		case JK_ALL_CANDIDATES			return XK_Zen_Koho;
-		case JK_PREVIOUS_CANDIDATE		return XK_Mae_Koho;
-		case JK_CODE_INPUT			return XK_Kanji_Bangou;
-		case JK_JAPANESE_KATAKANA		return XK_Hiragana_Katakana;	//Not Sure
-		case JK_JAPANESE_HIRAGANA		return XK_Hiragana_Katakana;	//Not Sure
-		case JK_JAPANESE_ROMAN			return XK_Romaji;		//Unknown
-		case JK_KANA_LOCK			return XK_Kana_Lock;
-		case JK_INPUT_METHOD_ON_OFF		return XK_VoidSymbol;		//Japanese keyboard: nihongo?
+		case JK_FINAL:				return XK_Cancel;		//Unknown Win32 API
+		case JK_CONVERT:				return XK_Henkan;
+		case JK_NONCONVERT:			return XK_Muhenkan;
+		case JK_ACCEPT:				return XK_VoidSymbol;		//Japanese keyboard: kakutei?
+		case JK_MODECHANGE:			return XK_Mode_switch;		//Unknown Win32 API
+		case JK_KANA:				return XK_Kana_Lock;
+		case JK_KANJI:				return XK_Kanji;
+		case JK_ALPHANUMERIC:			return XK_Eisu_Shift;
+		case JK_KATAKANA:			return XK_Katakana;
+		case JK_HIRAGANA:			return XK_Hiragana;
+		case JK_FULL_WIDTH:			return XK_Zenkaku;
+		case JK_HALF_WIDTH:			return XK_Hankaku;
+		case JK_ROMAN_CHARACTERS:		return XK_Romaji;
+		case JK_ALL_CANDIDATES:			return XK_Zen_Koho;
+		case JK_PREVIOUS_CANDIDATE:		return XK_Mae_Koho;
+		case JK_CODE_INPUT:			return XK_Kanji_Bangou;
+		case JK_JAPANESE_KATAKANA:		return XK_Hiragana_Katakana;	//Not Sure
+		case JK_JAPANESE_HIRAGANA:		return XK_Hiragana_Katakana;	//Not Sure
+		case JK_JAPANESE_ROMAN:			return XK_Romaji;		//Unknown
+		case JK_KANA_LOCK:			return XK_Kana_Lock;
+		case JK_INPUT_METHOD_ON_OFF:		return XK_VoidSymbol;		//Japanese keyboard: nihongo?
 
 		/* for Sun keyboards */
-		case JK_CUT				return SunXK_Cut;
-		case JK_COPY				return SunXK_Copy;
-		case JK_PASTE				return SunXK_Paste;
-		case JK_UNDO				return SunXK_Undo;
-		case JK_AGAIN				return SunXK_Again;
-		case JK_FIND				return SunXK_Find;
-		case JK_PROPS				return SunXK_Props;
-		case JK_STOP				return SunXK_Stop;
+		case JK_CUT:				return SunXK_Cut;
+		case JK_COPY:				return SunXK_Copy;
+		case JK_PASTE:				return SunXK_Paste;
+		case JK_UNDO:				return SunXK_Undo;
+		case JK_AGAIN:				return SunXK_Again;
+		case JK_FIND:				return SunXK_Find;
+		case JK_PROPS:				return SunXK_Props;
+		case JK_STOP:				return SunXK_Stop;
 
-		case JK_COMPOSE				return SunXK_Compose;
-		case JK_ALT_GRAPH			return SunXK_AltGraph;
-		case JK_BEGIN				return XK_Begin;
+		case JK_COMPOSE:				return SunXK_Compose;
+		case JK_ALT_GRAPH:			return SunXK_AltGraph;
+		case JK_BEGIN:				return XK_Begin;
 
 		default:
-		case JK_UNDEFINED			return XK_VoidSymbol;		//Key Undefined
+		case JK_UNDEFINED:			return XK_VoidSymbol;		//Key Undefined
 	}
 }
-
-int main(int argc, const char* argv[]) {
-
-//XKeysymToKeycode(display, keysym)
-//	convertJkXk(JK_A);
-
-	return 0;
-}
-

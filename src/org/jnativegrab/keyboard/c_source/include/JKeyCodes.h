@@ -1,4 +1,4 @@
-//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java.htm
+//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java
 
 #define JK_ENTER			'\n'
 #define JK_BACK_SPACE			'\b'
@@ -213,4 +213,3 @@
 #define JK_BEGIN			0xFF58
 
 #define JK_UNDEFINED			0x0		//Key Undefined
-
