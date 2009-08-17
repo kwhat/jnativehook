@@ -1,9 +1,4 @@
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <stdio.h>
-
-#include <string.h>
-#include "include/JKeyCodes.h"
+#include "JKeyConvert.h"
 
 KeySym JKeycodeToXKeysym(KeyCode key) {
 	switch (key) {

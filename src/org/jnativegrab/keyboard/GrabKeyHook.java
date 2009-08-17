@@ -6,7 +6,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import javax.swing.event.EventListenerList;
-import org.jnativegrab.GlobalScreen;
 
 public class GrabKeyHook {
 	//Instance Variables
@@ -76,7 +75,6 @@ public class GrabKeyHook {
 		
 		//Setup instance variables.
 		objEventListeners = new EventListenerList();
-		objScreen = new GlobalScreen();
 		
 		//Register the hook.
 		new Thread() {

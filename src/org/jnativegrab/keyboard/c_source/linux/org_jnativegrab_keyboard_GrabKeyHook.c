@@ -5,13 +5,13 @@
  *	JNI Interface for setting a Keyboard Hook and monitoring
  *	it with java.
  *
- *  TODO Add GPL License
+ *  TODO Add LGPL License
  */
 
 /*
 Compiling Options:
 	gcc -m32 -march=i586 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativegrab_keyboard_GrabKeyHook.c -o libJNativeGrab_Keyboard.so
-	gcc -m64 -march=i586 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativegrab_keyboard_GrabKeyHook.c -o libJNativeGrab_Keyboard.so
+	gcc -m64 -march=k8 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativegrab_keyboard_GrabKeyHook.c -o libJNativeGrab_Keyboard.so
 */
 
 typedef enum { FALSE, TRUE } bool;
@@ -31,7 +31,7 @@ typedef enum { FALSE, TRUE } bool;
 
 #include <jni.h>
 #include "org_jnativegrab_keyboard_GrabKeyHook.h"
-
+#include "JKeyConvert.h"
 
 
 //Instance Variables
@@ -102,16 +102,18 @@ void MsgLoop() {
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject obj, jint modifiers, jint keycode) {
-	//Attempt the grab the key.
-	XGrabKey(disp, keycode, modifiers, default_win, True, GrabModeAsync, GrabModeAsync);
+JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject obj, jobject event) {
+	jclass event_cls = (*env)->GetObjectClass(env, event);
+	jmethodID mid = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
+	jint ikeycode = (*env)->CallIntMethod(env, event, mid);
 
-
+	//Attempt the grab the native key.
+	//XGrabKey(disp, keycode, modifiers, default_win, True, GrabModeAsync, GrabModeAsync);
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject object, jint modifiers, jint keycode) {
-	XUngrabKey(disp, keycode, modifiers, default_win);
+JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject object, jobject event) {
+	//XUngrabKey(disp, keycode, modifiers, default_win);
 
 	#ifdef DEBUG
 	printf("Native: XUngrabKey successful.\n");
@@ -190,9 +192,6 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_stopHook(JNIEnv
 	#endif
 }
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_stopHook(JNIEnv * env, jobject obj, jobject ) {
-
-}
 
 void Init() {
 	#ifdef DEBUG
