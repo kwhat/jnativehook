@@ -5,10 +5,9 @@
 	<property environment="os"/>
 	
 	<!-- Project Settings -->
-	<property name="project.name" value="JNativeGrap"/>
+	<property name="project.name" value="JNativeGrab"/>
 	<property name="project.vendor" value="1stleg Development"/>
-	<property name="project.keyboard.name" value="JGrabKey"/>
-	<property name="project.keyboard.version" value="0.9.93"/>
+	<property name="project.version" value="0.9.93"/>
 	<property name="project.src" value="src"/>
 	
 	
@@ -24,26 +23,53 @@
 	<property name="javac.source" value="1.6"/>
 	<property name="javac.target" value="1.6"/>
 	
-	
-	<target name="os-detection">
-		<condition property="isMac">
-			<os family="mac"/>
-		</condition>	
+	<target name="config_gcc">
+		<echo>Determining gcc settings for ${os.name} ${os.arch}</echo>
+		
+		<!-- determin the march to use -->
+		<condition property="gcc.arch" value="i586">
+			<and>
+				<not>
+					<isset property="gcc.arch"/>
+				</not>
+				
+				<or>
+					<os arch="x86"/>
+					<os arch="i386"/>
+					<os arch="i486"/>
+					<os arch="i586"/>
+					<os arch="i686"/>
+				</or>
+			</and>
+		</condition>
+		
+		<condition property="gcc.arch" value="k8">
+			<and>
+				<not>
+					<isset property="gcc.arch"/>
+				</not>
+				
+				<or>
+					<os arch="x86_64"/>
+					<os arch="amd64"/>
+					<os arch="k8"/>
+				</or>
+			</and>
+		</condition>
+		
+		<!-- Stop here if we could not find a supported arch -->
+		<fail unless="gcc.arch" message="The ${os.arch} architecture is not currently supported."/>
+		
+		<!-- Set 32 or 64 bit flag -->
+		<condition property="gcc.bits" value="32" else="64">
+			<equals arg1="${gcc.arch}" arg2="i586" casesensitive="false"/>
+		</condition>
+		
+		<!-- Set the gcc debug flag ONLY IF debug is true, unset implies false -->
+		<condition property="gcc.debug" value="true">
+			<istrue value="${project.debug}"/>
+		</condition>
 	</target>
-	
-	<target name="Mac" if="isMac" depends="os-detection">
-		<echo>MacOS X</echo>
-	</target>
-	<target name="Win" unless="isMac" depends="os-detection">
-		<echo>Win</echo>
-	</target>
-	
-	<target name="showOS">
-		<echo>${os.name}-${os.arch}</echo>
-		<antcall target="Mac"/>
-		<antcall target="Win"/>
-	</target>
-
 	
 	<target name="clean" description="prepares the environment">
 		<echo>Cleaning old build structure...</echo>
@@ -79,7 +105,7 @@
 	</target>
 	
 	
-	<target name="compile" depends="clean" description="Compiles the classes">
+	<target name="compile" depends="clean,config_gcc" description="Compiles the classes">
 		<echo>Compiling ${project.keyboard.name}...</echo>
 		<javac srcdir="${project.src}"
 			destdir="${dir.classes}"
@@ -92,9 +118,7 @@
 		/>
 		
 		<echo>Compiling C source...</echo>
-		<cpptasks:cc multithreaded="true"
-			optimize="speed"
-			link="shared" 
+		<cpptasks:cc
 			outtype="shared"
 			outfile="${dir.dist}/JNativeGrab_Keyboard"
 			objdir="${dir.objs}"
@@ -102,28 +126,43 @@
 			debug="${project.debug}"
 			warnings="diagnostic"
 		>
-			<includepath location="${basedir}/src/org/jnativegrab/keyboard/c_source"/>
-			<sysincludepath location="${os.JAVA_HOME}/include"/>
-			<sysincludepath location="${os.JAVA_HOME}/include/linux"/>
+			<!-- compiler name="gcc"
+			multithreaded="true"
+			optimize="speed"
+			link="shared" 
+			outtype="shared"
+			outfile="${dir.dist}/JNativeGrab_Keyboard"
+			objdir="${dir.objs}"
 			
-			<compiler name="gcc">
-				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/linux" includes="*.c"/>
+			
+			 -->
+				<includepath location="${basedir}/src/org/jnativegrab/keyboard/c_source"/>
+				<includepath location="${os.JAVA_HOME}/include"/>
+				<includepath location="${os.JAVA_HOME}/include/linux"/>
 				
-				<compilerparam value="-m32"/>
-				<compilerparam value="-march=i586"/>
-				<compilerparam value="-fPIC"/>
-				<compilerparam value="-Wall"/>
-				<compilerparam value="-O3"/>
-				<compilerparam value="-lX11"/>
-				<compilerarg value="-DDEBUG"/>
+				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/linux">
+					<include name="*.h"/>
+					<include name="*.c"/>
+				</fileset>
+				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/include">
+								<include name="*.h"/>
+								<include name="*.c"/>
+							</fileset>
+				<compilerarg value="-m${gcc.bits}"/>
+				<compilerarg value="-march=${gcc.arch}"/>
+				<compilerarg value="-fPIC"/>
+				<compilerarg value="-Wall"/>
+				<compilerarg value="-O3"/>
 				<compilerarg value="-fno-strict-aliasing"/>
-			</compiler>
-			<linker name="gcc"/>
-			<versioninfo
+				<compilerarg value="-lX11"/>
+				<compilerarg value="-DDEBUG" if="${gcc.debug}"/>
+			<!-- /compiler -->
+
+			<!-- versioninfo
 				companyname="${project.vendor}"
 				productname="${project.keyboard.name}"
 				productversion="${project.keyboard.version}"
-			/>
+			/-->
 		</cpptasks:cc>
 	</target>
 	
@@ -140,16 +179,16 @@
 		-->
 		
 		
-		<echo>Creating libGlobalHook_Keyboard.jar...</echo>
-		<jar jarfile="${dir.jars}/libGlobalHook_Keyboard.jar" basedir="${dir.classes}">
-			<include name="org/dotnative/globalhook/keyboard/**"/>
-			<include name="org/dotnative/globalhook/GlobalScreen.class"/>
-			<!-- <exclude name="org/dotnative/globalhook/keyboard/Driver.class"/> -->
+		<echo>Creating JNativeGrab.jar...</echo>
+		<jar jarfile="${dir.jars}/JNativeGrab.jar" basedir="${dir.classes}">
+			<include name="org/jnativegrab/keyboard/**"/>
+			<include name="org/jnativegrab/**"/>
+			<!-- <exclude name="org/jnativegrab/Driver.class"/> -->
 			<manifest>
-				<attribute name="Main-Class" value="org.dotnative.globalhook.keyboard.Driver"/>
-				<section name="org/dotNative">
-					<attribute name="Implementation-Title" value="${project.name} ${project.keyboard.name} Library"/>
-					<attribute name="Implementation-Version" value="${project.keyboard.version}"/> 
+				<attribute name="Main-Class" value="org.jnativegrab.Driver"/>
+				<section name="org/jnativegrab">
+					<attribute name="Implementation-Title" value="${project.name} Library"/>
+					<attribute name="Implementation-Version" value="${project.version}"/> 
 					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
 				</section>
 			</manifest>
@@ -165,44 +204,11 @@
 	
 	<target name="package" depends="jar" description="Builds the server binaries">
 		<!-- Copy Files To Dist Locations -->
-		<echo>Copying files to Linux branch...</echo>
+		<echo>Copying files...</echo>
 		<copy 
 			overwrite="true" 
-			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
-			todir="${dir.dist}/Linux/x86_32"
-		/>
-		<copy 
-			overwrite="true" 
-			file="src/org/dotnative/globalhook/keyboard/cpp_source/Linux/x86_32/libGlobalHook_Keyboard.so" 
-			todir="${dir.dist}/Linux/x86_32"
-		/>
-		
-		<copy 
-			overwrite="true" 
-			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
-			todir="${dir.dist}/Linux/x86_64"
-		/>
-		<copy 
-			overwrite="true" 
-			file="src/org/dotnative/globalhook/keyboard/cpp_source/Linux/x86_64/libGlobalHook_Keyboard.so" 
-			todir="${dir.dist}/Linux/x86_64"
-		/>
-		
-		
-		<echo>Copying files to OSX branch..</echo>
-		
-		
-		<echo>Copying files to Windows branch..</echo>
-		<copy 
-			overwrite="true" 
-			file="${dir.jars}/libGlobalHook_Keyboard.jar" 
-			todir="${dir.dist}/Windows/x86_32"
-		/>
-		
-		<copy 
-			overwrite="true" 
-			file="src/org/dotnative/globalhook/keyboard/cpp_source/Windows/x86_32/GlobalHook_Keyboard.dll" 
-			todir="${dir.dist}/Windows/x86_32"
+			file="${dir.jars}/JNativeGrab.jar" 
+			todir="${dir.dist}"
 		/>
 	</target>
 	

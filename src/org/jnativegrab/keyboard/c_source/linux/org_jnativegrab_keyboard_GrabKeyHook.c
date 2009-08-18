@@ -29,7 +29,7 @@ typedef enum { FALSE, TRUE } bool;
 
 #include <jni.h>
 #include "org_jnativegrab_keyboard_GrabKeyHook.h"
-#include "JKeyConvert.h"
+#include "include/JKeyConvert.h"
 
 
 //Instance Variables

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="gcc noversion nomachine-m64 -march=k8 -fPIC -Wall -O3 -fno-strict-aliasing -lX11 -c -Isrc/org/jnativegrab/keyboard/c_source -I../../../../opt/sun-jdk-1.6.0.15/include -I../../../../opt/sun-jdk-1.6.0.15/include/linux">
+      <target file="org_jnativegrab_keyboard_GrabKeyHook.o" lastModified="1232c0dd860">
+         <source file="src/org/jnativegrab/keyboard/c_source/linux/org_jnativegrab_keyboard_GrabKeyHook.c" lastModified="1232b778400"/>
+      </target>
+      <target file="JKeyConvert.o" lastModified="1232c0ddc48">
+         <source file="src/org/jnativegrab/keyboard/c_source/linux/JKeyConvert.c" lastModified="1232b78fee8"/>
+      </target>
+   </processor>
+</history>

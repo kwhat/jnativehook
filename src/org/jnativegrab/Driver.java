@@ -1,7 +1,9 @@
-package org.jnativegrab.keyboard;
+package org.jnativegrab;
 
 //Imports
 import java.awt.event.KeyEvent;
+
+import org.jnativegrab.keyboard.GrabKeyException;
 import org.jnativegrab.keyboard.GrabKeyListener;
 import org.jnativegrab.keyboard.GrabKeyHook;
 

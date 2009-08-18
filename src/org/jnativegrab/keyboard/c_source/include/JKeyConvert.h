@@ -4,8 +4,8 @@
 
 #include <jni.h>
 
-#include "include/JKeyCodes.h"
-#include "include/JKeyLocations.h"
-#include "include/JKeyModifiers.h"
+#include "JKeyCodes.h"
+#include "JKeyLocations.h"
+#include "JKeyModifiers.h"
 
 KeySym JKeycodeToXKeysym(jint key);

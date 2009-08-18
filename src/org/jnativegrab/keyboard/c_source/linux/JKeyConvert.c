@@ -1,4 +1,4 @@
-#include "JKeyConvert.h"
+#include "include/JKeyConvert.h"
 
 KeySym JKeycodeToXKeysym(jint key) {
 	switch (key) {
@@ -133,7 +133,7 @@ KeySym JKeycodeToXKeysym(jint key) {
 
 		case JK_DEAD_GRAVE:			return XK_dead_grave;
 		case JK_DEAD_ACUTE:			return XK_dead_acute;
-		case JK_DEAD_CIRCUMFLEX:			return XK_dead_circumflex;
+		case JK_DEAD_CIRCUMFLEX:		return XK_dead_circumflex;
 		case JK_DEAD_TILDE:			return XK_dead_tilde;
 		case JK_DEAD_MACRON:			return XK_dead_macron;
 		case JK_DEAD_BREVE:			return XK_dead_breve;
@@ -152,7 +152,7 @@ KeySym JKeycodeToXKeysym(jint key) {
 		case JK_ASTERISK:			return XK_asterisk;
 		case JK_QUOTEDBL:			return XK_quotedbl;
 		case JK_LESS:				return XK_less;
-		case JK_GREATER:				return XK_greater;
+		case JK_GREATER:			return XK_greater;
 		case JK_BRACELEFT:			return XK_braceleft;
 		case JK_BRACERIGHT:			return XK_braceright;
 
@@ -169,12 +169,12 @@ KeySym JKeycodeToXKeysym(jint key) {
 		case JK_RIGHT_PARENTHESIS:		return XK_parenright;
 		case JK_UNDERSCORE:			return XK_underscore;
 
-		case JK_WINDOWS:				return XK_Super_L;		//FIXME R and L
+		case JK_WINDOWS:			return XK_Super_L;		//FIXME R and L
 		case JK_CONTEXT_MENU:			return XK_Menu;
 
 		/* for input method support on Asian Keyboards */
 		case JK_FINAL:				return XK_Cancel;		//Unknown Win32 API
-		case JK_CONVERT:				return XK_Henkan;
+		case JK_CONVERT:			return XK_Henkan;
 		case JK_NONCONVERT:			return XK_Muhenkan;
 		case JK_ACCEPT:				return XK_VoidSymbol;		//Japanese keyboard: kakutei?
 		case JK_MODECHANGE:			return XK_Mode_switch;		//Unknown Win32 API
@@ -205,7 +205,7 @@ KeySym JKeycodeToXKeysym(jint key) {
 		case JK_PROPS:				return SunXK_Props;
 		case JK_STOP:				return SunXK_Stop;
 
-		case JK_COMPOSE:				return SunXK_Compose;
+		case JK_COMPOSE:			return SunXK_Compose;
 		case JK_ALT_GRAPH:			return SunXK_AltGraph;
 		case JK_BEGIN:				return XK_Begin;
 
