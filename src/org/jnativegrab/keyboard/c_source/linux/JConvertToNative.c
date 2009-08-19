@@ -1,10 +1,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
+#include "include/JConvertToNative.h"
 
-#include "include/JKeyConvert.h"
-
-KeySym JKeycodeToXKeysym(jint key) {
+unsigned int JKeycodeToNative(jint key, jint location) {
 	switch (key) {
 		case JK_ENTER:				return XK_Return;
 		case JK_BACK_SPACE:			return XK_BackSpace;
@@ -215,5 +214,14 @@ KeySym JKeycodeToXKeysym(jint key) {
 
 		default:
 		case JK_UNDEFINED:			return XK_VoidSymbol;		//Key Undefined
+	}
+}
+
+unsigned char JModifierToNative(jint modifier) {
+	switch (modifier) {
+		case JK_SHIFT_MASK:			return ShiftMask;
+		case JK_CTRL_MASK:			return ControlMask;
+		case JK_META_MASK:			return Mod1Mask;
+		case JK_ALT_MASK:			return Mod1Mask; //FIXME Left Alt (mod3Mask right)
 	}
 }

@@ -15,6 +15,7 @@ Compiling Options:
 */
 
 typedef enum { FALSE, TRUE } bool;
+typedef char byte;
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -102,37 +103,49 @@ void MsgLoop() {
 
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject obj, jobject event) {
 	jclass event_cls = (*env)->GetObjectClass(env, event);
+
 	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
-	jint ikeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
+	jint jkeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
 
 	jmethodID getModifiers_ID = (*env)->GetMethodID(env, event_cls, "getModifiers", "()I");
-	jint imodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
+	jint jmodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
 
-	KeySym sym = JKeycodeToXKeysym((KeyCode) ikeycode);
-	KeyCode code = XKeysymToKeycode(disp, sym);
+	jmethodID getKeyLocation_ID = (*env)->GetMethodID(env, event_cls, "getKeyLocation", "()I");
+	jint jkeylocation = (*env)->CallIntMethod(env, event, getKeyLocation_ID);
+
+	KeySym keysym = JKeycodeToXKeysym(jkeycode, jkeylocation);
+	KeyCode keycode = XKeysymToKeycode(disp, keycode);
+
+	#ifdef DEBUG
+	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", keysym, keycode);
+	#endif
 
 	//Attempt to grab the native key.
-	XGrabKey(disp, code, 0, default_win, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(disp, keycode, 0, default_win, True, GrabModeAsync, GrabModeAsync);
 }
 
 
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject object, jobject event) {
 	jclass event_cls = (*env)->GetObjectClass(env, event);
+
 	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
-	jint ikeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
+	jint jkeycode = (*env)->CallIntMethod(env, event, getKeyCode_ID);
 
 	jmethodID getModifiers_ID = (*env)->GetMethodID(env, event_cls, "getModifiers", "()I");
-	jint imodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
+	jint jmodifiers = (*env)->CallIntMethod(env, event, getModifiers_ID);
 
-	KeySym sym = JKeycodeToXKeysym((KeyCode) ikeycode);
-	KeyCode code = XKeysymToKeycode(disp, sym);
+	jmethodID getKeyLocation_ID = (*env)->GetMethodID(env, event_cls, "getKeyLocation", "()I");
+	jint jkeylocation = (*env)->CallIntMethod(env, event, getKeyLocation_ID);
 
-	//Attempt to ungrab the native key.
-	XUngrabKey(disp, code, 0, default_win);
+	KeySym keysym = JKeycodeToXKeysym(jkeycode, jkeylocation);
+	KeyCode keycode = XKeysymToKeycode(disp, keycode);
 
 	#ifdef DEBUG
-	printf("Native: XUngrabKey successful.\n");
+	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", keysym, keycode);
 	#endif
+
+	//Attempt to ungrab the native key.
+	XUngrabKey(disp, keycode, 0, default_win);
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
