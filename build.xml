@@ -8,25 +8,49 @@
 	<property name="project.name" value="JNativeGrab"/>
 	<property name="project.vendor" value="1stleg Development"/>
 	<property name="project.version" value="0.9.93"/>
-	<property name="project.src" value="src"/>
 	
 	
 	<!-- Path Settings -->
-	<property name="dir.dist" value="dist"/>
-	<property name="dir.classes" value="${dir.dist}/build/classes"/>
-	<property name="dir.jars" value="${dir.dist}/build/jars"/>
-	<property name="dir.objs" value="${dir.dist}/build/objs"/>
+	<property name="dir.src" value="${basedir}/src"/>
+	<property name="dir.dist" value="${basedir}/dist"/>
 	
+	<property name="dir.build" value="${dir.dist}/build"/>
+	<property name="dir.classes" value="${dir.build}/classes"/>
+	<property name="dir.jars" value="${dir.build}/jars"/>
+	<property name="dir.objs" value="${dir.build}/objs"/>
 	
 	<!-- Compiler Settings -->
-	<property name="javac.optimize" value="true"/>
-	<property name="javac.source" value="1.6"/>
+	<property name="javac.fork" value="yes"/>
 	<property name="javac.target" value="1.6"/>
 	
-	<target name="config_gcc">
-		<echo>Determining gcc settings for ${os.name} ${os.arch}</echo>
+	
+	<target name="configure">
+		<echo>Checking environment sanity...</echo>
+		<!-- Try to locate the include folder for java headers -->
+		<condition property="javac.include" value="${java.home}/../include">
+			<and>
+				<not>
+					<isset property="javac.include"/>
+				</not>
+				
+				<available file="${java.home}/../include" type="dir"/>
+			</and>
+		</condition>
+		<condition property="javac.include" value="${os.JAVA_HOME}/include">
+			<and>
+				<not>
+					<isset property="javac.include"/>
+				</not>
+				
+				<available file="${os.JAVA_HOME}/include" type="dir"/>
+			</and>
+		</condition>
+		<fail unless="javac.include" message="Could not determine javac.include location.  Please set your JAVA_HOME environment variable or manually specify your javac.include location."/>
+		<echo>Found java include location: ${javac.include}</echo>
 		
-		<!-- determin the march to use -->
+		
+		
+		<!-- Figure out of the system arch is supported -->
 		<condition property="gcc.arch" value="i586">
 			<and>
 				<not>
@@ -42,7 +66,6 @@
 				</or>
 			</and>
 		</condition>
-		
 		<condition property="gcc.arch" value="k8">
 			<and>
 				<not>
@@ -56,18 +79,30 @@
 				</or>
 			</and>
 		</condition>
-		
-		<!-- Stop here if we could not find a supported arch -->
 		<fail unless="gcc.arch" message="The ${os.arch} architecture is not currently supported."/>
 		
+		
 		<!-- Set 32 or 64 bit flag -->
-		<condition property="gcc.bits" value="32" else="64">
-			<equals arg1="${gcc.arch}" arg2="i586" casesensitive="false"/>
+		<condition property="gcc.arch.model" value="${os.arch.data.model}">
+				<not>
+					<isset property="gcc.arch.model"/>
+				</not>
 		</condition>
 		
 		<!-- Set the gcc debug flag ONLY IF debug is true, unset implies false -->
-		<condition property="gcc.debug" value="true">
+		<condition property="gcc.debug" value="-DDEBUG">
 			<istrue value="${project.debug}"/>
+		</condition>
+		
+		<!-- Determin the os family, unset implies false -->
+		<condition property="gcc.os.family.windows" value="yes">
+			<os family="winnt"/>
+		</condition>
+		<condition property="gcc.os.family.unix" value="yes">
+			<os family="unix"/>
+		</condition>
+		<condition property="gcc.os.family.mac" value="yes">
+			<os family="mac"/>
 		</condition>
 	</target>
 	
@@ -105,8 +140,8 @@
 	</target>
 	
 	
-	<target name="compile" depends="clean,config_gcc" description="Compiles the classes">
-		<echo>Compiling ${project.keyboard.name}...</echo>
+	<target name="compile" depends="clean,configure" description="Compiles the classes">
+		<echo>Compiling java source...</echo>
 		<javac srcdir="${project.src}"
 			destdir="${dir.classes}"
 			classpathref="classpath"
@@ -119,66 +154,58 @@
 		
 		<echo>Compiling C source...</echo>
 		<cpptasks:cc
+			multithreaded="true"
+			optimize="speed"
+			
 			outtype="shared"
+			link="shared"
+			
 			outfile="${dir.dist}/JNativeGrab_Keyboard"
 			objdir="${dir.objs}"
 			
 			debug="${project.debug}"
 			warnings="diagnostic"
 		>
-			<!-- compiler name="gcc"
-			multithreaded="true"
-			optimize="speed"
-			link="shared" 
-			outtype="shared"
-			outfile="${dir.dist}/JNativeGrab_Keyboard"
-			objdir="${dir.objs}"
-			
-			
-			 -->
+			<compiler name="gcc">
 				<includepath location="${basedir}/src/org/jnativegrab/keyboard/c_source"/>
 				<includepath location="${os.JAVA_HOME}/include"/>
 				<includepath location="${os.JAVA_HOME}/include/linux"/>
 				
 				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/linux">
-					<include name="*.h"/>
 					<include name="*.c"/>
 				</fileset>
-				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/include">
-								<include name="*.h"/>
-								<include name="*.c"/>
-							</fileset>
-				<compilerarg value="-m${gcc.bits}"/>
+				
+				<compilerarg value="-m${gcc.arch.model}"/>
 				<compilerarg value="-march=${gcc.arch}"/>
 				<compilerarg value="-fPIC"/>
 				<compilerarg value="-Wall"/>
 				<compilerarg value="-O3"/>
 				<compilerarg value="-fno-strict-aliasing"/>
-				<compilerarg value="-lX11"/>
+				<compilerarg value="-lX11" if="${gcc.os.family.unix}"/>
 				<compilerarg value="-DDEBUG" if="${gcc.debug}"/>
-			<!-- /compiler -->
-
-			<!-- versioninfo
+			</compiler>
+			
+			<linker name="gcc">
+				<linkerarg value="-m${gcc.bits}"/>
+				<linkerarg value="-march=${gcc.arch}"/>
+				<linkerarg value="-fPIC"/>
+				<linkerarg value="-Wall"/>
+				<linkerarg value="-O3"/>
+				<linkerarg value="-fno-strict-aliasing"/>
+				<linkerarg value="-lX11" if="${gcc.os.family.unix}"/>
+				<linkerarg value="-DDEBUG" if="${gcc.debug}"/>
+			</linker>
+			
+			<versioninfo
 				companyname="${project.vendor}"
-				productname="${project.keyboard.name}"
-				productversion="${project.keyboard.version}"
-			/-->
+				productname="${project.name}"
+				productversion="${project.version}"
+			/>
 		</cpptasks:cc>
 	</target>
 	
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
-		<!--
-		<copy overwrite="true" todir="${project.build}/${dir.images}">
-			<fileset dir="${project.web}/${dir.images}">
-				<include name="*.jpg"/>
-				<include name="*.gif"/>
-				<include name="*.png"/>
-			</fileset>
-		</copy>
-		-->
-		
-		
 		<echo>Creating JNativeGrab.jar...</echo>
 		<jar jarfile="${dir.jars}/JNativeGrab.jar" basedir="${dir.classes}">
 			<include name="org/jnativegrab/keyboard/**"/>
