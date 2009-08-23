@@ -117,7 +117,7 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv 
 	KeyCode keycode = XKeysymToKeycode(disp, keycode);
 
 	#ifdef DEBUG
-	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", keysym, keycode);
+	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", keysym, keycode);
 	#endif
 
 	//Attempt to grab the native key.
