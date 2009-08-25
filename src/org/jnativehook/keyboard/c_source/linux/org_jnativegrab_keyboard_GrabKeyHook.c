@@ -1,5 +1,5 @@
 /*
- *	JNativeGrab - GrabKeyHook - 09/08/06
+ *	JNativeHook - GrabKeyHook - 09/08/06
  *  Alexander Barker
  *
  *	JNI Interface for setting a Keyboard Hook and monitoring
@@ -10,8 +10,8 @@
 
 /*
 Compiling Options:
-	gcc -m32 -march=i586 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativegrab_keyboard_GrabKeyHook.c -o libJNativeGrab_Keyboard.so
-	gcc -m64 -march=k8 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativegrab_keyboard_GrabKeyHook.c -o libJNativeGrab_Keyboard.so
+	gcc -m32 -march=i586 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativehook_keyboard_GrabKeyHook.c -o libJNativeHook_Keyboard.so
+	gcc -m64 -march=k8 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativehook_keyboard_GrabKeyHook.c -o libJNativeHook_Keyboard.so
 */
 
 typedef enum { FALSE, TRUE } bool;
@@ -40,7 +40,7 @@ typedef char byte;
 #include <X11/Xlib.h>
 
 #include <jni.h>
-#include "org_jnativegrab_keyboard_GrabKeyHook.h"
+#include "org_jnativehook_keyboard_GrabKeyHook.h"
 #include "include/JConvertToNative.h"
 
 //Instance Variables
@@ -62,7 +62,7 @@ void __attribute__ ((destructor)) Cleanup(void);
 
 void throwException(JNIEnv * env, char * sMessage) {
 	//Locate our exception class
-	jclass objExceptionClass = (*env)->FindClass(env, "org/jnativegrab/keyboard/GrabKeyException");
+	jclass objExceptionClass = (*env)->FindClass(env, "org/jnativehook/keyboard/GrabKeyException");
 
 	if (objExceptionClass != NULL) {
 		#ifdef DEBUG
@@ -87,7 +87,7 @@ void MsgLoop() {
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
 
-	jclass objEventClass = (*env)->FindClass(env, "org/jnativegrab/keyboard/GrabKeyEvent");
+	jclass objEventClass = (*env)->FindClass(env, "org/jnativehook/keyboard/GrabKeyEvent");
 	jmethodID constructor_ID = (*env)->GetMethodID(env, objEventClass, "<init>", "(IJIICI)V");
 
 	XEvent xev;
@@ -121,7 +121,7 @@ void MsgLoop() {
 	#endif
 }
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject UNUSED(obj), jobject event) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject UNUSED(obj), jobject event) {
 	jclass event_cls = (*env)->GetObjectClass(env, event);
 
 	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
@@ -145,7 +145,7 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey(JNIEnv 
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject UNUSED(obj), jobject event) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject UNUSED(obj), jobject event) {
 	jclass event_cls = (*env)->GetObjectClass(env, event);
 
 	jmethodID getKeyCode_ID = (*env)->GetMethodID(env, event_cls, "getKeyCode", "()I");
@@ -169,7 +169,7 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey(JNIEn
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_startHook(JNIEnv * env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_startHook(JNIEnv * env, jobject obj) {
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
 	(*env)->GetJavaVM(env, &jvm);
@@ -214,8 +214,8 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_startHook(JNIEn
 	//Setup all the jni hook call back pointers.
 	hookObj = (*env)->NewGlobalRef(env, obj);
 	jclass cls = (*env)->GetObjectClass(env, hookObj);
-	fireKeyPressed_ID = (*env)->GetMethodID(env, cls, "fireKeyPressed", "(Lorg/jnativegrab/keyboard/GrabKeyEvent;)V");
-	fireKeyReleased_ID = (*env)->GetMethodID(env, cls, "fireKeyReleased", "(Lorg/jnativegrab/keyboard/GrabKeyEvent;)V");
+	fireKeyPressed_ID = (*env)->GetMethodID(env, cls, "fireKeyPressed", "(Lorg/jnativehook/keyboard/GrabKeyEvent;)V");
+	fireKeyReleased_ID = (*env)->GetMethodID(env, cls, "fireKeyReleased", "(Lorg/jnativehook/keyboard/GrabKeyEvent;)V");
 
 	//Call listener
 	hookThreadId = pthread_self();
@@ -227,7 +227,7 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_startHook(JNIEn
 	MsgLoop();
 }
 
-JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_stopHook(JNIEnv * env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_stopHook(JNIEnv * env, jobject obj) {
 	bRunning = FALSE;
 	pthread_cancel(hookThreadId);
 

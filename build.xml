@@ -5,7 +5,7 @@
 	<property environment="os"/>
 	
 	<!-- Project Settings -->
-	<property name="project.name" value="JNativeGrab"/>
+	<property name="project.name" value="JNativeHook"/>
 	<property name="project.vendor" value="1stleg Development"/>
 	<property name="project.version" value="0.9.93"/>
 	
@@ -161,18 +161,18 @@
 			outtype="shared"
 			link="shared"
 			
-			outfile="${dir.dist}/JNativeGrab_Keyboard"
+			outfile="${dir.dist}/JNativeHook_Keyboard"
 			objdir="${dir.objs}"
 			
 			debug="${project.debug}"
 			warnings="diagnostic"
 		>
 			<compiler name="gcc">
-				<includepath location="${dir.src}/org/jnativegrab/keyboard/c_source"/>
+				<includepath location="${dir.src}/org/jnativehook/keyboard/c_source"/>
 				<includepath location="${javac.include}"/>
 				<includepath location="${javac.include}/linux"/>
 				
-				<fileset dir="${dir.src}/org/jnativegrab/keyboard/c_source/linux">
+				<fileset dir="${dir.src}/org/jnativehook/keyboard/c_source/linux">
 					<include name="*.c"/>
 				</fileset>
 				
@@ -207,14 +207,14 @@
 	
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
-		<echo>Creating JNativeGrab.jar...</echo>
-		<jar jarfile="${dir.jars}/JNativeGrab.jar" basedir="${dir.classes}">
-			<include name="org/jnativegrab/keyboard/**"/>
-			<include name="org/jnativegrab/**"/>
-			<!-- <exclude name="org/jnativegrab/Driver.class"/> -->
+		<echo>Creating JNativeHook.jar...</echo>
+		<jar jarfile="${dir.jars}/JNativeHook.jar" basedir="${dir.classes}">
+			<include name="org/jnativehook/keyboard/**"/>
+			<include name="org/jnativehook/**"/>
+			<!-- <exclude name="org/jnativehook/Driver.class"/> -->
 			<manifest>
-				<attribute name="Main-Class" value="org.jnativegrab.Driver"/>
-				<section name="org/jnativegrab">
+				<attribute name="Main-Class" value="org.jnativehook.Driver"/>
+				<section name="org/jnativehook">
 					<attribute name="Implementation-Title" value="${project.name} Library"/>
 					<attribute name="Implementation-Version" value="${project.version}"/> 
 					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
@@ -235,7 +235,7 @@
 		<echo>Copying files...</echo>
 		<copy 
 			overwrite="true" 
-			file="${dir.jars}/JNativeGrab.jar" 
+			file="${dir.jars}/JNativeHook.jar" 
 			todir="${dir.dist}"
 		/>
 	</target>

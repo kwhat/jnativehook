@@ -1,8 +1,9 @@
-package org.jnativegrab.keyboard;
+package org.jnativehook.keyboard;
 
 //Imports
 import java.awt.event.KeyEvent;
-import org.jnativegrab.GlobalScreen;
+
+import org.jnativehook.GlobalScreen;
  
 public class GrabKeyEvent extends KeyEvent {
 	private static final long serialVersionUID = -4226037291462485089L;

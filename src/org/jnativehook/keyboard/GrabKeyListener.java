@@ -1,4 +1,4 @@
-package org.jnativegrab.keyboard;
+package org.jnativehook.keyboard;
 
 //Imports
 import java.awt.event.KeyEvent;

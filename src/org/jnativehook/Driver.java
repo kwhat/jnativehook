@@ -1,11 +1,11 @@
-package org.jnativegrab;
+package org.jnativehook;
 
 //Imports
 import java.awt.event.KeyEvent;
 
-import org.jnativegrab.keyboard.GrabKeyException;
-import org.jnativegrab.keyboard.GrabKeyListener;
-import org.jnativegrab.keyboard.GrabKeyHook;
+import org.jnativehook.keyboard.GrabKeyException;
+import org.jnativehook.keyboard.GrabKeyHook;
+import org.jnativehook.keyboard.GrabKeyListener;
 
 //Should go GPL
 
