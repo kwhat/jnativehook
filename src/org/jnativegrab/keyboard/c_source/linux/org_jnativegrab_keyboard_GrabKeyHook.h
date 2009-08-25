@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     org_jnativegrab_keyboard_GrabKeyHook
  * Method:    grabKey
- * Signature: (Ljava/awt/event/KeyEvent;)V
+ * Signature: (Lorg/jnativegrab/keyboard/GrabKeyEvent;)V
  */
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey
   (JNIEnv *, jobject, jobject);
@@ -18,7 +18,7 @@ JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_grabKey
 /*
  * Class:     org_jnativegrab_keyboard_GrabKeyHook
  * Method:    ungrabKey
- * Signature: (Ljava/awt/event/KeyEvent;)V
+ * Signature: (Lorg/jnativegrab/keyboard/GrabKeyEvent;)V
  */
 JNIEXPORT void JNICALL Java_org_jnativegrab_keyboard_GrabKeyHook_ungrabKey
   (JNIEnv *, jobject, jobject);

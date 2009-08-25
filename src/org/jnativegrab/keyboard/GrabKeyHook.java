@@ -1,16 +1,11 @@
 package org.jnativegrab.keyboard;
 
 //Imports
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
-import javax.swing.event.EventListenerList;
 
 public class GrabKeyHook {
-	//Instance Variables
-	private EventListenerList objEventListeners;
-	
 	/**
 	 * Default Constructor
 	 *
@@ -73,9 +68,6 @@ public class GrabKeyHook {
 			throw new GrabKeyException(e.getMessage());
 		}
 		
-		//Setup instance variables.
-		objEventListeners = new EventListenerList();
-		
 		//Register the hook.
 		new Thread() {
 			public void run() {
@@ -86,39 +78,9 @@ public class GrabKeyHook {
 		}.start();
 	}
 	
-	public void addEventListener(GrabKeyListener objListener) {
-		objEventListeners.add(GrabKeyListener.class, objListener);
-	}
-	
-	public void removeEventListener(GrabKeyListener objListener) {
-		objEventListeners.remove(GrabKeyListener.class, objListener);
-	}
-	
-	//Notify Listeners Key Down
-	@SuppressWarnings("unused")
-	private void fireKeyPressed(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
-		Object[] objListeners = objEventListeners.getListenerList();
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == GrabKeyListener.class ) {
-				((GrabKeyListener) objListeners[i + 1]).keyPressed( new GrabKeyEvent(KeyEvent.KEY_PRESSED, iWhen, iModifiers, iKeyCode, cKeyChar) );
-			}
-		}
-	}
-	
-	//Notify Listeners Key Up
-	@SuppressWarnings("unused")
-	private void fireKeyReleased(long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
-		Object[] objListeners = objEventListeners.getListenerList();
-		for ( int i = 0; i < objListeners.length; i += 2 ) {
-			if ( objListeners[ i ] == GrabKeyListener.class ) {
-				( (GrabKeyListener)objListeners[i + 1] ).keyReleased( new GrabKeyEvent(KeyEvent.KEY_RELEASED, iWhen, iModifiers, iKeyCode, cKeyChar) );
-			}
-		}
-	}
-	
 	//These are basically the constructors and deconstructors for the hook.
-	public native void grabKey(int iModifiers, int iKeyCode) throws GrabKeyException;
-	public native void ungrabKey(int iModifiers, int iKeyCode) throws GrabKeyException;
+	public native void grabKey(GrabKeyEvent objEvent) throws GrabKeyException;
+	public native void ungrabKey(GrabKeyEvent objEvent) throws GrabKeyException;
 	
 	private native void startHook();
 	private native void stopHook();

@@ -38,6 +38,14 @@ public class GlobalScreen extends Component {
 		objEventListeners.remove(GrabKeyListener.class, objListener);
 	}
 	
+	public void addGrabButtonListener(GrabKeyListener objListener) {
+		//objEventListeners.add(GrabKeyListener.class, objListener);
+	}
+	
+	public void removeGrabButtonListener(GrabKeyListener objListener) {
+		//objEventListeners.remove(GrabKeyListener.class, objListener);
+	}
+	
 	@SuppressWarnings("unused")
 	private void fireKeyPressed(GrabKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
