@@ -2,14 +2,9 @@ package org.jnativegrab;
 
 //Imports
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-
 import javax.swing.event.EventListenerList;
-
 import org.jnativegrab.keyboard.GrabKeyEvent;
 import org.jnativegrab.keyboard.GrabKeyListener;
-
-import java.util.EventListener;
 
 public class GlobalScreen extends Component {
 	//Instance Variables

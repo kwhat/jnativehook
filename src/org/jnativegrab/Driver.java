@@ -19,7 +19,7 @@ public class Driver implements GrabKeyListener {
 	
 	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, GrabKeyException {
 		objKeyHook = new GrabKeyHook();
-		objKeyHook.addEventListener(this);
+		//objKeyHook.addEventListener(this);
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
