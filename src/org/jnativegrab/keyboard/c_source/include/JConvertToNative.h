@@ -5,4 +5,4 @@
 #include "JKeyModifiers.h"
 
 unsigned int JKeycodeToNative(jint key, jint location);
-unsigned char JModifierToNative(jint modifier);
+unsigned int JModifierToNative(jint modifier);

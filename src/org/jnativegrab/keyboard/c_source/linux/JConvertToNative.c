@@ -11,9 +11,7 @@ unsigned int SuperMask = 0;
 unsigned int MetaMask = 0;
 
 void getModifiers (Display * disp) {
-	int i;
 	XModifierKeymap *modmap;
-	KeyCode nlock, slock;
 	static int mask_table[8] = {
 		ShiftMask, LockMask, ControlMask, Mod1Mask,
 		Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
@@ -21,25 +19,22 @@ void getModifiers (Display * disp) {
 
 	KeyCode numlock = XKeysymToKeycode(disp, XK_Num_Lock);
 	KeyCode scrlock = XKeysymToKeycode(disp, XK_Scroll_Lock);
-	printf("Num %d\tScroll %d\n", numlock, scrlock);
 
 	KeyCode altlkey = XKeysymToKeycode(disp, XK_Alt_L);
 	KeyCode altrkey = XKeysymToKeycode(disp, XK_Alt_R);
-	printf("AltL %d\tAltR %d\n", altlkey, altrkey);
 
 	KeyCode suplkey = XKeysymToKeycode(disp, XK_Super_L);
 	KeyCode suprkey = XKeysymToKeycode(disp, XK_Super_R);
-	printf("Supr L %d\tSupr R %d\n", suplkey, suprkey);
 
 	KeyCode metalkey = XKeysymToKeycode(disp, XK_Meta_L);
 	KeyCode metarkey = XKeysymToKeycode(disp, XK_Meta_R);
-	printf("Meta L %d\tMeta R %d\n", metalkey, metarkey);
 
 	// Find out the masks for the NumLock and ScrollLock modifiers,
 	// so that we can bind the grabs for when they are enabled too.
 	modmap = XGetModifierMapping(disp);
 
 	if (modmap != NULL && modmap->max_keypermod > 0) {
+		int i;
 		for (i = 0; i < 8 * modmap->max_keypermod; i++) {
 			if (modmap->modifiermap[i] != 0) {
 				if (modmap->modifiermap[i] == numlock && NumberLockMask == 0) {
@@ -81,7 +76,7 @@ void getModifiers (Display * disp) {
 	CapsLockMask = LockMask;
 
 	if (modmap) {
-		XFreeModifiermap (modmap);
+		XFreeModifiermap(modmap);
 	}
 }
 
@@ -90,9 +85,9 @@ unsigned int JKeycodeToNative(jint key, jint location) {
 		case JK_ENTER:						return XK_Return;
 		case JK_BACK_SPACE:					return XK_BackSpace;
 		case JK_TAB:						return XK_Tab;
-		case JK_SHIFT:						return XK_Shift_L;			//FIXME R and L
-		case JK_CONTROL:					return XK_Control_L;		//FIXME R and L
-		case JK_ALT:						return XK_Alt_L;			//FIXME R and L
+		case JK_SHIFT:						return XK_Shift_L;				//FIXME R and L
+		case JK_CONTROL:					return XK_Control_L;			//FIXME R and L
+		case JK_ALT:						return XK_Alt_L;				//FIXME R and L
 		case JK_PAUSE:						return XK_Pause;
 		case JK_CAPS_LOCK:					return XK_Caps_Lock;
 		case JK_ESCAPE:						return XK_Escape;
@@ -206,7 +201,7 @@ unsigned int JKeycodeToNative(jint key, jint location) {
 		case JK_PRINTSCREEN:				return XK_Print;
 		case JK_INSERT:						return XK_Insert;
 		case JK_HELP:						return XK_Help;
-		case JK_META:						return XK_Meta_L;			//FIXME R and L
+		case JK_META:						return XK_Meta_L;				//FIXME R and L
 
 		case JK_QUOTE:						return XK_quoteright;
 		case JK_BACK_QUOTE:					return XK_asciitilde;
@@ -254,7 +249,7 @@ unsigned int JKeycodeToNative(jint key, jint location) {
 		case JK_RIGHT_PARENTHESIS:			return XK_parenright;
 		case JK_UNDERSCORE:					return XK_underscore;
 
-		case JK_WINDOWS:					return XK_Super_L;		//FIXME R and L
+		case JK_WINDOWS:					return XK_Super_L;				//FIXME R and L
 		case JK_CONTEXT_MENU:				return XK_Menu;
 
 		/* for input method support on Asian Keyboards */
@@ -278,7 +273,7 @@ unsigned int JKeycodeToNative(jint key, jint location) {
 		case JK_JAPANESE_HIRAGANA:			return XK_Hiragana_Katakana;	//Not Sure
 		case JK_JAPANESE_ROMAN:				return XK_Romaji;				//Unknown
 		case JK_KANA_LOCK:					return XK_Kana_Lock;
-		case JK_INPUT_METHOD_ON_OFF:		return XK_VoidSymbol;		//Japanese keyboard: nihongo?
+		case JK_INPUT_METHOD_ON_OFF:		return XK_VoidSymbol;			//Japanese keyboard: nihongo?
 
 		/* for Sun keyboards */
 		case JK_CUT:						return SunXK_Cut;
@@ -299,7 +294,7 @@ unsigned int JKeycodeToNative(jint key, jint location) {
 	}
 }
 
-unsigned char JModifierToNative(jint modifier) {
+unsigned int JModifierToNative(jint modifier) {
 	switch (modifier) {
 		case JK_SHIFT_MASK:					return ShiftMask;
 		case JK_CTRL_MASK:					return ControlMask;

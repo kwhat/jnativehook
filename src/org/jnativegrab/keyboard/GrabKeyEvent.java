@@ -10,4 +10,8 @@ public class GrabKeyEvent extends KeyEvent {
 	public GrabKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
 		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar);
 	}
+	
+	public GrabKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar, int iKeyLocation) {
+		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar, iKeyLocation);
+	}
 }

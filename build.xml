@@ -83,11 +83,12 @@
 		
 		
 		<!-- Set 32 or 64 bit flag -->
-		<condition property="gcc.arch.model" value="${os.arch.data.model}">
+		<condition property="gcc.arch.model" value="${sun.arch.data.model}">
 				<not>
 					<isset property="gcc.arch.model"/>
 				</not>
 		</condition>
+		<!-- echo>${sun.cpu.endian}</echo -->
 		
 		<!-- Set the gcc debug flag ONLY IF debug is true, unset implies false -->
 		<condition property="gcc.debug" value="-DDEBUG">
@@ -142,13 +143,13 @@
 	
 	<target name="compile" depends="clean,configure" description="Compiles the classes">
 		<echo>Compiling java source...</echo>
-		<javac srcdir="${project.src}"
+		<javac srcdir="${dir.src}"
 			destdir="${dir.classes}"
 			classpathref="classpath"
 			debug="${project.debug}"
 			optimize="${javac.optimize}"
 			deprecation="false"
-			source="${javac.source}"
+			source="${javac.target}"
 			target="${javac.target}"
 		/>
 		
@@ -167,11 +168,11 @@
 			warnings="diagnostic"
 		>
 			<compiler name="gcc">
-				<includepath location="${basedir}/src/org/jnativegrab/keyboard/c_source"/>
-				<includepath location="${os.JAVA_HOME}/include"/>
-				<includepath location="${os.JAVA_HOME}/include/linux"/>
+				<includepath location="${dir.src}/org/jnativegrab/keyboard/c_source"/>
+				<includepath location="${javac.include}"/>
+				<includepath location="${javac.include}/linux"/>
 				
-				<fileset dir="${basedir}/src/org/jnativegrab/keyboard/c_source/linux">
+				<fileset dir="${dir.src}/org/jnativegrab/keyboard/c_source/linux">
 					<include name="*.c"/>
 				</fileset>
 				
