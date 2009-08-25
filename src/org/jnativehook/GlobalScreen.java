@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.event.EventListenerList;
 
 import org.jnativehook.keyboard.GrabKeyEvent;
-import org.jnativehook.keyboard.GrabKeyListener;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 public class GlobalScreen extends Component {
 	//Instance Variables
@@ -26,19 +26,19 @@ public class GlobalScreen extends Component {
 		return GlobalScreen.instance;
 	}
 	
-	public void addGrabKeyListener(GrabKeyListener objListener) {
-		objEventListeners.add(GrabKeyListener.class, objListener);
+	public void addGrabKeyListener(NativeKeyListener objListener) {
+		objEventListeners.add(NativeKeyListener.class, objListener);
 	}
 	
-	public void removeGrabKeyListener(GrabKeyListener objListener) {
-		objEventListeners.remove(GrabKeyListener.class, objListener);
+	public void removeGrabKeyListener(NativeKeyListener objListener) {
+		objEventListeners.remove(NativeKeyListener.class, objListener);
 	}
 	
-	public void addGrabButtonListener(GrabKeyListener objListener) {
+	public void addGrabButtonListener(NativeKeyListener objListener) {
 		//objEventListeners.add(GrabKeyListener.class, objListener);
 	}
 	
-	public void removeGrabButtonListener(GrabKeyListener objListener) {
+	public void removeGrabButtonListener(NativeKeyListener objListener) {
 		//objEventListeners.remove(GrabKeyListener.class, objListener);
 	}
 	
@@ -46,8 +46,8 @@ public class GlobalScreen extends Component {
 	private void fireKeyPressed(GrabKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == GrabKeyListener.class ) {
-				((GrabKeyListener) objListeners[i + 1]).keyPressed( objEvent );
+			if ( objListeners[ i ] == NativeKeyListener.class ) {
+				((NativeKeyListener) objListeners[i + 1]).keyPressed( objEvent );
 			}
 		}
 	}
@@ -56,8 +56,8 @@ public class GlobalScreen extends Component {
 	private void fireKeyReleased(GrabKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
-			if ( objListeners[ i ] == GrabKeyListener.class ) {
-				( (GrabKeyListener)objListeners[i + 1] ).keyReleased( objEvent );
+			if ( objListeners[ i ] == NativeKeyListener.class ) {
+				( (NativeKeyListener)objListeners[i + 1] ).keyReleased( objEvent );
 			}
 		}
 	}

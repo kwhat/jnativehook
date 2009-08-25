@@ -12,7 +12,7 @@ public class GrabKeyHook {
 	 * This will attempt to locate the native shared objects by 
 	 * looking in the same location as the calling jar.  
 	 */
-	public GrabKeyHook() throws GrabKeyException {
+	public GrabKeyHook() throws NativeKeyException {
 		//Setup default location to the pwd.
 		String sLibPath = System.getProperty("user.dir", new File("").getAbsolutePath());
 		
@@ -39,14 +39,14 @@ public class GrabKeyHook {
 	 * 
 	 * @param sLibPath the location to look for the native library.
 	 */
-	public GrabKeyHook(String sLibPath) throws GrabKeyException {
+	public GrabKeyHook(String sLibPath) throws NativeKeyException {
 		loadLibrary(sLibPath);
 	}
 	
 	/**
 	 * Attempts to load the native library based on the supplied path.
 	 */
-	private void loadLibrary(String sLibPath) throws GrabKeyException {
+	private void loadLibrary(String sLibPath) throws NativeKeyException {
 		//Set the new lib path to system property.
 		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
 		
@@ -61,11 +61,11 @@ public class GrabKeyHook {
 			//Linux: libJNativeGrab_Keyboard.so
 			//Mac OSX: libJNativeGrab_Keyboard.so ?
 			//Windows: JNativeGrab_Keyboard.dll
-			System.loadLibrary("JNativeGrab_Keyboard");
+			System.loadLibrary("JNativeHook_Keyboard");
 		}
 		catch (Throwable e) {
 			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError
-			throw new GrabKeyException(e.getMessage());
+			throw new NativeKeyException(e.getMessage());
 		}
 		
 		//Register the hook.
@@ -78,10 +78,10 @@ public class GrabKeyHook {
 		}.start();
 	}
 	
-	//These are basically the constructors and deconstructors for the hook.
-	public native void grabKey(GrabKeyEvent objEvent) throws GrabKeyException;
-	public native void ungrabKey(GrabKeyEvent objEvent) throws GrabKeyException;
+	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
+	public native void ungrabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	
+	//These are basically the constructors and deconstructors for the hook.
 	private native void startHook();
 	private native void stopHook();
 }

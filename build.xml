@@ -80,7 +80,7 @@
 			</and>
 		</condition>
 		<fail unless="gcc.arch" message="The ${os.arch} architecture is not currently supported."/>
-		
+		<echo>Compatible system architecture: ${gcc.arch}</echo>
 		
 		<!-- Set 32 or 64 bit flag -->
 		<condition property="gcc.arch.model" value="${sun.arch.data.model}">
@@ -88,12 +88,15 @@
 					<isset property="gcc.arch.model"/>
 				</not>
 		</condition>
+		<echo>System architecture data model: ${gcc.arch.model} bit</echo>
 		<!-- echo>${sun.cpu.endian}</echo -->
+		
 		
 		<!-- Set the gcc debug flag ONLY IF debug is true, unset implies false -->
 		<condition property="gcc.debug" value="-DDEBUG">
 			<istrue value="${project.debug}"/>
 		</condition>
+		<echo>Debug Mode: ${project.debug} ${gcc.debug}</echo>
 		
 		<!-- Determin the os family, unset implies false -->
 		<condition property="gcc.os.family.windows" value="yes">
@@ -182,19 +185,22 @@
 				<compilerarg value="-Wall"/>
 				<compilerarg value="-O3"/>
 				<compilerarg value="-fno-strict-aliasing"/>
-				<compilerarg value="-lX11" if="${gcc.os.family.unix}"/>
-				<compilerarg value="-DDEBUG" if="${gcc.debug}"/>
+				<compilerarg value="-lX11" if="gcc.os.family.unix"/>
+				<compilerarg value="-DDEBUG" if="gcc.debug"/>
+				
+				<compilerarg value="-v"/>
 			</compiler>
 			
 			<linker name="gcc">
-				<linkerarg value="-m${gcc.bits}"/>
+				<linkerarg value="-m${gcc.arch.model}"/>
 				<linkerarg value="-march=${gcc.arch}"/>
 				<linkerarg value="-fPIC"/>
 				<linkerarg value="-Wall"/>
 				<linkerarg value="-O3"/>
 				<linkerarg value="-fno-strict-aliasing"/>
-				<linkerarg value="-lX11" if="${gcc.os.family.unix}"/>
-				<linkerarg value="-DDEBUG" if="${gcc.debug}"/>
+				<linkerarg value="-lX11" if="gcc.os.family.unix"/>
+				
+				<linkerarg value="-v"/>
 			</linker>
 			
 			<versioninfo

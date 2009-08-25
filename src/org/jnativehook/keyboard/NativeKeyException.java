@@ -1,13 +1,13 @@
 package org.jnativehook.keyboard;
 
-public class GrabKeyException extends Exception {
+public class NativeKeyException extends Exception {
 	private static final long serialVersionUID = -6239432803200521634L;
 
-	public GrabKeyException() {
+	public NativeKeyException() {
 		super();
 	}
 	
-	public GrabKeyException(String sMessage) {
+	public NativeKeyException(String sMessage) {
 		super(sMessage);
 	}
 }
