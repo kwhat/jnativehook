@@ -66,37 +66,37 @@ void getModifiers(Display * disp) {
 			if (modmap->modifiermap[i] != 0) {
 				if (modmap->modifiermap[i] == numlock && NumberLockMask == 0) {
 					#ifdef DEBUG
-					printf("Found NumberLockMask (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found NumberLockMask (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					NumberLockMask = mask_table[i / modmap->max_keypermod];
 				}
 				else if (modmap->modifiermap[i] == scrlock && ScrollLockMask == 0) {
 					#ifdef DEBUG
-					printf("Found ScrollLockMask (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found ScrollLockMask (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					ScrollLockMask = mask_table[i / modmap->max_keypermod];
 				}
 				else if (modmap->modifiermap[i] == altlkey && AltMask == 0) {
 					#ifdef DEBUG
-					printf("Found AltMask Left (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found AltMask Left (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					AltMask = mask_table[i / modmap->max_keypermod];
 				}
 				else if (modmap->modifiermap[i] == altrkey && AltMask == 0) {
 					#ifdef DEBUG
-					printf("Found AltMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found AltMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					AltMask = mask_table[i / modmap->max_keypermod];
 				}
 				else if (modmap->modifiermap[i] == suplkey && SuperMask == 0) {
 					#ifdef DEBUG
-					printf("Found SuperMask Left (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found SuperMask Left (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					SuperMask = mask_table[i / modmap->max_keypermod];
 				}
 				else if (modmap->modifiermap[i] == suprkey && SuperMask == 0) {
 					#ifdef DEBUG
-					printf("Found SuperMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found SuperMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					SuperMask = mask_table[i / modmap->max_keypermod];
 				}
@@ -108,7 +108,7 @@ void getModifiers(Display * disp) {
 				}
 				else if (modmap->modifiermap[i] == metarkey && MetaMask == 0) {
 					#ifdef DEBUG
-					printf("Found MetaMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
+					printf("Native: Found MetaMask Right (%d)\n", mask_table[i / modmap->max_keypermod]);
 					#endif
 					MetaMask = mask_table[i / modmap->max_keypermod];
 				}

@@ -62,6 +62,19 @@ pthread_t hookThreadId = 0;
 void __attribute__ ((constructor)) Init(void);
 void __attribute__ ((destructor)) Cleanup(void);
 
+void jniFatalError(char * message) {
+	//Attach to the currently running jvm
+	JNIEnv * env = NULL;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
+	#ifdef DEBUG
+	printf("Native: Fatal Error - %s\n", message);
+	#endif
+
+	(*env)->FatalError(env, message);
+	exit(1);
+}
+
 void throwException(char * message) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
@@ -79,12 +92,11 @@ void throwException(char * message) {
 	}
 	else {
 		//Unable to find exception class, Terminate with error.
-		(*env)->FatalError(env, "Unable to locate NativeKeyException class.");
-		exit(1);
+		jniFatalError("Unable to locate NativeKeyException class.");
 	}
 }
 
-int xerrorToException(Display * dpy, XErrorEvent * e) {
+int xErrorToException(Display * dpy, XErrorEvent * e) {
 	char message[255];
 	XGetErrorText(dpy, e->error_code, message, sizeof message);
 
@@ -93,6 +105,8 @@ int xerrorToException(Display * dpy, XErrorEvent * e) {
 	#endif
 
 	throwException(message);
+
+	return 0;
 }
 
 
@@ -109,12 +123,12 @@ void MsgLoop() {
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
 
+	//A reference to the GlobalScreen Object
+	jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
+
 	//ID's for the pressed, typed and released callbacks
 	jmethodID fireKeyPressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 	jmethodID fireKeyReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-
-	//A reference to the GlobalScreen Object
-	jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 
 
 	XEvent xev;
@@ -148,6 +162,28 @@ void MsgLoop() {
 	#endif
 }
 
+void interruptMsgLoop() {
+	//We need to create an event to send to the thread to wake it up
+	//so it will listen to grab changes.
+	XKeyEvent xev;
+	xev.display		= disp;			// defined globally
+	xev.window		= default_win;
+	xev.root		= default_win;	// defined globally
+	xev.subwindow	= None;
+	xev.time		= CurrentTime;
+	xev.x			= 1;
+	xev.y			= 1;
+	xev.x_root		= 1;
+	xev.y_root		= 1;
+	xev.same_screen	= True;
+	xev.keycode		= AnyKey;
+	xev.state		= 0;
+	xev.type		= KeyPress;
+
+	XSendEvent(xev.display, xev.window, True, KeyPressMask, (XEvent *)&xev);
+	XFlush(xev.display);
+}
+
 int factorial(int n) {
 	if (n <= 1) {
 		return 1;
@@ -157,13 +193,13 @@ int factorial(int n) {
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv * env, jobject obj, jint jmodifiers, jint jkeycode, jint jkeylocation) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
 	XLockDisplay(disp);
 	KeySym keysym = JKeycodeToNative(jkeycode, jkeylocation);
 	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
 	#ifdef DEBUG
-	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", keysym, keycode);
+	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) keysym, keycode);
 	#endif
 
 	unsigned int mask_table[10];
@@ -236,7 +272,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv 
 				curr_mask |= mask_table[pos];
 				pos++;
 				pos %= count;
-				//pos = ++pos % count;
 			}
 
 			XGrabKey(disp, keycode, curr_mask, default_win, True, GrabModeAsync, GrabModeAsync);
@@ -245,40 +280,109 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv 
 
 	XUnlockDisplay(disp);
 
-	//We need to create an event to send to the thread to wake it up
-	//so it will listen to grab changes.
-	XKeyEvent event;
-	event.display     = disp;			// defined globally
-	event.window      = default_win;
-	event.root        = default_win;	// defined globally
-	event.subwindow   = None;
-	event.time        = CurrentTime;
-	event.x           = 1;
-	event.y           = 1;
-	event.x_root      = 1;
-	event.y_root      = 1;
-	event.same_screen = True;
-	event.keycode     = keycode;
-	event.state       = 0;
-	event.type = KeyPress;
-
-	XSendEvent(event.display, event.window, True, KeyPressMask, (XEvent *)&event);
-	XFlush(event.display);
+	//Refresh what XNextEvent is listening for.
+	interruptMsgLoop();
 }
 
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
+	XLockDisplay(disp);
+	KeySym keysym = JKeycodeToNative(jkeycode, jkeylocation);
+	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEnv *env, jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
+	#ifdef DEBUG
+	printf("Native: ungrabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) keysym, keycode);
+	#endif
 
+	unsigned int mask_table[10];
+	unsigned int count = 0;
+
+	if (getCapsLockMask() != 0) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using CapsLockMask\n");
+		#endif
+		mask_table[count++] = getCapsLockMask();
+	}
+
+	if (getNumberLockMask() != 0) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using NumberLockMask\n");
+		#endif
+		mask_table[count++] = getNumberLockMask();
+	}
+
+	if (getScrollLockMask() != 0) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using ScrollLockMask\n");
+		#endif
+		mask_table[count++] = getScrollLockMask();
+	}
+
+	if (jmodifiers & JK_SHIFT_MASK) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using ShiftMask\n");
+		#endif
+		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
+	}
+
+	if (jmodifiers & JK_CTRL_MASK) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using ControlMask\n");
+		#endif
+		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
+	}
+
+	if (jmodifiers & JK_META_MASK) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using MetaMask\n");
+		#endif
+		mask_table[count++] = JModifierToNative(JK_META_MASK);
+	}
+
+	if (jmodifiers & JK_ALT_MASK) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using AltMask\n");
+		#endif
+		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
+	}
+
+	if (jmodifiers & 0) {
+		#ifdef DEBUG
+		printf("Native: ungrabKey - Using No Mask\n");
+		#endif
+		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
+	}
+
+	int set_size, i, j;
+	for (set_size = count; set_size > 0; set_size--) {
+		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
+
+		int pos = 0;
+		for (i = 0; i < num_of_items; i++) {
+			int curr_mask = 0;
+			for (j = 0; j < set_size; j++) {
+				curr_mask |= mask_table[pos];
+				pos++;
+				pos %= count;
+			}
+
+			XUngrabKey(disp, keycode, curr_mask, default_win);
+		}
+	}
+
+	XUnlockDisplay(disp);
+
+	//Refresh what XNextEvent is listening for.
+	interruptMsgLoop();
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JNIEnv * env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JNIEnv * env, jobject UNUSED(obj)) {
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
 	(*env)->GetJavaVM(env, &jvm);
 
 	//Set the native error handler.
-	XSetErrorHandler((XErrorHandler) xerrorToException);
+	XSetErrorHandler((XErrorHandler) xErrorToException);
 
 	//Grab the default display
 	char * disp_name = XDisplayName(NULL);
@@ -312,7 +416,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	//Iterate over screens
 	int screen;
 	for (screen = 0; screen < ScreenCount(disp); screen++) {
-		printf ("Init Screen %i\n", screen);
+		#ifdef DEBUG
+		printf ("Native: Init Screen %i\n", screen);
+		#endif
 		XSelectInput(disp, RootWindow(disp, screen), KeyPressMask | KeyReleaseMask);
 	}
 
@@ -335,26 +441,25 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	}
 }
 
-/*
-void __cleanup() {
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_unregisterHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	if (disp != NULL) {
 		XUngrabKey(disp, AnyKey, AnyModifier, default_win);
+		XCloseDisplay(disp);
+		disp = NULL;
 	}
 
+	//Try to exit the thread naturally.
 	bRunning = FALSE;
-	if (pthread_kill(hookThreadId, SIGKILL)) {
-		#ifdef DEBUG
-		printf("Native: pthread_kill successful.\n");
-		#endif
-	}
-}
-*/
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_unregisterHook(JNIEnv * env, jobject obj) {
-	//__cleanup();
+	interruptMsgLoop();
+	pthread_join(hookThreadId, NULL);
+
+	#ifdef DEBUG
+	printf("Native: Thread terminated successful.\n");
+	#endif
 }
 
 void Init() {
-	//Do Nothing
+	//Tell X Threads are OK
 	XInitThreads();
 
 	#ifdef DEBUG
@@ -363,7 +468,14 @@ void Init() {
 }
 
 void Cleanup() {
+	//Make sure the thread has stopped.
+	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
+		#ifdef DEBUG
+		printf("Native: pthread_kill successful.\n");
+		#endif
+	}
+
 	#ifdef DEBUG
-	printf("Native: Init - Shared Object Process Detach.\n");
+	printf("Native: Cleanup - Shared Object Process Detach.\n");
 	#endif
 }

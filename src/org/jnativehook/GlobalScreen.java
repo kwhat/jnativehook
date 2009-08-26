@@ -42,8 +42,7 @@ public class GlobalScreen extends Component {
 		//objEventListeners.remove(GrabKeyListener.class, objListener);
 	}
 	
-	@SuppressWarnings("unused")
-	private void fireKeyPressed(NativeKeyEvent objEvent) {
+	protected void fireKeyPressed(NativeKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
@@ -52,12 +51,11 @@ public class GlobalScreen extends Component {
 		}
 	}
 	
-	@SuppressWarnings("unused")
-	private void fireKeyReleased(NativeKeyEvent objEvent) {
+	protected void fireKeyReleased(NativeKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				( (NativeKeyListener)objListeners[i + 1] ).keyReleased( objEvent );
+				((NativeKeyListener) objListeners[i + 1]).keyReleased( objEvent );
 			}
 		}
 	}

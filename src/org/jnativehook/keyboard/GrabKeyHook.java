@@ -32,7 +32,6 @@ public class GrabKeyHook {
 	}
 	
 	protected void finalize() throws Throwable {
-		System.out.print("Fin");
 	    try {
 	    	unregisterHook();
 	    }
@@ -83,15 +82,6 @@ public class GrabKeyHook {
 		
 		//Register the hook.
 		registerHook();
-		/*
-		new Thread() {
-			public void run() {
-				//Start hook should block until stopHook is called.
-				registerHook();
-				unregisterHook();
-			}
-		}.start();
-		*/
 	}
 	
 	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
