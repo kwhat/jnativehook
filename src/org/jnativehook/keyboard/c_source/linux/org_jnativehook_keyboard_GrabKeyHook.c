@@ -72,7 +72,7 @@ void throwException(char * message) {
 
 	if (objExceptionClass != NULL) {
 		#ifdef DEBUG
-		printf("Native: Exception - %s\n", sMessage);
+		printf("Native: Exception - %s\n", message);
 		#endif
 
 		(*env)->ThrowNew(env, objExceptionClass, message);
