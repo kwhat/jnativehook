@@ -62,32 +62,37 @@ pthread_t hookThreadId = 0;
 void __attribute__ ((constructor)) Init(void);
 void __attribute__ ((destructor)) Cleanup(void);
 
-void throwException(JNIEnv * env, char * sMessage) {
+void throwException(char * message) {
+	//Attach to the currently running jvm
+	JNIEnv * env = NULL;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
 	//Locate our exception class
 	jclass objExceptionClass = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyException");
 
 	if (objExceptionClass != NULL) {
 		#ifdef DEBUG
-		printf("C++ Exception: %s\n", sMessage);
+		printf("Native: Exception - %s\n", sMessage);
 		#endif
 
-		(*env)->ThrowNew(env, objExceptionClass, sMessage);
-		//(*env)->ExceptionDescribe();
-		//(*env)->DeleteLocalRef(objExceptionClass);
+		(*env)->ThrowNew(env, objExceptionClass, message);
 	}
 	else {
-		//Unable to find exception class
-		#ifdef DEBUG
-		printf("Native: Unable to locate exception class.\n");
-		#endif
-
-		//FIXME Terminate with error.  Maybe throw xerror
+		//Unable to find exception class, Terminate with error.
+		(*env)->FatalError(env, "Unable to locate NativeKeyException class.");
+		exit(1);
 	}
 }
 
-int handle_xerror(Display * dpy, XErrorEvent * e) {
-	char msg[255];
-	XGetErrorText(dpy, e->error_code, msg, sizeof msg);
+int xerrorToException(Display * dpy, XErrorEvent * e) {
+	char message[255];
+	XGetErrorText(dpy, e->error_code, message, sizeof message);
+
+	#ifdef DEBUG
+	printf("Native: XError %i - %s.\n", e->error_code, message);
+	#endif
+
+	throwException(message);
 }
 
 
@@ -273,7 +278,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	(*env)->GetJavaVM(env, &jvm);
 
 	//Set the native error handler.
-	XSetErrorHandler((XErrorHandler) errorToException);
+	XSetErrorHandler((XErrorHandler) xerrorToException);
 
 	//Grab the default display
 	char * disp_name = XDisplayName(NULL);
@@ -286,16 +291,18 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 		strcat(exceptoin_msg, error_msg);
 		strcat(exceptoin_msg, disp_name);
 
-		throwException(env, exceptoin_msg);
+		throwException(exceptoin_msg);
 		free(exceptoin_msg);
 
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
+	else {
+		#ifdef DEBUG
+		printf("Native: XOpenDisplay successful\n");
+		#endif
+	}
 
-	#ifdef DEBUG
-	printf("Native: XOpenDisplay successful\n");
-	#endif
 
 	//Set allowed events and the default root window.
 	XAllowEvents(disp, AsyncKeyboard, CurrentTime);
