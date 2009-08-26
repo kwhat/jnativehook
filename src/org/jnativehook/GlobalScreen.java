@@ -4,7 +4,7 @@ package org.jnativehook;
 import java.awt.Component;
 import javax.swing.event.EventListenerList;
 
-import org.jnativehook.keyboard.GrabKeyEvent;
+import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 public class GlobalScreen extends Component {
@@ -18,7 +18,7 @@ public class GlobalScreen extends Component {
 		objEventListeners = new EventListenerList();
 	}
 	
-	public static GlobalScreen getInstance() {
+	public static synchronized GlobalScreen getInstance() {
 		if (GlobalScreen.instance == null) {
 			GlobalScreen.instance = new GlobalScreen();
 		}
@@ -43,7 +43,7 @@ public class GlobalScreen extends Component {
 	}
 	
 	@SuppressWarnings("unused")
-	private void fireKeyPressed(GrabKeyEvent objEvent) {
+	private void fireKeyPressed(NativeKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
@@ -53,7 +53,7 @@ public class GlobalScreen extends Component {
 	}
 	
 	@SuppressWarnings("unused")
-	private void fireKeyReleased(GrabKeyEvent objEvent) {
+	private void fireKeyReleased(NativeKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {

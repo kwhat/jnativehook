@@ -19,7 +19,7 @@ public class Driver implements NativeKeyListener {
 	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
 		GlobalScreen.getInstance().addGrabKeyListener(this);
 		objKeyHook = new GrabKeyHook();
-		objKeyHook.grabKey(KeyEvent.SHIFT_MASK, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
+		objKeyHook.grabKey(0, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {

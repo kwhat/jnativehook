@@ -31,6 +31,19 @@ public class GrabKeyHook {
 		loadLibrary(sLibPath);
 	}
 	
+	protected void finalize() throws Throwable {
+		System.out.print("Fin");
+	    try {
+	    	unregisterHook();
+	    }
+	    catch(Exception e) {
+	        //Do Nothing
+	    }
+	    finally {
+	        super.finalize();
+	    }
+	}
+	
 	/**
 	 * Overloaded Constructor
 	 *
@@ -47,7 +60,7 @@ public class GrabKeyHook {
 	 * Attempts to load the native library based on the supplied path.
 	 */
 	private void loadLibrary(String sLibPath) throws NativeKeyException {
-		//Set the new lib path to system property.
+		//Set the new library path to system property.
 		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
 		
 		try {
@@ -69,19 +82,22 @@ public class GrabKeyHook {
 		}
 		
 		//Register the hook.
+		registerHook();
+		/*
 		new Thread() {
 			public void run() {
 				//Start hook should block until stopHook is called.
-				startHook();
-				stopHook();
+				registerHook();
+				unregisterHook();
 			}
 		}.start();
+		*/
 	}
 	
 	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	public native void ungrabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	
 	//These are basically the constructors and deconstructors for the hook.
-	private native void startHook();
-	private native void stopHook();
+	private native void registerHook();
+	private native void unregisterHook();
 }

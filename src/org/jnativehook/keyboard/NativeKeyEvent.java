@@ -5,14 +5,14 @@ import java.awt.event.KeyEvent;
 
 import org.jnativehook.GlobalScreen;
  
-public class GrabKeyEvent extends KeyEvent {
+public class NativeKeyEvent extends KeyEvent {
 	private static final long serialVersionUID = -4226037291462485089L;
 	
-	public GrabKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
+	public NativeKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
 		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar);
 	}
 	
-	public GrabKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar, int iKeyLocation) {
+	public NativeKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar, int iKeyLocation) {
 		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar, iKeyLocation);
 	}
 }

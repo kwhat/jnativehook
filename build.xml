@@ -188,7 +188,7 @@
 				<compilerarg value="-lX11" if="gcc.os.family.unix"/>
 				<compilerarg value="-DDEBUG" if="gcc.debug"/>
 				
-				<compilerarg value="-v"/>
+				<!-- compilerarg value="-v"/ -->
 			</compiler>
 			
 			<linker name="gcc">
@@ -200,7 +200,7 @@
 				<linkerarg value="-fno-strict-aliasing"/>
 				<linkerarg value="-lX11" if="gcc.os.family.unix"/>
 				
-				<linkerarg value="-v"/>
+				<!-- linkerarg value="-v"/ -->
 			</linker>
 			
 			<versioninfo

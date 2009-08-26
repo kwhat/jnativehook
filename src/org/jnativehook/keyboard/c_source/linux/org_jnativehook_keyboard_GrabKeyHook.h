@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey
  * Method:    unregisterHook
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_startHook
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook
   (JNIEnv *, jobject);
 
 /*
@@ -36,7 +36,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_startHook
  * Method:    unregisterHook
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_stopHook
+JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_unregisterHook
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus
