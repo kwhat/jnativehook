@@ -14,10 +14,6 @@ Compiling Options:
 	gcc -m64 -march=k8 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativehook_keyboard_GrabKeyHook.c -o libJNativeHook_Keyboard.so
 */
 
-typedef enum { FALSE, TRUE } bool;
-typedef char byte;
-
-
 #ifdef UNUSED
 #elif defined(__GNUC__)
 # define UNUSED(x) UNUSED_ ## x __attribute__((unused))
@@ -34,6 +30,7 @@ typedef char byte;
 #endif
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include <pthread.h>
@@ -50,7 +47,7 @@ typedef char byte;
 #include "XMapModifers.h"
 
 //Instance Variables
-bool bRunning = TRUE;
+bool bRunning = True;
 
 Display * disp;
 Window default_win;
@@ -132,6 +129,8 @@ void MsgLoop() {
 
 
 	XEvent xev;
+	JKeyCode jkey;
+	jint modifiers;
 	jobject objEvent = NULL;
 	while (bRunning) {
 		XNextEvent(disp, &xev);
@@ -142,8 +141,17 @@ void MsgLoop() {
 				printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
 				#endif
 
-				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, (jint) xev.xkey.state, (jint) xev.xkey.keycode, (jchar) xev.xkey.keycode, 0);
+				jkey = NativeToJKeycode(xev.xkey.keycode);
+				modifiers = 0;
+				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
+				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
+				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
+				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+
+				printf("KEY LOCATION: %X\n", jkey.location);
+				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
+				objEvent = NULL;
 			break;
 
 			case KeyRelease:
@@ -151,10 +159,26 @@ void MsgLoop() {
 				printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
 				#endif
 
-				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, (jint) xev.xkey.state, (jint) xev.xkey.keycode, (jchar) xev.xkey.keycode, 0);
+				jkey = NativeToJKeycode(xev.xkey.keycode);
+				modifiers = 0;
+				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
+				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
+				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
+				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+
+				printf("KEY LOCATION: %X\n", jkey.location);
+				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
+				objEvent = NULL;
 			break;
 		}
+
+		#ifdef DEBUG
+		if ((*env)->ExceptionOccurred(env)) {
+			printf("Native: JNI Error Occured.\n");
+			((*env)->ExceptionDescribe(env));
+		}
+		#endif
 	}
 
 	#ifdef DEBUG
@@ -195,7 +219,12 @@ int factorial(int n) {
 
 JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
 	XLockDisplay(disp);
-	KeySym keysym = JKeycodeToNative(jkeycode, jkeylocation);
+
+	JKeyCode jkey;
+	jkey.keycode = jkeycode;
+	jkey.location = jkeylocation;
+
+	KeySym keysym = JKeycodeToNative(jkey);
 	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
 	#ifdef DEBUG
@@ -286,7 +315,12 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv 
 
 JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
 	XLockDisplay(disp);
-	KeySym keysym = JKeycodeToNative(jkeycode, jkeylocation);
+
+	JKeyCode jkey;
+	jkey.keycode = jkeycode;
+	jkey.location = jkeylocation;
+
+	KeySym keysym = JKeycodeToNative(jkey);
 	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
 	#ifdef DEBUG
@@ -411,7 +445,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	//Set allowed events and the default root window.
 	XAllowEvents(disp, AsyncKeyboard, CurrentTime);
 	default_win = DefaultRootWindow(disp);
-	XkbSetDetectableAutoRepeat(disp, TRUE, NULL);
+	XkbSetDetectableAutoRepeat(disp, True, NULL);
 
 	//Iterate over screens
 	int screen;
@@ -426,7 +460,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	getModifiers(disp);
 
 	//Call listener
-	bRunning = TRUE;
+	bRunning = True;
 
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
 		#ifdef DEBUG
@@ -449,7 +483,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_unregisterHook(
 	}
 
 	//Try to exit the thread naturally.
-	bRunning = FALSE;
+	bRunning = False;
 	interruptMsgLoop();
 	pthread_join(hookThreadId, NULL);
 

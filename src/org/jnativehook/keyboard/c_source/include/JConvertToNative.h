@@ -4,5 +4,14 @@
 #include "JKeyLocations.h"
 #include "JKeyModifiers.h"
 
-unsigned int JKeycodeToNative(jint key, jint location);
+typedef struct {
+	jint keycode;		//Key Code
+	jint location;		//Key Location
+} JKeyCode;
+
+
+unsigned int JKeycodeToNative(JKeyCode jkey);
+JKeyCode NativeToJKeycode(unsigned int keycode);
+
 unsigned int JModifierToNative(jint modifier);
+jint NativeToJModifier(unsigned int modifier);

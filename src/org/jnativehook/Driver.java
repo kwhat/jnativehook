@@ -24,11 +24,16 @@ public class Driver implements NativeKeyListener {
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
-		System.out.println("Key Pressed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
+		//System.out.println("Key Pressed: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
 	
 	public void keyReleased(KeyEvent objEvent) {
-		System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
+		if (objEvent == null) {
+			System.out.println("Bastards Null");
+		}
+		else {
+			System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
+		}
 	}
 	
 	public void keyTyped(KeyEvent objEvent) {
