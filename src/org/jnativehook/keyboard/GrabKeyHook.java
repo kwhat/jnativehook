@@ -31,18 +31,6 @@ public class GrabKeyHook {
 		loadLibrary(sLibPath);
 	}
 	
-	protected void finalize() throws Throwable {
-	    try {
-	    	unregisterHook();
-	    }
-	    catch(Exception e) {
-	        //Do Nothing
-	    }
-	    finally {
-	        super.finalize();
-	    }
-	}
-	
 	/**
 	 * Overloaded Constructor
 	 *
@@ -53,6 +41,24 @@ public class GrabKeyHook {
 	 */
 	public GrabKeyHook(String sLibPath) throws NativeKeyException {
 		loadLibrary(sLibPath);
+	}
+	
+	/**
+	 * DeConstructor
+	 *
+	 * This will attempt to run some of the native cleanup 
+	 * when the class is garbage collected.
+	 */
+	protected void finalize() throws Throwable {
+	    try {
+	    	unregisterHook();
+	    }
+	    catch(Exception e) {
+	        //Do Nothing
+	    }
+	    finally {
+	        super.finalize();
+	    }
 	}
 	
 	/**
@@ -84,6 +90,7 @@ public class GrabKeyHook {
 		registerHook();
 	}
 	
+	//Native hooks to add and remove key bindings.
 	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	public native void ungrabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	

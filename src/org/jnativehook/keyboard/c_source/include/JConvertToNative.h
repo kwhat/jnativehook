@@ -3,6 +3,7 @@
 #include "JKeyCodes.h"
 #include "JKeyLocations.h"
 #include "JKeyModifiers.h"
+#include "JKeyEvents.h"
 
 typedef struct {
 	jint keycode;		//Key Code

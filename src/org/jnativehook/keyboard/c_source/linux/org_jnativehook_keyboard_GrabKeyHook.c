@@ -148,8 +148,7 @@ void MsgLoop() {
 				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
 				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
 
-				printf("KEY LOCATION: %X\n", jkey.location);
-				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, JK_KEY_PRESSED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
 			break;
@@ -166,8 +165,7 @@ void MsgLoop() {
 				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
 				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
 
-				printf("KEY LOCATION: %X\n", jkey.location);
-				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsEvent, constructor_ID, JK_KEY_RELEASED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
@@ -202,7 +200,7 @@ void interruptMsgLoop() {
 	xev.same_screen	= True;
 	xev.keycode		= AnyKey;
 	xev.state		= 0;
-	xev.type		= KeyPress;
+	//xev.type		= KeyPress;
 
 	XSendEvent(xev.display, xev.window, True, KeyPressMask, (XEvent *)&xev);
 	XFlush(xev.display);
