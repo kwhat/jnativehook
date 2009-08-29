@@ -3,13 +3,12 @@ package org.jnativehook;
 //Imports
 import java.awt.event.KeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
-import org.jnativehook.keyboard.GrabKeyHook;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 //Should go GPL
 
 public class Driver implements NativeKeyListener {
-	GrabKeyHook objKeyHook;
+	GrabHook objKeyHook;
 	
 	public static void main(String[] args) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
 		new Driver();
@@ -19,7 +18,7 @@ public class Driver implements NativeKeyListener {
 	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
 		GlobalScreen.getInstance().addGrabKeyListener(this);
 		
-		objKeyHook = new GrabKeyHook();
+		objKeyHook = new GrabHook();
 		objKeyHook.grabKey(0, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
 	}
 	

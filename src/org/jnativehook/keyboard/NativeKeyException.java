@@ -10,4 +10,12 @@ public class NativeKeyException extends Exception {
 	public NativeKeyException(String sMessage) {
 		super(sMessage);
 	}
+	
+	public NativeKeyException(String sMessage, Throwable objThrowable) {
+		super(sMessage, objThrowable);
+	}
+	
+	public NativeKeyException(Throwable objThrowable) {
+		super(objThrowable);
+	}
 }
