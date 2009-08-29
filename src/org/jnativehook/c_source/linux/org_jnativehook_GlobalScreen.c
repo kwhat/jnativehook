@@ -42,7 +42,7 @@ Compiling Options:
 
 #include <jni.h>
 
-#include "org_jnativehook_keyboard_GrabKeyHook.h"
+#include "include/org_jnativehook_GlobalScreen.h"
 #include "include/JConvertToNative.h"
 #include "XMapModifers.h"
 
@@ -215,7 +215,7 @@ int factorial(int n) {
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
 	XLockDisplay(disp);
 
 	JKeyCode jkey;
@@ -311,7 +311,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_grabKey(JNIEnv 
 	interruptMsgLoop();
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
 	XLockDisplay(disp);
 
 	JKeyCode jkey;
@@ -408,7 +408,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_ungrabKey(JNIEn
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JNIEnv * env, jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
 	(*env)->GetJavaVM(env, &jvm);
@@ -473,7 +473,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_registerHook(JN
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_keyboard_GrabKeyHook_unregisterHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	if (disp != NULL) {
 		XUngrabKey(disp, AnyKey, AnyModifier, default_win);
 		XCloseDisplay(disp);

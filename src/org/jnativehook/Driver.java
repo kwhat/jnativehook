@@ -8,18 +8,16 @@ import org.jnativehook.keyboard.NativeKeyListener;
 //Should go GPL
 
 public class Driver implements NativeKeyListener {
-	GrabHook objKeyHook;
-	
 	public static void main(String[] args) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
 		new Driver();
 		System.out.println("Driver Started");
 	}
 	
 	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
-		GlobalScreen.getInstance().addGrabKeyListener(this);
+		GlobalScreen.registerHook();
 		
-		objKeyHook = new GrabHook();
-		objKeyHook.grabKey(0, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
+		GlobalScreen.getInstance().addGrabKeyListener(this);
+		GlobalScreen.getInstance().grabKey(0, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
 	}
 	
 	public void keyPressed(KeyEvent objEvent) {
@@ -27,12 +25,7 @@ public class Driver implements NativeKeyListener {
 	}
 	
 	public void keyReleased(KeyEvent objEvent) {
-		if (objEvent == null) {
-			System.out.println("Bastards Null");
-		}
-		else {
-			System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
-		}
+		System.out.println("Key Released: " + objEvent.getKeyLocation() + " " + objEvent.getKeyCode() + " " + objEvent.getKeyChar());
 	}
 	
 	public void keyTyped(KeyEvent objEvent) {

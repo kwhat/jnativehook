@@ -164,18 +164,18 @@
 			outtype="shared"
 			link="shared"
 			
-			outfile="${dir.dist}/JNativeHook_Keyboard"
+			outfile="${dir.dist}/JNativeHook"
 			objdir="${dir.objs}"
 			
 			debug="${project.debug}"
 			warnings="diagnostic"
 		>
 			<compiler name="gcc">
-				<includepath location="${dir.src}/org/jnativehook/keyboard/c_source"/>
+				<includepath location="${dir.src}/org/jnativehook/c_source"/>
 				<includepath location="${javac.include}"/>
 				<includepath location="${javac.include}/linux"/>
 				
-				<fileset dir="${dir.src}/org/jnativehook/keyboard/c_source/linux">
+				<fileset dir="${dir.src}/org/jnativehook/c_source/linux">
 					<include name="*.c"/>
 				</fileset>
 				
