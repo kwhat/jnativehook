@@ -10,6 +10,7 @@ import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
+import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
 
 public class GlobalScreen extends Component {
@@ -49,25 +50,27 @@ public class GlobalScreen extends Component {
 		return GlobalScreen.instance;
 	}
 	
-	public void addGrabKeyListener(NativeKeyListener objListener) {
+	public void addNativeKeyListener(NativeKeyListener objListener) {
 		objEventListeners.add(NativeKeyListener.class, objListener);
 	}
 	
-	public void removeGrabKeyListener(NativeKeyListener objListener) {
+	public void removeNativeKeyListener(NativeKeyListener objListener) {
 		objEventListeners.remove(NativeKeyListener.class, objListener);
 	}
 	
-	public void addGrabButtonListener(NativeMouseListener objListener) {
+	public void addNativeButtonListener(NativeMouseListener objListener) {
 		objEventListeners.add(NativeMouseListener.class, objListener);
 	}
 	
-	public void removeGrabButtonListener(NativeMouseListener objListener) {
+	public void removeNativeButtonListener(NativeMouseListener objListener) {
 		objEventListeners.remove(NativeMouseListener.class, objListener);
 	}
 	
 	//Native hooks to add and remove key bindings.
 	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
 	public native void ungrabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
+	public native void grabButton(int iButton) throws NativeKeyException;
+	public native void ungrabButton(int iButton) throws NativeKeyException;
 	
 	
 	protected void fireKeyPressed(NativeKeyEvent objEvent) {
@@ -88,7 +91,24 @@ public class GlobalScreen extends Component {
 		}
 	}
 	
-
+	protected void fireMousePressed(NativeMouseEvent objEvent) {
+		Object[] objListeners = objEventListeners.getListenerList();
+		for (int i = 0; i < objListeners.length; i += 2) {
+			if ( objListeners[ i ] == NativeMouseListener.class ) {
+				((NativeMouseListener) objListeners[i + 1]).mousePressed( objEvent );
+			}
+		}
+	}
+	
+	protected void fireMouseReleased(NativeMouseEvent objEvent) {
+		Object[] objListeners = objEventListeners.getListenerList();
+		for ( int i = 0; i < objListeners.length; i += 2 ) {
+			if ( objListeners[ i ] == NativeMouseListener.class ) {
+				((NativeMouseListener) objListeners[i + 1]).mouseReleased( objEvent );
+			}
+		}
+	}
+	
 	public static void registerHook() {
 		//Setup default location to the pwd.
 		String sLibPath = System.getProperty("user.dir", new File("").getAbsolutePath());

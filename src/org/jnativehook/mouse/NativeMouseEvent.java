@@ -1,18 +1,17 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.event.KeyEvent;
-
+import java.awt.event.MouseEvent;
 import org.jnativehook.GlobalScreen;
  
-public class NativeMouseEvent extends KeyEvent {
+public class NativeMouseEvent extends MouseEvent {
 	private static final long serialVersionUID = -4226037291462485089L;
 	
-	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar);
+	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iX, int iY, int iClickCount, boolean bPopupTrigger) {
+		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iX, iY, iClickCount, bPopupTrigger);
 	}
 	
-	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar, int iKeyLocation) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar, iKeyLocation);
+	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iX, int iY, int iClickCount, boolean bPopupTrigger,  int iButton) {
+		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iX, iY, iClickCount, bPopupTrigger, iButton);
 	}
 }

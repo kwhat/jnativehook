@@ -16,7 +16,7 @@ public class Driver implements NativeKeyListener {
 	public Driver() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, NativeKeyException {
 		GlobalScreen.registerHook();
 		
-		GlobalScreen.getInstance().addGrabKeyListener(this);
+		GlobalScreen.getInstance().addNativeKeyListener(this);
 		GlobalScreen.getInstance().grabKey(0, KeyEvent.VK_B, KeyEvent.KEY_LOCATION_STANDARD);
 	}
 	

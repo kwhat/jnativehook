@@ -45,6 +45,22 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey
 
 /*
  * Class:     org_jnativehook_GlobalScreen
+ * Method:    grabButton
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    ungrabButton
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
  * Method:    initialize
  * Signature: ()V
  */

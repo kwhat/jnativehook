@@ -460,6 +460,30 @@ JKeyCode NativeToJKeycode(unsigned int keycode) {
 	}
 }
 
+jint NativeToJButton(unsigned int button) {
+	switch (button) {
+		case Button1:									return JBUTTON1;
+		case Button2:									return JBUTTON2;
+		case Button3:									return JBUTTON3;
+		case Button4:									return JBUTTON4;
+		case Button5:									return JBUTTON5;
+		default:
+		case AnyButton:									return JNOBUTTON;
+	}
+}
+
+unsigned int JButtonToNative(jint button) {
+	switch (button) {
+		case JBUTTON1:									return Button1;
+		case JBUTTON2:									return Button2;
+		case JBUTTON3:									return Button3;
+		case JBUTTON4:									return Button4;
+		case JBUTTON5:									return Button5;
+		default:
+		case JNOBUTTON:									return AnyButton;
+	}
+}
+
 unsigned int JModifierToNative(jint modifier) {
 	switch (modifier) {
 		case JK_SHIFT_MASK:								return ShiftMask;
