@@ -33,31 +33,23 @@ Compiling Options:
 #include <stdbool.h>
 #include <string.h>
 
-#include <pthread.h>
-#include <signal.h>
-
-
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
+#include <windows.h>
 
 #include <jni.h>
 
 #include "include/org_jnativehook_GlobalScreen.h"
 #include "include/JConvertToNative.h"
-#include "XMapModifers.h"
+#include "WinMapKeyCodes.h"
 
 //Instance Variables
 bool bRunning = True;
+HHOOK handleKeyboardHook = NULL;
+HHOOK handleMouseHook = NULL;
 
-Display * disp;
-Window default_win;
 
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
 
-//Shared Object Constructor and Deconstructor
-void __attribute__ ((constructor)) Init(void);
-void __attribute__ ((destructor)) Cleanup(void);
 
 void jniFatalError(char * message) {
 	//Attach to the currently running jvm
@@ -107,7 +99,7 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 }
 
 
-void MsgLoop() {
+LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
@@ -133,6 +125,74 @@ void MsgLoop() {
 
 	jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 	jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+
+
+
+
+	KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
+
+	if (jvm->AttachCurrentThread((void **)&env, NULL) >= 0) {
+		switch (wParam) {
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+				#ifdef DEBUG
+				printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
+				#endif
+
+				jkey = NativeToJKeycode(xev.xkey.keycode);
+				modifiers = 0;
+				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
+				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
+				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
+				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
+				objEvent = NULL;
+			break;
+
+			case WM_KEYUP:
+			case WM_SYSKEYUP:
+				#ifdef DEBUG
+				printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
+				#endif
+
+				jkey = NativeToJKeycode(xev.xkey.keycode);
+				modifiers = 0;
+				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
+				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
+				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
+				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
+				objEvent = NULL;
+			break;
+
+			default:
+			break;
+		}
+	}
+	else {
+		#ifdef DEBUG
+		printf("C++: MsgLoop - Error on the attach current thread.\n");
+		#endif
+	}
+
+	return CallNextHookEx(NULL, nCode, wParam, lParam);
+}
+
+void MsgLoop() {
+	MSG message;
+
+	while (bRunning && GetMessage(&message, NULL, 0, 0)) {
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+	}
+}
+
+void MsgLoop() {
+
 
 	XEvent xev;
 	JKeyCode jkey;
@@ -216,18 +276,6 @@ void MsgLoop() {
 	#endif
 }
 
-void interruptMsgLoop() {
-	//We need to create an event to send to the thread to wake it up
-	//so it will listen to grab changes.
-	XAnyEvent xev;
-	//xev.type		= KeyPress;
-	xev.display		= disp;			// defined globally
-	xev.window		= default_win;
-
-	XSendEvent(xev.display, xev.window, True, KeyPressMask, (XEvent *)&xev);
-	XFlush(xev.display);
-}
-
 int factorial(int n) {
 	if (n <= 1) {
 		return 1;
@@ -238,8 +286,6 @@ int factorial(int n) {
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
-
 	JKeyCode jkey;
 	jkey.keycode = jkeycode;
 	jkey.location = jkeylocation;
@@ -326,16 +372,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 			XGrabKey(disp, keycode, curr_mask, default_win, True, GrabModeAsync, GrabModeAsync);
 		}
 	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
-
 	JKeyCode jkey;
 	jkey.keycode = jkeycode;
 	jkey.location = jkeylocation;
@@ -422,15 +461,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 			XUngrabKey(disp, keycode, curr_mask, default_win);
 		}
 	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
 	unsigned int button = JButtonToNative(jbutton);
 
 	#ifdef DEBUG
@@ -438,14 +471,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	#endif
 
 	XGrabButton(disp, button, AnyModifier, default_win, True, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
 	unsigned int button = JButtonToNative(jbutton);
 
 	#ifdef DEBUG
@@ -453,10 +481,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 	#endif
 
 	XUngrabKey(disp, button, AnyModifier, default_win);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 
@@ -467,45 +491,51 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 	(*env)->GetJavaVM(env, &jvm);
 
 	//Set the native error handler.
-	XSetErrorHandler((XErrorHandler) xErrorToException);
+	//XSetErrorHandler((XErrorHandler) xErrorToException);
 
-	//Grab the default display
-	char * disp_name = XDisplayName(NULL);
-	disp = XOpenDisplay(disp_name);
-	if (disp == NULL) {
-		//We couldnt hook a display so we need to die.
-		char * error_msg = "Could not open display: ";
-		char * exceptoin_msg = (char *) malloc( (strlen(error_msg) + strlen(disp_name)) + 1 * sizeof(char));
+	//Setup the native hooks and their callbacks.
+	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
+	if (handleKeyboardHook != NULL) {
+		#ifdef DEBUG
+		printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) successful\n");
+		#endif
 
-		strcat(exceptoin_msg, error_msg);
-		strcat(exceptoin_msg, disp_name);
+		UnhookWindowsHookEx(hookHandle);
+	}
+	else {
+		#ifdef DEBUG
+		printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
+		#endif
 
-		throwException(exceptoin_msg);
-		free(exceptoin_msg);
+		throwException(env, "Failed to hook keyboard using SetWindowsHookEx");
 
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
+
+
+	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
+	if (handleMouseHook != NULL) {
+		#ifdef DEBUG
+		printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) successful\n");
+		#endif
+
+		UnhookWindowsHookEx(hookHandle);
+	}
 	else {
 		#ifdef DEBUG
-		printf("Native: XOpenDisplay successful\n");
+		printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
 		#endif
+
+		throwException(env, "Failed to hook mouse using SetWindowsHookEx");
+
+		//Naturaly exit so jni exception is thrown.
+		return;
 	}
 
 
-	//Set allowed events and the default root window.
-	XAllowEvents(disp, AsyncBoth, CurrentTime);
-	default_win = DefaultRootWindow(disp);
-	XkbSetDetectableAutoRepeat(disp, True, NULL);
 
-	//Iterate over screens
-	int screen;
-	for (screen = 0; screen < ScreenCount(disp); screen++) {
-		#ifdef DEBUG
-		printf ("Native: Init Screen %i\n", screen);
-		#endif
-		XSelectInput(disp, RootWindow(disp, screen), KeyPressMask | KeyReleaseMask | ButtonPress | ButtonRelease);
-	}
+
 
 	//Setup modifieres
 	getModifiers(disp);
@@ -543,24 +573,25 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	#endif
 }
 
-void Init() {
-	//Tell X Threads are OK
-	XInitThreads();
+BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
+	switch (reason) {
+		case DLL_PROCESS_ATTACH:
+			#ifdef DEBUG
+			printf("Native: DllMain - DLL Process attach.\n");
+			#endif
 
-	#ifdef DEBUG
-	printf("Native: Init - Shared Object Process Attach.\n");
-	#endif
-}
+			hInst = _hInst;
+		break;
 
-void Cleanup() {
-	//Make sure the thread has stopped.
-	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
-		#ifdef DEBUG
-		printf("Native: pthread_kill successful.\n");
-		#endif
+		case DLL_PROCESS_DETACH:
+			#ifdef DEBUG
+			printf("Native: DllMain - DLL Process Detach.\n");
+			#endif
+		break;
+
+		default:
+		break;
 	}
 
-	#ifdef DEBUG
-	printf("Native: Cleanup - Shared Object Process Detach.\n");
-	#endif
+	return TRUE;
 }
