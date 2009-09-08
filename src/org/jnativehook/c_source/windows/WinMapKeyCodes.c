@@ -5,24 +5,9 @@
 
 #include <windows.h>
 
-unsigned int CapsLockMask  = 0;
-unsigned int NumberLockMask = 0;
-unsigned int ScrollLockMask = 0;
 unsigned int AltMask = 0;
 unsigned int SuperMask = 0;
 unsigned int MetaMask = 0;
-
-unsigned int getCapsLockMask() {
-	return CapsLockMask;
-}
-
-unsigned int getNumberLockMask() {
-	return NumberLockMask;
-}
-
-unsigned int getScrollLockMask() {
-	return ScrollLockMask;
-}
 
 unsigned int getAltMask() {
 	return AltMask;
@@ -121,4 +106,3 @@ void getModifiers(Display * disp) {
 		XFreeModifiermap(modmap);
 	}
 }
-
