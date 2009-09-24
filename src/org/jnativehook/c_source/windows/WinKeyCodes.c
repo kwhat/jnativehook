@@ -5,15 +5,15 @@
 
 #include <windows.h>
 
-unsigned int AltMask = 0;
+KeyCode * AltMask = 0;
 unsigned int SuperMask = 0;
 unsigned int MetaMask = 0;
 
-unsigned int getAltMask() {
+KeyCode getKeyCode() {
 	return AltMask;
 }
 
-unsigned int getSuperMask() {
+unsigned int addKeyCode(KeyCode key) {
 	return SuperMask;
 }
 

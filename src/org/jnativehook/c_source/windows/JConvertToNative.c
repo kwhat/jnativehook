@@ -6,9 +6,15 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_ENTER:									return VK_RETURN;
 		case JK_BACK_SPACE:								return VK_BACK;
 		case JK_TAB:									return VK_TAB;
-		case JK_SHIFT:									return VK_SHIFT;		//FIXME R and L
-		case JK_CONTROL:								return VK_CONTROL;		//FIXME R and L
-		case JK_ALT:									return VK_MENU;			//FIXME R and L
+		case JK_SHIFT:
+			if (jkey.location == JK_LOCATION_LEFT)		return VK_LSHIFT;
+			else										return VK_RSHIFT;
+		case JK_CONTROL:
+			if (jkey.location == JK_LOCATION_LEFT)		return VK_LCONTROL;
+			else										return VK_RCONTROL;
+		case JK_ALT:
+			if (jkey.location == JK_LOCATION_LEFT)		return VK_LMENU;
+			else										return VK_RMENU;
 		case JK_PAUSE:									return VK_PAUSE;
 		case JK_CAPS_LOCK:								return VK_CAPITAL;
 		case JK_ESCAPE:									return VK_ESCAPE;
@@ -28,51 +34,49 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_PERIOD:									return VK_OEM_PERIOD;
 		case JK_SLASH:									return VK_OEM_2;
 
-//		TODO exists 0-9 outside of numpad?
-		case JK_0:										return VK_NUMPAD0;
-		case JK_1:										return VK_NUMPAD1;
-		case JK_2:										return VK_NUMPAD2;
-		case JK_3:										return VK_NUMPAD3;
-		case JK_4:										return VK_NUMPAD4;
-		case JK_5:										return VK_NUMPAD5;
-		case JK_6:										return VK_NUMPAD6;
-		case JK_7:										return VK_NUMPAD7;
-		case JK_8:										return VK_NUMPAD8;
-		case JK_9:										return VK_NUMPAD9;
+		case JK_0:										return 0x30;
+		case JK_1:										return 0x31;
+		case JK_2:										return 0x32;
+		case JK_3:										return 0x33;
+		case JK_4:										return 0x34;
+		case JK_5:										return 0x35;
+		case JK_6:										return 0x36;
+		case JK_7:										return 0x37;
+		case JK_8:										return 0x38;
+		case JK_9:										return 0x39;
 
 		case JK_SEMICOLON:								return VK_OEM_1;
 		//case JK_EQUALS:								return VK_equal; 	//TODO FIND EQUALS
 
-		case JK_A:										return VK_A;
-		case JK_B:										return VK_B;
-		case JK_C:										return VK_C;
-		case JK_D:										return VK_D;
-		case JK_E:										return VK_E;
-		case JK_F:										return VK_F;
-		case JK_G:										return VK_G;
-		case JK_H:										return VK_H;
-		case JK_I:										return VK_I;
-		case JK_J:										return VK_J;
-		case JK_L:										return VK_L;
-		case JK_M:										return VK_M;
-		case JK_N:										return VK_N;
-		case JK_O:										return VK_O;
-		case JK_P:										return VK_P;
-		case JK_Q:										return VK_Q;
-		case JK_R:										return VK_R;
-		case JK_S:										return VK_S;
-		case JK_T:										return VK_T;
-		case JK_U:										return VK_U;
-		case JK_V:										return VK_V;
-		case JK_W:										return VK_W;
-		case JK_X:										return VK_X;
-		case JK_Y:										return VK_Y;
-		case JK_Z:										return VK_Z;
+		case JK_A:										return 0x41;
+		case JK_B:										return 0x42;
+		case JK_C:										return 0x43;
+		case JK_D:										return 0x44;
+		case JK_E:										return 0x45;
+		case JK_F:										return 0x46;
+		case JK_G:										return 0x47;
+		case JK_H:										return 0x48;
+		case JK_I:										return 0x49;
+		case JK_J:										return 0x4A;
+		case JK_K:										return 0x4B;
+		case JK_L:										return 0x4C;
+		case JK_M:										return 0x4D;
+		case JK_N:										return 0x4E;
+		case JK_O:										return 0x4F;
+		case JK_P:										return 0x50;
+		case JK_Q:										return 0x51;
+		case JK_R:										return 0x52;
+		case JK_S:										return 0x53;
+		case JK_T:										return 0x54;
+		case JK_U:										return 0x55;
+		case JK_V:										return 0x56;
+		case JK_W:										return 0x57;
+		case JK_X:										return 0x58;
+		case JK_Y:										return 0x59;
+		case JK_Z:										return 0x5A;
 
-//		TODO - Correct brackets? "{ ["
 		case JK_OPEN_BRACKET:							return VK_OEM_4;
 		case JK_BACK_SLASH:								return VK_OEM_5;
-//		TODO - Correct close brackets? "} ]"
 		case JK_CLOSE_BRACKET:							return VK_OEM_6;
 
 		case JK_NUMPAD0:								return VK_NUMPAD0;
@@ -125,35 +129,36 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_PRINTSCREEN:							return VK_SNAPSHOT;
 		case JK_INSERT:									return VK_INSERT;
 		case JK_HELP:									return VK_HELP;
-//		TODO - find meta key
-//		case JK_META:									return VK_Meta_L;		//FIXME R and L
+		case JK_META:
+			if (jkey.location == JK_LOCATION_LEFT)		return VK_LWIN;
+			else										return VK_RWIN;
 
 		case JK_QUOTE:									return VK_OEM_7;
 		case JK_BACK_QUOTE:								return VK_OEM_3;
 
-//		TODO - exists udlr on keypad specific?
+		//Windows does not have keypad direction keys
 		case JK_KP_UP:									return VK_UP;
 		case JK_KP_DOWN:								return VK_DOWN;
 		case JK_KP_LEFT:								return VK_LEFT;
 		case JK_KP_RIGHT:								return VK_RIGHT;
 
-//		TODO - find dead... ?
-//		case JK_DEAD_GRAVE:								return VK_dead_grave;
-//		case JK_DEAD_ACUTE:								return VK_dead_acute;
-//		case JK_DEAD_CIRCUMFLEX:						return VK_dead_circumflex;
-//		case JK_DEAD_TILDE:								return VK_dead_tilde;
-//		case JK_DEAD_MACRON:							return VK_dead_macron;
-//		case JK_DEAD_BREVE:								return VK_dead_breve;
-//		case JK_DEAD_ABOVEDOT:							return VK_dead_abovedot;
-//		case JK_DEAD_DIAERESIS:							return VK_dead_diaeresis;
-//		case JK_DEAD_ABOVERING:							return VK_dead_abovering;
-//		case JK_DEAD_DOUBLEACUTE:						return VK_dead_doubleacute;
-//		case JK_DEAD_CARON:								return VK_dead_caron;
-//		case JK_DEAD_CEDILLA:							return VK_dead_cedilla;
-//		case JK_DEAD_OGONEK:							return VK_dead_ogonek;
-//		case JK_DEAD_IOTA:								return VK_dead_iota;
-//		case JK_DEAD_VOICED_SOUND:						return VK_dead_voiced_sound;
-//		case JK_DEAD_SEMIVOICED_SOUND:					return VK_dead_semivoiced_sound;
+		//No Windows Key Equivalent?
+		//case JK_DEAD_GRAVE:							return VK_dead_grave;
+		//case JK_DEAD_ACUTE:							return VK_dead_acute;
+		//case JK_DEAD_CIRCUMFLEX:						return VK_dead_circumflex;
+		//case JK_DEAD_TILDE:							return VK_dead_tilde;
+		//case JK_DEAD_MACRON:							return VK_dead_macron;
+		//case JK_DEAD_BREVE:							return VK_dead_breve;
+		//case JK_DEAD_ABOVEDOT:						return VK_dead_abovedot;
+		//case JK_DEAD_DIAERESIS:						return VK_dead_diaeresis;
+		//case JK_DEAD_ABOVERING:						return VK_dead_abovering;
+		//case JK_DEAD_DOUBLEACUTE:						return VK_dead_doubleacute;
+		//case JK_DEAD_CARON:							return VK_dead_caron;
+		//case JK_DEAD_CEDILLA:							return VK_dead_cedilla;
+		//case JK_DEAD_OGONEK:							return VK_dead_ogonek;
+		//case JK_DEAD_IOTA:							return VK_dead_iota;
+		//case JK_DEAD_VOICED_SOUND:					return VK_dead_voiced_sound;
+		//case JK_DEAD_SEMIVOICED_SOUND:				return VK_dead_semivoiced_sound;
 
 		case JK_AMPERSAND:								return VK_ampersand;
 		case JK_ASTERISK:								return VK_asterisk;
@@ -163,66 +168,64 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_BRACELEFT:								return VK_braceleft;
 		case JK_BRACERIGHT:								return VK_braceright;
 
-//		TODO - some of these are defined already within the OEM vk's; does msdn know when one is pressed
-//		case JK_AT:										return VK_at;
+		//Some of these are defined already within the OEM vk's based on keyboard layout
+		//case JK_AT:									return VK_at;
 		case JK_COLON:									return VK_OEM_1;
-//		case JK_CIRCUMFLEX:								return VK_asciicircum;
-//		case JK_DOLLAR:									return VK_dollar;
-//		case JK_EURO_SIGN:								return VK_EuroSign;
-//		case JK_EXCLAMATION_MARK:						return VK_exclam;
-//		case JK_INVERTED_EXCLAMATION_MARK:				return VK_exclamdown;
-//		case JK_LEFT_PARENTHESIS:						return VK_parenleft;
-//		case JK_NUMBER_SIGN:							return VK_numbersign;
+		//case JK_CIRCUMFLEX:							return VK_asciicircum;
+		//case JK_DOLLAR:								return VK_dollar;
+		//case JK_EURO_SIGN:							return VK_EuroSign;
+		//case JK_EXCLAMATION_MARK:						return VK_exclam;
+		//case JK_INVERTED_EXCLAMATION_MARK:			return VK_exclamdown;
+		//case JK_LEFT_PARENTHESIS:						return VK_parenleft;
+		//case JK_NUMBER_SIGN:							return VK_numbersign;
 		case JK_PLUS:									return VK_OEM_PLUS;
-//		case JK_RIGHT_PARENTHESIS:						return VK_parenright;
-//		case JK_UNDERSCORE:								return VK_underscore;
+		//case JK_RIGHT_PARENTHESIS:					return VK_parenright;
+		//case JK_UNDERSCORE:							return VK_underscore;
 
-		case JK_WINDOWS:								return VK_LWIN;									//FIXME R and L
-//		TODO - is the = to the apps key?
-		case JK_CONTEXT_MENU: 							return VK_APPS;
-//		case JK_CONTEXT_MENU:							return VK_Menu;
+		case JK_WINDOWS:
+			if (jkey.location == JK_LOCATION_LEFT)		return VK_LWIN;
+			else										return VK_RWIN;
+		case JK_CONTEXT_MENU: 							return VK_APPS;									//is the = to the apps key?
+		//case JK_CONTEXT_MENU:							return VK_Menu;
 
 		/* for input method support on Asian Keyboards */
-//		TODO - find this support?
 		case JK_FINAL:									return VK_CANCEL;								//Unknown Win32 API
-//		case JK_CONVERT:								return VK_Henkan;
-//		case JK_NONCONVERT:								return VK_Muhenkan;
-//		case JK_ACCEPT:									return VK_VoidSymbol;							//Japanese keyboard: kakutei?
-//		case JK_MODECHANGE:								return VK_Mode_switch;							//Unknown Win32 API
+		//case JK_CONVERT:								return VK_Henkan;
+		//case JK_NONCONVERT:							return VK_Muhenkan;
+		//case JK_ACCEPT:								return VK_VoidSymbol;							//Japanese keyboard: kakutei?
+		//case JK_MODECHANGE:							return VK_Mode_switch;							//Unknown Win32 API
 		case JK_KANA:									return VK_KANA;
 		case JK_KANJI:									return VK_Kanji;
-//		case JK_ALPHANUMERIC:							return VK_Eisu_Shift;
-//		case JK_KATAKANA:								return VK_Katakana;
-//		case JK_HIRAGANA:								return VK_Hiragana;
-//		case JK_FULL_WIDTH:								return VK_Zenkaku;
-//		case JK_HALF_WIDTH:								return VK_Hankaku;
-//		case JK_ROMAN_CHARACTERS:						return VK_Romaji;
-//		case JK_ALL_CANDIDATES:							return VK_Zen_Koho;
-//		case JK_PREVIOUS_CANDIDATE:						return VK_Mae_Koho;
-//		case JK_CODE_INPUT:								return VK_Kanji_Bangou;
-//		case JK_JAPANESE_KATAKANA:						return VK_Hiragana_Katakana;					//Not Sure
-//		case JK_JAPANESE_HIRAGANA:						return VK_Hiragana_Katakana;					//Not Sure
-//		case JK_JAPANESE_ROMAN:							return VK_Romaji;								//Unknown
-//		case JK_KANA_LOCK:								return VK_Kana_Lock;
-//		case JK_INPUT_METHOD_ON_OFF:					return VK_VoidSymbol;							//Japanese keyboard: nihongo?
+		//case JK_ALPHANUMERIC:							return VK_Eisu_Shift;
+		//case JK_KATAKANA:								return VK_Katakana;
+		//case JK_HIRAGANA:								return VK_Hiragana;
+		//case JK_FULL_WIDTH:							return VK_Zenkaku;
+		//case JK_HALF_WIDTH:							return VK_Hankaku;
+		//case JK_ROMAN_CHARACTERS:						return VK_Romaji;
+		//case JK_ALL_CANDIDATES:						return VK_Zen_Koho;
+		//case JK_PREVIOUS_CANDIDATE:					return VK_Mae_Koho;
+		//case JK_CODE_INPUT:							return VK_Kanji_Bangou;
+		//case JK_JAPANESE_KATAKANA:					return VK_Hiragana_Katakana;					//Not Sure
+		//case JK_JAPANESE_HIRAGANA:					return VK_Hiragana_Katakana;					//Not Sure
+		//case JK_JAPANESE_ROMAN:						return VK_Romaji;								//Unknown
+		//case JK_KANA_LOCK:							return VK_Kana_Lock;
+		//case JK_INPUT_METHOD_ON_OFF:					return VK_VoidSymbol;							//Japanese keyboard: nihongo?
 
 		/* for Sun keyboards */
-//		TODO - find this support?
-//		case JK_CUT:									return SunXK_Cut;
-//		case JK_COPY:									return SunXK_Copy;
-//		case JK_PASTE:									return SunXK_Paste;
-//		case JK_UNDO:									return SunXK_Undo;
-//		case JK_AGAIN:									return SunXK_Again;
-//		case JK_FIND:									return SunXK_Find;
-//		case JK_PROPS:									return SunXK_Props;
-//		case JK_STOP:									return SunXK_Stop;
-//
-//		case JK_COMPOSE:								return SunXK_Compose;
-//		case JK_ALT_GRAPH:								return SunXK_AltGraph;
-//		case JK_BEGIN:									return XK_Begin;
+		//case JK_CUT:									return SunXK_Cut;
+		//case JK_COPY:									return SunXK_Copy;
+		//case JK_PASTE:								return SunXK_Paste;
+		//case JK_UNDO:									return SunXK_Undo;
+		//case JK_AGAIN:								return SunXK_Again;
+		//case JK_FIND:									return SunXK_Find;
+		//case JK_PROPS:								return SunXK_Props;
+		//case JK_STOP:									return SunXK_Stop;
+		//case JK_COMPOSE:								return SunXK_Compose;
+		//case JK_ALT_GRAPH:							return SunXK_AltGraph;
+		//case JK_BEGIN:								return XK_Begin;
 
 		default:
-		case JK_UNDEFINED:								return 0x507;									//Key Undefined
+		case JK_UNDEFINED:								return 0x07;									//Key Undefined
 	}
 }
 
@@ -416,6 +419,6 @@ jint NativeToJModifier(unsigned int mod) {
 		case MOD_CONTROL:								return JK_CTRL_MASK;
 		case MOD_WIN:									return JK_META_MASK;
 		case MOD_ALT:									return JK_ALT_MASK;
-		default:										return 0x00;
+		default:										return JK_UNDEFINED;
 	}
 }

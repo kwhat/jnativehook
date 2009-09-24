@@ -46,6 +46,8 @@ bool bRunning = True;
 HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 
+JKey *
+JButton *
 
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
@@ -346,88 +348,13 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 	jkey.keycode = jkeycode;
 	jkey.location = jkeylocation;
 
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
+	unsigned int keycode = JKeycodeToNative(jkey);
 
 	#ifdef DEBUG
 	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) keysym, keycode);
 	#endif
 
-	unsigned int mask_table[10];
-	unsigned int count = 0;
 
-	if (getCapsLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using CapsLockMask\n");
-		#endif
-		mask_table[count++] = getCapsLockMask();
-	}
-
-	if (getNumberLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using NumberLockMask\n");
-		#endif
-		mask_table[count++] = getNumberLockMask();
-	}
-
-	if (getScrollLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ScrollLockMask\n");
-		#endif
-		mask_table[count++] = getScrollLockMask();
-	}
-
-	if (jmodifiers & JK_SHIFT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ShiftMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
-	}
-
-	if (jmodifiers & JK_CTRL_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ControlMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
-	}
-
-	if (jmodifiers & JK_META_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using MetaMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_META_MASK);
-	}
-
-	if (jmodifiers & JK_ALT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using AltMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	if (jmodifiers & 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using No Mask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	int set_size, i, j;
-	for (set_size = count; set_size > 0; set_size--) {
-		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
-
-		int pos = 0;
-		for (i = 0; i < num_of_items; i++) {
-			int curr_mask = 0;
-			for (j = 0; j < set_size; j++) {
-				curr_mask |= mask_table[pos];
-				pos++;
-				pos %= count;
-			}
-
-			XGrabKey(disp, keycode, curr_mask, default_win, True, GrabModeAsync, GrabModeAsync);
-		}
-	}
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
