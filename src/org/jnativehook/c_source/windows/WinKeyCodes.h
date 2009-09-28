@@ -1,7 +1,15 @@
 typedef struct {
-	unsigned char keycode;		//Key Code
-	bool shift_mask;			//Key Location
-	bool control_mask;			//Key Location
-	bool alt_mask;				//Key Location
-	bool meta_mask;				//Key Location
+	unsigned char keycode;
+	bool shift_mask;
+	bool control_mask;
+	bool alt_mask;
+	bool meta_mask;
 } KeyCode;
+
+typedef struct {
+	unsigned char buttoncode;
+	bool shift_mask;
+	bool control_mask;
+	bool alt_mask;
+	bool meta_mask;
+} ButtonCode;

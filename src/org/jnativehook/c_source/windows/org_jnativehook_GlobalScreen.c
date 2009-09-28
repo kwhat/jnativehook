@@ -39,20 +39,32 @@ Compiling Options:
 
 #include "include/org_jnativehook_GlobalScreen.h"
 #include "include/JConvertToNative.h"
-#include "WinMapKeyCodes.h"
+#include "WinKeyCodes.h"
 
 //Instance Variables
-bool bRunning = True;
+bool bRunning = TRUE;
 HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 
 
-int grabkeycount = 0;
-KeyCode grabkeys[0] = {};
+unsigned short int keysize = 0;
+KeyCode * grabkeys = NULL;
+
+unsigned short int buttonsize = 0;
+KeyCode * grabbuttons = NULL;
+
+bool rshift_mask = FALSE;
+bool lshift_mask = FALSE;
+bool rcontrol_mask = FALSE;
+bool lcontrol_mask = FALSE;
+bool ralt_mask = FALSE;
+bool lalt_mask = FALSE;
+bool rmeta_mask = FALSE;
+bool lmeta_mask = FALSE;
+
 
 JavaVM * jvm = NULL;
-pthread_t hookThreadId = 0;
-
+//pthread_t hookThreadId = 0;
 
 void jniFatalError(char * message) {
 	//Attach to the currently running jvm
@@ -88,29 +100,56 @@ void throwException(char * message) {
 	}
 }
 
-LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
-	//Class and Constructor for the NativeKeyEvent Object
-	jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-	jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
-
-	//ID's for the pressed, typed and released callbacks
-	jmethodID fireKeyPressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-	jmethodID fireKeyReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-
-	KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
-
-	//Attach to the currently running jvm
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
+
+		//Class and Constructor for the NativeKeyEvent Object
+		jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+		jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
+
+		//Class and Constructor for the NativeMouseEvent Object
+		jclass clsButtonEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+		jmethodID MouseEvent_ID = (*env)->GetMethodID(env, clsButtonEvent, "<init>", "(IJIIIIZI)V");
+
+		//Class and getInstance method id for the GlobalScreen Object
+		jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
+		jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
+
+		//A reference to the GlobalScreen Object
+		jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
+
+		//ID's for the pressed, typed and released callbacks
+		jmethodID fireKeyPressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
+		jmethodID fireKeyReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
+
+		jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+		jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+
 		switch (wParam) {
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
+				KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
+
 				#ifdef DEBUG
-				printf("Native: KeyboardProc - Key pressed (%i)\n", xev.xkey.keycode);
+				printf("Native: LowLevelProc - Key pressed (%i)\n", p.vkCode);
 				#endif
+
+				if (xev.xkey.keycode == VK_LSHIFT)		lshift_mask = TRUE;
+				if (xev.xkey.keycode == VK_RSHIFT)		rshift_mask = TRUE;
+
+				if (xev.xkey.keycode == VK_LCONTROL)	lcontrol_mask = TRUE;
+				if (xev.xkey.keycode == VK_RCONTROL)	rcontrol_mask = TRUE;
+
+				if (xev.xkey.keycode == VK_LMENU)		lalt_mask = TRUE;
+				if (xev.xkey.keycode == VK_RMENU)		ralt_mask = TRUE;
+
+				if (xev.xkey.keycode == VK_LWIN)		lmeta_mask = TRUE;
+				if (xev.xkey.keycode == VK_RWIN)		rmeta_mask = TRUE;
+
+
+				xev.xkey.keycode
 
 				jkey = NativeToJKeycode(xev.xkey.keycode);
 				modifiers = 0;
@@ -126,9 +165,24 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
+				KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
+
 				#ifdef DEBUG
-				printf("Native: KeyboardProc - Key released(%i)\n", xev.xkey.keycode);
+				printf("Native: LowLevelProc - Key released(%i)\n", p.vkCode);
 				#endif
+
+				if (xev.xkey.keycode == VK_LSHIFT)		lshift_mask = FALSE;
+				if (xev.xkey.keycode == VK_RSHIFT)		rshift_mask = FALSE;
+
+				if (xev.xkey.keycode == VK_LCONTROL)	lcontrol_mask = FALSE;
+				if (xev.xkey.keycode == VK_RCONTROL)	rcontrol_mask = FALSE;
+
+				if (xev.xkey.keycode == VK_LMENU)		lalt_mask = FALSE;
+				if (xev.xkey.keycode == VK_RMENU)		ralt_mask = FALSE;
+
+				if (xev.xkey.keycode == VK_LWIN)		lmeta_mask = FALSE;
+				if (xev.xkey.keycode == VK_RWIN)		rmeta_mask = FALSE;
+
 
 				jkey = NativeToJKeycode(xev.xkey.keycode);
 				modifiers = 0;
@@ -142,50 +196,12 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				objEvent = NULL;
 			break;
 
-			default:
-			break;
-		}
-	}
-	else {
-		#ifdef DEBUG
-		printf("Native: KeyboardProc - Error on the attach current thread.\n");
-		#endif
-	}
-
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
-}
-
-LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	//Attach to the currently running jvm
-	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
-
-		//Class and Constructor for the NativeMouseEvent Object
-		jclass clsButtonEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-		jmethodID MouseEvent_ID = (*env)->GetMethodID(env, clsButtonEvent, "<init>", "(IJIIIIZI)V");
-
-		//ID's for the pressed, typed and released callbacks
-		jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-		jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-
-
-		//Class and getInstance method id for the GlobalScreen Object
-		jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
-		jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
-
-		//A reference to the GlobalScreen Object
-		jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
-
-		MSLLHOOKSTRUCT * p = (MSLLHOOKSTRUCT *)lParam;
-		int fwButton = 0;
-
-		switch (wParam) {
 			case WM_XBUTTONDOWN:
 			case WM_NCXBUTTONDOWN:
 				fwButton = GET_XBUTTON_WPARAM(wParam);
 
 				#ifdef DEBUG
-				printf("Native: MouseProc - Button pressed (%i)\n", sizeof );
+				printf("Native: LowLevelProc - Button pressed (%i)\n", sizeof );
 				#endif
 
 				jkey = NativeToJKeycode(xev.xkey.keycode);
@@ -205,7 +221,7 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				fwButton = GET_XBUTTON_WPARAM(wParam);
 
 				#ifdef DEBUG
-				printf("Native: MouseProc - Key released(%i)\n", xev.xkey.keycode);
+				printf("Native: LowLevelProc - Button released(%i)\n", xev.xkey.keycode);
 				#endif
 
 				jkey = NativeToJKeycode(xev.xkey.keycode);
@@ -227,18 +243,11 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: MouseProc - Error on the attach current thread.\n");
+		printf("Native: LowLevelProc - Error on the attach current thread.\n");
 		#endif
 	}
 
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
-}
-
-LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
-
-
-
-
 }
 
 void MsgLoop() {
@@ -248,100 +257,10 @@ void MsgLoop() {
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
-}
-
-void MsgLoop() {
-
-
-	XEvent xev;
-	JKeyCode jkey;
-	jint jbutton;
-	jint modifiers;
-	jobject objEvent = NULL;
-	while (bRunning) {
-		XNextEvent(disp, &xev);
-
-		//We need to check to see if we interrupted XNextEvent or if this was for a legitimate event.
-		if (!xev.xany.send_event) {
-			switch (xev.type) {
-				case KeyPress:
-					#ifdef DEBUG
-					printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
-					#endif
-
-					jkey = NativeToJKeycode(xev.xkey.keycode);
-					modifiers = 0;
-					if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-					if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-					if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-					if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
-
-					objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
-					objEvent = NULL;
-				break;
-
-				case KeyRelease:
-					#ifdef DEBUG
-					printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
-					#endif
-
-					jkey = NativeToJKeycode(xev.xkey.keycode);
-					modifiers = 0;
-					if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-					if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-					if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-					if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
-
-					objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
-					objEvent = NULL;
-				break;
-
-				case ButtonPress:
-					#ifdef DEBUG
-					printf("Native: MsgLoop - Button pressed(%i)\n", xev.xbutton.button);
-					#endif
-
-					jbutton = NativeToJButton(xev.xbutton.button);
-					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 1, (jboolean) False, jbutton);
-					(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
-					objEvent = NULL;
-				break;
-
-				case ButtonRelease:
-					#ifdef DEBUG
-					printf("Native: MsgLoop - Button released(%i)\n", xev.xbutton.button);
-					#endif
-
-					jbutton = NativeToJButton(xev.xbutton.button);
-					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 0, (jboolean) False, jbutton);
-					(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
-					objEvent = NULL;
-				break;
-			}
-		}
-
-		#ifdef DEBUG
-		if ((*env)->ExceptionOccurred(env)) {
-			printf("Native: JNI Error Occured.\n");
-			((*env)->ExceptionDescribe(env));
-		}
-		#endif
-	}
 
 	#ifdef DEBUG
 	printf("Native: MsgLoop() stop successful.\n");
 	#endif
-}
-
-int factorial(int n) {
-	if (n <= 1) {
-		return 1;
-	}
-	else {
-		return n * factorial( n - 1 );
-	}
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
@@ -353,14 +272,40 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, jmodifiers);
 	#endif
 
-	KeyCode winkey;
-	winkey.keycode = JKeycodeToNative(jkey);
-	winkey.shift_mask = jmodifiers & JK_SHIFT_MASK;
-	winkey.control_mask = jmodifiers & JK_CTRL_MASK;
-	winkey.alt_mask = jmodifiers & JK_ALT_MASK;
-	winkey.meta_mask = jmodifiers & JK_META_MASK;
+	KeyCode newkey;
+	newkey.keycode = JKeycodeToNative(jkey);
+	newkey.shift_mask = jmodifiers & JK_SHIFT_MASK;
+	newkey.control_mask = jmodifiers & JK_CTRL_MASK;
+	newkey.alt_mask = jmodifiers & JK_ALT_MASK;
+	newkey.meta_mask = jmodifiers & JK_META_MASK;
 
-	grabkeys
+	if (keysize == USHRT_MAX) {
+		//TODO Throw exception
+		return;
+	}
+
+	KeyCode * tmp = malloc( (keysize + 1) * sizeof(KeyCode) );
+
+	int i = 0;
+	for (; i < keysize; i++) {
+		if (grabkey[i].keycode		== newkey.keycode &&
+			grabkey[i].shift_mask	== newkey.shift_mask &&
+			grabkey[i].control_mask	== newkey.control_mask &&
+			grabkey[i].alt_mask		== newkey.alt_mask &&
+			grabkey[i].meta_mask	== newkey.meta_mask
+		) {
+			//We have a duplicate.
+			free(tmp);
+			return;
+		}
+
+		tmp[i] = grabkey[i];
+	}
+
+	free(grabkey);
+	grabkey = tmp;
+	grabkey[keysize] = newkey;
+	keysize++;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
@@ -368,35 +313,110 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 	jkey.keycode = jkeycode;
 	jkey.location = jkeylocation;
 
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
-
 	#ifdef DEBUG
-	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, jmodifiers);
+	printf("Native: ungrabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, jmodifiers);
 	#endif
 
+	KeyCode newkey;
+	newkey.keycode = JKeycodeToNative(jkey);
+	newkey.shift_mask = jmodifiers & JK_SHIFT_MASK;
+	newkey.control_mask = jmodifiers & JK_CTRL_MASK;
+	newkey.alt_mask = jmodifiers & JK_ALT_MASK;
+	newkey.meta_mask = jmodifiers & JK_META_MASK;
 
-	grabkeys
+	KeyCode * tmp = malloc( (keysize - 1) * sizeof(KeyCode) );
+
+	int i = 0, j = 0;
+	for (; i < keysize; i++) {
+		if (grabkey[i].keycode		!= newkey.keycode ||
+			grabkey[i].shift_mask	!= newkey.shift_mask ||
+			grabkey[i].control_mask	!= newkey.control_mask ||
+			grabkey[i].alt_mask		!= newkey.alt_mask ||
+			grabkey[i].meta_mask	!= newkey.meta_mask
+		) {
+			tmp[j++] = grabkey[i];
+		}
+	}
+
+	free(grabkey);
+	keysize--;
+	grabkey = tmp;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	unsigned int button = JButtonToNative(jbutton);
-
 	#ifdef DEBUG
 	printf("Native: grabButton - Button(%i)\n", (unsigned int) button);
 	#endif
 
-	XGrabButton(disp, button, AnyModifier, default_win, True, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
+	ButtonCode newbutton;
+	newbutton.keycode = JButtonToNative(jbutton);
+	/*
+	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
+	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
+	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
+	newbutton.meta_mask = jmodifiers & JK_META_MASK;
+	*/
+
+	if (buttonsize == USHRT_MAX) {
+		//TODO Throw exception
+		return;
+	}
+
+	ButtonCode * tmp = malloc( (buttonsize + 1) * sizeof(ButtonCode) );
+
+	int i = 0;
+	for (; i < buttonsize; i++) {
+		if (grabbutton[i].keycode			== newkey.keycode &&
+				grabbutton[i].shift_mask	== newkey.shift_mask &&
+				grabbutton[i].control_mask	== newkey.control_mask &&
+				grabbutton[i].alt_mask		== newkey.alt_mask &&
+				grabbutton[i].meta_mask		== newkey.meta_mask
+		) {
+			//We have a duplicate.
+			free(tmp);
+			return;
+		}
+
+		tmp[i] = grabbutton[i];
+	}
+
+	free(grabbutton);
+	grabbutton = tmp;
+	grabbutton[buttonsize] = newbutton;
+	buttonsize++;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	unsigned int button = JButtonToNative(jbutton);
-
 	#ifdef DEBUG
 	printf("Native: ungrabButton - Button(%i)\n", (unsigned int) button);
 	#endif
 
-	XUngrabKey(disp, button, AnyModifier, default_win);
+	ButtonCode newbutton;
+	newbutton.keycode = JButtonToNative(jbutton);
+	/*
+	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
+	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
+	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
+	newbutton.meta_mask = jmodifiers & JK_META_MASK;
+	*/
+
+	ButtonCode * tmp = malloc( (buttonsize - 1) * sizeof(ButtonCode) );
+
+	int i = 0, j = 0;
+	for (; i < buttonsize; i++) {
+		if (grabkey[i].keycode		!= newkey.keycode ||
+			grabkey[i].shift_mask	!= newkey.shift_mask ||
+			grabkey[i].control_mask	!= newkey.control_mask ||
+			grabkey[i].alt_mask		!= newkey.alt_mask ||
+			grabkey[i].meta_mask	!= newkey.meta_mask
+		) {
+			tmp[j++] = grabkey[i];
+		}
+	}
+
+	free(grabbutton);
+	grabbutton = tmp;
+	buttonsize--;
 }
 
 
@@ -443,13 +463,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		return;
 	}
 
-
-	//Setup modifieres
-	getModifiers(disp);
-
-	//Call listener
 	bRunning = True;
 
+	/*
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start failure.\n");
@@ -461,6 +477,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: MsgLoop() start successful.\n");
 		#endif
 	}
+	*/
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
