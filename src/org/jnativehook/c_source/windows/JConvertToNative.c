@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include <winuser.h>
 #include "include/JConvertToNative.h"
 
 unsigned int JKeycodeToNative(JKeyCode jkey) {

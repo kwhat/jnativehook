@@ -32,7 +32,11 @@ Compiling Options:
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
+#include <w32api.h>
+#define WINVER Windows2000
+#define _WIN32_WINNT WINVER
 #include <windows.h>
 
 #include <jni.h>
@@ -45,22 +49,13 @@ Compiling Options:
 bool bRunning = TRUE;
 HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
-
+HINSTANCE hInst = NULL;
 
 unsigned short int keysize = 0;
 KeyCode * grabkeys = NULL;
 
 unsigned short int buttonsize = 0;
-KeyCode * grabbuttons = NULL;
-
-bool rshift_mask = FALSE;
-bool lshift_mask = FALSE;
-bool rcontrol_mask = FALSE;
-bool lcontrol_mask = FALSE;
-bool ralt_mask = FALSE;
-bool lalt_mask = FALSE;
-bool rmeta_mask = FALSE;
-bool lmeta_mask = FALSE;
+ButtonCode * grabbuttons = NULL;
 
 
 JavaVM * jvm = NULL;
@@ -127,116 +122,119 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 		jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
+
+		unsigned int modifiers = 0;
+		KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
+		JKeyCode jkey;
+		jobject objEvent = NULL;
+
 		switch (wParam) {
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
-				KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
-
 				#ifdef DEBUG
 				printf("Native: LowLevelProc - Key pressed (%i)\n", p.vkCode);
 				#endif
 
-				if (xev.xkey.keycode == VK_LSHIFT)		lshift_mask = TRUE;
-				if (xev.xkey.keycode == VK_RSHIFT)		rshift_mask = TRUE;
+				if (p->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
+				if (p->vkCode == VK_RSHIFT)		setModifierMask(MOD_RSHIFT);
 
-				if (xev.xkey.keycode == VK_LCONTROL)	lcontrol_mask = TRUE;
-				if (xev.xkey.keycode == VK_RCONTROL)	rcontrol_mask = TRUE;
+				if (p->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
+				if (p->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
 
-				if (xev.xkey.keycode == VK_LMENU)		lalt_mask = TRUE;
-				if (xev.xkey.keycode == VK_RMENU)		ralt_mask = TRUE;
+				if (p->vkCode == VK_LMENU)		setModifierMask(MOD_LALT);
+				if (p->vkCode == VK_RMENU)		setModifierMask(MOD_RALT);
 
-				if (xev.xkey.keycode == VK_LWIN)		lmeta_mask = TRUE;
-				if (xev.xkey.keycode == VK_RWIN)		rmeta_mask = TRUE;
+				if (p->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
+				if (p->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
 
-				xev.xkey.keycode
+				jkey = NativeToJKeycode(p->vkCode);
+				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
+				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				jkey = NativeToJKeycode(xev.xkey.keycode);
-				modifiers = 0;
-				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
-
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
 			break;
 
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
-				KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
-
 				#ifdef DEBUG
 				printf("Native: LowLevelProc - Key released(%i)\n", p.vkCode);
 				#endif
 
-				if (xev.xkey.keycode == VK_LSHIFT)		lshift_mask = FALSE;
-				if (xev.xkey.keycode == VK_RSHIFT)		rshift_mask = FALSE;
+				if (p->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
+				if (p->vkCode == VK_RSHIFT)		unsetModifierMask(MOD_RSHIFT);
 
-				if (xev.xkey.keycode == VK_LCONTROL)	lcontrol_mask = FALSE;
-				if (xev.xkey.keycode == VK_RCONTROL)	rcontrol_mask = FALSE;
+				if (p->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
+				if (p->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
 
-				if (xev.xkey.keycode == VK_LMENU)		lalt_mask = FALSE;
-				if (xev.xkey.keycode == VK_RMENU)		ralt_mask = FALSE;
+				if (p->vkCode == VK_LMENU)		unsetModifierMask(MOD_LALT);
+				if (p->vkCode == VK_RMENU)		unsetModifierMask(MOD_RALT);
 
-				if (xev.xkey.keycode == VK_LWIN)		lmeta_mask = FALSE;
-				if (xev.xkey.keycode == VK_RWIN)		rmeta_mask = FALSE;
+				if (p->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
+				if (p->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
 
-				jkey = NativeToJKeycode(xev.xkey.keycode);
-				modifiers = 0;
-				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+				jkey = NativeToJKeycode(p->vkCode);
+				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
+				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
 
+
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_MBUTTONDOWN:
 			case WM_XBUTTONDOWN:
 			case WM_NCXBUTTONDOWN:
-				fwButton = GET_XBUTTON_WPARAM(wParam);
-
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Button pressed (%i)\n", sizeof );
+				printf("Native: LowLevelProc - Button pressed (%i)\n", wParam);
 				#endif
+				//fwButton = GET_XBUTTON_WPARAM(wParam);
 
-				jkey = NativeToJKeycode(xev.xkey.keycode);
-				modifiers = 0;
-				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+				jkey = NativeToJKeycode(p->vkCode);
+				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
+				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
 			break;
 
+
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+			case WM_MBUTTONUP:
 			case WM_XBUTTONUP:
 			case WM_NCXBUTTONUP:
-				fwButton = GET_XBUTTON_WPARAM(wParam);
+				//fwButton = GET_XBUTTON_WPARAM(wParam);
 
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Button released(%i)\n", xev.xkey.keycode);
+				printf("Native: LowLevelProc - Button released(%i)\n", wParam);
 				#endif
 
-				jkey = NativeToJKeycode(xev.xkey.keycode);
-				modifiers = 0;
-				if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
-				if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
-				if (xev.xkey.state & getMetaMask())		modifiers |= NativeToJModifier(getMetaMask());
-				if (xev.xkey.state & getAltMask())		modifiers |= NativeToJModifier(getAltMask());
+				jkey = NativeToJKeycode(p->vkCode);
+				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
+				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) xev.xkey.time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
 
-			WM_MOUSEWHEEL:
+			case WM_MOUSEWHEEL:
 			default:
 			break;
 		}
@@ -288,23 +286,23 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 
 	int i = 0;
 	for (; i < keysize; i++) {
-		if (grabkey[i].keycode		== newkey.keycode &&
-			grabkey[i].shift_mask	== newkey.shift_mask &&
-			grabkey[i].control_mask	== newkey.control_mask &&
-			grabkey[i].alt_mask		== newkey.alt_mask &&
-			grabkey[i].meta_mask	== newkey.meta_mask
+		if (grabkeys[i].keycode			== newkey.keycode &&
+			grabkeys[i].shift_mask		== newkey.shift_mask &&
+			grabkeys[i].control_mask	== newkey.control_mask &&
+			grabkeys[i].alt_mask		== newkey.alt_mask &&
+			grabkeys[i].meta_mask		== newkey.meta_mask
 		) {
 			//We have a duplicate.
 			free(tmp);
 			return;
 		}
 
-		tmp[i] = grabkey[i];
+		tmp[i] = grabkeys[i];
 	}
 
-	free(grabkey);
-	grabkey = tmp;
-	grabkey[keysize] = newkey;
+	free(grabkeys);
+	grabkeys = tmp;
+	grabkeys[keysize] = newkey;
 	keysize++;
 }
 
@@ -328,19 +326,19 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 
 	int i = 0, j = 0;
 	for (; i < keysize; i++) {
-		if (grabkey[i].keycode		!= newkey.keycode ||
-			grabkey[i].shift_mask	!= newkey.shift_mask ||
-			grabkey[i].control_mask	!= newkey.control_mask ||
-			grabkey[i].alt_mask		!= newkey.alt_mask ||
-			grabkey[i].meta_mask	!= newkey.meta_mask
+		if (grabkeys[i].keycode			!= newkey.keycode ||
+			grabkeys[i].shift_mask		!= newkey.shift_mask ||
+			grabkeys[i].control_mask	!= newkey.control_mask ||
+			grabkeys[i].alt_mask		!= newkey.alt_mask ||
+			grabkeys[i].meta_mask		!= newkey.meta_mask
 		) {
-			tmp[j++] = grabkey[i];
+			tmp[j++] = grabkeys[i];
 		}
 	}
 
-	free(grabkey);
+	free(grabkeys);
 	keysize--;
-	grabkey = tmp;
+	grabkeys = tmp;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
@@ -349,7 +347,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	#endif
 
 	ButtonCode newbutton;
-	newbutton.keycode = JButtonToNative(jbutton);
+	newbutton.buttoncode = JButtonToNative(jbutton);
 	/*
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
@@ -366,23 +364,23 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 
 	int i = 0;
 	for (; i < buttonsize; i++) {
-		if (grabbutton[i].keycode			== newkey.keycode &&
-				grabbutton[i].shift_mask	== newkey.shift_mask &&
-				grabbutton[i].control_mask	== newkey.control_mask &&
-				grabbutton[i].alt_mask		== newkey.alt_mask &&
-				grabbutton[i].meta_mask		== newkey.meta_mask
+		if (grabbuttons[i].buttoncode		== newbutton.buttoncode &&
+			grabbuttons[i].shift_mask		== newbutton.shift_mask &&
+			grabbuttons[i].control_mask		== newbutton.control_mask &&
+			grabbuttons[i].alt_mask			== newbutton.alt_mask &&
+			grabbuttons[i].meta_mask		== newbutton.meta_mask
 		) {
 			//We have a duplicate.
 			free(tmp);
 			return;
 		}
 
-		tmp[i] = grabbutton[i];
+		tmp[i] = grabbuttons[i];
 	}
 
-	free(grabbutton);
-	grabbutton = tmp;
-	grabbutton[buttonsize] = newbutton;
+	free(grabbuttons);
+	grabbuttons = tmp;
+	grabbuttons[buttonsize] = newbutton;
 	buttonsize++;
 }
 
@@ -392,7 +390,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 	#endif
 
 	ButtonCode newbutton;
-	newbutton.keycode = JButtonToNative(jbutton);
+	newbutton.buttoncode = JButtonToNative(jbutton);
 	/*
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
@@ -404,18 +402,18 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 
 	int i = 0, j = 0;
 	for (; i < buttonsize; i++) {
-		if (grabkey[i].keycode		!= newkey.keycode ||
-			grabkey[i].shift_mask	!= newkey.shift_mask ||
-			grabkey[i].control_mask	!= newkey.control_mask ||
-			grabkey[i].alt_mask		!= newkey.alt_mask ||
-			grabkey[i].meta_mask	!= newkey.meta_mask
+		if (grabbuttons[i].buttoncode		!= newbutton.buttoncode ||
+			grabbuttons[i].shift_mask		!= newbutton.shift_mask ||
+			grabbuttons[i].control_mask		!= newbutton.control_mask ||
+			grabbuttons[i].alt_mask			!= newbutton.alt_mask ||
+			grabbuttons[i].meta_mask		!= newbutton.meta_mask
 		) {
-			tmp[j++] = grabkey[i];
+			tmp[j++] = grabbuttons[i];
 		}
 	}
 
-	free(grabbutton);
-	grabbutton = tmp;
+	free(grabbuttons);
+	grabbuttons = tmp;
 	buttonsize--;
 }
 
@@ -439,7 +437,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
 		#endif
 
-		throwException(env, "Failed to hook keyboard using SetWindowsHookEx");
+		throwException("Failed to hook keyboard using SetWindowsHookEx");
 
 		//Naturaly exit so jni exception is thrown.
 		return;
@@ -457,13 +455,13 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
 		#endif
 
-		throwException(env, "Failed to hook mouse using SetWindowsHookEx");
+		throwException("Failed to hook mouse using SetWindowsHookEx");
 
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
 
-	bRunning = True;
+	bRunning = TRUE;
 
 	/*
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
@@ -482,14 +480,13 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	if (handleKeyboardHook != NULL) {
-		UnhookWindowsHookEx(hookHandle);
+		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;
 	}
 
 	//Try to exit the thread naturally.
-	bRunning = False;
-	interruptMsgLoop();
-	pthread_join(hookThreadId, NULL);
+	bRunning = FALSE;
+	//pthread_join(hookThreadId, NULL);
 
 	#ifdef DEBUG
 	printf("Native: Thread terminated successful.\n");
@@ -503,7 +500,7 @@ BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
 			printf("Native: DllMain - DLL Process attach.\n");
 			#endif
 
-			hInst = _hInst;
+			hInst = _hInst; //GetModuleHandle(NULL)
 		break;
 
 		case DLL_PROCESS_DETACH:
