@@ -11,32 +11,33 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	switch (wParam) {
 		case WM_MOUSEMOVE:
 		break;
-		
+
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
-			
-		
+
+
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
-		
+
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
-		
+
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP:
 
 		default:
-			printf("fwButton (%x) (%x)\t", HIWORD(wParam), LOWORD(wParam));
-			printf("pressed (%x) (%x)\n", wParam, lParam);
+			printf("fwButton (%i) (%i)\t", HIWORD(wParam), LOWORD(wParam));
+			printf("MSLLHOOKSTRUCT (%x)\t", p->mouseData);
+			printf("pressed (%i) (%i)\n", wParam, lParam);
 		break;
 	}
-	
+
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
 main() {
 	//BOOL RegisterHotKey(HWND hWnd, int id, UINT fsModifiers, UINT vk);
-	
+
 	/*
 	BOOL ret = RegisterHotKey(NULL, 0x42, WM_KEYUP, 0x42);
 	if ( ret ) {
@@ -63,9 +64,9 @@ main() {
 
 	MSG msg = {0};
 	while (GetMessage(&msg, NULL, 0, 0) != 0) {
-		TranslateMessage(&msg); 
-	        DispatchMessage(&msg); 
+		TranslateMessage(&msg);
+	        DispatchMessage(&msg);
 	}
- 
+
 	return 0;
 }
