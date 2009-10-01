@@ -51,13 +51,6 @@ HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
 
-unsigned short int keysize = 0;
-KeyCode * grabkeys = NULL;
-
-unsigned short int buttonsize = 0;
-ButtonCode * grabbuttons = NULL;
-
-
 JavaVM * jvm = NULL;
 //pthread_t hookThreadId = 0;
 
@@ -124,8 +117,10 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 
 		unsigned int modifiers = 0;
-		KBDLLHOOKSTRUCT * p = (KBDLLHOOKSTRUCT *)lParam;
+		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
+		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
 		JKeyCode jkey;
+		jnit jbtn = 0;
 		jobject objEvent = NULL;
 
 		switch (wParam) {
@@ -135,17 +130,17 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				printf("Native: LowLevelProc - Key pressed (%i)\n", p.vkCode);
 				#endif
 
-				if (p->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
-				if (p->vkCode == VK_RSHIFT)		setModifierMask(MOD_RSHIFT);
+				if (kbhook->vkCode == VK_LSHIFT)	setModifierMask(MOD_LSHIFT);
+				if (kbhook->vkCode == VK_RSHIFT)	setModifierMask(MOD_RSHIFT);
 
-				if (p->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
-				if (p->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
+				if (kbhook->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
+				if (kbhook->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
 
-				if (p->vkCode == VK_LMENU)		setModifierMask(MOD_LALT);
-				if (p->vkCode == VK_RMENU)		setModifierMask(MOD_RALT);
+				if (kbhook->vkCode == VK_LMENU)		setModifierMask(MOD_LALT);
+				if (kbhook->vkCode == VK_RMENU)		setModifierMask(MOD_RALT);
 
-				if (p->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
-				if (p->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
+				if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
+				if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
 
 				jkey = NativeToJKeycode(p->vkCode);
@@ -154,7 +149,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
 			break;
@@ -165,17 +160,17 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				printf("Native: LowLevelProc - Key released(%i)\n", p.vkCode);
 				#endif
 
-				if (p->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
-				if (p->vkCode == VK_RSHIFT)		unsetModifierMask(MOD_RSHIFT);
+				if (kbhook->vkCode == VK_LSHIFT)	unsetModifierMask(MOD_LSHIFT);
+				if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
 
-				if (p->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
-				if (p->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
+				if (kbhook->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
+				if (kbhook->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
 
-				if (p->vkCode == VK_LMENU)		unsetModifierMask(MOD_LALT);
-				if (p->vkCode == VK_RMENU)		unsetModifierMask(MOD_RALT);
+				if (kbhook->vkCode == VK_LMENU)		unsetModifierMask(MOD_LALT);
+				if (kbhook->vkCode == VK_RMENU)		unsetModifierMask(MOD_RALT);
 
-				if (p->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
-				if (p->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
+				if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
+				if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
 
 				jkey = NativeToJKeycode(p->vkCode);
@@ -184,29 +179,48 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
 
 
 			case WM_LBUTTONDOWN:
+				jbtn = NativeToJButton(VK_LBUTTON);
+			goto btndown;
+
 			case WM_RBUTTONDOWN:
+				jbtn = NativeToJButton(VK_RBUTTON);
+			goto btndown;
+
 			case WM_MBUTTONDOWN:
+				jbtn = NativeToJButton(VK_MBUTTON);
+			goto btndown;
+
 			case WM_XBUTTONDOWN:
 			case WM_NCXBUTTONDOWN:
+				if (HIWORD(mshook->mouseData) == XBUTTON1) {
+					jbtn = NativeToJButton(VK_XBUTTON1);
+				}
+				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+					jbtn = NativeToJButton(VK_XBUTTON2);
+				}
+
+				btndown:
 				#ifdef DEBUG
 				printf("Native: LowLevelProc - Button pressed (%i)\n", wParam);
 				#endif
-				//fwButton = GET_XBUTTON_WPARAM(wParam);
 
-				jkey = NativeToJKeycode(p->vkCode);
+				else {
+
+				}
+
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) mshook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
 			break;
@@ -229,7 +243,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) p->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) mshook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
@@ -277,33 +291,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 	newkey.alt_mask = jmodifiers & JK_ALT_MASK;
 	newkey.meta_mask = jmodifiers & JK_META_MASK;
 
-	if (keysize == USHRT_MAX) {
-		//TODO Throw exception
-		return;
-	}
-
-	KeyCode * tmp = malloc( (keysize + 1) * sizeof(KeyCode) );
-
-	int i = 0;
-	for (; i < keysize; i++) {
-		if (grabkeys[i].keycode			== newkey.keycode &&
-			grabkeys[i].shift_mask		== newkey.shift_mask &&
-			grabkeys[i].control_mask	== newkey.control_mask &&
-			grabkeys[i].alt_mask		== newkey.alt_mask &&
-			grabkeys[i].meta_mask		== newkey.meta_mask
-		) {
-			//We have a duplicate.
-			free(tmp);
-			return;
-		}
-
-		tmp[i] = grabkeys[i];
-	}
-
-	free(grabkeys);
-	grabkeys = tmp;
-	grabkeys[keysize] = newkey;
-	keysize++;
+	grabKey(newkey);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
@@ -322,23 +310,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 	newkey.alt_mask = jmodifiers & JK_ALT_MASK;
 	newkey.meta_mask = jmodifiers & JK_META_MASK;
 
-	KeyCode * tmp = malloc( (keysize - 1) * sizeof(KeyCode) );
-
-	int i = 0, j = 0;
-	for (; i < keysize; i++) {
-		if (grabkeys[i].keycode			!= newkey.keycode ||
-			grabkeys[i].shift_mask		!= newkey.shift_mask ||
-			grabkeys[i].control_mask	!= newkey.control_mask ||
-			grabkeys[i].alt_mask		!= newkey.alt_mask ||
-			grabkeys[i].meta_mask		!= newkey.meta_mask
-		) {
-			tmp[j++] = grabkeys[i];
-		}
-	}
-
-	free(grabkeys);
-	keysize--;
-	grabkeys = tmp;
+	ungrabKey(newkey);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
@@ -347,41 +319,14 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	#endif
 
 	ButtonCode newbutton;
+	/* Need to add the argument to the function.
 	newbutton.buttoncode = JButtonToNative(jbutton);
-	/*
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
 	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
 	newbutton.meta_mask = jmodifiers & JK_META_MASK;
-	*/
-
-	if (buttonsize == USHRT_MAX) {
-		//TODO Throw exception
-		return;
-	}
-
-	ButtonCode * tmp = malloc( (buttonsize + 1) * sizeof(ButtonCode) );
-
-	int i = 0;
-	for (; i < buttonsize; i++) {
-		if (grabbuttons[i].buttoncode		== newbutton.buttoncode &&
-			grabbuttons[i].shift_mask		== newbutton.shift_mask &&
-			grabbuttons[i].control_mask		== newbutton.control_mask &&
-			grabbuttons[i].alt_mask			== newbutton.alt_mask &&
-			grabbuttons[i].meta_mask		== newbutton.meta_mask
-		) {
-			//We have a duplicate.
-			free(tmp);
-			return;
-		}
-
-		tmp[i] = grabbuttons[i];
-	}
-
-	free(grabbuttons);
-	grabbuttons = tmp;
-	grabbuttons[buttonsize] = newbutton;
-	buttonsize++;
+	 */
+	grabButton(ButtonCode newbutton);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
@@ -390,31 +335,14 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 	#endif
 
 	ButtonCode newbutton;
+	/* Need to add the argument to the function.
 	newbutton.buttoncode = JButtonToNative(jbutton);
-	/*
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
 	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
 	newbutton.meta_mask = jmodifiers & JK_META_MASK;
 	*/
-
-	ButtonCode * tmp = malloc( (buttonsize - 1) * sizeof(ButtonCode) );
-
-	int i = 0, j = 0;
-	for (; i < buttonsize; i++) {
-		if (grabbuttons[i].buttoncode		!= newbutton.buttoncode ||
-			grabbuttons[i].shift_mask		!= newbutton.shift_mask ||
-			grabbuttons[i].control_mask		!= newbutton.control_mask ||
-			grabbuttons[i].alt_mask			!= newbutton.alt_mask ||
-			grabbuttons[i].meta_mask		!= newbutton.meta_mask
-		) {
-			tmp[j++] = grabbuttons[i];
-		}
-	}
-
-	free(grabbuttons);
-	grabbuttons = tmp;
-	buttonsize--;
+	ungrabButton(newbutton);
 }
 
 

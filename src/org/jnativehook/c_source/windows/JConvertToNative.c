@@ -388,7 +388,7 @@ jint NativeToJButton (unsigned int button) {
 		case VK_XBUTTON1:								return JBUTTON4;
 		case VK_XBUTTON2:								return JBUTTON5;
 		default:
-			case 0x07:									return JKNOBUTTON;
+		case 0x07:										return JKNOBUTTON;
 	}
 }
 
