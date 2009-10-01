@@ -120,7 +120,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
 		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
 		JKeyCode jkey;
-		jnit jbtn = 0;
+		jint jbutton = JNOBUTTON;
 		jobject objEvent = NULL;
 
 		switch (wParam) {
@@ -143,7 +143,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
 
-				jkey = NativeToJKeycode(p->vkCode);
+				jkey = NativeToJKeycode(kbhook->vkCode);
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
@@ -173,7 +173,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
 
-				jkey = NativeToJKeycode(p->vkCode);
+				jkey = NativeToJKeycode(kbhook->vkCode);
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
@@ -186,65 +186,75 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 
 			case WM_LBUTTONDOWN:
-				jbtn = NativeToJButton(VK_LBUTTON);
+				jbutton = NativeToJButton(VK_LBUTTON);
 			goto btndown;
 
 			case WM_RBUTTONDOWN:
-				jbtn = NativeToJButton(VK_RBUTTON);
+				jbutton = NativeToJButton(VK_RBUTTON);
 			goto btndown;
 
 			case WM_MBUTTONDOWN:
-				jbtn = NativeToJButton(VK_MBUTTON);
+				jbutton = NativeToJButton(VK_MBUTTON);
 			goto btndown;
 
 			case WM_XBUTTONDOWN:
 			case WM_NCXBUTTONDOWN:
 				if (HIWORD(mshook->mouseData) == XBUTTON1) {
-					jbtn = NativeToJButton(VK_XBUTTON1);
+					jbutton = NativeToJButton(VK_XBUTTON1);
 				}
 				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-					jbtn = NativeToJButton(VK_XBUTTON2);
+					jbutton = NativeToJButton(VK_XBUTTON2);
 				}
 
 				btndown:
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Button pressed (%i)\n", wParam);
+				printf("Native: LowLevelProc - Button pressed (%i)\n", jbtn);
 				#endif
-
-				else {
-
-				}
 
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) mshook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
+				objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) FALSE, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
 				objEvent = NULL;
 			break;
 
 
 			case WM_LBUTTONUP:
+				jbutton = NativeToJButton(VK_LBUTTON);
+			goto btnup;
+
 			case WM_RBUTTONUP:
+				jbutton = NativeToJButton(VK_RBUTTON);
+			goto btnup;
+
 			case WM_MBUTTONUP:
+				jbutton = NativeToJButton(VK_MBUTTON);
+			goto btnup;
+
 			case WM_XBUTTONUP:
 			case WM_NCXBUTTONUP:
-				//fwButton = GET_XBUTTON_WPARAM(wParam);
+				if (HIWORD(mshook->mouseData) == XBUTTON1) {
+					jbutton = NativeToJButton(VK_XBUTTON1);
+				}
+				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+					jbutton = NativeToJButton(VK_XBUTTON2);
+				}
 
+				btnup:
 				#ifdef DEBUG
 				printf("Native: LowLevelProc - Button released(%i)\n", wParam);
 				#endif
 
-				jkey = NativeToJKeycode(p->vkCode);
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 				if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 				if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 				if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) mshook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
+				objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) FALSE, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
 				objEvent = NULL;
 			break;
 
@@ -326,7 +336,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
 	newbutton.meta_mask = jmodifiers & JK_META_MASK;
 	 */
-	grabButton(ButtonCode newbutton);
+	grabButton(newbutton);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {

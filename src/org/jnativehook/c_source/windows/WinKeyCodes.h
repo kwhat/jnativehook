@@ -24,6 +24,10 @@ typedef struct {
 	bool meta_mask;
 } ButtonCode;
 
+int grabKey(KeyCode key);
+int ungrabKey(KeyCode key);
+int grabButton(ButtonCode button);
+int ungrabButton(ButtonCode button);
 void setModifierMask(unsigned char mod);
 void unsetModifierMask(unsigned char mod);
 bool isMaskSet(unsigned char mod);

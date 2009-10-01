@@ -8,7 +8,7 @@ KeyCode * grabkeys = NULL;
 unsigned short int buttonsize = 0;
 ButtonCode * grabbuttons = NULL;
 
-unsigned int grabKey(KeyCode key) {
+int grabKey(KeyCode key) {
 	if (keysize == USHRT_MAX) {
 		//This shouldn't happen but just in case.
 		return 1;
@@ -40,7 +40,7 @@ unsigned int grabKey(KeyCode key) {
 	return 0;
 }
 
-unsigned int ungrabKey(KeyCode key) {
+int ungrabKey(KeyCode key) {
 	KeyCode * tmp = malloc( (keysize - 1) * sizeof(KeyCode) );
 
 	int i = 0, j = 0;
@@ -62,7 +62,7 @@ unsigned int ungrabKey(KeyCode key) {
 	return 0;
 }
 
-unsigned int grabButton(ButtonCode button) {
+int grabButton(ButtonCode button) {
 	if (buttonsize == USHRT_MAX) {
 		//This shouldn't happen but just in case.
 		return 1;
@@ -94,7 +94,7 @@ unsigned int grabButton(ButtonCode button) {
 	return 0;
 }
 
-unsigned int ungrabButton(ButtonCode button) {
+int ungrabButton(ButtonCode button) {
 	ButtonCode * tmp = malloc( (buttonsize - 1) * sizeof(ButtonCode) );
 
 	int i = 0, j = 0;
