@@ -2,6 +2,7 @@
 
 <project default="all" basedir="." xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
 	<property environment="os"/>
+	<property environment="env"/>
 	
 	<!-- Project Settings -->
 	<property name="project.name"		value="JNativeHook"/>
@@ -30,7 +31,7 @@
 					<isset property="javac.include"/>
 				</not>
 				
-				<available file="${java.home}${file.separator}..${file.separator}include" type="dir"/>
+				<available file="${java.home}/../include" type="dir"/>
 			</and>
 		</condition>
 		<condition property="javac.include" value="${os.JAVA_HOME}${file.separator}include">
@@ -117,34 +118,9 @@
 	
 	<target name="clean" description="prepares the environment">
 		<echo>Cleaning old build structure...</echo>
-		<delete includeemptydirs="true" verbose="true">
-			<fileset dir="${dir.dist}" includes="**/*"/>
+		<delete includeemptydirs="false" verbose="true">
+			<fileset dir="${dir.build}" includes="**/*"/>
 		</delete>
-		
-		<echo>Creating build folders...</echo>
-		<mkdir dir="${dir.dist}"/>
-		<mkdir dir="${dir.classes}"/>
-		<mkdir dir="${dir.jars}"/>
-		<mkdir dir="${dir.objs}"/>
-		
-		<!-- Create Linux Branch -->
-		<mkdir dir="${dir.dist}/Linux/x86_32"/>
-		<mkdir dir="${dir.dist}/Linux/x86_64"/>
-		
-		<!-- Create OSX Branch -->
-		<mkdir dir="${dir.dist}/OSX"/>
-		
-		<!-- Create Windows Branch -->
-		<mkdir dir="${dir.dist}/Windows/x86_32"/>
-		
-		<path id="classpath">
-			<pathelement location="${dir.classes}"/>
-			<!--
-			<fileset dir="${project.lib}">
-				<include name="*.jar"/>
-			</fileset>
-			-->
-		</path>
 	</target>
 	
 	
@@ -153,7 +129,7 @@
 		<fail message="Your build.properties file appears to be incomplete.  Please verify your settings or run the ant configure task.">
 			<condition>
 				<not>
-					<or>
+					<and>
 						<isset property="project.debug"/>
 						<isset property="javac.fork"/>
 						<isset property="javac.target"/>
@@ -161,7 +137,7 @@
 						<isset property="gcc.arch"/>
 						<isset property="gcc.arch.model"/>
 						<isset property="gcc.os.family"/>
-					</or>
+					</and>
 				</not>
 			</condition>
 		</fail>
@@ -188,18 +164,25 @@
 			</condition>
 		</fail>
 		
-		
 		<condition property="project.isDebug" value="true">
 			<istrue value="${project.debug}"/>
 		</condition>
 		
-		
 		<echo>Compiling java source...</echo>
+		<mkdir dir="${dir.dist}"/>
+		<mkdir dir="${dir.classes}"/>
+		<path id="classpath">
+			<pathelement location="${dir.classes}"/>
+			<!--
+			<fileset dir="${project.lib}">
+				<include name="*.jar"/>
+			</fileset>
+			-->
+		</path>
 		<javac srcdir="${dir.src}"
 			destdir="${dir.classes}"
 			classpathref="classpath"
 			debug="${project.debug}"
-			optimize="${javac.optimize}"
 			deprecation="false"
 			source="${javac.target}"
 			target="${javac.target}"
@@ -207,6 +190,7 @@
 		
 		
 		<echo>Compiling C source...</echo>
+		<mkdir dir="${dir.objs}"/>
 		<cpptasks:cc
 			multithreaded="true"
 			optimize="speed"
@@ -223,8 +207,9 @@
 			<compiler name="gcc">
 				<includepath location="${dir.src}/org/jnativehook/c_source"/>
 				<includepath location="${javac.include}"/>
-				<includepath location="${javac.include}/windows" if="gcc.os.family.isWindows"/>
+				<includepath location="${javac.include}/windows" if="gcc.os.family.isUnix"/>
 				<includepath location="${javac.include}/unix" if="gcc.os.family.isUnix"/>
+				<includepath location="${javac.include}/linux" if="gcc.os.family.isUnix"/>
 				<includepath location="${javac.include}/osx" if="gcc.os.family.isMac"/>
 				
 				<fileset dir="${dir.src}/org/jnativehook/c_source">
@@ -268,6 +253,7 @@
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
 		<echo>Creating JNativeHook.jar...</echo>
+		<mkdir dir="${dir.jars}"/>
 		<jar jarfile="${dir.jars}/JNativeHook.jar" basedir="${dir.classes}">
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
@@ -293,6 +279,15 @@
 	<target name="package" depends="jar" description="Builds the server binaries">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Copying files...</echo>
+		<!-- Create Linux Branch -->
+		<mkdir dir="${dir.dist}/Linux/x86_32"/>
+		<mkdir dir="${dir.dist}/Linux/x86_64"/>
+				
+		<!-- Create OSX Branch -->
+		<mkdir dir="${dir.dist}/OSX"/>
+				
+		<!-- Create Windows Branch -->
+		<mkdir dir="${dir.dist}/Windows/x86_32"/>
 		<copy 
 			overwrite="true" 
 			file="${dir.jars}/JNativeHook.jar" 
