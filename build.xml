@@ -16,25 +16,20 @@
 	
 	<property name="dir.jar" value="${dir.dist}/jar"/>
 	<property name="dir.lib" value="${dir.dist}/lib"/>
+	
+	<!--
 	<property name="dir.build" value="${dir.dist}/build"/>
 	<property name="dir.class" value="${dir.build}/class"/>
 	<property name="dir.obj" value="${dir.build}/obj"/>
-	
+	-->
+	<property name="dir.class" value="${basedir}/bin"/>
+	<property name="dir.obj" value="${basedir}/bin/obj"/>
 	
 	<target name="configure">
 		<delete file="build.properties" verbose="true" failonerror="false"/>
 		
 		<echo>Checking environment sanity...</echo>
 		<!-- Try to locate the include folder for java headers -->
-		<condition property="javac.include" value="${java.home}${file.separator}..${file.separator}include">
-			<and>
-				<not>
-					<isset property="javac.include"/>
-				</not>
-				
-				<available file="${java.home}/../include" type="dir"/>
-			</and>
-		</condition>
 		<condition property="javac.include" value="${os.JAVA_HOME}${file.separator}include">
 			<and>
 				<not>
@@ -42,6 +37,15 @@
 				</not>
 				
 				<available file="${os.JAVA_HOME}/include" type="dir"/>
+			</and>
+		</condition>
+		<condition property="javac.include" value="${java.home}${file.separator}..${file.separator}include">
+			<and>
+				<not>
+					<isset property="javac.include"/>
+				</not>
+				
+				<available file="${java.home}/../include" type="dir"/>
 			</and>
 		</condition>
 		<fail unless="javac.include" message="Could not determine javac.include location.  Please set your JAVA_HOME environment variable or manually specify your javac.include location."/>
@@ -97,6 +101,12 @@
 		<condition property="gcc.os.family" value="winnt">
 			<os family="winnt"/>
 		</condition>
+		<condition property="gcc.os.family" value="osx">
+			<and>
+				<os family="mac"/>
+				<os family="unix"/>
+			</and>
+		</condition>
 		<condition property="gcc.os.family" value="unix">
 			<and>
 				<os family="unix"/>
@@ -109,12 +119,6 @@
 			<and>
 				<os family="unix"/>
 				<equals arg1="${os.name}" arg2="linux" casesensitive="false" trim="true"/>
-			</and>
-		</condition>
-		<condition property="gcc.os.family" value="osx">
-			<and>
-				<os family="mac"/>
-				<os family="unix"/>
 			</and>
 		</condition>
 		<fail unless="gcc.os.family" message="The ${os.name} ${os.version} opperating system is not currently supported."/>
@@ -134,7 +138,7 @@
 	<target name="clean" description="prepares the environment">
 		<echo>Cleaning old build structure...</echo>
 		<delete includeemptydirs="false" verbose="true">
-			<fileset dir="${dir.build}" includes="**/*"/>
+			<fileset dir="${dir.class}" includes="**/*"/>
 		</delete>
 	</target>
 	
@@ -236,6 +240,11 @@
 					</dirset>
 				</includepath>
 				
+				<includepath location="/usr/include" if="gcc.os.family.isUnix"/>
+				<includepath location="/usr/local/include" if="gcc.os.family.isUnix"/>
+				<includepath location="/usr/include" if="gcc.os.family.isLinux"/>
+				<includepath location="/usr/local/include" if="gcc.os.family.isLinux"/>
+				
 				<fileset dir="${dir.src}/org/jnativehook/c_source">
 					<include name="windows/*.c" if="gcc.os.family.isWindows"/>
 					<include name="unix/*.c" if="gcc.os.family.isUnix"/>
@@ -249,6 +258,7 @@
 				<compilerarg value="-Wall"/>
 				<compilerarg value="-O3"/>
 				<compilerarg value="-fno-strict-aliasing"/>
+				<compilerarg value="-lX11" if="gcc.os.family.isLinux"/>
 				<compilerarg value="-lX11" if="gcc.os.family.isUnix"/>
 				<compilerarg value="-DDEBUG" if="project.isDebug"/>
 				
@@ -262,7 +272,14 @@
 				<linkerarg value="-Wall"/>
 				<linkerarg value="-O3"/>
 				<linkerarg value="-fno-strict-aliasing"/>
+				
+				<linkerarg value="-lX11" if="gcc.os.family.isLinux"/>
+				<linkerarg value="-L/usr/lib" if="gcc.os.family.isLinux"/>
+				<linkerarg value="-L/usr/local/lib" if="gcc.os.family.isLinux"/>
+				
 				<linkerarg value="-lX11" if="gcc.os.family.isUnix"/>
+				<linkerarg value="-L/usr/lib" if="gcc.os.family.isUnix"/>
+				<linkerarg value="-L/usr/local/lib" if="gcc.os.family.isUnix"/>
 				
 				<!-- linkerarg value="-v"/ -->
 			</linker>
@@ -288,6 +305,7 @@
 		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.class}">
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
+			<exclude name="org/jnativehook/c_source/**"/>
 			<!-- <exclude name="org/jnativehook/Driver.class"/> -->
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.Driver"/>
@@ -298,12 +316,6 @@
 				</section>
 			</manifest>
 		</jar>
-		
-		
-		<!--
-		<echo>Creating client init script.</echo>
-		<copy overwrite="true" file="${project.src}/org/dotnative/globalkeylistener/cpp_source/Linux/x86_32/libGlobalKeyListener.so" todir="${dir.key}"/>
-		-->
 	</target>
 	
 	
