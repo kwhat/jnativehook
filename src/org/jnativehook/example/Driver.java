@@ -1,7 +1,9 @@
-package org.jnativehook;
+package org.jnativehook.example;
 
 //Imports
 import java.awt.event.KeyEvent;
+
+import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 
