@@ -5,10 +5,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class KeyEventDemo extends JFrame implements KeyListener, ActionListener {
+public class KeyEventDemo extends JFrame implements KeyListener, ActionListener, FocusListener {
 	boolean oneEvent = false;
 	
     JTextArea displayArea;
@@ -21,15 +22,6 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener 
     public KeyEventDemo() {
         setTitle("JNativeHook Demo");
         setLayout(new GridBagLayout());
-        
-        
-        
-        
-        clearButton = new JButton("Clear");
-        clearButton.addActionListener(this);
-        
-        enableButton = new JButton("Enable");
-        enableButton.addActionListener(this);
         
         typingArea = new JTextField();
         typingArea.addKeyListener(this);
@@ -47,18 +39,15 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener 
         JScrollPane scrollPane = new JScrollPane(displayArea);
         scrollPane.setPreferredSize(new Dimension(375, 125));
         
-        getContentPane().add(typingArea, BorderLayout.PAGE_START);
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
-        getContentPane().add(clearButton, BorderLayout.PAGE_END);
-        //getContentPane().add(enableButton, );
-        getContentPane().add(enableButton, BorderLayout.WEST);
-        
         GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
-        pane.add(button, c);
-
+        
+        add(typingArea, c);
+        add(scrollPane, c);
+        
     }
 
     /**
