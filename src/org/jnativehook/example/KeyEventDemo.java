@@ -1,130 +1,120 @@
 package org.jnativehook.example;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
-public class KeyEventDemo extends JFrame implements KeyListener, ActionListener, FocusListener {
-	boolean oneEvent = false;
+public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, ActionListener, FocusListener {
+	JTextArea displayArea;
+	JTextField typingArea;
 	
-    JTextArea displayArea;
-    JTextField typingArea;
+	public KeyEventDemo() {
+		setTitle("JNativeHook Demo");
+		setLayout(new GridBagLayout());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(300, 400);
+		
+		typingArea = new JTextField("Click to GrabKey");
+		typingArea.setEditable(false);
+		typingArea.addFocusListener(this);
+		typingArea.setFocusTraversalKeysEnabled(false);
+		
+		displayArea = new JTextArea();
+		displayArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(displayArea);
+		scrollPane.setPreferredSize(new Dimension(375, 125));
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		c.gridx = 0;
+		c.gridy = 0;
+		add(typingArea, c);
+		
+		c.gridy = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.weighty = 1.0;
+		add(scrollPane, c);
+		
+		setVisible(true);
+	}
+	
+	/** Handle the key typed event from the text field. */
+	public void keyTyped(KeyEvent e) {
+		displayInfo(e, "KEY TYPED: ");
+	}
+	
+	/** Handle the key pressed event from the text field. */
+	public void keyPressed(KeyEvent e) {
+		displayInfo(e, "KEY PRESSED: ");
+	}
+	
+	/** Handle the key released event from the text field. */
+	public void keyReleased(KeyEvent e) {
+		displayInfo(e, "KEY RELEASED: ");
+	}
     
-    JButton clearButton;
-    JButton enableButton;
-    
-    
-    public KeyEventDemo() {
-        setTitle("JNativeHook Demo");
-        setLayout(new GridBagLayout());
-        
-        typingArea = new JTextField();
-        typingArea.addKeyListener(this);
-        
-        //Uncomment this if you wish to turn off focus
-        //traversal.  The focus subsystem consumes
-        //focus traversal keys, such as Tab and Shift Tab.
-        //If you uncomment the following line of code, this
-        //disables focus traversal and the Tab events will
-        //become available to the key event listener.
-        typingArea.setFocusTraversalKeysEnabled(false);
-        
-        displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-        scrollPane.setPreferredSize(new Dimension(375, 125));
-        
-        GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 0;
-        
-        add(typingArea, c);
-        add(scrollPane, c);
-        
-    }
+	/** Handle the button click. */
+	public void actionPerformed(ActionEvent e) {
+		//Clear the text components.
 
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI() {
-        //Create and set up the window.
-        KeyEventDemo frame = new KeyEventDemo("KeyEventDemo");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        //Set up the content pane.
-        frame.addComponentsToPane();
-        
-        
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-    }
+		displayArea.setText("");
+		typingArea.setText("");
+		
+		//	Return the focus to the typing area.
+		typingArea.requestFocusInWindow();
+	
+	}
     
+	public void focusGained(FocusEvent e) {
+		if (e.getSource() instanceof KeyListener) {
+			((Component) e.getSource()).addKeyListener(this);
+		}
+		
+		if (e.getSource() instanceof MouseListener) {
+			((Component) e.getSource()).addMouseListener(this);
+		}
+	}
 
-    
-    
-    /** Handle the key typed event from the text field. */
-    public void keyTyped(KeyEvent e) {
-    	if (!oneEvent) 
-    	{
-    		displayInfo(e, "KEY TYPED: ");
-    		oneEvent =true;
-    	}
-    }
-    
-    /** Handle the key pressed event from the text field. */
-    public void keyPressed(KeyEvent e) {
-    	if (!oneEvent)
-    	{
-    		displayInfo(e, "KEY PRESSED: ");
-    		oneEvent =true;
-    	}
-    }
-    
-    /** Handle the key released event from the text field. */
-    public void keyReleased(KeyEvent e) {
-    	if (!oneEvent)
-    	{
-    		displayInfo(e, "KEY RELEASED: ");
-    		oneEvent =true;
-    	}
-    }
-    
-    /** Handle the button click. */
-    public void actionPerformed(ActionEvent e) {
-        //Clear the text components.
-    	
-    	/*
-    	System.out.println(e.getID());
-    	System.out.println(e.getSource());
-    	System.out.println(e.getActionCommand());
-    	
-    	System.out.println();
-    	*/
-    	
-    	if (e.getActionCommand() == "Enable")
-    	{
-    		oneEvent =false;
-    	}
-    	else
-    	{
-    		displayArea.setText("");
-        	typingArea.setText("");
-        
-        //	Return the focus to the typing area.
-        	typingArea.requestFocusInWindow();
-    	}
-    }
-    
+	public void focusLost(FocusEvent e) {
+		if (e.getSource() instanceof KeyListener) {
+			((Component) e.getSource()).removeKeyListener(this);
+		}
+		
+		if (e.getSource() instanceof MouseListener) {
+			((Component) e.getSource()).removeMouseListener(this);
+		}
+	}
+	
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void mouseEntered(MouseEvent e) { /* Do Nothing */ }
+	public void mouseExited(MouseEvent e) { /* Do Nothing */ }
+	public void mousePressed(MouseEvent e) { /* Do Nothing */ }
+	public void mouseReleased(MouseEvent e) { /* Do Nothing */ }
+	
     /*
      * We have to jump through some hoops to avoid
      * trying to print non-printing characters
@@ -141,7 +131,8 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener,
         if (id == KeyEvent.KEY_TYPED) {
             char c = e.getKeyChar();
             keyString = "key character = '" + c + "'";
-        } else {
+        }
+        else {
             int keyCode = e.getKeyCode();
             keyString = "key code = " + keyCode
                     + " ("
@@ -161,7 +152,8 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener,
         String actionString = "action key? ";
         if (e.isActionKey()) {
             actionString += "YES";
-        } else {
+        }
+        else {
             actionString += "NO";
         }
         
@@ -169,16 +161,21 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener,
         int location = e.getKeyLocation();
         if (location == KeyEvent.KEY_LOCATION_STANDARD) {
             locationString += "standard";
-        } else if (location == KeyEvent.KEY_LOCATION_LEFT) {
+        }
+        else if (location == KeyEvent.KEY_LOCATION_LEFT) {
             locationString += "left";
-        } else if (location == KeyEvent.KEY_LOCATION_RIGHT) {
+        }
+        else if (location == KeyEvent.KEY_LOCATION_RIGHT) {
             locationString += "right";
-        } else if (location == KeyEvent.KEY_LOCATION_NUMPAD) {
+        }
+        else if (location == KeyEvent.KEY_LOCATION_NUMPAD) {
             locationString += "numpad";
-        } else { // (location == KeyEvent.KEY_LOCATION_UNKNOWN)
+        }
+        else { // (location == KeyEvent.KEY_LOCATION_UNKNOWN)
             locationString += "unknown";
         }
         
+        String newline = System.getProperty("line.separator");
         displayArea.append(keyStatus + newline
                 + "    " + keyString + newline
                 + "    " + modString + newline
@@ -187,16 +184,7 @@ public class KeyEventDemo extends JFrame implements KeyListener, ActionListener,
         displayArea.setCaretPosition(displayArea.getDocument().getLength());
     }
     
-    public static void main(String[] args) {
-        /* Turn off metal's use of bold fonts */
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
-        
-        //Schedule a job for event dispatch thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }   
+	public static void main(String[] args) {
+		new KeyEventDemo();
+	}
 }
