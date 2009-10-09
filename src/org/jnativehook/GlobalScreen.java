@@ -2,20 +2,12 @@ package org.jnativehook;
 
 //Imports
 import java.awt.Component;
-import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
 import javax.swing.event.EventListenerList;
-import org.jnativehook.example.Driver;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -120,84 +112,48 @@ public class GlobalScreen extends Component {
 	}
 	
 	public static void registerHook() {
-		//Setup default location to look for libraries the current directory.
-		String sLibPath = System.getProperty("user.dir", new File("").getAbsolutePath());
-		
 		try {
-			//Try to locate our jar file.
-			File objFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
+			String sLoadPath = "org/jnativehook/lib/" + OperatingSystem.getFamily() + "-" +	OperatingSystem.getArchitecture();
+			File objCode = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 			
-			sLibPath = objFile.getPath();
-			if (objFile.isFile()) {
-				//Make sure we got a folder not a file.
-				sLibPath = sLibPath.substring(0, sLibPath.length() - objFile.getName().length());
+			if (objCode.isFile()) {
+				//Found the jar file to load.
+				ZipInputStream objZipInputStream = new ZipInputStream(new FileInputStream(objCode));
+				ZipEntry objEntry;
 				
-				//Open the jar  ZipFile objJarFile = new ZipFile(objFile);
-				/*
-				File objFolder = new File(GlobalScreen.class.getClassLoader().getResourceAsStream(
-						"org/jnativehook/lib/" + OperatingSystem.getFamily() + "-" + 
-						OperatingSystem.getArchitecture()) );
-				
-				File[] listOfFiles = objFolder.listFiles();
-				for (int i = 0; i < listOfFiles.length; i++) {
-					System.out.println(listOfFiles[i].getPath());
+				while ( (objEntry = objZipInputStream.getNextEntry()) != null) {
+					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
+						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
+						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
+						
+						
+						FileOutputStream objTempLibOutputStream = new FileOutputStream(objLibFile);
+						byte[] array = new byte[8192];
+					    int read = 0;
+					    while ( (read = objZipInputStream.read(array)) > 0) {
+					    	objTempLibOutputStream.write(array, 0, read);
+					    }
+					    objTempLibOutputStream.close();
+					    
+					    objLibFile.deleteOnExit();
+					    System.load(objLibFile.getPath());
+					}
 				}
-				*/
-				
-				ZipFile objJarFile = new ZipFile(objFile);
-				ZipEntry entry = objJarFile.getEntry("org/jnativehook/lib/" + 
-						OperatingSystem.getFamily() + "-" +	OperatingSystem.getArchitecture());
-				
-				ZipInputStream zio = new ZipInputStream(objJarFile.getInputStream(entry));
-				ZipEntry zipentry = zio.getNextEntry();
-				while (zipentry != null) {
-					System.out.println(zipentry.getName());
-					zipentry = zio.getNextEntry();
-				}
-				/*
-				OutputStream outStream = new FileOutputStream("/tmp/test.bin");
-				
-				byte[] buffer = new byte[1024];
-				int nrBytesRead;
-				while ((nrBytesRead = inStream.read(buffer)) > 0) {
-                    outStream.write(buffer, 0, nrBytesRead);
-                }
-				outStream.close();
-	            inStream.close();
-				*/
-				
-				
-				/*
-				System.out.println(stream);
-				
-				ZipInputStream zio = new ZipInputStream(new BufferedInputStream(stream));
-				ZipEntry zipentry = zio.getNextEntry();
-				while (zipentry != null) {
-					System.out.println(zipentry.getName());
-					zipentry = zio.getNextEntry();
-				}
-				*/
+				objZipInputStream.close();
 			}
-		}
-		catch (URISyntaxException e) { /* Do Nothing */ }
-		catch (Exception e) { e.printStackTrace(); /* Do Nothing */ }
-		
-		//Set the new library path to system property.
-		System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + sLibPath);
-		System.out.println(System.getProperty("java.library.path"));
-		
-		try {
-			//Try to load the library.
-			Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-			objSysPath.setAccessible(true);
-			if (objSysPath != null) {
-				objSysPath.set(System.class.getClassLoader(), null);
+			else if (objCode.isDirectory()) {
+				//Probably IDE enviroment, possible manual unpack.
+				//Setup the java.library.path to the load path and attempt a lib load.
+				File objLibFolder = new File(objCode.getAbsoluteFile() + "/" + sLoadPath);
+				if (objLibFolder.isDirectory()) {
+					System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + objLibFolder.getPath());
+					
+					//Linux: libJNativeGrab_Keyboard.so
+					//Mac OSX: libJNativeGrab_Keyboard.so ?
+					//Windows: JNativeGrab_Keyboard.dll
+					System.loadLibrary("JNativeHook");
+				}
 			}
-			
-			//Linux: libJNativeGrab_Keyboard.so
-			//Mac OSX: libJNativeGrab_Keyboard.so ?
-			//Windows: JNativeGrab_Keyboard.dll
-			System.loadLibrary("JNativeHook");
 		}
 		catch (Throwable e) {
 			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError

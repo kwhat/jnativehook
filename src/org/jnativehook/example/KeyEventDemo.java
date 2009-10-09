@@ -1,4 +1,4 @@
-package events;
+package org.jnativehook.example;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -16,7 +16,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -24,7 +23,6 @@ import javax.swing.JTextField;
 
 public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, ActionListener, FocusListener {
 	private boolean bGrabbing;
-	private JButton btnSetKey;
 	private JTextField txtTypingArea;
 	private JTextArea txtDisplayArea;
 	
@@ -37,7 +35,6 @@ public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, 
 		setFocusTraversalPolicy(new NoFocusTraversalPolicy());
 		
 		bGrabbing = false;
-		btnSetKey = new JButton("Set Bind");
 		
 		txtTypingArea = new JTextField("Click to GrabKey");
 		txtTypingArea.setEditable(false);

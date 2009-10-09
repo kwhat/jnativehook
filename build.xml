@@ -15,13 +15,8 @@
 	<property name="dir.dist" value="${basedir}/dist"/>
 	
 	<property name="dir.jar" value="${dir.dist}/jar"/>
-	<property name="dir.lib" value="${dir.dist}/lib"/>
+	<property name="dir.lib" value="${dir.src}/org/jnativehook/lib"/>
 	
-	<!--
-	<property name="dir.build" value="${dir.dist}/build"/>
-	<property name="dir.class" value="${dir.build}/class"/>
-	<property name="dir.obj" value="${dir.build}/obj"/>
-	-->
 	<property name="dir.class" value="${basedir}/bin"/>
 	<property name="dir.obj" value="${basedir}/bin/obj"/>
 	
@@ -269,13 +264,6 @@
 		</cpptasks:cc>
 	</target>
 	
-	
-	<mkdir dir="${dir.class}/org/jnativehook/lib"/>
-	<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
-		<fileset dir="${dir.lib}" includes="**/*" excludes="**/history.xml"/>
-	</copy>
-	
-	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
@@ -283,6 +271,7 @@
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
 			<exclude name="org/jnativehook/c_source/**"/>
+			<exclude name="org/jnativehook/lib/**/history.xml"/>
 			<!-- <exclude name="org/jnativehook/Driver.class"/> -->
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.Driver"/>
