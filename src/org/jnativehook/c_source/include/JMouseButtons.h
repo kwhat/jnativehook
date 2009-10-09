@@ -7,6 +7,3 @@
 
 #define JBUTTON4			4	//Extra Mouse Button
 #define JBUTTON5			5	//Extra Mouse Button
-
-//FIXME We need more buttons.
-//System.setProperty("sun.awt.enableExtraMouseButtons", "true");

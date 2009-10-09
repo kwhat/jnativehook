@@ -2,6 +2,7 @@ package org.jnativehook.example;
 
 //Imports
 import java.awt.event.KeyEvent;
+import java.lang.management.ManagementFactory;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyException;
