@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.event.EventListenerList;
@@ -148,9 +149,14 @@ public class GlobalScreen extends Component {
 				if (objLibFolder.isDirectory()) {
 					System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + objLibFolder.getPath());
 					
-					//Linux: libJNativeGrab_Keyboard.so
-					//Mac OSX: libJNativeGrab_Keyboard.so ?
-					//Windows: JNativeGrab_Keyboard.dll
+					//Refresh the library path
+					Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+					objSysPath.setAccessible(true);
+					if (objSysPath != null) {
+						objSysPath.set(System.class.getClassLoader(), null);
+					}
+					
+					//Try to load the native library
 					System.loadLibrary("JNativeHook");
 				}
 			}
