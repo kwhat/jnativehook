@@ -279,7 +279,7 @@
 			<exclude name="org/jnativehook/lib/**/history.xml"/>
 			<!-- <exclude name="org/jnativehook/Driver.class"/> -->
 			<manifest>
-				<attribute name="Main-Class" value="org.jnativehook.example.Driver"/>
+				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo"/>
 				<section name="org/jnativehook">
 					<attribute name="Implementation-Title" value="${project.name} Library"/>
 					<attribute name="Implementation-Version" value="${project.version}"/> 
