@@ -75,6 +75,9 @@ public class GlobalScreen extends Component {
 	public native void grabButton(int iButton) throws NativeKeyException;
 	public native void ungrabButton(int iButton) throws NativeKeyException;
 	
+	//Get seme keyboard information
+	public native long getAutoRepeatRate() throws NativeKeyException;
+	public native long getAutoRepeatDelay() throws NativeKeyException;
 	
 	protected void fireKeyPressed(NativeKeyEvent objEvent) {
 		Object[] objListeners = objEventListeners.getListenerList();

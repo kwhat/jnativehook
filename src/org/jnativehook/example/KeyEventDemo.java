@@ -8,6 +8,7 @@ import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -16,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -23,9 +25,9 @@ import javax.swing.JTextField;
 
 public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, ActionListener, FocusListener {
 	private boolean bGrabbing;
+	private JButton btnSetKey;
 	private JTextField txtTypingArea;
 	private JTextArea txtDisplayArea;
-	
 	
 	public KeyEventDemo() {
 		setTitle("JNativeHook Demo");
@@ -35,6 +37,7 @@ public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, 
 		setFocusTraversalPolicy(new NoFocusTraversalPolicy());
 		
 		bGrabbing = false;
+		btnSetKey = new JButton("Set Bind");
 		
 		txtTypingArea = new JTextField("Click to GrabKey");
 		txtTypingArea.setEditable(false);
@@ -125,7 +128,30 @@ public class KeyEventDemo extends JFrame implements KeyListener, MouseListener, 
 	}
 	
 	public void mouseClicked(MouseEvent e) {
-		
+		if (!bGrabbing)
+		{
+			
+			int modifiers =e.getModifiers(),
+				button =e.getButton();
+			Point pt =e.getLocationOnScreen();
+			
+			String newline = System.getProperty("line.separator");
+			txtDisplayArea.append("Mouse Clicked: " + newline +
+								"\tModifiers: " + modifiers + newline
+								+ "\tButton: " + button + newline
+								+ "\tPoint: (" + pt.x + "," + pt.y + ")" + newline);
+			
+			txtTypingArea.setText("Mouse Button: " + button);
+			/*
+			String newline = System.getProperty("line.separator");
+			txtDisplayArea.append(keyStatus + newline
+					+ "    " + keyString + newline
+					+ "    " + modString + newline
+					+ "    " + actionString + newline
+					+ "    " + locationString + newline);
+			txtDisplayArea.setCaretPosition(txtDisplayArea.getDocument().getLength());
+			*/
+		}
 	}
 	public void mousePressed(MouseEvent e) {
 		if (!bGrabbing) {

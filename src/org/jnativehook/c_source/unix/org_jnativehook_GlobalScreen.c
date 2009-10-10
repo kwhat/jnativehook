@@ -48,6 +48,8 @@ Compiling Options:
 
 //Instance Variables
 bool bRunning = True;
+unsigned int xkb_timeout;
+unsigned int xkb_interval;
 
 Display * disp;
 Window default_win;
@@ -460,6 +462,38 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 }
 
 
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
+		#ifdef DEBUG
+		printf("Native: XkbGetAutoRepeatRate failure\n");
+		#endif
+
+		throwException("Could not determine the keyboard auto repeat rate.");
+		return -1; //Naturaly exit so jni exception is thrown.
+	}
+
+	#ifdef DEBUG
+	printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
+	#endif
+	return (jlong) xkb_interval;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
+		#ifdef DEBUG
+		printf("Native: XkbGetAutoRepeatRate failure\n");
+		#endif
+
+		throwException("Could not determine the keyboard auto repeat delay.");
+		return -1; //Naturaly exit so jni exception is thrown.
+	}
+
+	#ifdef DEBUG
+	printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
+	#endif
+	return (jlong) xkb_timeout;
+}
+
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
 	//Grab the currently running virtual machine so we can attach to it in
@@ -482,9 +516,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 
 		throwException(exceptoin_msg);
 		free(exceptoin_msg);
-
-		//Naturaly exit so jni exception is thrown.
-		return;
+		return; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -496,7 +528,31 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 	//Set allowed events and the default root window.
 	XAllowEvents(disp, AsyncBoth, CurrentTime);
 	default_win = DefaultRootWindow(disp);
-	XkbSetDetectableAutoRepeat(disp, True, NULL);
+
+
+	/* Well XkbSetDetectableAutoRepeat doesnt work, big suprise right...
+	 * Look at https://bugs.freedesktop.org/show_bug.cgi?id=22515 and
+	 * http://www.x.org/wiki/Server16Branch for more information on
+	 * otherwise useful features that do not work.
+	 *
+	 * For the time being you should relay on the keyboard repeat rate
+	 * and delay functions to implement your own rate limitor in java.
+	 * This will allow for more flexible rate limit control regardless
+	 * of platform.
+	 */
+	Bool isAutoRepeat;
+	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
+	if (!isAutoRepeat) {
+		#ifdef DEBUG
+		printf("Native: Could not enable detectable autorepeat.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		printf("Native: XkbSetDetectableAutoRepeat successful\n");
+		#endif
+	}
+
 
 	//Iterate over screens
 	int screen;
@@ -517,7 +573,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start failure.\n");
 		#endif
-		//TODO Throw an exception
+		throwException("Could not create message loop thread.");
+		return; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG

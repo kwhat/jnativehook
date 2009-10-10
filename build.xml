@@ -8,7 +8,6 @@
 	<property name="project.name"		value="JNativeHook"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
 	<property name="project.version"	value="0.9.139"/>
-	<property name="project.debug"		value="false"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
@@ -195,7 +194,6 @@
 			target="${javac.target}"
 		/>
 		
-		
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${os.name}-${sys.arch}"/>
@@ -262,6 +260,13 @@
 				productversion="${project.version}"
 			/>
 		</cpptasks:cc>
+		
+		
+		<echo>Copying libs...</echo>
+		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
+		<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
+			<fileset dir="${dir.lib}" includes="**/*" excludes="**/history.xml"/>
+		</copy>
 	</target>
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
