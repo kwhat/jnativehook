@@ -29,6 +29,7 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseListener;
 
 public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyListener, MouseListener, NativeMouseListener, ActionListener, FocusListener, WindowListener {
+	private static final long serialVersionUID = -5549783775591314629L;
 	private JTextField txtTypingArea;
 	private JTextArea txtEventInfo;
 	
