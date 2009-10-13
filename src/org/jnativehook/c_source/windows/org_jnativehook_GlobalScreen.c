@@ -355,6 +355,39 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 	ungrabButton(newbutton);
 }
 
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	long spi_interval;
+	if (! ret = SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &spi_interval, 0) ) {
+		#ifdef DEBUG
+		printf("Native: SPI_GETKEYBOARDSPEED failure\n");
+		#endif
+
+		throwException("Could not determine the keyboard auto repeat rate.");
+		return -1; //Naturaly exit so jni exception is thrown.
+	}
+
+	#ifdef DEBUG
+	printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %i)\n", spi_interval);
+	#endif
+	return (jlong) spi_interval;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	long spi_timeout;
+	if (! ret = SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &wkb_interval, 0) ) {
+		#ifdef DEBUG
+		printf("Native: SPI_GETKEYBOARDDELAY failure\n");
+		#endif
+
+		throwException("Could not determine the keyboard auto repeat rate.");
+		return -1; //Naturaly exit so jni exception is thrown.
+	}
+
+	#ifdef DEBUG
+	printf("Native: SPI_GETKEYBOARDDELAY successful (delay: %i)\n", spi_timeout);
+	#endif
+	return (jlong) spi_timeout;
+}
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {

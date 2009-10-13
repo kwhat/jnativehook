@@ -38,6 +38,7 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(300, 400);
 		setFocusTraversalPolicy(new NoFocusTraversalPolicy());
+		addWindowListener(this);
 		
 		txtTypingArea = new JTextField("Click to GrabKey");
 		txtTypingArea.setEditable(false);
@@ -197,23 +198,23 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 	}
 	
 	private void displayEventInfo(KeyEvent e) {
-		String sEventText;
+		String sEventText = txtEventInfo.getText() + "\n\n";;
 		
 		switch (e.getID()) {
 			case KeyEvent.KEY_PRESSED:
-				sEventText = "KEY_PRESSED:\n";
+				sEventText += "KEY_PRESSED:\n";
 			break;
 			
 			case KeyEvent.KEY_RELEASED:
-				sEventText = "KEY_RELEASED:\n";
+				sEventText += "KEY_RELEASED:\n";
 			break;
 			
 			case KeyEvent.KEY_TYPED:
-				sEventText = "KEY_PRESSED:\n";
+				sEventText += "KEY_PRESSED:\n";
 			break;
 			
 			default:
-				sEventText = "KEY_UNKNOWN:\n";
+				sEventText += "KEY_UNKNOWN:\n";
 		}
 		
 		sEventText += "\tKeyCode:\t" + e.getKeyCode() + "\n";
@@ -222,34 +223,36 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		sEventText += "\tModifiers:\t" + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
 		sEventText += "\n";
 		
-		txtTypingArea.setText(sEventText);
+		txtEventInfo.setText(sEventText);
+		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 	}
 	
 	private void displayEventInfo(MouseEvent e) {
-		String sEventText;
+		String sEventText = txtEventInfo.getText() + "\n\n";
 		
 		switch (e.getID()) {
 			case MouseEvent.MOUSE_PRESSED:
-				sEventText = "MOUSE_PRESSED:\n";
+				sEventText += "MOUSE_PRESSED:\n";
 			break;
 			
 			case MouseEvent.MOUSE_RELEASED:
-				sEventText = "MOUSE_RELEASED:\n";
+				sEventText += "MOUSE_RELEASED:\n";
 			break;
 			
 			case MouseEvent.MOUSE_CLICKED:
-				sEventText = "MOUSE_CLICKED:\n";
+				sEventText += "MOUSE_CLICKED:\n";
 			break;
 			
 			default:
-				sEventText = "MOUSE_UNKNOWN:\n";
+				sEventText += "MOUSE_UNKNOWN:\n";
 		}
 		
 		sEventText += "\tButton:\t" + e.getButton() + "\n";
 		sEventText += "\tModifiers:\t" + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
 		sEventText += "\n";
 		
-		txtTypingArea.setText(sEventText);
+		txtEventInfo.setText(sEventText);
+		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
     }
     
 	public static void main(String[] args) {
@@ -286,10 +289,11 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 
 	public void windowOpened(WindowEvent e) {
 		GlobalScreen.registerHook();
-		GlobalScreen.getInstance().addNativeKeyListener(this);
+		GlobalScreen.getInstance().addNativeKeyListener(this);		
 	}
 	
 	public void windowClosed(WindowEvent e) {
 		GlobalScreen.unregisterHook();
+		System.exit(0);
 	}
 }
