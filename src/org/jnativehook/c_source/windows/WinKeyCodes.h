@@ -1,4 +1,5 @@
-#include <winuser.h>
+#include <stdbool.h>
+
 #define MOD_RALT		MOD_ALT
 #define MOD_RCONTROL	MOD_CONTROL
 #define MOD_RSHIFT		MOD_SHIFT

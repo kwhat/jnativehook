@@ -236,20 +236,20 @@
 				
 				<compilerarg value="-m${gcc.arch.model}"/>
 				<compilerarg value="-march=${gcc.arch}"/>
-				<compilerarg value="-fPIC"/>
+				<compilerarg value="-fPIC" unless="gcc.os.family.isWindows"/>
 				<compilerarg value="-Wall"/>
 				<compilerarg value="-O3"/>
 				<compilerarg value="-fno-strict-aliasing"/>
 				<compilerarg value="-lX11" if="gcc.os.family.isUnix"/>
 				<compilerarg value="-DDEBUG" if="project.isDebug"/>
-				
-				<!-- compilerarg value="-v"/ -->
+
+				<!-- compilerarg value="-v"/-->
 			</compiler>
 			
 			<linker name="gcc">
 				<linkerarg value="-m${gcc.arch.model}"/>
 				<linkerarg value="-march=${gcc.arch}"/>
-				<linkerarg value="-fPIC"/>
+				<linkerarg value="-fPIC" unless="gcc.os.family.isWindows"/>
 				<linkerarg value="-Wall"/>
 				<linkerarg value="-O3"/>
 				<linkerarg value="-fno-strict-aliasing"/>
@@ -258,7 +258,8 @@
 				<linkerarg value="-L/usr/lib" if="gcc.os.family.isUnix"/>
 				<linkerarg value="-L/usr/local/lib" if="gcc.os.family.isUnix"/>
 				
-				<!-- linkerarg value="-v"/ -->
+				<linkerarg value="-L${dir.obj}"/>
+				<!-- linkerarg value="-v"/-->
 			</linker>
 			
 			<versioninfo

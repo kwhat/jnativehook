@@ -1,4 +1,10 @@
-#include <winuser.h>
+#include <w32api.h>
+#define WINVER Windows2000
+#define _WIN32_WINNT WINVER
+#include <windows.h>
+#include <stdbool.h>
+#include <limits.h>
+#include "WinKeyCodes.h"
 
 unsigned char modifiers = 0x00;
 
@@ -18,15 +24,15 @@ int grabKey(KeyCode key) {
 
 	int i = 0;
 	for (; i < keysize; i++) {
-		if (grabkeys[i].keycode			== newkey.keycode &&
-			grabkeys[i].shift_mask		== newkey.shift_mask &&
-			grabkeys[i].control_mask	== newkey.control_mask &&
-			grabkeys[i].alt_mask		== newkey.alt_mask &&
-			grabkeys[i].meta_mask		== newkey.meta_mask
+		if (grabkeys[i].keycode			== key.keycode &&
+			grabkeys[i].shift_mask		== key.shift_mask &&
+			grabkeys[i].control_mask	== key.control_mask &&
+			grabkeys[i].alt_mask		== key.alt_mask &&
+			grabkeys[i].meta_mask		== key.meta_mask
 		) {
 			//We have a duplicate.
 			free(tmp);
-			return;
+			return 0;
 		}
 
 		tmp[i] = grabkeys[i];
@@ -34,7 +40,7 @@ int grabKey(KeyCode key) {
 
 	free(grabkeys);
 	grabkeys = tmp;
-	grabkeys[keysize] = newkey;
+	grabkeys[keysize] = key;
 	keysize++;
 
 	return 0;
@@ -80,7 +86,7 @@ int grabButton(ButtonCode button) {
 		) {
 			//We have a duplicate.
 			free(tmp);
-			return;
+			return 0;
 		}
 
 		tmp[i] = grabbuttons[i];
@@ -88,7 +94,7 @@ int grabButton(ButtonCode button) {
 
 	free(grabbuttons);
 	grabbuttons = tmp;
-	grabbuttons[buttonsize] = newbutton;
+	grabbuttons[buttonsize] = button;
 	buttonsize++;
 
 	return 0;

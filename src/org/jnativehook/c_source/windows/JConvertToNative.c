@@ -1,4 +1,13 @@
+/*
+#include <w32api.h>
+#define WINVER Windows2000
+#define _WIN32_WINNT WINVER
 #include <winuser.h>
+*/
+#include <w32api.h>
+#define WINVER Windows2000
+#define _WIN32_WINNT WINVER
+#include <windows.h>
 #include "include/JConvertToNative.h"
 
 unsigned int JKeycodeToNative(JKeyCode jkey) {
@@ -160,6 +169,7 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		//case JK_DEAD_VOICED_SOUND:					return VK_dead_voiced_sound;
 		//case JK_DEAD_SEMIVOICED_SOUND:				return VK_dead_semivoiced_sound;
 
+		/*
 		case JK_AMPERSAND:								return VK_ampersand;
 		case JK_ASTERISK:								return VK_asterisk;
 		case JK_QUOTEDBL:								return VK_quotedbl;
@@ -167,6 +177,7 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_GREATER:								return VK_greater;
 		case JK_BRACELEFT:								return VK_braceleft;
 		case JK_BRACERIGHT:								return VK_braceright;
+		 */
 
 		//Some of these are defined already within the OEM vk's based on keyboard layout
 		//case JK_AT:									return VK_at;
@@ -195,7 +206,7 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		//case JK_ACCEPT:								return VK_VoidSymbol;							//Japanese keyboard: kakutei?
 		//case JK_MODECHANGE:							return VK_Mode_switch;							//Unknown Win32 API
 		case JK_KANA:									return VK_KANA;
-		case JK_KANJI:									return VK_Kanji;
+		//case JK_KANJI:									return VK_Kanji;
 		//case JK_ALPHANUMERIC:							return VK_Eisu_Shift;
 		//case JK_KATAKANA:								return VK_Katakana;
 		//case JK_HIRAGANA:								return VK_Hiragana;
@@ -355,6 +366,7 @@ JKeyCode NativeToJKeyCode ( unsigned int keycode ){
 		case VK_OEM_7:									jkey.keycode = JK_QUOTE; 						return jkey;
 		case VK_OEM_3:									jkey.keycode = JK_BACK_QUOTE; 					return jkey;
 
+		/*
 		case VK_ampersand:								jkey.keycode = JK_AMPERSAND; 					return jkey;
 		case VK_asterisk:								jkey.keycode = JK_ASTERISK; 					return jkey;
 		case VK_quotedbl:								jkey.keycode = JK_QUOTEDBL; 					return jkey;
@@ -362,8 +374,9 @@ JKeyCode NativeToJKeyCode ( unsigned int keycode ){
 		case VK_greater:								jkey.keycode = JK_GREATER; 						return jkey;
 		case VK_braceleft:								jkey.keycode = JK_BRACELEFT; 					return jkey;
 		case VK_braceright:								jkey.keycode = JK_BRACERIGHT; 					return jkey;
+		 */
 
-		case VK_OEM_1:									jkey.keycode = JK_COLON; 						return jkey;
+		//case VK_OEM_1:									jkey.keycode = JK_COLON; 						return jkey;
 		case VK_OEM_PLUS:								jkey.keycode = JK_PLUS; 						return jkey;
 
 		case VK_LWIN:
@@ -371,9 +384,9 @@ JKeyCode NativeToJKeyCode ( unsigned int keycode ){
 		case VK_RWIN:
 			jkey.location = JK_LOCATION_RIGHT; 			jkey.keycode = JK_WINDOWS;						return jkey;
 		case VK_APPS:									jkey.keycode = JK_CONTEXT_MENU; 				return jkey;
-		case VK_CANCEL:									jkey.keycoe = JK_FINAL; 						return jkey;
+		case VK_CANCEL:									jkey.keycode = JK_FINAL; 						return jkey;
 		case VK_KANA:									jkey.keycode = JK_KANA; 						return jkey;
-		case VK_KANJI:									jkey.keycode = JK_KANJI;						return jkey;
+		//case VK_KANJI:									jkey.keycode = JK_KANJI;						return jkey;
 
 		default:
 			case 0x507:									jkey.keycode = JK_UNDEFINED; 					return jkey;
@@ -388,7 +401,7 @@ jint NativeToJButton (unsigned int button) {
 		case VK_XBUTTON1:								return JBUTTON4;
 		case VK_XBUTTON2:								return JBUTTON5;
 		default:
-		case 0x07:										return JKNOBUTTON;
+		case 0x07:										return JNOBUTTON;
 	}
 }
 

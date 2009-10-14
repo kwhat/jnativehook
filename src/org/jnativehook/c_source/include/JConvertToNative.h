@@ -7,12 +7,10 @@
 #include "JMouseButtons.h"
 #include "JMouseButtonEvents.h"
 
-
 typedef struct {
 	jint keycode;		//Key Code
 	jint location;		//Key Location
 } JKeyCode;
-
 
 unsigned int JKeycodeToNative(JKeyCode jkey);
 JKeyCode NativeToJKeycode(unsigned int keycode);
@@ -22,4 +20,3 @@ unsigned int JButtonToNative(jint button);
 
 unsigned int JModifierToNative(jint modifier);
 jint NativeToJModifier(unsigned int modifier);
-

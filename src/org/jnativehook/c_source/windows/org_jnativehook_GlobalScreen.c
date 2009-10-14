@@ -23,6 +23,10 @@ Compiling Options:
 # define UNUSED(x) x
 #endif
 
+#include <w32api.h>
+#define WINVER Windows2000
+#define _WIN32_WINNT WINVER
+#include <windows.h>
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -32,12 +36,7 @@ Compiling Options:
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <limits.h>
-
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
-#include <windows.h>
+//#include <limits.h>
 
 #include <jni.h>
 
@@ -127,7 +126,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Key pressed (%i)\n", p.vkCode);
+				printf("Native: LowLevelProc - Key pressed (%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
 				if (kbhook->vkCode == VK_LSHIFT)	setModifierMask(MOD_LSHIFT);
@@ -157,7 +156,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Key released(%i)\n", p.vkCode);
+				printf("Native: LowLevelProc - Key released(%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
 				if (kbhook->vkCode == VK_LSHIFT)	unsetModifierMask(MOD_LSHIFT);
@@ -208,7 +207,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 				btndown:
 				#ifdef DEBUG
-				printf("Native: LowLevelProc - Button pressed (%i)\n", jbtn);
+				printf("Native: LowLevelProc - Button pressed (%i)\n", (unsigned int) jbutton);
 				#endif
 
 				if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
@@ -291,7 +290,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 	jkey.location = jkeylocation;
 
 	#ifdef DEBUG
-	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, jmodifiers);
+	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, (unsigned int) jmodifiers);
 	#endif
 
 	KeyCode newkey;
@@ -310,7 +309,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 	jkey.location = jkeylocation;
 
 	#ifdef DEBUG
-	printf("Native: ungrabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, jmodifiers);
+	printf("Native: ungrabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) jkeycode, (unsigned int) jmodifiers);
 	#endif
 
 	KeyCode newkey;
@@ -325,7 +324,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
 	#ifdef DEBUG
-	printf("Native: grabButton - Button(%i)\n", (unsigned int) button);
+	printf("Native: grabButton - Button(%i)\n", (unsigned int) jbutton);
 	#endif
 
 	ButtonCode newbutton;
@@ -341,7 +340,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
 	#ifdef DEBUG
-	printf("Native: ungrabButton - Button(%i)\n", (unsigned int) button);
+	printf("Native: ungrabButton - Button(%i)\n", (unsigned int) jbutton);
 	#endif
 
 	ButtonCode newbutton;
@@ -356,8 +355,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	long spi_interval;
-	if (! ret = SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &spi_interval, 0) ) {
+	long int wkb_rate;
+	if (! SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &wkb_rate, 0) ) {
 		#ifdef DEBUG
 		printf("Native: SPI_GETKEYBOARDSPEED failure\n");
 		#endif
@@ -367,14 +366,14 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 	}
 
 	#ifdef DEBUG
-	printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %i)\n", spi_interval);
+	printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %ldd)\n", wkb_rate);
 	#endif
-	return (jlong) spi_interval;
+	return (jlong) wkb_rate;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	long spi_timeout;
-	if (! ret = SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &wkb_interval, 0) ) {
+	long int wkb_delay;
+	if (! SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &wkb_delay, 0) ) {
 		#ifdef DEBUG
 		printf("Native: SPI_GETKEYBOARDDELAY failure\n");
 		#endif
@@ -384,9 +383,9 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 	}
 
 	#ifdef DEBUG
-	printf("Native: SPI_GETKEYBOARDDELAY successful (delay: %i)\n", spi_timeout);
+	printf("Native: SPI_GETKEYBOARDDELAY successful (delay: %ldd)\n", wkb_delay);
 	#endif
-	return (jlong) spi_timeout;
+	return (jlong) wkb_delay;
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
