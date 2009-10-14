@@ -152,6 +152,8 @@ void MsgLoop() {
 					printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
 					#endif
 
+					printf("Native: TEST %i %i\n", (unsigned int) XKeycodeToKeysym(disp, xev.xkey.keycode, 1), xev.xkey.keycode);
+
 					jkey = NativeToJKeycode(xev.xkey.keycode);
 					modifiers = 0;
 					if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
@@ -250,7 +252,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
 	#ifdef DEBUG
-	printf("Native: grabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) keysym, keycode);
+	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
 	#endif
 
 	unsigned int mask_table[10];
@@ -346,7 +348,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUS
 	KeyCode keycode = XKeysymToKeycode(disp, keysym);
 
 	#ifdef DEBUG
-	printf("Native: ungrabKey - KeyCode(%i) Modifier(%X)\n", (unsigned int) keysym, keycode);
+	printf("Native: ungrabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
 	#endif
 
 	unsigned int mask_table[10];

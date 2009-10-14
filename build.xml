@@ -80,15 +80,22 @@
 		
 		<!-- Set 32 or 64 bit flag -->
 		<condition property="gcc.arch.model" value="${sun.arch.data.model}">
-				<not>
-					<isset property="gcc.arch.model"/>
-				</not>
+			<not>
+				<isset property="gcc.arch.model"/>
+			</not>
 		</condition>
 		<echo>System architecture data model: ${gcc.arch.model} bit</echo>
 		<!-- echo>${sun.cpu.endian}</echo -->
 		
 		
-		<!-- Set the gcc debug flag ONLY IF debug is true, unset implies false -->
+		<!-- Set the project debug flag -->
+		<condition property="project.debug" value="false">
+			<and>
+				<isset property="project.debug"/>
+				<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="false"/>
+				<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="false"/>
+			</and>
+		</condition>
 		<echo>Debug Mode: ${project.debug}</echo>
 		
 		<!-- Determin the os family -->
