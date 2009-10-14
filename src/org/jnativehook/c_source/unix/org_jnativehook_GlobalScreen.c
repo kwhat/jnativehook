@@ -152,9 +152,7 @@ void MsgLoop() {
 					printf("Native: MsgLoop - Key pressed (%i)\n", xev.xkey.keycode);
 					#endif
 
-					printf("Native: TEST %i %i\n", (unsigned int) XKeycodeToKeysym(disp, xev.xkey.keycode, 1), xev.xkey.keycode);
-
-					jkey = NativeToJKeycode(xev.xkey.keycode);
+					jkey = NativeToJKeycode(XLookupKeysym(&xev.xkey, 0));
 					modifiers = 0;
 					if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
 					if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);
@@ -171,7 +169,7 @@ void MsgLoop() {
 					printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
 					#endif
 
-					jkey = NativeToJKeycode(xev.xkey.keycode);
+					jkey = NativeToJKeycode(XLookupKeysym(&xev.xkey, 0));
 					modifiers = 0;
 					if (xev.xkey.state & ShiftMask)			modifiers |= NativeToJModifier(ShiftMask);
 					if (xev.xkey.state & ControlMask)		modifiers |= NativeToJModifier(ControlMask);

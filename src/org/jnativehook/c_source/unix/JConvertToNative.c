@@ -1,4 +1,5 @@
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
 #include "include/JConvertToNative.h"
@@ -232,7 +233,10 @@ JKeyCode NativeToJKeycode(unsigned int keycode) {
 	JKeyCode jkey;
 	jkey.location = JK_LOCATION_STANDARD;
 
-	switch (keycode) {
+	KeySym lower_keysym, upper_keysym;
+	XConvertCase(keycode, &lower_keysym, &upper_keysym);
+
+	switch ((unsigned int) upper_keysym) {
 		case XK_Return:									jkey.keycode = JK_ENTER;						return jkey;
 		case XK_BackSpace:								jkey.keycode = JK_BACK_SPACE;					return jkey;
 		case XK_Tab:									jkey.keycode = JK_TAB;							return jkey;

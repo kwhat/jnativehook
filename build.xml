@@ -89,7 +89,7 @@
 		
 		
 		<!-- Set the project debug flag -->
-		<condition property="project.debug" value="false">
+		<condition property="project.debug" value="true" else="false">
 			<and>
 				<isset property="project.debug"/>
 				<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="false"/>
