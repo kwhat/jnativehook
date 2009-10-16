@@ -36,7 +36,6 @@ Compiling Options:
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-//#include <limits.h>
 
 #include <jni.h>
 
@@ -328,8 +327,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	#endif
 
 	ButtonCode newbutton;
-	/* Need to add the argument to the function.
 	newbutton.buttoncode = JButtonToNative(jbutton);
+	/*TODO Need to add the argument to the function.
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
 	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
@@ -344,8 +343,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * U
 	#endif
 
 	ButtonCode newbutton;
-	/* Need to add the argument to the function.
 	newbutton.buttoncode = JButtonToNative(jbutton);
+	/*TODO Need to add the argument to the function.
 	newbutton.shift_mask = jmodifiers & JK_SHIFT_MASK;
 	newbutton.control_mask = jmodifiers & JK_CTRL_MASK;
 	newbutton.alt_mask = jmodifiers & JK_ALT_MASK;
@@ -463,7 +462,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	#endif
 }
 
-BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
+BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			#ifdef DEBUG

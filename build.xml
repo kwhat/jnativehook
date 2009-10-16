@@ -181,6 +181,54 @@
 			<equals arg1="${gcc.arch}" arg2="i586" casesensitive="false" trim="true"/>
 		</condition>
 		
+		
+		<condition property="sys.name" value="linux">
+			<equals arg1="${os.name}" arg2="Linux" casesensitive="false" trim="true"/>
+		</condition>
+		
+		<condition property="sys.name" value="osx">
+			<equals arg1="${os.name}" arg2="Mac OS X" casesensitive="false" trim="true"/>
+		</condition>
+			
+		<condition property="sys.name" value="windows">
+			<or>
+				<equals arg1="${os.name}" arg2="Windows 2000" casesensitive="false" trim="true"/>
+				<equals arg1="${os.name}" arg2="Windows XP" casesensitive="false" trim="true"/>
+				<equals arg1="${os.name}" arg2="Windows 2003" casesensitive="false" trim="true"/>
+				<equals arg1="${os.name}" arg2="Windows Vista" casesensitive="false" trim="true"/>
+				<equals arg1="${os.name}" arg2="Windows 7" casesensitive="false" trim="true"/>
+			</or>
+		</condition>
+		
+		<condition property="sys.name" value="solaris">
+			<or>
+				<equals arg1="${os.name}" arg2="Solaris" casesensitive="false" trim="true"/>
+				<equals arg1="${os.name}" arg2="SunOS" casesensitive="false" trim="true"/>
+			</or>
+		</condition>
+		
+		<condition property="sys.name" value="freebsd">
+			<equals arg1="${os.name}" arg2="FreeBSD" casesensitive="false" trim="true"/>
+		</condition>
+		
+		<fail message="The ${os.name} opperating system is not currently supported.">
+			<condition>
+				<or>
+					<not>
+						<or>
+							<isset property="gcc.os.family.isWindows"/>
+							<isset property="gcc.os.family.isUnix"/>
+							<isset property="gcc.os.family.isMac"/>
+						</or>
+					</not>
+					<not>
+						<isset property="sys.name"/>
+					</not>
+				</or>
+			</condition>
+		</fail>
+		
+		
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.class}"/>
@@ -204,10 +252,12 @@
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${os.name}-${sys.arch}"/>
+		
 		<cpptasks:cc
 			multithreaded="true"
 			optimize="speed"
 			
+			runtime="dynamic"
 			outtype="shared"
 			link="shared"
 			
@@ -247,6 +297,14 @@
 			</compiler>
 			
 			<linker name="gcc">
+					<linkerarg value="-W/dll" unless="gcc.os.family.isWindows"/>
+	
+					<linkerarg value="-lX11" if="gcc.os.family.isUnix"/>
+					<linkerarg value="-L/usr/lib" if="gcc.os.family.isUnix"/>
+					<linkerarg value="-L/usr/local/lib" if="gcc.os.family.isUnix"/>
+			</linker>
+			
+			<!--linker name="gcc">
 				<linkerarg value="-m${gcc.arch.model}"/>
 				<linkerarg value="-march=${gcc.arch}"/>
 				<linkerarg value="-fPIC" unless="gcc.os.family.isWindows"/>
@@ -258,9 +316,9 @@
 				<linkerarg value="-L/usr/lib" if="gcc.os.family.isUnix"/>
 				<linkerarg value="-L/usr/local/lib" if="gcc.os.family.isUnix"/>
 				
-				<linkerarg value="-L${dir.obj}"/>
-				<!-- linkerarg value="-v"/-->
-			</linker>
+				
+				<linkerarg value="-v"/>
+			</linker -->
 			
 			<versioninfo
 				companyname="${project.vendor}"

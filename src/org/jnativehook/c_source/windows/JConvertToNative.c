@@ -1,9 +1,3 @@
-/*
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
-#include <winuser.h>
-*/
 #include <w32api.h>
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
@@ -240,7 +234,7 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 	}
 }
 
-JKeyCode NativeToJKeyCode ( unsigned int keycode ){
+JKeyCode NativeToJKeycode(unsigned int keycode) {
 	JKeyCode jkey;
 	jkey.location = JK_LOCATION_STANDARD;
 
