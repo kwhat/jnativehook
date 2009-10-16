@@ -2,24 +2,24 @@ package org.jnativehook;
 
 public class OperatingSystem {
 	public enum Family {
-		Windows,
-		Linux,
-		FreeBSD,
-		OpenBSD,
+		WINDOWS,
+		LINUX,
+		FREEBSD,
+		OPENBSD,
 		OSX,
-		unsupported
+		UNSUPPORTED
 	}
 	
 	public enum Arch {
-		i586,
-		amd64,
-		ppc,
-		ppc64,
-		arm,
-		mips,
-		sparc,
-		alpha,
-		unsupported
+		I586,
+		AMD64,
+		PPC,
+		PPC64,
+		ARM,
+		MIPS,
+		SPARC,
+		ALPHA,
+		UNSUPPORTED
 	}
 	
 	public static Family getFamily() {
@@ -33,22 +33,22 @@ public class OperatingSystem {
 			os_name.equalsIgnoreCase("Windows Vista") ||
 			os_name.equalsIgnoreCase("Windows 7")
 		) {
-			family = Family.Windows;
+			family = Family.WINDOWS;
 		}
 		else if (os_name.equalsIgnoreCase("Linux")) {
-			family = Family.Linux;
+			family = Family.LINUX;
 		}
 		else if (os_name.equalsIgnoreCase("FreeBSD")) {
-			family = Family.FreeBSD;
+			family = Family.FREEBSD;
 		}
 		else if (os_name.equalsIgnoreCase("OpenBSD")) {
-			family = Family.OpenBSD;
+			family = Family.OPENBSD;
 		}
 		else if (os_name.equalsIgnoreCase("Mac OS X")) {
 			family = Family.OSX;
 		}
 		else {
-			family = Family.unsupported;
+			family = Family.UNSUPPORTED;
 		}
 		
 		return family;
@@ -64,24 +64,24 @@ public class OperatingSystem {
 			os_arch.equalsIgnoreCase("i586") ||
 			os_arch.equalsIgnoreCase("i686")
 		) {
-			arch = Arch.i586;
+			arch = Arch.I586;
 		}
 		else if (os_arch.equalsIgnoreCase("x86_64") || 
 				os_arch.equalsIgnoreCase("amd64") || 
 				os_arch.equalsIgnoreCase("k8")
 		) {
-			arch = Arch.amd64;
+			arch = Arch.AMD64;
 		}
 		else if (os_arch.equalsIgnoreCase("ppc") ||
 				os_arch.equalsIgnoreCase("PowerPC")
 		) {
-			arch = Arch.ppc;
+			arch = Arch.PPC;
 		}
 		else if (os_arch.equalsIgnoreCase("ppc64")) {
-			arch = Arch.ppc64;
+			arch = Arch.PPC64;
 		}
 		else {
-			arch = Arch.unsupported;
+			arch = Arch.UNSUPPORTED;
 		}
 		
 		return arch;

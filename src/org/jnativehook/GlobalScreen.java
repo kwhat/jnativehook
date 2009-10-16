@@ -34,19 +34,20 @@ public class GlobalScreen extends Component {
 	 * when the class is garbage collected.
 	 */
 	protected void finalize() throws Throwable {
-	    try {
-	    	GlobalScreen.unregisterHook();
-	    }
-	    catch(Exception e) {
-	        //Do Nothing
-	    }
-	    finally {
-	        super.finalize();
-	    }
+		try {
+			GlobalScreen.unregisterHook();
+		}
+		catch(Exception e) {
+			//Do Nothing
+		}
+		finally {
+			super.finalize();
+		}
 	}
 	
 	public static synchronized GlobalScreen getInstance() {
 		if (GlobalScreen.instance == null) {
+			GlobalScreen.registerHook();
 			GlobalScreen.instance = new GlobalScreen();
 		}
 		
@@ -115,9 +116,9 @@ public class GlobalScreen extends Component {
 		}
 	}
 	
-	public static void registerHook() {
+	protected static void registerHook() {
 		try {
-			String sLoadPath = "org/jnativehook/lib/" + OperatingSystem.getFamily() + "-" +	OperatingSystem.getArchitecture();
+			String sLoadPath = "org/jnativehook/lib/" + OperatingSystem.getFamily().toString().toLowerCase() + "-" +	OperatingSystem.getArchitecture().toString().toLowerCase();
 			File objCode = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 			
 			if (objCode.isFile()) {
@@ -173,7 +174,7 @@ public class GlobalScreen extends Component {
 		initialize();
 	}
 	
-	public static void unregisterHook() {
+	protected static void unregisterHook() {
 		deinitialize();
 	}
 	
