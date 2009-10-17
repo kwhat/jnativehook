@@ -389,6 +389,10 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
+	#ifdef DEBUG
+	printf("Native: TEST\n");
+	#endif
+
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
 	(*env)->GetJavaVM(env, &jvm);

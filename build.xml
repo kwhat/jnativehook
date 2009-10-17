@@ -304,11 +304,19 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${sys.name}-${sys.arch}"/>
 		
+		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply
+		<apply executable="gcc" osfamily="winnt" parallel="true">
+			<fileset dir="${dir.src}/org/jnativehook/c_source">
+				<include name="windows/*.c"/>
+			</fileset>
+		</apply>
+		-->
+		
+		<!-- runtime="dynamic" -->
 		<cpptasks:cc
-			multithreaded="true"
+			multithreaded="false"
 			optimize="speed"
 			
-			runtime="dynamic"
 			outtype="shared"
 			link="shared"
 			
@@ -349,12 +357,22 @@
 			</compiler>
 			
 			<linker name="gcc">
-					<linkerarg value="-W/dll" unless="gcc.os.isWindows"/>
-					
-					<linkerarg value="-lX11" if="gcc.os.isUnix"/>
-					<linkerarg value="-L/usr/lib" if="gcc.os.isUnix"/>
-					<linkerarg value="-L/usr/local/lib" if="gcc.os.isUnix"/>
+				<!-- linkerarg value="-W/dll" if="gcc.os.isWindows"/ -->
+				
+				<!--
+				<linkerarg value="-m${gcc.arch.model}"/>
+				<linkerarg value="-march=${gcc.arch}"/>
+				<linkerarg value="-fPIC"/>
+				<linkerarg value="-Wall"/>
+				<linkerarg value="-O3"/>
+				<linkerarg value="-fno-strict-aliasing"/>
+				-->
+				
+				<linkerarg value="-lX11" if="gcc.os.isUnix"/>
+				<linkerarg value="-L/usr/lib" if="gcc.os.isUnix"/>
+				<linkerarg value="-L/usr/local/lib" if="gcc.os.isUnix"/>
 			</linker>
+			
 			
 			<versioninfo
 				companyname="${project.vendor}"
@@ -363,12 +381,22 @@
 			/>
 		</cpptasks:cc>
 		
-		
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
 		<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
 			<fileset dir="${dir.lib}" includes="**/*" excludes="**/history.xml"/>
 		</copy>
+		
+		<!-- Fix for cpptasks on windows borked output -->
+		<move 
+			file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so" 
+			tofile="${dir.lib}/${sys.name}-${sys.arch}/JNativeHook.dll" 
+			failonerror="false"
+			overwrite="true"
+		/>
+		
+		<!-- Fix for ant not knowing how to move a file -->
+		<delete file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so"/>
 	</target>
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">

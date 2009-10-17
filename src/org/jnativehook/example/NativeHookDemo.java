@@ -289,6 +289,7 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 	public void windowIconified(WindowEvent e) { /* Do Nothing */ }
 
 	public void windowOpened(WindowEvent e) {
+		GlobalScreen.getInstance();
 		GlobalScreen.getInstance().addNativeKeyListener(this);		
 	}
 	

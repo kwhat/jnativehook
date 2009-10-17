@@ -61,6 +61,22 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton
 
 /*
  * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatRate
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatDelay
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
  * Method:    initialize
  * Signature: ()V
  */

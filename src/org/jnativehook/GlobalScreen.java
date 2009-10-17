@@ -118,6 +118,7 @@ public class GlobalScreen extends Component {
 	
 	protected static void registerHook() {
 		try {
+			//Try to locate the jar file
 			String sLoadPath = "org/jnativehook/lib/" + OperatingSystem.getFamily().toString().toLowerCase() + "-" +	OperatingSystem.getArchitecture().toString().toLowerCase();
 			File objCode = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 			
@@ -128,9 +129,9 @@ public class GlobalScreen extends Component {
 				
 				while ( (objEntry = objZipInputStream.getNextEntry()) != null) {
 					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
+						System.out.println(objEntry.getName().toLowerCase() +  " == " + sLoadPath.toLowerCase());
 						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
 						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
-						
 						
 						FileOutputStream objTempLibOutputStream = new FileOutputStream(objLibFile);
 						byte[] array = new byte[8192];
@@ -141,6 +142,7 @@ public class GlobalScreen extends Component {
 					    objTempLibOutputStream.close();
 					    
 					    objLibFile.deleteOnExit();
+					    System.out.println("Found: " + objLibFile.getPath());
 					    System.load(objLibFile.getPath());
 					}
 				}
