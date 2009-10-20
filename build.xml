@@ -304,82 +304,15 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${sys.name}-${sys.arch}"/>
 		
-		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply
+		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply  -->
 		<apply executable="gcc" osfamily="winnt" parallel="true">
 			<fileset dir="${dir.src}/org/jnativehook/c_source">
 				<include name="windows/*.c"/>
 			</fileset>
+			<arg line="-Wall -a"/>
 		</apply>
-		-->
 		
-		<!-- runtime="dynamic" -->
-		<cpptasks:cc
-			multithreaded="false"
-			optimize="speed"
-			
-			outtype="shared"
-			link="shared"
-			
-			outfile="${dir.lib}/${sys.name}-${sys.arch}/JNativeHook"
-			objdir="${dir.obj}"
-			
-			debug="${project.debug}"
-			warnings="diagnostic"
-		>
-			<compiler name="gcc">
-				<includepath location="${dir.src}/org/jnativehook/c_source"/>
-				<includepath>
-					<dirset dir="${javac.include}">
-						<include name="**"/>
-					</dirset>
-				</includepath>
-				
-				<includepath location="/usr/include" if="gcc.os.isUnix"/>
-				<includepath location="/usr/local/include" if="gcc.os.isUnix"/>
-				
-				<fileset dir="${dir.src}/org/jnativehook/c_source">
-					<include name="windows/*.c" if="gcc.os.isWindows"/>
-					<include name="unix/*.c" if="gcc.os.isUnix"/>
-					<include name="osx/*.c" if="gcc.os.isMac"/>
-				</fileset>
-				
-				<compilerarg value="-march=${gcc.arch}"/>
-				<compilerarg value="-m${gcc.arch.model}"/>
-				
-				<compilerarg value="-fPIC" unless="gcc.os.isWindows"/>
-				<compilerarg value="-Wall"/>
-				<compilerarg value="-O3"/>
-				<compilerarg value="-fno-strict-aliasing"/>
-				<compilerarg value="-lX11" if="gcc.os.isUnix"/>
-				<compilerarg value="-DDEBUG" if="project.isDebug"/>
-
-				<!-- compilerarg value="-v"/-->
-			</compiler>
-			
-			<linker name="gcc">
-				<!-- linkerarg value="-W/dll" if="gcc.os.isWindows"/ -->
-				
-				<!--
-				<linkerarg value="-m${gcc.arch.model}"/>
-				<linkerarg value="-march=${gcc.arch}"/>
-				<linkerarg value="-fPIC"/>
-				<linkerarg value="-Wall"/>
-				<linkerarg value="-O3"/>
-				<linkerarg value="-fno-strict-aliasing"/>
-				-->
-				
-				<linkerarg value="-lX11" if="gcc.os.isUnix"/>
-				<linkerarg value="-L/usr/lib" if="gcc.os.isUnix"/>
-				<linkerarg value="-L/usr/local/lib" if="gcc.os.isUnix"/>
-			</linker>
-			
-			
-			<versioninfo
-				companyname="${project.vendor}"
-				productname="${project.name}"
-				productversion="${project.version}"
-			/>
-		</cpptasks:cc>
+		<!-- remove cpptasks -->
 		
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
@@ -388,15 +321,15 @@
 		</copy>
 		
 		<!-- Fix for cpptasks on windows borked output -->
-		<move 
+		<!-- move 
 			file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so" 
 			tofile="${dir.lib}/${sys.name}-${sys.arch}/JNativeHook.dll" 
 			failonerror="false"
 			overwrite="true"
-		/>
+		/-->
 		
 		<!-- Fix for ant not knowing how to move a file -->
-		<delete file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so"/>
+		<!-- delete file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so"/ -->
 	</target>
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
