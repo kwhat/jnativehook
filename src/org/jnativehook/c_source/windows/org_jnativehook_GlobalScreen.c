@@ -44,7 +44,7 @@ Compiling Options:
 #include "WinKeyCodes.h"
 
 //Instance Variables
-bool bRunning = TRUE;
+bool bRunning = true;
 HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
@@ -90,9 +90,14 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
-
 		//Class and Constructor for the NativeKeyEvent Object
 		jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+		#ifdef DEBUG
+		if ((*env)->ExceptionOccurred(env)) {
+			printf("Native: JNI Error Occured.\n");
+			((*env)->ExceptionDescribe(env));
+		}
+		#endif
 		jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
 
 		//Class and Constructor for the NativeMouseEvent Object
@@ -113,7 +118,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 		jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
-
+printf("Native: Callback4\n");
 		unsigned int modifiers = 0;
 		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
 		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
@@ -416,7 +421,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		return;
 	}
 
-
+/*
 	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
 	if (handleMouseHook != NULL) {
 		#ifdef DEBUG
@@ -433,8 +438,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
-
-	bRunning = TRUE;
+*/
+	bRunning = true;
 
 	/*
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
@@ -466,7 +471,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	#endif
 }
 
-BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
+bool APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			#ifdef DEBUG
@@ -486,5 +491,5 @@ BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 		break;
 	}
 
-	return TRUE;
+	return true;
 }

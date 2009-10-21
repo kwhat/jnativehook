@@ -47,7 +47,7 @@ Compiling Options:
 #include "XMapModifers.h"
 
 //Instance Variables
-bool bRunning = True;
+bool bRunning = true;
 unsigned int xkb_timeout;
 unsigned int xkb_interval;
 
@@ -187,7 +187,7 @@ void MsgLoop() {
 					#endif
 
 					jbutton = NativeToJButton(xev.xbutton.button);
-					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 1, (jboolean) False, jbutton);
+					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 1, (jboolean) false, jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
 					objEvent = NULL;
 				break;
@@ -198,7 +198,7 @@ void MsgLoop() {
 					#endif
 
 					jbutton = NativeToJButton(xev.xbutton.button);
-					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 0, (jboolean) False, jbutton);
+					objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) xev.xbutton.time, 0, (jint) xev.xbutton.x, (jint) xev.xbutton.y, 0, (jboolean) false, jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
 					objEvent = NULL;
 				break;
@@ -226,7 +226,7 @@ void interruptMsgLoop() {
 	xev.display		= disp;			// defined globally
 	xev.window		= default_win;
 
-	XSendEvent(xev.display, xev.window, True, KeyPressMask, (XEvent *)&xev);
+	XSendEvent(xev.display, xev.window, true, KeyPressMask, (XEvent *)&xev);
 	XFlush(xev.display);
 }
 
@@ -325,7 +325,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED
 				pos %= count;
 			}
 
-			XGrabKey(disp, keycode, curr_mask, default_win, True, GrabModeAsync, GrabModeAsync);
+			XGrabKey(disp, keycode, curr_mask, default_win, true, GrabModeAsync, GrabModeAsync);
 		}
 	}
 
@@ -439,7 +439,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNU
 	printf("Native: grabButton - Button(%i)\n", (unsigned int) button);
 	#endif
 
-	XGrabButton(disp, button, AnyModifier, default_win, True, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
+	XGrabButton(disp, button, AnyModifier, default_win, true, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
 	XUnlockDisplay(disp);
 
 	//Refresh what XNextEvent is listening for.
@@ -541,7 +541,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 	 * of platform.
 	 */
 	Bool isAutoRepeat;
-	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
+	XkbSetDetectableAutoRepeat(disp, true, &isAutoRepeat);
 	if (!isAutoRepeat) {
 		#ifdef DEBUG
 		printf("Native: Could not enable detectable autorepeat.\n");
@@ -567,7 +567,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 	getModifiers(disp);
 
 	//Call listener
-	bRunning = True;
+	bRunning = true;
 
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
 		#ifdef DEBUG
@@ -591,7 +591,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	}
 
 	//Try to exit the thread naturally.
-	bRunning = False;
+	bRunning = false;
 	interruptMsgLoop();
 	pthread_join(hookThreadId, NULL);
 

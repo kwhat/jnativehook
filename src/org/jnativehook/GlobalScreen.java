@@ -129,7 +129,6 @@ public class GlobalScreen extends Component {
 				
 				while ( (objEntry = objZipInputStream.getNextEntry()) != null) {
 					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
-						System.out.println(objEntry.getName().toLowerCase() +  " == " + sLoadPath.toLowerCase());
 						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
 						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
 						
@@ -173,11 +172,11 @@ public class GlobalScreen extends Component {
 		}
 		
 		//Register the hook.
-		initialize();
+		GlobalScreen.initialize();
 	}
 	
 	protected static void unregisterHook() {
-		deinitialize();
+		GlobalScreen.deinitialize();
 	}
 	
 	//These are basically the constructors and deconstructors for the native hook.
