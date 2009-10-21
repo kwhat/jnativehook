@@ -50,7 +50,7 @@ HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
 
 JavaVM * jvm = NULL;
-//pthread_t hookThreadId = 0;
+HANDLE hookThreadId = 0;
 
 void jniFatalError(char * message) {
 	//Attach to the currently running jvm
@@ -92,12 +92,6 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
 		//Class and Constructor for the NativeKeyEvent Object
 		jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-		#ifdef DEBUG
-		if ((*env)->ExceptionOccurred(env)) {
-			printf("Native: JNI Error Occured.\n");
-			((*env)->ExceptionDescribe(env));
-		}
-		#endif
 		jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
 
 		//Class and Constructor for the NativeMouseEvent Object
@@ -118,7 +112,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 		jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
-printf("Native: Callback4\n");
+
 		unsigned int modifiers = 0;
 		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
 		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
@@ -265,6 +259,13 @@ printf("Native: Callback4\n");
 			default:
 			break;
 		}
+
+		#ifdef DEBUG
+		if ((*env)->ExceptionOccurred(env)) {
+			printf("Native: JNI Error Occured.\n");
+			((*env)->ExceptionDescribe(env));
+		}
+		#endif
 	}
 	else {
 		#ifdef DEBUG
@@ -275,7 +276,8 @@ printf("Native: Callback4\n");
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
-void MsgLoop() {
+//void MsgLoop() {
+DWORD WINAPI MsgLoop(LPVOID lpParameter) {
 	MSG message;
 
 	while (bRunning && GetMessage(&message, NULL, 0, 0)) {
@@ -286,6 +288,8 @@ void MsgLoop() {
 	#ifdef DEBUG
 	printf("Native: MsgLoop() stop successful.\n");
 	#endif
+
+	return 0;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
@@ -394,17 +398,12 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
-	#ifdef DEBUG
-	printf("Native: TEST\n");
-	#endif
-
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
 	(*env)->GetJavaVM(env, &jvm);
 
 	//Setup the native hooks and their callbacks.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
-
 	if (handleKeyboardHook != NULL) {
 		#ifdef DEBUG
 		printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) successful\n");
@@ -421,7 +420,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		return;
 	}
 
-/*
+
 	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
 	if (handleMouseHook != NULL) {
 		#ifdef DEBUG
@@ -438,11 +437,12 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		//Naturaly exit so jni exception is thrown.
 		return;
 	}
-*/
-	bRunning = true;
 
-	/*
-	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
+	bRunning = true;
+	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
+	LPVOID lpParameter = lpStartAddress;
+	hookThreadId = CreateThread( NULL, 0, lpStartAddress, NULL, 0, 0);
+	if( hookThreadId == INVALID_HANDLE_VALUE ) {
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start failure.\n");
 		#endif
@@ -453,7 +453,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: MsgLoop() start successful.\n");
 		#endif
 	}
-	*/
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
@@ -471,7 +470,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	#endif
 }
 
-bool APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
+BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			#ifdef DEBUG

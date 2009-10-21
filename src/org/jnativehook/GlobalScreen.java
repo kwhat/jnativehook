@@ -18,13 +18,14 @@ import org.jnativehook.mouse.NativeMouseListener;
 public class GlobalScreen extends Component {
 	//Instance Variables
 	private static final long serialVersionUID = -3980582715467809283L;
-	private static GlobalScreen instance = null;
+	private static GlobalScreen instance = new GlobalScreen();
 	private EventListenerList objEventListeners;
 	
 	private GlobalScreen() {
 		//Setup instance variables.
 		objEventListeners = new EventListenerList();
 		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
+		GlobalScreen.registerHook();
 	}
 	
 	/**
@@ -44,13 +45,8 @@ public class GlobalScreen extends Component {
 			super.finalize();
 		}
 	}
-	
+
 	public static synchronized GlobalScreen getInstance() {
-		if (GlobalScreen.instance == null) {
-			GlobalScreen.registerHook();
-			GlobalScreen.instance = new GlobalScreen();
-		}
-		
 		return GlobalScreen.instance;
 	}
 	
