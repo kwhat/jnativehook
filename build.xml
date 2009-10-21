@@ -3,6 +3,7 @@
 <project default="all" basedir="." xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
 	<property environment="os"/>
 	<property environment="env"/>
+	<property file="build.properties"/>
 	
 	<!-- Project Settings -->
 	<property name="project.name"		value="JNativeHook"/>
@@ -19,88 +20,83 @@
 	<property name="dir.class" value="${basedir}/bin"/>
 	<property name="dir.obj" value="${basedir}/bin/obj"/>
 	
-	<target name="configure">
-		<delete file="build.properties" verbose="true" failonerror="false"/>
+	
+	<target name="clean" description="prepares the environment">
+		<echo>Cleaning old build structure...</echo>
+		<delete includeemptydirs="false" verbose="true">
+			<fileset dir="${dir.class}" includes="**/*"/>
+		</delete>
 		
+		<delete file="build.properties" verbose="true" failonerror="false"/>
+	</target>
+	
+	
+	<target name="configure" description="Automatically generates a configuration for this enviroment.">
 		<echo>Checking environment sanity...</echo>
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="javac.include" value="${os.JAVA_HOME}${file.separator}include">
-			<and>
-				<not>
-					<isset property="javac.include"/>
-				</not>
-				
-				<available file="${os.JAVA_HOME}/include" type="dir"/>
-			</and>
+			<available file="${os.JAVA_HOME}/include" type="dir"/>
 		</condition>
 		<condition property="javac.include" value="${java.home}${file.separator}..${file.separator}include">
-			<and>
-				<not>
-					<isset property="javac.include"/>
-				</not>
-				
 				<available file="${java.home}/../include" type="dir"/>
-			</and>
 		</condition>
-		<fail unless="javac.include" message="Could not determine javac.include location.  Please set your JAVA_HOME environment variable or manually specify your javac.include location."/>
+		<fail message="Could not determine javac.include location.  Please set your JAVA_HOME environment variable or manually specify your javac.include location.">
+			<condition>
+				<not>
+					<or>
+						<isset property="${javac.include}"/>
+						<available file="${javac.include}" type="dir"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		<echo>Found java include location: ${javac.include}</echo>
 		
 		
 		<!-- Figure out of the system arch is supported -->
 		<condition property="gcc.arch" value="i586">
-			<and>
-				<not>
-					<isset property="gcc.arch"/>
-				</not>
-				
-				<or>
-					<os arch="x86"/>
-					<os arch="i386"/>
-					<os arch="i486"/>
-					<os arch="i586"/>
-					<os arch="i686"/>
-				</or>
-			</and>
+			<or>
+				<os arch="x86"/>
+				<os arch="i386"/>
+				<os arch="i486"/>
+				<os arch="i586"/>
+				<os arch="i686"/>
+			</or>
 		</condition>
 		<condition property="gcc.arch" value="k8">
-			<and>
-				<not>
-					<isset property="gcc.arch"/>
-				</not>
-				
-				<or>
-					<os arch="x86_64"/>
-					<os arch="amd64"/>
-					<os arch="k8"/>
-				</or>
-			</and>
+			<or>
+				<os arch="x86_64"/>
+				<os arch="amd64"/>
+				<os arch="k8"/>
+			</or>
 		</condition>
 		<condition property="gcc.arch" value="powerpc">
-			<and>
-				<not>
-					<isset property="gcc.arch"/>
-				</not>
-				
-				<or>
-					<os arch="ppc"/>
-					<os arch="PowerPC"/>
-				</or>
-			</and>
+			<or>
+				<os arch="ppc"/>
+				<os arch="PowerPC"/>
+			</or>
 		</condition>
 		<condition property="gcc.arch" value="powerpc64">
-			<and>
-				<not>
-					<isset property="gcc.arch"/>
-				</not>
-				
-				<or>
-					<os arch="ppc64"/>
-					<os arch="PowerPC64"/>
-				</or>
-			</and>
+			<or>
+				<os arch="ppc64"/>
+				<os arch="PowerPC64"/>
+			</or>
 		</condition>
-		<fail unless="gcc.arch" message="The ${os.arch} architecture is not currently supported."/>
+		<fail message="The ${os.arch} architecture is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<available file="${javac.include}" type="dir"/>
+						<equals arg1="${gcc.arch}" arg2="i586" casesensitive="false" trim="true"/>
+						<equals arg1="${gcc.arch}" arg2="k8" casesensitive="false" trim="true"/>
+						<equals arg1="${gcc.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
+						<equals arg1="${gcc.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		<echo>Compatible system architecture: ${gcc.arch}</echo>
+		
 		
 		<!-- Set 32 or 64 bit flag -->
 		<condition property="gcc.arch.model" value="${sun.arch.data.model}">
@@ -108,6 +104,16 @@
 				<isset property="gcc.arch.model"/>
 			</not>
 		</condition>
+		<fail message="The ${sun.arch.data.model}-bit data model is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<equals arg1="${gcc.arch.model}" arg2="32" casesensitive="false" trim="true"/>
+						<equals arg1="${gcc.arch.model}" arg2="64" casesensitive="false" trim="true"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		<echo>System architecture data model: ${gcc.arch.model} bit</echo>
 		<!-- echo>${sun.cpu.endian}</echo -->
 		
@@ -121,6 +127,7 @@
 			</and>
 		</condition>
 		<echo>Debug Mode: ${project.debug}</echo>
+		
 		
 		<!-- Determin the os family -->
 		<condition property="gcc.os" value="windows">
@@ -151,47 +158,59 @@
 				<os family="unix" name="SunOS"/>
 			</or>
 		</condition>
-		<fail unless="gcc.os" message="The ${os.name} ${os.version} opperating system is not currently supported."/>
+		<fail message="The ${os.name} ${os.version} opperating system is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<and>
+							<os family="winnt"/>
+							<equals arg1="${gcc.os}" arg2="windows" casesensitive="true" trim="true"/>
+						</and>
+						
+						<and>
+							<os family="mac"/>
+							<os family="unix"/>
+							<equals arg1="${gcc.os}" arg2="osx" casesensitive="true" trim="true"/>
+						</and>
+						
+						<and>
+							<os family="unix"/>
+							<or>
+								<equals arg1="${gcc.os}" arg2="linux" casesensitive="true" trim="true"/>
+								<equals arg1="${gcc.os}" arg2="freebsd" casesensitive="true" trim="true"/>
+								<equals arg1="${gcc.os}" arg2="solaris" casesensitive="true" trim="true"/>
+							</or>
+						</and>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		<echo>Opperating System: ${os.name} ${os.version} (${gcc.os})</echo>
+		
+		
+		<property name="javac.target" value="${ant.java.version}"/>
+		<echo>Java Compatibility: ${javac.target}</echo>
+		
+		<property name="javac.fork" value="yes"/>
+		<echo>Fork Java Compiler: ${javac.fork}</echo>
+		
+		<property name="gcc.fork" value="yes"/>
+		<echo>Fork GNU C Compiler: ${gcc.fork}</echo>
 		
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
 			<entry key="project.debug"			value="${project.debug}"/>
 			<entry key="javac.fork"				value="yes"/>
-			<entry key="javac.target"			value="${ant.java.version}"/>
+			<entry key="javac.target"			value="${javac.target}"/>
 			<entry key="javac.include" 			value="${javac.include}"/>
+			<entry key="gcc.fork" 				value="yes"/>
 			<entry key="gcc.arch" 				value="${gcc.arch}"/>
 			<entry key="gcc.arch.model"			value="${gcc.arch.model}"/>
 			<entry key="gcc.os"					value="${gcc.os}"/>
 		</propertyfile>
 	</target>
 	
-	<target name="clean" description="prepares the environment">
-		<echo>Cleaning old build structure...</echo>
-		<delete includeemptydirs="false" verbose="true">
-			<fileset dir="${dir.class}" includes="**/*"/>
-		</delete>
-	</target>
 	
-	
-	<target name="compile" depends="" description="Compiles the classes">
-		<property file="build.properties"/>
-		<fail message="Your build.properties file appears to be incomplete.  Please verify your settings or run the ant configure task.">
-			<condition>
-				<not>
-					<and>
-						<isset property="project.debug"/>
-						<isset property="javac.fork"/>
-						<isset property="javac.target"/>
-						<isset property="javac.include"/>
-						<isset property="gcc.arch"/>
-						<isset property="gcc.arch.model"/>
-						<isset property="gcc.os"/>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		
-		
+	<target name="verify" depends="configure" description="verify the build properties.">
 		<!-- Figure out the os family -->
 		<condition property="gcc.os.isWindows" value="true">
 			<equals arg1="${gcc.os}" arg2="windows" casesensitive="false" trim="true"/>
@@ -227,65 +246,22 @@
 		<condition property="sys.arch" value="ppc64">
 			<equals arg1="${gcc.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
 		</condition>
+
 		<condition property="sys.arch.isx86" value="true">
 			<or>
 				<equals arg1="${gcc.arch}" arg2="i586" casesensitive="false" trim="true"/>
 				<equals arg1="${gcc.arch}" arg2="amd64" casesensitive="false" trim="true"/>
 			</or>
 		</condition>
-		
-		<!-- Set the system os name -->
-		<condition property="sys.name" value="linux">
-			<equals arg1="${os.name}" arg2="Linux" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.name" value="osx">
-			<equals arg1="${os.name}" arg2="Mac OS X" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.name" value="windows">
-			<or>
-				<equals arg1="${os.name}" arg2="Windows 2000" casesensitive="false" trim="true"/>
-				<equals arg1="${os.name}" arg2="Windows XP" casesensitive="false" trim="true"/>
-				<equals arg1="${os.name}" arg2="Windows 2003" casesensitive="false" trim="true"/>
-				<equals arg1="${os.name}" arg2="Windows Vista" casesensitive="false" trim="true"/>
-				<equals arg1="${os.name}" arg2="Windows 7" casesensitive="false" trim="true"/>
-			</or>
-		</condition>
-		<condition property="sys.name" value="solaris">
-			<or>
-				<equals arg1="${os.name}" arg2="Solaris" casesensitive="false" trim="true"/>
-				<equals arg1="${os.name}" arg2="SunOS" casesensitive="false" trim="true"/>
-			</or>
-		</condition>
-		<condition property="sys.name" value="freebsd">
-			<equals arg1="${os.name}" arg2="FreeBSD" casesensitive="false" trim="true"/>
-		</condition>
-		
-		<fail message="The ${os.name} opperating system is not currently supported.">
-			<condition>
-				<or>
-					<not>
-						<or>
-							<isset property="gcc.os.isWindows"/>
-							<isset property="gcc.os.isUnix"/>
-							<isset property="gcc.os.isMac"/>
-						</or>
-					</not>
-					<not>
-						<isset property="sys.name"/>
-					</not>
-				</or>
-			</condition>
-		</fail>
-		
-		
-		
-		
+	</target>
+	
+	<target name="compile" depends="verify" description="Compiles the classes">
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.class}"/>
 		<path id="classpath">
 			<pathelement location="${dir.class}"/>
-			<!--
+			<!-- Use this to include addtional dependencies
 			<fileset dir="${project.lib}">
 				<include name="*.jar"/>
 			</fileset>
@@ -304,33 +280,175 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${sys.name}-${sys.arch}"/>
 		
-		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply  -->
+		<antcall target="gcc_windows"/>
+		<antcall target="gcc_unix"/>
+		<antcall target="gcc_osx"/>
+		
+		
+		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply
 		<apply executable="gcc" osfamily="winnt" parallel="true">
 			<fileset dir="${dir.src}/org/jnativehook/c_source">
 				<include name="windows/*.c"/>
 			</fileset>
-			<arg line="-Wall -a"/>
+			<arg line="-Wall -O3  -D_JNI_IMPLEMENTATION_ -Wl, kill-at -IC:/Java/jdk1.6.0_03/include -IC:/Java/jdk1.6.0_03/include/win32 -shared  -o JNativeHook.dll"/>
 		</apply>
+		-->
 		
-		<!-- remove cpptasks -->
+		
+
+		
+		
+		
+		<!-- Fix for ant not knowing how to move a file -->
+		<!-- delete file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so"/ -->
 		
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
 		<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
 			<fileset dir="${dir.lib}" includes="**/*" excludes="**/history.xml"/>
 		</copy>
+	</target>
+	
+	<target name="gcc_windows" depends="verify" if="gcc.os.isWindows">
+		<!-- runtime="dynamic" -->
+		<cpptasks:cc
+			multithreaded="false"
+			optimize="speed"
+			
+			outtype="shared"
+			link="shared"
+			
+			outfile="${dir.lib}/${gcc.os}-${sys.arch}/JNativeHook"
+			objdir="${dir.obj}"
+			
+			debug="${project.debug}"
+			warnings="diagnostic"
+		>
+			<compiler name="gcc">
+				<includepath location="${dir.src}/org/jnativehook/c_source"/>
+				<includepath>
+					<dirset dir="${javac.include}">
+						<include name="**"/>
+					</dirset>
+				</includepath>
+				
+				<fileset dir="${dir.src}/org/jnativehook/c_source">
+					<include name="windows/*.c"/>
+				</fileset>
+				
+				<compilerarg value="-march=${gcc.arch}"/>
+				<compilerarg value="-m${gcc.arch.model}"/>
+				
+				<compilerarg value="-Wall"/>
+				<compilerarg value="-O3"/>
+				<compilerarg value="-fno-strict-aliasing"/>
+				<compilerarg value="-DDEBUG" if="project.isDebug"/>
+
+				<!-- compilerarg value="-v"/-->
+			</compiler>
+			
+			<linker name="gcc">
+				<linkerarg value="-W/dll" if="gcc.os.isWindows"/>
+				<linkerarg value="-Wall"/>
+				
+				<!--
+				<linkerarg value="-m${gcc.arch.model}"/>
+				<linkerarg value="-march=${gcc.arch}"/>
+				<linkerarg value="-fPIC"/>
+				<linkerarg value="-O3"/>
+				<linkerarg value="-fno-strict-aliasing"/>
+				-->
+			</linker>
+			
+			
+			<versioninfo
+				companyname="${project.vendor}"
+				productname="${project.name}"
+				productversion="${project.version}"
+			/>
+		</cpptasks:cc>
 		
 		<!-- Fix for cpptasks on windows borked output -->
-		<!-- move 
+		<move 
 			file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so" 
 			tofile="${dir.lib}/${sys.name}-${sys.arch}/JNativeHook.dll" 
 			failonerror="false"
 			overwrite="true"
-		/-->
-		
-		<!-- Fix for ant not knowing how to move a file -->
-		<!-- delete file="${dir.lib}/${sys.name}-${sys.arch}/libJNativeHook.so"/ -->
+		/>
 	</target>
+	
+	<target name="gcc_unix" depends="verify" if="gcc.os.isUnix">
+		<!-- runtime="dynamic" -->
+		<cpptasks:cc
+			multithreaded="false"
+			optimize="speed"
+			
+			outtype="shared"
+			link="shared"
+			
+			outfile="${dir.lib}/${gcc.os}-${sys.arch}/JNativeHook"
+			objdir="${dir.obj}"
+			
+			debug="${project.debug}"
+			warnings="diagnostic"
+		>
+			<compiler name="gcc">
+				<includepath location="${dir.src}/org/jnativehook/c_source"/>
+				<includepath>
+					<dirset dir="${javac.include}">
+						<include name="**"/>
+					</dirset>
+				</includepath>
+				
+				<includepath location="/usr/include"/>
+				<includepath location="/usr/local/include"/>
+				
+				<fileset dir="${dir.src}/org/jnativehook/c_source">
+					<include name="unix/*.c"/>
+				</fileset>
+				
+				<compilerarg value="-march=${gcc.arch}"/>
+				<compilerarg value="-m${gcc.arch.model}"/>
+				
+				<compilerarg value="-fPIC"/>
+				<compilerarg value="-Wall"/>
+				<compilerarg value="-O3"/>
+				<compilerarg value="-fno-strict-aliasing"/>
+				<compilerarg value="-lX11"/>
+				<compilerarg value="-DDEBUG" if="project.isDebug"/>
+
+				<!-- compilerarg value="-v"/-->
+			</compiler>
+			
+			<linker name="gcc">
+				<!--
+				<linkerarg value="-m${gcc.arch.model}"/>
+				<linkerarg value="-march=${gcc.arch}"/>
+				<linkerarg value="-fPIC"/>
+				<linkerarg value="-O3"/>
+				<linkerarg value="-fno-strict-aliasing"/>
+				-->
+				
+				<linkerarg value="-Wall"/>
+				<linkerarg value="-lX11" if="gcc.os.isUnix"/>
+				<linkerarg value="-L/usr/lib" if="gcc.os.isUnix"/>
+				<linkerarg value="-L/usr/local/lib" if="gcc.os.isUnix"/>
+			</linker>
+			
+			
+			<versioninfo
+				companyname="${project.vendor}"
+				productname="${project.name}"
+				productversion="${project.version}"
+			/>
+		</cpptasks:cc>
+	</target>
+	
+	
+	<target name="gcc_osx" depends="verify" if="gcc.os.isMac">
+		<echo>Not Currently Supported.</echo>
+	</target>
+	
 	
 	<target name="jar" depends="compile" description="Builds the required jar binaries">
 		<echo>Creating JNativeHook.jar...</echo>
