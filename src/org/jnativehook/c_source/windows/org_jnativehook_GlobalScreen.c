@@ -89,9 +89,16 @@ void throwException(char * message) {
 LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
+	//if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), NULL) >= 0) {
+
 		//Class and Constructor for the NativeKeyEvent Object
-		jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+		//jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+		jclass clsKeyEvent = (*env)->FindClass(env, "java/lang/String");
+
+		printf("TEST: %i\n", clsKeyEvent);
+
+/*
 		jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
 
 		//Class and Constructor for the NativeMouseEvent Object
@@ -149,6 +156,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
 				objEvent = NULL;
+
 			break;
 
 			case WM_KEYUP:
@@ -179,6 +187,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
 				objEvent = NULL;
+
 			break;
 
 
@@ -253,13 +262,14 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) FALSE, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
 				objEvent = NULL;
+
 			break;
 
 			case WM_MOUSEWHEEL:
 			default:
 			break;
 		}
-
+*/
 		#ifdef DEBUG
 		if ((*env)->ExceptionOccurred(env)) {
 			printf("Native: JNI Error Occured.\n");
@@ -441,7 +451,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 	bRunning = true;
 	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
 	LPVOID lpParameter = lpStartAddress;
-	hookThreadId = CreateThread( NULL, 0, lpStartAddress, NULL, 0, 0);
+	hookThreadId = CreateThread( NULL, 0, lpStartAddress, NULL, 0, 0 );
 	if( hookThreadId == INVALID_HANDLE_VALUE ) {
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start failure.\n");
