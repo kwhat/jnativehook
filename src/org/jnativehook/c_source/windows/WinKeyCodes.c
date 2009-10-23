@@ -68,6 +68,22 @@ int ungrabKey(KeyCode key) {
 	return 0;
 }
 
+bool isKeyGrabbed(KeyCode key) {
+	int i = 0;
+	for (; i < keysize; i++) {
+		if (grabkeys[i].keycode			== key.keycode &&
+			grabkeys[i].shift_mask		== key.shift_mask &&
+			grabkeys[i].control_mask	== key.control_mask &&
+			grabkeys[i].alt_mask		== key.alt_mask &&
+			grabkeys[i].meta_mask		== key.meta_mask
+		) {
+			return True;
+		}
+	}
+
+	return False;
+}
+
 int grabButton(ButtonCode button) {
 	if (buttonsize == USHRT_MAX) {
 		//This shouldn't happen but just in case.
@@ -120,6 +136,10 @@ int ungrabButton(ButtonCode button) {
 	buttonsize--;
 
 	return 0;
+}
+
+bool isButtonGrabbed(ButtonCode button) {
+
 }
 
 void setModifierMask(unsigned char mod) {
