@@ -89,13 +89,17 @@ void throwException(char * message) {
 LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	//if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) >= 0) {
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), NULL) >= 0) {
+
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), NULL) != JNI_OK) {
+		printf("detach \n");
+		(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	}
+
+	//if ( >= 0) {
+	if (env != NULL) {
 
 		//Class and Constructor for the NativeKeyEvent Object
-		//jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-		jclass clsKeyEvent = (*env)->FindClass(env, "java/lang/String");
-
+		jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 		printf("TEST: %i\n", clsKeyEvent);
 
 /*
@@ -407,10 +411,21 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
-	(*env)->GetJavaVM(env, &jvm);
+	jvm = vm;
+
+	JNIEnv * env = 0;
+	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
+	if (jni_ret == JNI_OK) {
+		jni_ret = JNI_VERSION_1_4;
+	}
+	else {
+		#ifdef DEBUG
+		printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", jni_ret);
+		#endif
+	}
 
 	//Setup the native hooks and their callbacks.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
@@ -425,9 +440,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		#endif
 
 		throwException("Failed to hook keyboard using SetWindowsHookEx");
-
-		//Naturaly exit so jni exception is thrown.
-		return;
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 
 
@@ -443,9 +456,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		#endif
 
 		throwException("Failed to hook mouse using SetWindowsHookEx");
-
-		//Naturaly exit so jni exception is thrown.
-		return;
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 
 	bRunning = true;
@@ -463,9 +474,11 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: MsgLoop() start successful.\n");
 		#endif
 	}
+
+	return jni_ret;
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;

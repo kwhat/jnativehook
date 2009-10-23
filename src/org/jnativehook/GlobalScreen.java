@@ -17,7 +17,7 @@ import org.jnativehook.mouse.NativeMouseListener;
 
 public class GlobalScreen extends Component {
 	//Instance Variables
-	private static final long serialVersionUID = -3980582715467809283L;
+	private static final long serialVersionUID = 6504561173380322679L;
 	private static GlobalScreen instance = new GlobalScreen();
 	private EventListenerList objEventListeners;
 	
@@ -166,16 +166,9 @@ public class GlobalScreen extends Component {
 			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError
 			throw new NativeHookException(e);
 		}
-		
-		//Register the hook.
-		GlobalScreen.initialize();
 	}
 	
 	protected static void unregisterHook() {
-		GlobalScreen.deinitialize();
+		//GlobalScreen.deinitialize();
 	}
-	
-	//These are basically the constructors and deconstructors for the native hook.
-	private native static void initialize();
-	private native static void deinitialize();
 }

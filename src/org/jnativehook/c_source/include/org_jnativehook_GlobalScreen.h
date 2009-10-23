@@ -26,7 +26,7 @@ extern "C" {
 #undef org_jnativehook_GlobalScreen_serialVersionUID
 #define org_jnativehook_GlobalScreen_serialVersionUID -7644114512714619750LL
 #undef org_jnativehook_GlobalScreen_serialVersionUID
-#define org_jnativehook_GlobalScreen_serialVersionUID -3980582715467809283LL
+#define org_jnativehook_GlobalScreen_serialVersionUID 6504561173380322679LL
 /*
  * Class:     org_jnativehook_GlobalScreen
  * Method:    grabKey
@@ -74,22 +74,6 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate
  */
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay
   (JNIEnv *, jobject);
-
-/*
- * Class:     org_jnativehook_GlobalScreen
- * Method:    initialize
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize
-  (JNIEnv *, jclass);
-
-/*
- * Class:     org_jnativehook_GlobalScreen
- * Method:    deinitialize
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize
-  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

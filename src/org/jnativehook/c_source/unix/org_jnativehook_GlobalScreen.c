@@ -57,10 +57,6 @@ Window default_win;
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
 
-//Shared Object Constructor and Deconstructor
-void __attribute__ ((constructor)) Init(void);
-void __attribute__ ((destructor)) Cleanup(void);
-
 void jniFatalError(char * message) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
@@ -495,10 +491,28 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env, jobject UNUSED(obj)) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
+	#ifdef DEBUG
+	printf("Native: JNI_OnLoad - Shared Object Process Attach.\n");
+	#endif
+
 	//Grab the currently running virtual machine so we can attach to it in
 	//functions that are not called from java. ( I.E. MsgLoop )
-	(*env)->GetJavaVM(env, &jvm);
+	jvm = vm;
+
+	JNIEnv * env = 0;
+	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
+	if (jni_ret == JNI_OK) {
+		jni_ret = JNI_VERSION_1_4;
+	}
+	else {
+		#ifdef DEBUG
+		printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", jni_ret);
+		#endif
+	}
+
+	//Tell X Threads are OK
+	XInitThreads();
 
 	//Set the native error handler.
 	XSetErrorHandler((XErrorHandler) xErrorToException);
@@ -516,7 +530,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 
 		throwException(exceptoin_msg);
 		free(exceptoin_msg);
-		return; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -574,16 +588,18 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_initialize(JNIEnv * env
 		printf("Native: MsgLoop() start failure.\n");
 		#endif
 		throwException("Could not create message loop thread.");
-		return; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start successful.\n");
 		#endif
 	}
+
+	return jni_ret;
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
 	if (disp != NULL) {
 		XUngrabKey(disp, AnyKey, AnyModifier, default_win);
 		XCloseDisplay(disp);
@@ -595,21 +611,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_deinitialize(JNIEnv * U
 	interruptMsgLoop();
 	pthread_join(hookThreadId, NULL);
 
-	#ifdef DEBUG
-	printf("Native: Thread terminated successful.\n");
-	#endif
-}
 
-void Init() {
-	//Tell X Threads are OK
-	XInitThreads();
-
-	#ifdef DEBUG
-	printf("Native: Init - Shared Object Process Attach.\n");
-	#endif
-}
-
-void Cleanup() {
 	//Make sure the thread has stopped.
 	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
 		#ifdef DEBUG
@@ -618,6 +620,6 @@ void Cleanup() {
 	}
 
 	#ifdef DEBUG
-	printf("Native: Cleanup - Shared Object Process Detach.\n");
+	printf("Native: JNI_OnUnload successful.\n");
 	#endif
 }
