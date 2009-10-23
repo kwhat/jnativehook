@@ -218,7 +218,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) FALSE, jbutton);
+			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) false, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
 			objEvent = NULL;
 		break;
@@ -255,7 +255,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) FALSE, jbutton);
+			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) false, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
 			objEvent = NULL;
 
@@ -486,8 +486,18 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	}
 
 	//Try to exit the thread naturally.
-	bRunning = FALSE;
-	//pthread_join(hookThreadId, NULL);
+	bRunning = false;
+	WaitForSingleObject(hookThreadHandle, 1000);
+
+	CloseHandle(hookThreadHandle);
+	if(hookThreadHandle != NULL) {
+		HeapFree(GetProcessHeap(), 0, hookThreadHandle);
+		hookThreadHandle = NULL;
+
+		#ifdef DEBUG
+		printf("Native: HeapFree successful.\n");
+		#endif
+	}
 
 	#ifdef DEBUG
 	printf("Native: Thread terminated successful.\n");
@@ -498,7 +508,7 @@ BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			#ifdef DEBUG
-			printf("Native: DllMain - DLL Process attach.\n");
+			printf("Native: DllMain - DLL Process Attach.\n");
 			#endif
 
 			hInst = _hInst; //GetModuleHandle(NULL)

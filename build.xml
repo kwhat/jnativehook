@@ -8,7 +8,7 @@
 	<!-- Project Settings -->
 	<property name="project.name"		value="JNativeHook"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="0.9.139"/>
+	<property name="project.version"	value="0.9.172"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>

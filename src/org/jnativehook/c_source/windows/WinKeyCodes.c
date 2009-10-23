@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <string.h>
 #include "WinKeyCodes.h"
 
 unsigned char modifiers = 0x00;
@@ -47,22 +48,28 @@ int grabKey(KeyCode key) {
 }
 
 int ungrabKey(KeyCode key) {
-	KeyCode * tmp = malloc( (keysize - 1) * sizeof(KeyCode) );
+	//Start out with tmp array of the same size.
+	KeyCode * tmp = malloc( keysize * sizeof(KeyCode) );
 
 	int i = 0, j = 0;
 	for (; i < keysize; i++) {
-		if (grabkeys[i].keycode			!= key.keycode ||
-			grabkeys[i].shift_mask		!= key.shift_mask ||
-			grabkeys[i].control_mask	!= key.control_mask ||
-			grabkeys[i].alt_mask		!= key.alt_mask ||
-			grabkeys[i].meta_mask		!= key.meta_mask
+		if (grabkeys[i].keycode			== key.keycode &&
+			grabkeys[i].shift_mask		== key.shift_mask &&
+			grabkeys[i].control_mask	== key.control_mask &&
+			grabkeys[i].alt_mask		== key.alt_mask &&
+			grabkeys[i].meta_mask		== key.meta_mask
 		) {
+			//Found what we want to remove, so shorten the array and skip the item
+			tmp = (KeyCode *) realloc( tmp, (keysize - 1) * sizeof(KeyCode) );
+			keysize--;
+		}
+		else {
+			//Not the key in question.
 			tmp[j++] = grabkeys[i];
 		}
 	}
 
 	free(grabkeys);
-	keysize--;
 	grabkeys = tmp;
 
 	return 0;
@@ -77,11 +84,11 @@ bool isKeyGrabbed(KeyCode key) {
 			grabkeys[i].alt_mask		== key.alt_mask &&
 			grabkeys[i].meta_mask		== key.meta_mask
 		) {
-			return True;
+			return true;
 		}
 	}
 
-	return False;
+	return false;
 }
 
 int grabButton(ButtonCode button) {
@@ -117,29 +124,45 @@ int grabButton(ButtonCode button) {
 }
 
 int ungrabButton(ButtonCode button) {
-	ButtonCode * tmp = malloc( (buttonsize - 1) * sizeof(ButtonCode) );
+	ButtonCode * tmp = malloc( buttonsize * sizeof(ButtonCode) );
 
 	int i = 0, j = 0;
 	for (; i < buttonsize; i++) {
-		if (grabbuttons[i].buttoncode		!= button.buttoncode ||
-			grabbuttons[i].shift_mask		!= button.shift_mask ||
-			grabbuttons[i].control_mask		!= button.control_mask ||
-			grabbuttons[i].alt_mask			!= button.alt_mask ||
-			grabbuttons[i].meta_mask		!= button.meta_mask
+		if (grabbuttons[i].buttoncode		== button.buttoncode &&
+			grabbuttons[i].shift_mask		== button.shift_mask &&
+			grabbuttons[i].control_mask		== button.control_mask &&
+			grabbuttons[i].alt_mask			== button.alt_mask &&
+			grabbuttons[i].meta_mask		== button.meta_mask
 		) {
+			//Found what we want to remove, so shorten the array and skip the item
+			tmp = (ButtonCode *) realloc( tmp, (buttonsize - 1) * sizeof(ButtonCode) );
+			buttonsize--;
+		}
+		else {
 			tmp[j++] = grabbuttons[i];
 		}
 	}
 
 	free(grabbuttons);
 	grabbuttons = tmp;
-	buttonsize--;
 
 	return 0;
 }
 
 bool isButtonGrabbed(ButtonCode button) {
+	int i = 0;
+	for (; i < buttonsize; i++) {
+		if (grabbuttons[i].buttoncode		== button.buttoncode &&
+			grabbuttons[i].shift_mask		== button.shift_mask &&
+			grabbuttons[i].control_mask		== button.control_mask &&
+			grabbuttons[i].alt_mask			== button.alt_mask &&
+			grabbuttons[i].meta_mask		== button.meta_mask
+		) {
+			return true;
+		}
+	}
 
+	return false;
 }
 
 void setModifierMask(unsigned char mod) {
