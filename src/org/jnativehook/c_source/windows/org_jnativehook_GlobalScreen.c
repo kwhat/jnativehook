@@ -122,6 +122,8 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JKeyCode jkey;
 	jint jbutton = JNOBUTTON;
 	jobject objEvent = NULL;
+	KeyCode key;
+	ButtonCode button;
 
 	switch (wParam) {
 		case WM_KEYDOWN:
@@ -142,17 +144,23 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
 			if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
+			key.keycode = kbhook->vkCode;
+			key.shift_mask = isMaskSet(MOD_SHIFT);
+			key.control_mask = isMaskSet(MOD_CONTROL);
+			key.alt_mask = isMaskSet(MOD_ALT);
+			key.meta_mask = isMaskSet(MOD_WIN);
 
-			jkey = NativeToJKeycode(kbhook->vkCode);
-			if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
-			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
+			if (isKeyGrabbed(key)) {
+				jkey = NativeToJKeycode(key.keycode);
+				if (key.shift_mask)			modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (key.control_mask)		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (key.alt_mask)			modifiers |= NativeToJModifier(MOD_ALT);
+				if (key.meta_mask)			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
-			objEvent = NULL;
-
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_PRESSED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyPressed_ID, objEvent);
+				objEvent = NULL;
+			}
 		break;
 
 		case WM_KEYUP:
@@ -173,17 +181,23 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
 			if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
+			key.keycode = kbhook->vkCode;
+			key.shift_mask = isMaskSet(MOD_SHIFT);
+			key.control_mask = isMaskSet(MOD_CONTROL);
+			key.alt_mask = isMaskSet(MOD_ALT);
+			key.meta_mask = isMaskSet(MOD_WIN);
 
-			jkey = NativeToJKeycode(kbhook->vkCode);
-			if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
-			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
+			if (isKeyGrabbed(key)) {
+				jkey = NativeToJKeycode(key.keycode);
+				if (key.shift_mask)			modifiers |= NativeToJModifier(MOD_SHIFT);
+				if (key.control_mask)		modifiers |= NativeToJModifier(MOD_CONTROL);
+				if (key.alt_mask)			modifiers |= NativeToJModifier(MOD_ALT);
+				if (key.meta_mask)			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
-			objEvent = NULL;
-
+				objEvent = (*env)->NewObject(env, clsKeyEvent, KeyEvent_ID, JK_KEY_RELEASED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, fireKeyReleased_ID, objEvent);
+				objEvent = NULL;
+			}
 		break;
 
 
@@ -277,7 +291,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 
 //void MsgLoop() {
-DWORD WINAPI MsgLoop(LPVOID lpParameter) {
+DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	MSG message;
 
 	//Setup the native hooks and their callbacks.
