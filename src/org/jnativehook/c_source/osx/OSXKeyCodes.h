@@ -5,7 +5,7 @@
 #define AK_TAB							0x30
 #define AK_SHIFT						0x38
 #define AK_CONTROL						0x3B
-#define AK_ALT							0x3A
+#define AK_ALT							0x37	//Command Key
 #define AK_PAUSE						AK_F15
 #define AK_CAPS_LOCK					0x39
 #define AK_ESCAPE						0x35
@@ -83,124 +83,124 @@
 #define AK_MULTIPLY						0x43
 #define AK_ADD							0x45
 
-//#define JK_SEPARATOR					0x
+//#define AK_SEPARATOR					0x
 
-#define JK_SUBTRACT						0x4E
-#define JK_DECIMAL						0x41
-#define JK_DIVIDE						0x4B
-#define JK_DELETE						0x75
+#define AK_SUBTRACT						0x4E
+#define AK_DECIMAL						0x41
+#define AK_DIVIDE						0x4B
+#define AK_DELETE						0x75
 #define AK_NUM_LOCK						0x47
 #define AK_SCROLL_LOCK					AK_F14
 
-#define JK_F1							0x7A
-#define JK_F2							0x78
-#define JK_F3							0x63
-#define JK_F4							0x76
-#define JK_F5							0x60
-#define JK_F6							0x61
-#define JK_F7							0x62
-#define JK_F8							0x64
-#define JK_F9							0x65
-#define JK_F10							0x6D
-#define JK_F11							0x67
-#define JK_F12							0x6F
+#define AK_F1							0x7A
+#define AK_F2							0x78
+#define AK_F3							0x63
+#define AK_F4							0x76
+#define AK_F5							0x60
+#define AK_F6							0x61
+#define AK_F7							0x62
+#define AK_F8							0x64
+#define AK_F9							0x65
+#define AK_F10							0x6D
+#define AK_F11							0x67
+#define AK_F12							0x6F
 
 #define AK_F13							0x69
 #define AK_F14							0x6B
 #define AK_F15							0x71
-//#define JK_F16							0x
-//#define JK_F17							0x
-//#define JK_F18							0x
-//#define JK_F19							0x
-//#define JK_F20							0x
-//#define JK_F21							0x
-//#define JK_F22							0x
-//#define JK_F23							0x
-//#define JK_F24							0x
+//#define AK_F16							0x
+//#define AK_F17							0x
+//#define AK_F18							0x
+//#define AK_F19							0x
+//#define AK_F20							0x
+//#define AK_F21							0x
+//#define AK_F22							0x
+//#define AK_F23							0x
+//#define AK_F24							0x
 
 
-#define JK_PRINTSCREEN					AK_F13
-#define JK_INSERT						0x
-#define JK_HELP							0x
-#define JK_META							0x
+#define AK_PRINTSCREEN					AK_F13
+#define AK_INSERT						0x
+#define AK_HELP							0x
+#define AK_META							0x
 
-#define JK_BACK_QUOTE					0x
-#define JK_QUOTE						0x
+#define AK_BACK_QUOTE					0x
+#define AK_QUOTE						0x
 
-#define JK_KP_UP						0x
-#define JK_KP_DOWN						0x
-#define JK_KP_LEFT						0x
-#define JK_KP_RIGHT						0x
+#define AK_KP_UP						0x
+#define AK_KP_DOWN						0x
+#define AK_KP_LEFT						0x
+#define AK_KP_RIGHT						0x
 
 
 /* For European keyboards */
-#define JK_DEAD_GRAVE					0x
-#define JK_DEAD_ACUTE					0x
-#define JK_DEAD_CIRCUMFLEX				0x
-#define JK_DEAD_TILDE					0x
-#define JK_DEAD_MACRON					0x
-#define JK_DEAD_BREVE					0x
-#define JK_DEAD_ABOVEDOT				0x
-#define JK_DEAD_DIAERESIS				0x
-#define JK_DEAD_ABOVERING				0x
-#define JK_DEAD_DOUBLEACUTE				0x
-#define JK_DEAD_CARON					0x
-#define JK_DEAD_CEDILLA					0x
-#define JK_DEAD_OGONEK					0x
-#define JK_DEAD_IOTA					0x
-#define JK_DEAD_VOICED_SOUND			0x
-#define JK_DEAD_SEMIVOICED_SOUND		0x
+//#define AK_DEAD_GRAVE					0x
+//#define AK_DEAD_ACUTE					0x
+//#define AK_DEAD_CIRCUMFLEX			0x
+//#define AK_DEAD_TILDE					0x
+//#define AK_DEAD_MACRON				0x
+//#define AK_DEAD_BREVE					0x
+//#define AK_DEAD_ABOVEDOT				0x
+//#define AK_DEAD_DIAERESIS				0x
+//#define AK_DEAD_ABOVERING				0x
+//#define AK_DEAD_DOUBLEACUTE			0x
+//#define AK_DEAD_CARON					0x
+//#define AK_DEAD_CEDILLA				0x
+//#define AK_DEAD_OGONEK				0x
+//#define AK_DEAD_IOTA					0x
+//#define AK_DEAD_VOICED_SOUND			0x
+//#define AK_DEAD_SEMIVOICED_SOUND		0x
 
-#define JK_AMPERSAND					0x
-#define JK_ASTERISK						0x
-#define JK_QUOTEDBL						0x
-#define JK_LESS							0x
-#define JK_GREATER						0x
-#define JK_BRACELEFT					0x
-#define JK_BRACERIGHT					0x
+#define AK_AMPERSAND					0x
+#define AK_ASTERISK						0x
+#define AK_QUOTEDBL						0x
+#define AK_LESS							0x
+#define AK_GREATER						0x
+#define AK_BRACELEFT					0x
+#define AK_BRACERIGHT					0x
 
-#define JK_AT							0x
-#define JK_COLON						0x
-#define JK_CIRCUMFLEX					0x
-#define JK_DOLLAR						0x
-#define JK_EURO_SIGN					0x
-#define JK_EXCLAMATION_MARK				0x
-#define JK_INVERTED_EXCLAMATION_MARK	0x
-#define JK_LEFT_PARENTHESIS				0x
-#define JK_NUMBER_SIGN					0x
-#define JK_PLUS							0x
-#define JK_RIGHT_PARENTHESIS			0x
-#define JK_UNDERSCORE					0x
+#define AK_AT							0x
+#define AK_COLON						0x
+#define AK_CIRCUMFLEX					0x
+#define AK_DOLLAR						0x
+#define AK_EURO_SIGN					0x
+#define AK_EXCLAMATION_MARK				0x
+#define AK_INVERTED_EXCLAMATION_MARK	0x
+#define AK_LEFT_PARENTHESIS				0x
+#define AK_NUMBER_SIGN					0x
+#define AK_PLUS							0x
+#define AK_RIGHT_PARENTHESIS			0x
+#define AK_UNDERSCORE					0x
 
-#define JK_WINDOWS						0x
-#define JK_CONTEXT_MENU					0x
+#define AK_WINDOWS						AK_ALT
+#define AK_CONTEXT_MENU					0x3A	//OPTION KEY
 
 /* for input method support on Asian Keyboards */
-#define JK_FINAL						0x	//Unknown Win32 API
-#define JK_CONVERT						0x
-#define JK_NONCONVERT					0x
-#define JK_ACCEPT						0x
-#define JK_MODECHANGE					0x	//Unknown Win32 API
-#define JK_KANA							0x
-#define JK_KANJI						0x
-#define JK_ALPHANUMERIC					0x
-#define JK_KATAKANA						0x
-#define JK_HIRAGANA						0x
-#define JK_FULL_WIDTH					0x
-#define JK_HALF_WIDTH					0x
-#define JK_ROMAN_CHARACTERS				0x
-#define JK_ALL_CANDIDATES				0x
-#define JK_PREVIOUS_CANDIDATE			0x
-#define JK_CODE_INPUT					0x
-#define JK_JAPANESE_KATAKANA			0x
-#define JK_JAPANESE_HIRAGANA			0x
-#define JK_JAPANESE_ROMAN				0x
-#define JK_KANA_LOCK					0x
-#define JK_INPUT_METHOD_ON_OFF			0x
+//#define AK_FINAL						0x	//Unknown Win32 API
+//#define AK_CONVERT					0x
+//#define AK_NONCONVERT					0x
+//#define AK_ACCEPT						0x
+//#define AK_MODECHANGE					0x	//Unknown Win32 API
+//#define AK_KANA						0x
+//#define AK_KANJI						0x
+//#define AK_ALPHANUMERIC				0x
+//#define AK_KATAKANA					0x
+//#define AK_HIRAGANA					0x
+//#define AK_FULL_WIDTH					0x
+//#define AK_HALF_WIDTH					0x
+//#define AK_ROMAN_CHARACTERS			0x
+//#define AK_ALL_CANDIDATES				0x
+//#define AK_PREVIOUS_CANDIDATE			0x
+//#define AK_CODE_INPUT					0x
+//#define AK_JAPANESE_KATAKANA			0x
+//#define AK_JAPANESE_HIRAGANA			0x
+//#define AK_JAPANESE_ROMAN				0x
+//#define AK_KANA_LOCK					0x
+//#define AK_INPUT_METHOD_ON_OFF		0x
 
 
-#define JK_COMPOSE						0x
-#define JK_ALT_GRAPH					0x
-#define JK_BEGIN						0x
+//#define AK_COMPOSE					0x
+//#define AK_ALT_GRAPH					0x
+//#define AK_BEGIN						0x
 
-#define JK_UNDEFINED					0xFF		//Key Undefined
+#define AK_UNDEFINED					0xFF		//Key Undefined
