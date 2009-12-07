@@ -280,6 +280,12 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${gcc.os}-${sys.arch}"/>
 		
+		<exec executable="make" dir="" >
+			<arg value="/c"/>
+			<arg value="ant.bat"/>
+		</exec>
+
+		
 		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply
 		<apply executable="gcc" osfamily="winnt" parallel="true">
 			<fileset dir="${dir.src}/org/jnativehook/c_source">
@@ -368,24 +374,7 @@
 		</copy>
 	</target>
 	
-	<target name="fix_windows" depends="compile" if="gcc.os.isWindows">
-		<!-- Fix for cpptasks on windows borked dll output -->
-		<move 
-			file="${dir.lib}/${gcc.os}-${sys.arch}/libJNativeHook.so" 
-			tofile="${dir.lib}/${gcc.os}-${sys.arch}/JNativeHook.dll" 
-			failonerror="false"
-			overwrite="true"
-		/>
-		
-		<move 
-			file="${dir.class}/org/jnativehook/lib/${gcc.os}-${sys.arch}/libJNativeHook.so" 
-			tofile="${dir.class}/org/jnativehook/lib/${gcc.os}-${sys.arch}/JNativeHook.dll" 
-			failonerror="false"
-			overwrite="true"
-		/>
-	</target>
-	
-	<target name="jar" depends="fix_windows" description="Builds the required jar binaries">
+	<target name="jar" depends="compile" description="Builds the required jar binaries">
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
 		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.class}">

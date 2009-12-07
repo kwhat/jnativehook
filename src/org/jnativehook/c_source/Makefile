@@ -3,6 +3,9 @@ CFLAGS=-Wall -O3 -fno-strict-aliasing -shared -fPIC
 MARCH=
 BITS=
 
+SOURCES=JConvertToNative.c org_jnativehook_GlobalScreen.c XMapModifers.c
+OBJECTS=$(SOURCES:.c=.o)
+
 include foo *.mk $(bar)
 
 LIBS=
@@ -12,7 +15,8 @@ OSNAME = $(shell uname -s)
 PLATFORM=linux
 MARCH=$(shell uname -m)
 LIBS=$(shell pkg-config x11 --libs) $(shell pkg-config xevie --libs)
-INCLUDES=-I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
+
+INCLUDES=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 
 ifeq ($(patsubst i%86,i586,$(MARCH)),i586)
 	MARCH=i586
@@ -26,11 +30,13 @@ else
 	endif
 endif
 
-all: build
+all: $(SOURCES) $(EXECUTABLE)
 
-build:
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	
 	$(CC) $(CFLAGS) -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalHook_Keyboard.so
 	
-debug:
-	$(CC) $(CFLAGS) -DDEBUG -m$(BITS) -march=$(MARCH) $(LIBS) $(INCLUDES) ./org_dotnative_globalhook_keyboard_GlobalKeyHook.cpp -o ./x86_$(BITS)/libGlobalHook_Keyboard.so
+.c.o:
+	$(CC) $(CFLAGS) $< -o $@
 
