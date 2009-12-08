@@ -471,7 +471,6 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${native.os}-${sys.arch}"/>
 		
-		
 		<condition property="native.cflags" value="-D_JNI_IMPLEMENTATION_">
 			<and>
 				<not>
@@ -501,14 +500,19 @@
 			<isset property="project.isDebug"/>
 		</condition>
 		
+		<condition property="native.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
+			<isset property="native.os.isWindows"/>
+		</condition>
 		
 		<exec executable="${native.make}" dir="." failonerror="true">
+			<env key="SHELL" value="${native.shell}"/>
 			<env key="CC" value="${native.cc}"/>
 			<env key="LD" value="${native.ld}"/>
 			<env key="MARCH" value="${native.arch}"/>
 			<env key="MODEL" value="${native.arch.model}"/>
 			<env key="JAVA_INCLUDE" value="-I${java.include} -I${java.include}${file.separator}${native.os}"/>
 			<env key="DEBUG" value="${native.debug}"/>
+			<env key="EXECUTABLE" value="${project.name}"/>
 		</exec>
 		
 		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply

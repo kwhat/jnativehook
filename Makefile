@@ -1,17 +1,10 @@
-SHELL = /bin/sh
-
 SRC_DIR = src/org/jnativehook/c_source/unix
 OBJ_DIR = bin/obj
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(subst $(SRC_DIR),$(OBJ_DIR),$(SOURCES:.c=.o))
 
-EXECUTABLE = JNativeHook
-INCLUDES = -I$(JAVA_INCLUDE)
-for dir in $(JAVA_INCLUDE); do \
-	INCLUDES += -I$$dir; \
-done
-
+INCLUDES += $(JAVA_INCLUDE)
 INCLUDES += -I$(SRC_DIR)/..
 
 all: $(SOURCES) $(EXECUTABLE)
