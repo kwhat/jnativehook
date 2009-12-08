@@ -36,20 +36,10 @@
 		
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="java.include" value="${os.JAVA_HOME}${file.separator}include">
-			<and>
-				<not>
-					<isset property="java.include"/>
-				</not>
-				<available file="${os.JAVA_HOME}/include" type="dir"/>
-			</and>
+			<available file="${os.JAVA_HOME}/include" type="dir"/>
 		</condition>
 		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}include">
-			<and>
-				<not>
-					<isset property="java.include"/>
-				</not>
-				<available file="${java.home}/../include" type="dir"/>
-			</and>
+			<available file="${java.home}/../include" type="dir"/>
 		</condition>
 		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually specify your java.include location.">
 			<condition>
@@ -93,37 +83,12 @@
 				<os arch="PowerPC64"/>
 			</or>
 		</condition>
-		<fail message="The ${os.arch} architecture is not currently supported.">
-			<condition>
-				<not>
-					<or>
-						<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
-					</or>
-				</not>
-			</condition>
-		</fail>
+		<property name="native.arch" value="${os.arch}"/>
 		<echo>Compatible system architecture: ${native.arch}</echo>
 		
 		
 		<!-- Set 32 or 64 bit flag -->
-		<condition property="native.arch.model" value="${sun.arch.data.model}">
-			<not>
-				<isset property="native.arch.model"/>
-			</not>
-		</condition>
-		<fail message="The ${sun.arch.data.model}-bit data model is not currently supported.">
-			<condition>
-				<not>
-					<or>
-						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
-					</or>
-				</not>
-			</condition>
-		</fail>
+		<property name="native.arch.model" value="${sun.arch.data.model}"/>
 		<echo>System architecture data model: ${native.arch.model} bit</echo>
 		<!-- echo>${sun.cpu.endian}</echo -->
 		
@@ -157,193 +122,75 @@
 				<os family="unix" name="SunOS"/>
 			</or>
 		</condition>
-		<fail message="The ${os.name} ${os.version} opperating system is not currently supported.">
+		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
 			<condition>
 				<not>
-					<or>
-						<and>
-							<os family="winnt"/>
-							<equals arg1="${native.os}" arg2="windows" casesensitive="true" trim="true"/>
-						</and>
-						
-						<and>
-							<os family="mac"/>
-							<os family="unix"/>
-							<equals arg1="${native.os}" arg2="osx" casesensitive="true" trim="true"/>
-						</and>
-						
-						<and>
-							<os family="unix"/>
-							<or>
-								<equals arg1="${native.os}" arg2="linux" casesensitive="true" trim="true"/>
-								<equals arg1="${native.os}" arg2="freebsd" casesensitive="true" trim="true"/>
-								<equals arg1="${native.os}" arg2="solaris" casesensitive="true" trim="true"/>
-							</or>
-						</and>
-					</or>
+					<isset property="native.os"/>
 				</not>
 			</condition>
 		</fail>
-		<echo>Opperating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
+		<echo>operating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
 		
 		<!-- Try to locate a suitable C compiler -->
 		<condition property="native.cc" value="gcc">
-			<and>
-				<not>
-					<isset property="native.cc"/>
-				</not>
-				<available file="gcc">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+			<available file="gcc">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
-		<condition property="native.cc" value="cc">
-			<and>
-				<not>
-					<isset property="native.cc"/>
-				</not>
-				<available file="cc">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+		<condition property="native.cc" value="icc">
+			<available file="icc">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
-		<condition property="native.cc" value="g++">
-			<and>
-				<not>
-					<isset property="native.cc"/>
-				</not>
-				<available file="g++">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
-		</condition>
-		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.cc"/>
-						<available file="${native.cc}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
+		<property name="native.cc" value="cc"/>
 		<echo>Native Compiler: ${native.cc}</echo>
 		
 		
 		<!-- Try to locate a suitable linker compiler -->
-		<condition property="native.ld" value="ld">
-			<and>
-				<not>
-					<isset property="native.ld"/>
-				</not>
-				<available file="ld">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
-		</condition>
 		<condition property="native.ld" value="gcc">
-			<and>
-				<not>
-					<isset property="native.ld"/>
-				</not>
-				<available file="gcc">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+			<available file="gcc">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
-		<condition property="native.ld" value="g++">
-			<and>
-				<not>
-					<isset property="native.ld"/>
-				</not>
-				<available file="g++">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+		<condition property="native.ld" value="icc">
+			<available file="icc">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
-		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.ld"/>
-						<available file="${native.ld}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
+		<property name="native.ld" value="ld"/>
 		<echo>Native Linker: ${native.ld}</echo>
 		
 		
 		<condition property="native.make" value="make">
-			<and>
-				<not>
-					<isset property="native.make"/>
-				</not>
-				<available file="make">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+			<available file="make">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
 		<condition property="native.make" value="mingw32-make">
-			<and>
-				<not>
-					<isset property="native.make"/>
-				</not>
-				<available file="mingw32-make">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+			<available file="mingw32-make">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
 		<condition property="native.make" value="mingw64-make">
-			<and>
-				<not>
-					<isset property="native.make"/>
-				</not>
-				<available file="mingw64-make">
-					<filepath>
-						<pathelement path="${os.PATH}"/>
-					</filepath>
-				</available>
-			</and>
+			<available file="mingw64-make">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
 		</condition>
-		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.make"/>
-						<available file="${native.make}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
+		<property name="native.make" value="make"/>
 		<echo>Native Make: ${native.make}</echo>
 		
 		
@@ -360,8 +207,10 @@
 		<condition property="project.debug" value="true" else="false">
 			<and>
 				<isset property="project.debug"/>
-				<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="false"/>
-				<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="false"/>
+				<or>
+					<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="false"/>
+					<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="false"/>
+				</or>
 			</and>
 		</condition>
 		<echo>Debug Mode: ${project.debug}</echo>
@@ -385,22 +234,25 @@
 	
 	<target name="verify" description="verify the build properties.">
 		<!-- Make sure we have values for all needed build properties -->
-		<condition property="project.isConfigured" value="true">
-			<and>
-				<isset property="project.debug"/>
-				<isset property="java.fork"/>
-				<isset property="java.target"/>
-				<isset property="java.include"/>
-				<isset property="native.fork"/>
-				<isset property="native.arch"/>
-				<isset property="native.arch.model"/>
-				<isset property="native.os"/>
-				<isset property="native.cc"/>
-				<isset property="native.ld"/>
-				<isset property="native.make"/>
-			</and>
-		</condition>
-		<antcall target="configure"/>
+		<fail message="One or more build properties are missing. Please be sure to run ant configure first.">
+			<condition>
+				<not>
+					<and>
+						<isset property="project.debug"/>
+						<isset property="java.fork"/>
+						<isset property="java.target"/>
+						<isset property="java.include"/>
+						<isset property="native.fork"/>
+						<isset property="native.arch"/>
+						<isset property="native.arch.model"/>
+						<isset property="native.os"/>
+						<isset property="native.cc"/>
+						<isset property="native.ld"/>
+						<isset property="native.make"/>
+					</and>
+				</not>
+			</condition>
+		</fail>
 		
 		<!-- Figure out the os family -->
 		<condition property="native.os.isWindows" value="true">
@@ -417,6 +269,17 @@
 			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true"/>
 		</condition>
 		
+		<fail message="The value ${native.os} is not recognized as a compatible operating system.">
+			<condition>
+				<not>
+					<or>
+						<isset property="native.os.isWindows"/>
+						<isset property="native.os.isUnix"/>
+						<isset property="native.os.isMac"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		
 		<!-- Check for debug -->
 		<condition property="project.isDebug" value="true">
@@ -437,13 +300,75 @@
 		<condition property="sys.arch" value="ppc64">
 			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
 		</condition>
-
 		<condition property="sys.arch.isx86" value="true">
 			<or>
 				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
 				<equals arg1="${native.arch}" arg2="amd64" casesensitive="false" trim="true"/>
 			</or>
 		</condition>
+		<fail message="The ${os.arch} architecture is not currently supported.">
+			<condition>
+				<not>
+					<isset property="sys.arch"/>
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="The ${sun.arch.data.model}-bit data model is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true"/>
+						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
+		
+		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.cc"/>
+						<available file="${native.cc}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.ld"/>
+						<available file="${native.ld}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.make"/>
+						<available file="${native.make}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
 	</target>
 	
 	<target name="compile" depends="verify" description="Compiles all Java and C source files.">
@@ -471,135 +396,82 @@
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${native.os}-${sys.arch}"/>
 		
-		<condition property="native.cflags" value="-D_JNI_IMPLEMENTATION_">
-			<and>
-				<not>
-					<isset property="native.cflags"/>
-				</not>
-				<isset property="native.os.isWindows"/>
-			</and>
+		
+		<!-- set system specific src -->
+		<condition property="native.src" value="windows">
+			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-lX11 -fPIC">
-			<and>
-				<not>
-					<isset property="native.cflags"/>
-				</not>
-				<isset property="native.os.isUnix"/>
-			</and>
+		<condition property="native.src" value="unix">
+			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="-fPIC">
-			<and>
-				<not>
-					<isset property="native.cflags"/>
-				</not>
-				<isset property="native.os.isMac"/>
-			</and>
+		<condition property="native.src" value="osx">
+			<isset property="native.os.isMac"/>
 		</condition>
 		
+		<!-- set system specific cflags -->
+		<condition property="native.cflags" value="-D_JNI_IMPLEMENTATION_">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.cflags" value="-lX11 -fPIC">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.cflags" value="-fPIC">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
+		<!-- set system specific ldflags -->
+		<condition property="native.ldflags" value="--kill-at">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.ldflags" value="-lX11 -L/usr/lib -L/usr/local/lib">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.ldflags" value="">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
+		<!-- set system specific includes -->
+		<condition property="native.include" value="">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.include" value="-I/usr/include -I/usr/local/include">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.include" value="">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
+		<!-- set debug flag -->
 		<condition property="native.debug" value="-DDEBUG">
 			<isset property="project.isDebug"/>
 		</condition>
 		
+		<!-- set system shell -->
 		<condition property="native.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
 		<exec executable="${native.make}" dir="." failonerror="true">
+			<env key="ANT_TASK" value="true"/>
 			<env key="SHELL" value="${native.shell}"/>
 			<env key="CC" value="${native.cc}"/>
 			<env key="LD" value="${native.ld}"/>
 			<env key="MARCH" value="${native.arch}"/>
 			<env key="MODEL" value="${native.arch.model}"/>
+			<env key="CFLAGS" value="${native.cflags}"/>
+			<env key="LDFLAGS" value="${native.ldflags}"/>
+			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
+			<env key="OBJ_DIR" value="${dir.obj}"/>
+			<env key="NATIVE_INCLUDE" value="${native.include}"/>
 			<env key="JAVA_INCLUDE" value="-I${java.include} -I${java.include}${file.separator}${native.os}"/>
 			<env key="DEBUG" value="${native.debug}"/>
 			<env key="EXECUTABLE" value="${project.name}"/>
 		</exec>
 		
-		<!-- cpptasks are nice but there are alot of bugs, replace with exec and apply
-		<apply executable="gcc" osfamily="winnt" parallel="true">
-			<fileset dir="${dir.src}/org/jnativehook/c_source">
-				<include name="windows/*.c"/>
-			</fileset>
-			<arg line="-Wall -O3  -D_JNI_IMPLEMENTATION_ -Wl, kill-at -IC:/Java/jdk1.6.0_03/include -IC:/Java/jdk1.6.0_03/include/win32 -shared  -o JNativeHook.dll"/>
-		</apply>
-		-->
-		
-		<!-- runtime="dynamic" -->
-		<cpptasks:cc
-			multithreaded="false"
-			optimize="speed"
-			
-			outtype="shared"
-			link="shared"
-			
-			outfile="${dir.lib}/${gcc.os}-${sys.arch}/JNativeHook"
-			objdir="${dir.obj}"
-			
-			debug="${project.debug}"
-			warnings="diagnostic"
-		>
-			<compiler name="gcc">
-				<includepath location="${dir.src}/org/jnativehook/c_source"/>
-				<includepath>
-					<dirset dir="${javac.include}">
-						<include name="**"/>
-					</dirset>
-				</includepath>
-				
-				<includepath location="/usr/include" if="gcc.os.isUnix"/>
-				<includepath location="/usr/local/include" if="gcc.os.isUnix"/>
-				
-				<fileset dir="${dir.src}/org/jnativehook/c_source">
-					<include name="windows/*.c" if="gcc.os.isWindows"/>
-					<include name="unix/*.c" if="gcc.os.isUnix"/>
-					<include name="osx/*.c" if="gcc.os.isMac"/>
-				</fileset>
-				
-				<compilerarg value="-march=${gcc.arch}"/>
-				<compilerarg value="-m${gcc.arch.model}"/>
-				
-				<compilerarg value="-Wall"/>
-				<compilerarg value="-O3"/>
-				<compilerarg value="-fno-strict-aliasing"/>
-				<compilerarg value="-fPIC" unless="gcc.os.isWindows"/>
-				<compilerarg value="-lX11" if="gcc.os.isUnix"/>
-				<compilerarg value="-D_JNI_IMPLEMENTATION_" if="gcc.os.isWindows"/>
-				<compilerarg value="-DDEBUG" if="project.isDebug"/>
-
-				<!-- compilerarg value="-v"/-->
-			</compiler>
-			
-			<linker name="gcc">
-				<!-- linkerarg value="-W/dll" if="gcc.os.isWindows"/ -->
-				
-				<!--
-				<linkerarg value="-m${gcc.arch.model}"/>
-				<linkerarg value="-march=${gcc.arch}"/>
-				
-				-->
-				<linkerarg value="-fPIC"/>
-				<linkerarg value="-Wall"/>
-				<linkerarg value="-O3"/>
-				<linkerarg value="-fno-strict-aliasing"/>
-				<linkerarg value="--kill-at" if="gcc.os.isWindows"/>
-				
-				<linkerarg value="-lX11" if="gcc.os.isUnix"/>
-				<linkerarg value="-L/usr/lib" if="gcc.os.isUnix"/>
-				<linkerarg value="-L/usr/local/lib" if="gcc.os.isUnix"/>
-			</linker>
-			
-			
-			<versioninfo
-				companyname="${project.vendor}"
-				productname="${project.name}"
-				productversion="${project.version}"
-			/>
-		</cpptasks:cc>
-		
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
 		<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
-			<fileset dir="${dir.lib}" includes="**/*" excludes="**/history.xml"/>
+			<fileset dir="${dir.lib}" includes="**/*"/>
 		</copy>
 	</target>
 	
