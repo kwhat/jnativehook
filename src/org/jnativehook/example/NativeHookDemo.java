@@ -43,13 +43,15 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		
 		txtTypingArea = new JTextField("Click to GrabKey");
 		txtTypingArea.setEditable(false);
-		txtTypingArea.setBackground(Color.GRAY);
-		txtTypingArea.setForeground(Color.WHITE);
+		txtTypingArea.setBackground(new Color(0xFF, 0xFF, 0xFF));
+		txtTypingArea.setForeground(new Color(0x00, 0x00, 0x00));
 		txtTypingArea.addFocusListener(this);
 		
 		
 		txtEventInfo = new JTextArea();
 		txtEventInfo.setEditable(false);
+		txtEventInfo.setBackground(new Color(0xFF, 0xFF, 0xFF));
+		txtEventInfo.setForeground(new Color(0x00, 0x00, 0x00));
 		JScrollPane scrollPane = new JScrollPane(txtEventInfo);
 		scrollPane.setPreferredSize(new Dimension(375, 125));
 		
@@ -82,6 +84,7 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
     
 	public void focusGained(FocusEvent e) {
 		if (e.getSource() == txtTypingArea) {
+			((JTextField) e.getSource()).setBackground(new Color(0xFF, 0xF9, 0xB6));
 			((JTextField) e.getSource()).setText("Press Key to Bind");
 			((JTextField) e.getSource()).addKeyListener(this);
 			((JTextField) e.getSource()).addMouseListener(this);
@@ -92,6 +95,7 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		if (e.getSource()  == txtTypingArea) {
 			((JTextField) e.getSource()).removeKeyListener(this);
 			((JTextField) e.getSource()).removeMouseListener(this);
+			((JTextField) e.getSource()).setBackground(new Color(0xFF, 0xFF, 0xFF));
 		}
 	}
 	
