@@ -43,6 +43,7 @@
 		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}include">
 			<available file="${java.home}/../include" type="dir"/>
 		</condition>
+		
 		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually specify your java.include location.">
 			<condition>
 				<not>
@@ -55,6 +56,7 @@
 		</fail>
 		<echo>Found java include location: ${java.include}</echo>
 		
+		
 		<!-- Try to locate the env path varaible -->
 		<condition property="native.path" value="${env.PATH}">
 			<isset property="env.PATH"/>
@@ -65,6 +67,7 @@
 		<condition property="native.path" value="${env.path}">
 			<isset property="env.path"/>
 		</condition>
+		
 		<fail message="Could not determine enviroemtn path.  Please set your PATH environment variable or manually specify native.path.">
 			<condition>
 				<not>
@@ -73,6 +76,7 @@
 			</condition>
 		</fail>
 		<echo>Found Path: ${native.path}</echo>
+		
 		
 		<!-- Figure out of the system arch is supported -->
 		<condition property="native.arch" value="i586">
@@ -103,17 +107,53 @@
 				<os arch="PowerPC64"/>
 			</or>
 		</condition>
-		<property name="native.arch" value="${os.arch}"/>
-		<echo>Compatible system architecture: ${native.arch}</echo>
+		
+		<!-- Set the system arch name -->
+		<condition property="native.arch.name" value="i586">
+			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
+		</condition>
+		<condition property="native.arch.name" value="amd64">
+			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true"/>
+		</condition>
+		<condition property="native.arch.name" value="ppc">
+			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
+		</condition>
+		<condition property="native.arch.name" value="ppc64">
+			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
+		</condition>
+		
+		<fail message="The ${os.arch} architecture is not currently supported.">
+			<condition>
+				<not>
+					<isset property="native.arch.name"/>
+				</not>
+			</condition>
+		</fail>
+		<echo>Compatible system architecture: ${native.arch.name}</echo>
 		
 		
 		<!-- Set 32 or 64 bit flag -->
 		<property name="native.arch.model" value="${sun.arch.data.model}"/>
+		<fail message="The ${native.arch.model}-bit data model is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true"/>
+						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
+					</or>
+				</not>
+			</condition>
+		</fail>
 		<echo>System architecture data model: ${native.arch.model} bit</echo>
-		<!-- echo>${sun.cpu.endian}</echo -->
 		
 		
-		<!-- Determin the os family -->
+		<!-- Set little or big endian
+		<property name="native.arch.endian" value="${sun.cpu.endian}"/>
+		<echo>System architecture endian: ${native.arch.endian}</echo>
+		 -->
+		
+		
+		<!-- Determin the operating system -->
 		<condition property="native.os" value="windows">
 			<or>
 				<os family="winnt" name="Windows 2000"/>
@@ -142,14 +182,35 @@
 				<os family="unix" name="SunOS"/>
 			</or>
 		</condition>
+		
+		<!-- Figure out the os family -->
+		<condition property="native.os.isWindows" value="true">
+			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true"/>
+		</condition>
+		<condition property="native.os.isUnix" value="true">
+			<or>
+				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true"/>
+				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true"/>
+				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true"/>
+			</or>
+		</condition>
+		<condition property="native.os.isMac" value="true">
+			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true"/>
+		</condition>
+		
 		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
 			<condition>
 				<not>
-					<isset property="native.os"/>
+					<or>
+						<isset property="native.os.isWindows"/>
+						<isset property="native.os.isUnix"/>
+						<isset property="native.os.isMac"/>
+					</or>
 				</not>
 			</condition>
 		</fail>
-		<echo>operating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
+		<echo>Operating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
+		
 		
 		<!-- Try to locate a suitable C compiler -->
 		<echo>${os.PATH} ${os.Path} ${os.path}</echo>
@@ -175,7 +236,28 @@
 				</filepath>
 			</available>
 		</condition>
-		<property name="native.cc" value="cc"/>
+		<condition property="native.cc" value="cc">
+			<available file="cc">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
+		</condition>
+		
+		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.cc"/>
+						<available file="${native.cc}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
 		<echo>Native Compiler: ${native.cc}</echo>
 		
 		
@@ -194,10 +276,32 @@
 				</filepath>
 			</available>
 		</condition>
-		<property name="native.ld" value="ld"/>
+		<condition property="native.ld" value="ld">
+			<available file="ld">
+				<filepath>
+					<pathelement path="${os.PATH}"/>
+				</filepath>
+			</available>
+		</condition>
+			
+		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.ld"/>
+						<available file="${native.ld}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
 		<echo>Native Linker: ${native.ld}</echo>
 		
 		
+		<!-- Try to locate make -->
 		<condition property="native.make" value="make">
 			<available file="make">
 				<filepath>
@@ -219,12 +323,28 @@
 				</filepath>
 			</available>
 		</condition>
-		<property name="native.make" value="make"/>
+		
+		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.make"/>
+						<available file="${native.make}">
+							<filepath>
+								<pathelement path="${os.PATH}"/>
+							</filepath>
+						</available>
+					</and>
+				</not>
+			</condition>
+		</fail>
 		<echo>Native Make: ${native.make}</echo>
 		
 		
+		<!-- Set the java compatible version -->
 		<property name="java.target" value="${ant.java.version}"/>
 		<echo>Java Compatibility: ${java.target}</echo>
+		
 		
 		<!-- Set the project debug flag -->
 		<condition property="project.debug" value="true" else="false">
@@ -236,6 +356,12 @@
 				</or>
 			</and>
 		</condition>
+		
+		<!-- Check for debug -->
+		<condition property="project.isDebug" value="true">
+			<istrue value="${project.debug}"/>
+		</condition>
+		
 		<echo>Debug Mode: ${project.debug}</echo>
 		
 		
@@ -253,144 +379,7 @@
 	</target>
 	
 	
-	<target name="verify" description="verify the build properties.">
-		<!-- Make sure we have values for all needed build properties -->
-		<fail message="One or more build properties are missing. Please be sure to run ant configure first.">
-			<condition>
-				<not>
-					<and>
-						<isset property="project.debug"/>
-						<isset property="java.target"/>
-						<isset property="java.include"/>
-						<isset property="native.arch"/>
-						<isset property="native.arch.model"/>
-						<isset property="native.os"/>
-						<isset property="native.cc"/>
-						<isset property="native.ld"/>
-						<isset property="native.make"/>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		
-		<!-- Figure out the os family -->
-		<condition property="native.os.isWindows" value="true">
-			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="native.os.isUnix" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true"/>
-				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true"/>
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true"/>
-			</or>
-		</condition>
-		<condition property="native.os.isMac" value="true">
-			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true"/>
-		</condition>
-		
-		<fail message="The value ${native.os} is not recognized as a compatible operating system.">
-			<condition>
-				<not>
-					<or>
-						<isset property="native.os.isWindows"/>
-						<isset property="native.os.isUnix"/>
-						<isset property="native.os.isMac"/>
-					</or>
-				</not>
-			</condition>
-		</fail>
-		
-		<!-- Check for debug -->
-		<condition property="project.isDebug" value="true">
-			<istrue value="${project.debug}"/>
-		</condition>
-		
-		
-		<!-- Set the system arch name -->
-		<condition property="sys.arch" value="i586">
-			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.arch" value="amd64">
-			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.arch" value="ppc">
-			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.arch" value="ppc64">
-			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
-		</condition>
-		<condition property="sys.arch.isx86" value="true">
-			<or>
-				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
-				<equals arg1="${native.arch}" arg2="amd64" casesensitive="false" trim="true"/>
-			</or>
-		</condition>
-		<fail message="The ${os.arch} architecture is not currently supported.">
-			<condition>
-				<not>
-					<isset property="sys.arch"/>
-				</not>
-			</condition>
-		</fail>
-
-		<fail message="The ${sun.arch.data.model}-bit data model is not currently supported.">
-			<condition>
-				<not>
-					<or>
-						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
-					</or>
-				</not>
-			</condition>
-		</fail>
-		
-		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.cc"/>
-						<available file="${native.cc}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
-
-		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.ld"/>
-						<available file="${native.ld}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
-
-		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.make"/>
-						<available file="${native.make}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
-					</and>
-				</not>
-			</condition>
-		</fail>
-	</target>
-	
-	<target name="compile" depends="verify" description="Compiles all Java and C source files.">
+	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.class}"/>
