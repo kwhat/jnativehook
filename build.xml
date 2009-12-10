@@ -213,35 +213,17 @@
 		
 		
 		<!-- Try to locate a suitable C compiler -->
-		<echo>${os.PATH} ${os.Path} ${os.path}</echo>
-		<echo>${env.PATH} ${env.Path} ${env.path}</echo>
 		<condition property="native.cc" value="gcc">
-			<available file="gcc">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+			<available filepath="${native.path}" file="gcc"/>
 		</condition>
 		<condition property="native.cc" value="gcc.exe">
-			<available file="gcc.exe">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
-		</condition>
-		<condition property="native.cc" value="icc">
-			<available file="icc">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+			<available filepath="${native.path}" file="gcc.exe"/>
 		</condition>
 		<condition property="native.cc" value="cc">
-			<available file="cc">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+			<available filepath="${native.path}" file="cc"/>
+		</condition>
+		<condition property="native.cc" value="cc.exe">
+			<available filepath="${native.path}" file="cc.exe"/>
 		</condition>
 		
 		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
@@ -249,11 +231,7 @@
 				<not>
 					<and>
 						<isset property="native.cc"/>
-						<available file="${native.cc}">
-							<filepath>
-								<pathelement path="${os.PATH}"/>
-							</filepath>
-						</available>
+						<available filepath="${native.path}" file="${native.cc}"/>
 					</and>
 				</not>
 			</condition>
@@ -262,28 +240,19 @@
 		
 		
 		<!-- Try to locate a suitable linker compiler -->
-		<condition property="native.ld" value="gcc">
-			<available file="gcc">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
-		</condition>
-		<condition property="native.ld" value="icc">
-			<available file="icc">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
-		</condition>
 		<condition property="native.ld" value="ld">
-			<available file="ld">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+			<available filepath="${native.path}" file="ld"/>
 		</condition>
-			
+		<condition property="native.ld" value="ld.exe">
+			<available filepath="${native.path}" file="ld.exe"/>
+		</condition>
+		<condition property="native.ld" value="gcc">
+			<available filepath="${native.path}" file="gcc"/>
+		</condition>
+		<condition property="native.ld" value="gcc.exe">
+			<available filepath="${native.path}" file="gcc.exe"/>
+		</condition>
+		
 		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
 			<condition>
 				<not>
@@ -291,7 +260,7 @@
 						<isset property="native.ld"/>
 						<available file="${native.ld}">
 							<filepath>
-								<pathelement path="${os.PATH}"/>
+								<pathelement path="${native.path}"/>
 							</filepath>
 						</available>
 					</and>
@@ -303,25 +272,16 @@
 		
 		<!-- Try to locate make -->
 		<condition property="native.make" value="make">
-			<available file="make">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+			<available filepath="${native.path}" file="make"/>
 		</condition>
-		<condition property="native.make" value="mingw32-make">
-			<available file="mingw32-make">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+		<condition property="native.make" value="make.exe">
+			<available filepath="${native.path}" file="make.exe"/>
 		</condition>
-		<condition property="native.make" value="mingw64-make">
-			<available file="mingw64-make">
-				<filepath>
-					<pathelement path="${os.PATH}"/>
-				</filepath>
-			</available>
+		<condition property="native.make" value="mingw32-make.exe">
+			<available filepath="${native.path}" file="mingw32-make.exe"/>
+		</condition>
+		<condition property="native.make" value="mingw64-make.exe">
+			<available filepath="${native.path}" file="mingw64-make.exe"/>
 		</condition>
 		
 		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
@@ -331,7 +291,7 @@
 						<isset property="native.make"/>
 						<available file="${native.make}">
 							<filepath>
-								<pathelement path="${os.PATH}"/>
+								<pathelement path="${native.path}"/>
 							</filepath>
 						</available>
 					</and>
@@ -428,7 +388,7 @@
 		</condition>
 		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared --kill-at">
+		<condition property="native.ldflags" value="-O3 -fno-strict-aliasing -shared --kill-at">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared -lX11 -L/usr/lib -L/usr/local/lib">
@@ -439,10 +399,10 @@
 		</condition>
 		
 		<!-- set system specific includes -->
-		<condition property="native.include" value="">
+		<condition property="native.include" value="-I${java.include} -I${java.include}${file.separator}win${native.arch.model}">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.include" value="-I/usr/include -I/usr/local/include">
+		<condition property="native.include" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.include" value="">
@@ -482,7 +442,6 @@
 			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
 			<env key="OBJ_DIR" value="${dir.obj}"/>
 			<env key="NATIVE_INCLUDE" value="${native.include}"/>
-			<env key="JAVA_INCLUDE" value="-I${java.include} -I${java.include}${file.separator}${native.os}"/>
 			<env key="DEBUG" value="${native.debug}"/>
 			<env key="EXECUTABLE" value="${dir.lib}/${native.os}-${native.arch}/${native.executable}"/>
 		</exec>
