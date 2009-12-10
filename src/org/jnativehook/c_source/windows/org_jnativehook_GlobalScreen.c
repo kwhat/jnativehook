@@ -123,7 +123,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	jint jbutton = JNOBUTTON;
 	jobject objEvent = NULL;
 	KeyCode key;
-	ButtonCode button;
+	//ButtonCode button;
 
 	switch (wParam) {
 		case WM_KEYDOWN:
@@ -470,14 +470,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 
 
-
-
-
 	bRunning = true;
 	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
-	LPVOID lpParameter = lpStartAddress;
+	//LPVOID lpParameter = lpStartAddress;
 	//hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, CREATE_SUSPENDED, &hookThreadId );
-	hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, 0, &hookThreadId );
+	hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, 0, hookThreadId );
 	if( hookThreadHandle == INVALID_HANDLE_VALUE ) {
 		#ifdef DEBUG
 		printf("Native: MsgLoop() start failure.\n");

@@ -243,9 +243,11 @@
 		<condition property="native.ld" value="ld">
 			<available filepath="${native.path}" file="ld"/>
 		</condition>
+		<!-- mingw ld on windows does very strange things... linking with gcc just works.
 		<condition property="native.ld" value="ld.exe">
 			<available filepath="${native.path}" file="ld.exe"/>
 		</condition>
+		-->
 		<condition property="native.ld" value="gcc">
 			<available filepath="${native.path}" file="gcc"/>
 		</condition>
@@ -362,7 +364,7 @@
 		
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
-		<mkdir dir="${dir.lib}/${native.os}-${sys.arch}"/>
+		<mkdir dir="${dir.lib}/${native.os}-${native.arch.name}"/>
 		
 		
 		<!-- set system specific src -->
@@ -388,7 +390,7 @@
 		</condition>
 		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-O3 -fno-strict-aliasing -shared --kill-at">
+		<condition property="native.ldflags" value="-lgcc -O3 -fno-strict-aliasing -shared --kill-at">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared -lX11 -L/usr/lib -L/usr/local/lib">
