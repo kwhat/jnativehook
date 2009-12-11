@@ -445,7 +445,7 @@
 			<env key="OBJ_DIR" value="${dir.obj}"/>
 			<env key="NATIVE_INCLUDE" value="${native.include}"/>
 			<env key="DEBUG" value="${native.debug}"/>
-			<env key="EXECUTABLE" value="${dir.lib}/${native.os}-${native.arch}/${native.executable}"/>
+			<env key="EXECUTABLE" value="${dir.lib}/${native.os}-${native.arch.name}/${native.executable}"/>
 		</exec>
 		
 		<echo>Copying libs...</echo>
