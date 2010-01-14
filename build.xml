@@ -385,7 +385,7 @@
 		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -lX11 -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="">
+		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -fPIC">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -396,7 +396,7 @@
 		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared -lX11 -L/usr/lib -L/usr/local/lib">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.ldflags" value="">
+		<condition property="native.ldflags" value="-lc -framework Carbon">
 			<isset property="native.os.isMac"/>
 		</condition>
 		

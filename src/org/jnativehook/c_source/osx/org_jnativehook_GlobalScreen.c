@@ -8,12 +8,6 @@
  *  TODO Add LGPL License
  */
 
-/*
-Compiling Options:
-	gcc -m32 -march=i586 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativehook_keyboard_GrabKeyHook.c -o libJNativeHook_Keyboard.so
-	gcc -m64 -march=k8 -shared -fPIC -lX11 -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ./org_jnativehook_keyboard_GrabKeyHook.c -o libJNativeHook_Keyboard.so
-*/
-
 #ifdef UNUSED
 #elif defined(__GNUC__)
 # define UNUSED(x) UNUSED_ ## x __attribute__((unused))
@@ -36,15 +30,13 @@ Compiling Options:
 #include <pthread.h>
 #include <signal.h>
 
-
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
+#include <Carbon/Carbon.h>
 
 #include <jni.h>
 
 #include "include/org_jnativehook_GlobalScreen.h"
 #include "include/JConvertToNative.h"
-#include "XMapModifers.h"
+#include "OSXKeyCodes.h"
 
 //Instance Variables
 bool bRunning = true;
@@ -105,7 +97,68 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 }
 
 
-void MsgLoop() {
+static OSStatus EventHandlerCallback(EventHandlerCallRef caller, EventRef event, void* refcon) {
+	UInt32	key;
+	Point	mouse;
+	EventMouseButton button;
+
+	switch (GetEventKind(event)) {
+		case kEventRawKeyDown:
+			kindName = "KeyDown";
+			GetEventParameter(event, kEventParamKeyCode, typeUInt32, NULL, sizeof(key), NULL, &key);
+			fprintf(stderr, "keycode - %d - ", (int)ch);
+		break;
+
+		case kEventRawKeyUp:
+			kindName = "KeyUp";
+			GetEventParameter(event, kEventParamKeyCode, typeUInt32, NULL, sizeof(key), NULL, &key);
+			fprintf(stderr, "keycode - %d - ", (int)ch);
+		break;
+
+		case kEventRawKeyRepeat:
+			kindName = "KeyRepeat";
+			GetEventParameter(event, kEventParamKeyCode, typeUInt32, NULL, sizeof(key), NULL, &key);
+			fprintf(stderr, "keycode - %d - ", (int)ch);
+		break;
+
+		case kEventRawKeyModifiersChanged:
+			GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(key), NULL, &key);
+			fprintf(stderr, "0x%x - ", (unsigned int)ch);
+			kindName = "ModifiersChanged";
+		break;
+
+		case kEventMouseDown:
+			kindName = "MouseDown";
+			GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
+			fprintf(stderr, "Mouse button %d pressed\n", (int) button);
+		break;
+
+		case kEventMouseUp:
+			kindName = "MouseUp";
+			GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
+			fprintf(stderr, "Mouse button %d released\n", (int) button);
+		break;
+
+		case kEventMouseMoved:
+			kindName = "MouseMoved";
+			GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(mouse), NULL, &mouse);
+			fprintf(stderr, "location - %d, %d - ", mouse.v, mouse.h);
+		break;
+
+		case kEventMouseDragged:
+			kindName = "MouseDragged";
+		break;
+
+		case kEventMouseWheelMoved:
+			kindName = "MouseWheel";
+		break;
+
+		default:
+		break;
+	}
+
+
+
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
@@ -137,6 +190,11 @@ void MsgLoop() {
 	jint jbutton;
 	jint modifiers;
 	jobject objEvent = NULL;
+
+
+
+
+
 	while (bRunning) {
 		XNextEvent(disp, &xev);
 
@@ -213,6 +271,27 @@ void MsgLoop() {
 	printf("Native: MsgLoop() stop successful.\n");
 	#endif
 }
+
+OSStatus InitEventHandlers(void) {
+	EventTypeSpec	kEvents[] = {
+		{ kEventClassKeyboard, kEventRawKeyDown },
+		{ kEventClassKeyboard, kEventRawKeyUp },
+		{ kEventClassKeyboard, kEventRawKeyRepeat },
+		{ kEventClassKeyboard, kEventRawKeyModifiersChanged },
+		{ kEventClassMouse, kEventMouseDown },
+		{ kEventClassMouse, kEventMouseUp },
+		{ kEventClassMouse, kEventMouseMoved },
+		{ kEventClassMouse, kEventMouseDragged },
+		{ kEventClassMouse, kEventMouseWheelMoved }
+	};
+
+	//FIXME This should return something??
+	InstallEventHandler(GetEventMonitorTarget(), MonitorHandler, GetEventTypeCount( kEvents ), kEvents, 0, &sHandler);
+
+	return noErr;
+}
+
+
 
 void interruptMsgLoop() {
 	//We need to create an event to send to the thread to wake it up
