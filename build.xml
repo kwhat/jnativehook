@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project default="all" basedir="." xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks">
+<project default="all" basedir=".">
 	<property environment="os"/>
 	<property environment="env"/>
 	<property file="build.properties"/>
