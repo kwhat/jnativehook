@@ -1,9 +1,6 @@
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/Sunkeysym.h>
 #include "include/JConvertToNative.h"
-#include "XMapModifers.h"
+#include "OSXKeyCodes.h"
+#include "OSXButtonCodes.h"
 
 unsigned int JKeycodeToNative(JKeyCode jkey) {
 	switch (jkey.keycode) {

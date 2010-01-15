@@ -1,5 +1,5 @@
 /*
- *	JNativeHook - GrabKeyHook - 09/08/06
+ *	JNativeHook - GrabKeyHook - 01/12/10
  *  Alexander Barker
  *
  *	JNI Interface for setting a Keyboard Hook and monitoring
@@ -40,11 +40,6 @@
 
 //Instance Variables
 bool bRunning = true;
-unsigned int xkb_timeout;
-unsigned int xkb_interval;
-
-Display * disp;
-Window default_win;
 
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
@@ -293,280 +288,81 @@ OSStatus InitEventHandlers(void) {
 
 
 
-void interruptMsgLoop() {
-	//We need to create an event to send to the thread to wake it up
-	//so it will listen to grab changes.
-	XAnyEvent xev;
-	//xev.type		= KeyPress;
-	xev.display		= disp;			// defined globally
-	xev.window		= default_win;
-
-	XSendEvent(xev.display, xev.window, true, KeyPressMask, (XEvent *)&xev);
-	XFlush(xev.display);
-}
-
-int factorial(int n) {
-	if (n <= 1) {
-		return 1;
-	}
-	else {
-		return n * factorial( n - 1 );
-	}
-}
-
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
 
-	JKeyCode jkey;
-	jkey.keycode = jkeycode;
-	jkey.location = jkeylocation;
-
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
-
-	#ifdef DEBUG
-	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
-	#endif
-
-	unsigned int mask_table[10];
-	unsigned int count = 0;
-
-	if (getCapsLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using CapsLockMask\n");
-		#endif
-		mask_table[count++] = getCapsLockMask();
-	}
-
-	if (getNumberLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using NumberLockMask\n");
-		#endif
-		mask_table[count++] = getNumberLockMask();
-	}
-
-	if (getScrollLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ScrollLockMask\n");
-		#endif
-		mask_table[count++] = getScrollLockMask();
-	}
-
-	if (jmodifiers & JK_SHIFT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ShiftMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
-	}
-
-	if (jmodifiers & JK_CTRL_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ControlMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
-	}
-
-	if (jmodifiers & JK_META_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using MetaMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_META_MASK);
-	}
-
-	if (jmodifiers & JK_ALT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using AltMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	if (jmodifiers & 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using No Mask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	int set_size, i, j;
-	for (set_size = count; set_size > 0; set_size--) {
-		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
-
-		int pos = 0;
-		for (i = 0; i < num_of_items; i++) {
-			int curr_mask = 0;
-			for (j = 0; j < set_size; j++) {
-				curr_mask |= mask_table[pos];
-				pos++;
-				pos %= count;
-			}
-
-			XGrabKey(disp, keycode, curr_mask, default_win, true, GrabModeAsync, GrabModeAsync);
-		}
-	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
 
-	JKeyCode jkey;
-	jkey.keycode = jkeycode;
-	jkey.location = jkeylocation;
-
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
-
-	#ifdef DEBUG
-	printf("Native: ungrabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
-	#endif
-
-	unsigned int mask_table[10];
-	unsigned int count = 0;
-
-	if (getCapsLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using CapsLockMask\n");
-		#endif
-		mask_table[count++] = getCapsLockMask();
-	}
-
-	if (getNumberLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using NumberLockMask\n");
-		#endif
-		mask_table[count++] = getNumberLockMask();
-	}
-
-	if (getScrollLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ScrollLockMask\n");
-		#endif
-		mask_table[count++] = getScrollLockMask();
-	}
-
-	if (jmodifiers & JK_SHIFT_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ShiftMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
-	}
-
-	if (jmodifiers & JK_CTRL_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ControlMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
-	}
-
-	if (jmodifiers & JK_META_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using MetaMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_META_MASK);
-	}
-
-	if (jmodifiers & JK_ALT_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using AltMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	if (jmodifiers & 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using No Mask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	int set_size, i, j;
-	for (set_size = count; set_size > 0; set_size--) {
-		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
-
-		int pos = 0;
-		for (i = 0; i < num_of_items; i++) {
-			int curr_mask = 0;
-			for (j = 0; j < set_size; j++) {
-				curr_mask |= mask_table[pos];
-				pos++;
-				pos %= count;
-			}
-
-			XUngrabKey(disp, keycode, curr_mask, default_win);
-		}
-	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
-	unsigned int button = JButtonToNative(jbutton);
 
-	#ifdef DEBUG
-	printf("Native: grabButton - Button(%i)\n", (unsigned int) button);
-	#endif
-
-	XGrabButton(disp, button, AnyModifier, default_win, true, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
-	unsigned int button = JButtonToNative(jbutton);
 
-	#ifdef DEBUG
-	printf("Native: ungrabButton - Button(%i)\n", (unsigned int) button);
-	#endif
-
-	XUngrabKey(disp, button, AnyModifier, default_win);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
-		#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate failure\n");
-		#endif
+	SInt32 interval = -1;
 
-		throwException("Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturaly exit so jni exception is thrown.
+	CFTypeRef pref_val = CFPreferencesCopyAppValue(CFSTR("KeyRepeat"), kCFPreferencesCurrentApplication);
+	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+		CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &interval);
+		#ifdef DEBUG
+		printf("Native: CFPreferencesCopyAppValue successful (rate: %i)\n", interval);
+		#endif
+	}
+	else {
+		interval = LMGetKeyRepThresh() * 60;
+		if (interval < 0) {
+			#ifdef DEBUG
+			printf("Native: LMGetKeyRepThresh failure\n");
+			#endif
+
+			throwException("Could not determine the keyboard auto repeat rate.");
+			return -1; //Naturaly exit so jni exception is thrown.
+		}
+		else {
+			#ifdef DEBUG
+			printf("Native: LMGetKeyRepThresh successful (rate: %i)\n", interval);
+			#endif
+		}
 	}
 
-	#ifdef DEBUG
-	printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
-	#endif
-	return (jlong) xkb_interval;
+	return (jlong) interval;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
-		#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate failure\n");
-		#endif
+	SInt32 timeout = -1;
 
-		throwException("Could not determine the keyboard auto repeat delay.");
-		return -1; //Naturaly exit so jni exception is thrown.
+	CFTypeRef pref_val = CFPreferencesCopyAppValue(CFSTR("InitialKeyRepeat"), kCFPreferencesCurrentApplication);
+	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+		CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &interval);
+		#ifdef DEBUG
+		printf("Native: CFPreferencesCopyAppValue successful (delay: %i)\n", timeout);
+		#endif
+	}
+	else {
+		timeout = LMGetKeyThresh() * 60;
+		if (interval < 0) {
+			#ifdef DEBUG
+			printf("Native: LMGetKeyRepThresh failure\n");
+			#endif
+
+			throwException("Could not determine the keyboard auto repeat delay.");
+			return -1; //Naturaly exit so jni exception is thrown.
+		}
+		else {
+			#ifdef DEBUG
+			printf("Native: LMGetKeyThresh successful (delay: %i)\n", timeout);
+			#endif
+		}
 	}
 
-	#ifdef DEBUG
-	printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
-	#endif
-	return (jlong) xkb_timeout;
+	return (jlong) timeout;
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
@@ -596,54 +392,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Set the native error handler.
 	XSetErrorHandler((XErrorHandler) xErrorToException);
 
-	//Grab the default display
-	char * disp_name = XDisplayName(NULL);
-	disp = XOpenDisplay(disp_name);
-	if (disp == NULL) {
-		//We couldnt hook a display so we need to die.
-		char * error_msg = "Could not open display: ";
-		char * exceptoin_msg = (char *) malloc( (strlen(error_msg) + strlen(disp_name)) + 1 * sizeof(char));
-
-		strcat(exceptoin_msg, error_msg);
-		strcat(exceptoin_msg, disp_name);
-
-		throwException(exceptoin_msg);
-		free(exceptoin_msg);
+	//Check and make sure assistive devices is enabled.
+	if (! AXAPIEnabled()) {
+		#ifdef DEBUG
+		printf("Native: Accessibility API is not enabled.\n");
+		#endif
+		throwException("Please enabled access for assistive devices in the Universal Access section of the System Preferences.");
 		return JNI_ERR; //Naturaly exit so jni exception is thrown.
-	}
-	else {
-		#ifdef DEBUG
-		printf("Native: XOpenDisplay successful\n");
-		#endif
-	}
-
-
-	//Set allowed events and the default root window.
-	XAllowEvents(disp, AsyncBoth, CurrentTime);
-	default_win = DefaultRootWindow(disp);
-
-
-	/* Well XkbSetDetectableAutoRepeat doesnt work, big suprise right...
-	 * Look at https://bugs.freedesktop.org/show_bug.cgi?id=22515 and
-	 * http://www.x.org/wiki/Server16Branch for more information on
-	 * otherwise useful features that do not work.
-	 *
-	 * For the time being you should relay on the keyboard repeat rate
-	 * and delay functions to implement your own rate limitor in java.
-	 * This will allow for more flexible rate limit control regardless
-	 * of platform.
-	 */
-	Bool isAutoRepeat;
-	XkbSetDetectableAutoRepeat(disp, true, &isAutoRepeat);
-	if (!isAutoRepeat) {
-		#ifdef DEBUG
-		printf("Native: Could not enable detectable autorepeat.\n");
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		printf("Native: XkbSetDetectableAutoRepeat successful\n");
-		#endif
 	}
 
 
@@ -655,9 +410,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#endif
 		XSelectInput(disp, RootWindow(disp, screen), KeyPressMask | KeyReleaseMask | ButtonPress | ButtonRelease);
 	}
-
-	//Setup modifieres
-	getModifiers(disp);
 
 	//Call listener
 	bRunning = true;

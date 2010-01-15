@@ -6,7 +6,7 @@
 #define AK_SHIFT						0x38
 #define AK_CONTROL						0x3B
 #define AK_ALT							0x37	//Command Key
-#define AK_PAUSE						AK_F15
+#define AK_PAUSE						AK_F16
 #define AK_CAPS_LOCK					0x39
 #define AK_ESCAPE						0x35
 #define AK_SPACE						0x31
@@ -20,7 +20,7 @@
 #define AK_RIGHT						0x7C
 #define AK_DOWN							0x7D
 
-#define AK_COMMA						0x27	// ','
+#define AK_COMMA						0x2B	// ','
 #define AK_MINUS						0x1B	// '-'
 #define AK_PERIOD						0x2F	// '.'
 #define AK_SLASH						0x2C	// '/'
@@ -108,7 +108,7 @@
 #define AK_F13							0x69
 #define AK_F14							0x6B
 #define AK_F15							0x71
-//#define AK_F16							0x
+#define AK_F16							0x6A
 //#define AK_F17							0x
 //#define AK_F18							0x
 //#define AK_F19							0x
@@ -120,17 +120,17 @@
 
 
 #define AK_PRINTSCREEN					AK_F13
-#define AK_INSERT						0x
-#define AK_HELP							0x
+#define AK_INSERT						0x72	// Help Key
+#define AK_HELP							AK_INSERT
 #define AK_META							0x
 
-#define AK_BACK_QUOTE					0x
-#define AK_QUOTE						0x
+#define AK_BACK_QUOTE					0x32
+#define AK_QUOTE						0x27
 
-#define AK_KP_UP						0x
-#define AK_KP_DOWN						0x
-#define AK_KP_LEFT						0x
-#define AK_KP_RIGHT						0x
+//#define AK_KP_UP						0x
+//#define AK_KP_DOWN						0x
+//#define AK_KP_LEFT						0x
+//#define AK_KP_RIGHT						0x
 
 
 /* For European keyboards */
