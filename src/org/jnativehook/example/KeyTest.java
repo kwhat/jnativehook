@@ -28,7 +28,7 @@ public class KeyTest {
 			private void dumpInfo(String s, KeyEvent e) {
 				System.out.println(s);
 				int code = e.getKeyCode();
-				System.out.println("\tCode: " + KeyEvent.getKeyText(code));
+				System.out.println("\tCode: " + KeyEvent.getKeyText(code) + " " + code);
 				System.out.println("\tChar: " + e.getKeyChar());
 				int mods = e.getModifiersEx();
 				System.out.println("\tMods: "

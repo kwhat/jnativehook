@@ -3,9 +3,11 @@
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
 #define JK_TAB							'\t'
+#define JK_CLEAR						0x03
+#define JK_CANCEL						0x0C
 #define JK_SHIFT						0x10
 #define JK_CONTROL						0x11
-#define JK_ALT							0x12
+#define JK_ALT							0x12	//option-alt key
 #define JK_PAUSE						0x13
 #define JK_CAPS_LOCK					0x14
 #define JK_ESCAPE						0x1B
@@ -122,7 +124,7 @@
 #define JK_PRINTSCREEN					0x9A
 #define JK_INSERT						0x9B
 #define JK_HELP							0x9C
-#define JK_META							0x9D
+#define JK_META							0x9D	//osx: command
 
 #define JK_BACK_QUOTE					0xC0
 #define JK_QUOTE						0xDE
