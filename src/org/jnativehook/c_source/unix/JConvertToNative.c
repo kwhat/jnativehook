@@ -62,6 +62,7 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_H:										return XK_H;
 		case JK_I:										return XK_I;
 		case JK_J:										return XK_J;
+		case JK_K:										return XK_K;
 		case JK_L:										return XK_L;
 		case JK_M:										return XK_M;
 		case JK_N:										return XK_N;

@@ -2,36 +2,37 @@
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
 
+//Values mapped from http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html
 unsigned int JKeycodeToNative(JKeyCode jkey) {
 	switch (jkey.keycode) {
-		case JK_ENTER:									return XK_Return;
-		case JK_BACK_SPACE:								return XK_BackSpace;
-		case JK_TAB:									return XK_Tab;
+		case JK_ENTER:									return kVK_Return;
+		case JK_BACK_SPACE:								return kVK_Delete;
+		case JK_TAB:									return kVK_Tab;
 		case JK_SHIFT:
-			if (jkey.location == JK_LOCATION_LEFT)		return XK_Shift_L;
-			else										return XK_Shift_R;
+			if (jkey.location == JK_LOCATION_LEFT)		return kVK_Shift;
+			else										return kVK_RightShift;
 		case JK_CONTROL:
-			if (jkey.location == JK_LOCATION_LEFT)		return XK_Control_L;
-			else										return XK_Control_R;
+			if (jkey.location == JK_LOCATION_LEFT)		return kVK_Control;
+			else										return kVK_RightControl;
 		case JK_ALT:
 			if (jkey.location == JK_LOCATION_LEFT)		return XK_Alt_L;
 			else										return XK_Alt_R;
 		case JK_PAUSE:									return XK_Pause;
-		case JK_CAPS_LOCK:								return XK_Caps_Lock;
-		case JK_ESCAPE:									return XK_Escape;
-		case JK_SPACE:									return XK_space;
-		case JK_PAGE_UP:								return XK_Page_Up;
-		case JK_PAGE_DOWN:								return XK_Page_Down;
-		case JK_HOME:									return XK_Home;
-		case JK_END:									return XK_End;
+		case JK_CAPS_LOCK:								return kVK_CapsLock;
+		case JK_ESCAPE:									return kVK_Escape;
+		case JK_SPACE:									return kVK_Space;
+		case JK_PAGE_UP:								return kVK_PageUp;
+		case JK_PAGE_DOWN:								return kVK_PageDown;
+		case JK_HOME:									return kVK_Home;
+		case JK_END:									return kVK_End;
 
-		case JK_LEFT:									return XK_Left;
-		case JK_RIGHT:									return XK_Right;
-		case JK_UP:										return XK_Up;
-		case JK_DOWN:									return XK_Down;
+		case JK_LEFT:									return kVK_LeftArrow;
+		case JK_RIGHT:									return kVK_RightArrow;
+		case JK_UP:										return kVK_UpArrow;
+		case JK_DOWN:									return kVK_DownArrow;
 
 		case JK_COMMA:									return XK_comma;
-		case JK_MINUS:									return XK_minus;
+		case JK_MINUS:									return kVK_ANSI_Minus;
 		case JK_PERIOD:									return XK_period;
 		case JK_SLASH:									return XK_slash;
 
@@ -49,83 +50,85 @@ unsigned int JKeycodeToNative(JKeyCode jkey) {
 		case JK_SEMICOLON:								return XK_semicolon;
 		case JK_EQUALS:									return XK_equal;
 
-		case JK_A:										return XK_A;
-		case JK_B:										return XK_B;
-		case JK_C:										return XK_C;
-		case JK_D:										return XK_D;
-		case JK_E:										return XK_E;
-		case JK_F:										return XK_F;
-		case JK_G:										return XK_G;
-		case JK_H:										return XK_H;
-		case JK_I:										return XK_I;
-		case JK_J:										return XK_J;
-		case JK_L:										return XK_L;
-		case JK_M:										return XK_M;
-		case JK_N:										return XK_N;
-		case JK_O:										return XK_O;
-		case JK_P:										return XK_P;
-		case JK_Q:										return XK_Q;
-		case JK_R:										return XK_R;
-		case JK_S:										return XK_S;
-		case JK_T:										return XK_T;
-		case JK_U:										return XK_U;
-		case JK_V:										return XK_V;
-		case JK_W:										return XK_W;
-		case JK_X:										return XK_X;
-		case JK_Y:										return XK_Y;
-		case JK_Z:										return XK_Z;
+		case JK_A:										return kVK_ANSI_A;
+		case JK_B:										return kVK_ANSI_B;
+		case JK_C:										return kVK_ANSI_C;
+		case JK_D:										return kVK_ANSI_D;
+		case JK_E:										return kVK_ANSI_E;
+		case JK_F:										return kVK_ANSI_F;
+		case JK_G:										return kVK_ANSI_G;
+		case JK_H:										return kVK_ANSI_H;
+		case JK_I:										return kVK_ANSI_I;
+		case JK_J:										return kVK_ANSI_J;
+		case JK_K:										return kVK_ANSI_K;
+		case JK_L:										return kVK_ANSI_L;
+		case JK_M:										return kVK_ANSI_M;
+		case JK_N:										return kVK_ANSI_N;
+		case JK_O:										return kVK_ANSI_O;
+		case JK_P:										return kVK_ANSI_P;
+		case JK_Q:										return kVK_ANSI_Q;
+		case JK_R:										return kVK_ANSI_R;
+		case JK_S:										return kVK_ANSI_S;
+		case JK_T:										return kVK_ANSI_T;
+		case JK_U:										return kVK_ANSI_U;
+		case JK_V:										return kVK_ANSI_V;
+		case JK_W:										return kVK_ANSI_W;
+		case JK_X:										return kVK_ANSI_X;
+		case JK_Y:										return kVK_ANSI_Y;
+		case JK_Z:										return kVK_ANSI_Z;
 
-		case JK_OPEN_BRACKET:							return XK_bracketleft;
-		case JK_BACK_SLASH:								return XK_backslash;
-		case JK_CLOSE_BRACKET:							return XK_bracketright;
+		case JK_OPEN_BRACKET:							return kVK_ANSI_LeftBracket;
+		case JK_BACK_SLASH:								return kVK_ANSI_Backslash;
+		case JK_CLOSE_BRACKET:							return kVK_ANSI_RightBracket;
 
-		case JK_NUMPAD0:								return XK_KP_0;
-		case JK_NUMPAD1:								return XK_KP_1;
-		case JK_NUMPAD2:								return XK_KP_2;
-		case JK_NUMPAD3:								return XK_KP_3;
-		case JK_NUMPAD4:								return XK_KP_4;
-		case JK_NUMPAD5:								return XK_KP_5;
-		case JK_NUMPAD6:								return XK_KP_6;
-		case JK_NUMPAD7:								return XK_KP_7;
-		case JK_NUMPAD8:								return XK_KP_8;
-		case JK_NUMPAD9:								return XK_KP_9;
+		case JK_NUMPAD0:								return kVK_ANSI_Keypad0;
+		case JK_NUMPAD1:								return kVK_ANSI_Keypad1;
+		case JK_NUMPAD2:								return kVK_ANSI_Keypad2;
+		case JK_NUMPAD3:								return kVK_ANSI_Keypad3;
+		case JK_NUMPAD4:								return kVK_ANSI_Keypad4;
+		case JK_NUMPAD5:								return kVK_ANSI_Keypad5;
+		case JK_NUMPAD6:								return kVK_ANSI_Keypad6;
+		case JK_NUMPAD7:								return kVK_ANSI_Keypad7;
+		case JK_NUMPAD8:								return kVK_ANSI_Keypad8;
+		case JK_NUMPAD9:								return kVK_ANSI_Keypad9;
 		case JK_MULTIPLY:								return XK_KP_Multiply;
 		case JK_ADD:									return XK_KP_Add;
 
 		case JK_SEPARATOR:								return XK_KP_Separator;
 
-		case JK_SUBTRACT:								return XK_KP_Subtract;
-		case JK_DECIMAL:								return XK_KP_Decimal;
-		case JK_DIVIDE:									return XK_KP_Divide;
+		case JK_SUBTRACT:								return kVK_ANSI_KeypadMinus;
+		case JK_DECIMAL:								return kVK_ANSI_KeypadDecimal;
+		case JK_DIVIDE:									return kVK_ANSI_KeypadDivide;
 		case JK_DELETE:									return XK_KP_Delete;
 		case JK_NUM_LOCK:								return XK_Num_Lock;
 		case JK_SCROLL_LOCK:							return XK_Scroll_Lock;
 
-		case JK_F1:										return XK_F1;
-		case JK_F2:										return XK_F2;
-		case JK_F3:										return XK_F3;
-		case JK_F4:										return XK_F4;
-		case JK_F5:										return XK_F5;
-		case JK_F6:										return XK_F6;
-		case JK_F7:										return XK_F7;
-		case JK_F8:										return XK_F8;
-		case JK_F9:										return XK_F9;
-		case JK_F10:									return XK_F10;
-		case JK_F11:									return XK_F11;
-		case JK_F12:									return XK_F12;
-		case JK_F13:									return XK_F13;
-		case JK_F14:									return XK_F14;
-		case JK_F15:									return XK_F15;
-		case JK_F16:									return XK_F16;
-		case JK_F17:									return XK_F17;
-		case JK_F18:									return XK_F18;
-		case JK_F19:									return XK_F19;
-		case JK_F20:									return XK_F20;
+		case JK_F1:										return kVK_F1;
+		case JK_F2:										return kVK_F2;
+		case JK_F3:										return kVK_F3;
+		case JK_F4:										return kVK_F4;
+		case JK_F5:										return kVK_F5;
+		case JK_F6:										return kVK_F6;
+		case JK_F7:										return kVK_F7;
+		case JK_F8:										return kVK_F8;
+		case JK_F9:										return kVK_F9;
+		case JK_F10:									return kVK_F10;
+		case JK_F11:									return kVK_F11;
+		case JK_F12:									return kVK_F12;
+		case JK_F13:									return kVK_F13;
+		case JK_F14:									return kVK_F14;
+		case JK_F15:									return kVK_F15;
+		case JK_F16:									return kVK_F16;
+		case JK_F17:									return kVK_F17;
+		case JK_F18:									return kVK_F18;
+		case JK_F19:									return kVK_F19;
+		case JK_F20:									return kVK_F20;
+		/* No Apple Support
 		case JK_F21:									return XK_F21;
 		case JK_F22:									return XK_F22;
 		case JK_F23:									return XK_F23;
 		case JK_F24:									return XK_F24;
-
+		 */
 		case JK_PRINTSCREEN:							return XK_Print;
 		case JK_INSERT:									return XK_Insert;
 		case JK_HELP:									return XK_Help;
