@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project default="all" basedir=".">
+<project name="JNativeHook" default="all" basedir=".">
 	<property environment="os"/>
 	<property environment="env"/>
 	<property file="build.properties"/>
 	
 	<!-- Project Settings -->
-	<property name="project.name"		value="JNativeHook"/>
+	<property name="project.name"		value="${ant.project.name}"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="0.9.172"/>
+	<property name="project.version"	value="0.9.191"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
