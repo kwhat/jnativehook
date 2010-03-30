@@ -5,8 +5,8 @@ import java.awt.event.MouseEvent;
 import org.jnativehook.GlobalScreen;
  
 public class NativeMouseEvent extends MouseEvent {
-	private static final long serialVersionUID = -4226037291462485089L;
-	
+	private static final long serialVersionUID = 369524271252805186L;
+
 	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iX, int iY, int iClickCount, boolean bPopupTrigger) {
 		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iX, iY, iClickCount, bPopupTrigger);
 	}

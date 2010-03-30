@@ -1,6 +1,6 @@
 package org.jnativehook;
 
-public class OperatingSystem {
+public class NativeSystem {
 	public enum Family {
 		WINDOWS,
 		LINUX,

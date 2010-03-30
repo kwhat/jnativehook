@@ -115,7 +115,7 @@ public class GlobalScreen extends Component {
 	protected static void registerHook() {
 		try {
 			//Try to locate the jar file
-			String sLoadPath = "org/jnativehook/lib/" + OperatingSystem.getFamily().toString().toLowerCase() + "-" +	OperatingSystem.getArchitecture().toString().toLowerCase();
+			String sLoadPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "-" +	NativeSystem.getArchitecture().toString().toLowerCase();
 			File objCode = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 			
 			if (objCode.isFile()) {
