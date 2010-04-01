@@ -137,7 +137,6 @@ public class GlobalScreen extends Component {
 					    objTempLibOutputStream.close();
 					    
 					    objLibFile.deleteOnExit();
-					    System.out.println("Found: " + objLibFile.getPath());
 					    System.load(objLibFile.getPath());
 					}
 				}
