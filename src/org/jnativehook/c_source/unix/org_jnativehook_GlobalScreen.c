@@ -162,7 +162,7 @@ void MsgLoop() {
 
 				case KeyRelease:
 					#ifdef DEBUG
-					printf("Native: MsgLoop - Key released(%i)\n", xev.xkey.keycode);
+					printf("Native: MsgLoop - Key released (%i)\n", xev.xkey.keycode);
 					#endif
 
 					jkey = NativeToJKeycode(XLookupKeysym(&xev.xkey, 0));
@@ -179,7 +179,7 @@ void MsgLoop() {
 
 				case ButtonPress:
 					#ifdef DEBUG
-					printf("Native: MsgLoop - Button pressed(%i)\n", xev.xbutton.button);
+					printf("Native: MsgLoop - Button pressed (%i)\n", xev.xbutton.button);
 					#endif
 
 					jbutton = NativeToJButton(xev.xbutton.button);
@@ -190,7 +190,7 @@ void MsgLoop() {
 
 				case ButtonRelease:
 					#ifdef DEBUG
-					printf("Native: MsgLoop - Button released(%i)\n", xev.xbutton.button);
+					printf("Native: MsgLoop - Button released (%i)\n", xev.xbutton.button);
 					#endif
 
 					jbutton = NativeToJButton(xev.xbutton.button);
@@ -203,7 +203,7 @@ void MsgLoop() {
 
 		#ifdef DEBUG
 		if ((*env)->ExceptionOccurred(env)) {
-			printf("Native: JNI Error Occured.\n");
+			printf("Native: JNI Error Occurred.\n");
 			((*env)->ExceptionDescribe(env));
 		}
 		#endif
