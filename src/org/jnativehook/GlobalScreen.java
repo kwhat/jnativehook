@@ -15,6 +15,22 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
 
+/**
+ * GlobalScreen is used as a class to represent the global screen area that
+ * Java does not usually have access to.  This allows our native events to 
+ * extend Java's InputEvent class and maintain compatability between Java input 
+ * events and native input events.
+ * <p>
+ * This class also hanldes the loading and communicaiton with the native 
+ * library.
+ * of any new keys that we would like to listen for. 
+ * 
+ * http://svnbook.red-bean.com/en/1.0/ch07s02.html#svn-ch-7-sect-2.3.4
+ * @author Alex Barker ( <a href="mailto:alex@1stleg.com">alex@1stleg.com</a> )
+ * @version $LastChangedRevision$ $Rev$, $LastChangedDate$
+ * @since 0.9
+ */
+
 public class GlobalScreen extends Component {
 	//Instance Variables
 	private static final long serialVersionUID = 6504561173380322679L;
