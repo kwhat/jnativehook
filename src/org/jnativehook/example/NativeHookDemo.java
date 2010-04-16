@@ -1,3 +1,18 @@
+/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+ * 
+ * JNativeHook is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.jnativehook.example;
 
 import java.awt.Color;
@@ -28,11 +43,24 @@ import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseListener;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class NativeHookDemo.
+ */
 public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyListener, MouseListener, NativeMouseListener, ActionListener, FocusListener, WindowListener {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5549783775591314629L;
+	
+	/** The txt typing area. */
 	private JTextField txtTypingArea;
+	
+	/** The txt event info. */
 	private JTextArea txtEventInfo;
 	
+	/**
+	 * Instantiates a new native hook demo.
+	 */
 	public NativeHookDemo() {
 		setTitle("JNativeHook Demo");
 		setLayout(new GridBagLayout());
@@ -73,6 +101,9 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		setVisible(true);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void actionPerformed(ActionEvent e) {
 		//Clear the text components.
 		txtEventInfo.setText("");
@@ -82,6 +113,9 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		this.requestFocusInWindow();	
 	}
     
+	/* (non-Javadoc)
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
 	public void focusGained(FocusEvent e) {
 		if (e.getSource() == txtTypingArea) {
 			((JTextField) e.getSource()).setBackground(new Color(0xFF, 0xF9, 0xB6));
@@ -91,6 +125,9 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
 	public void focusLost(FocusEvent e) {
 		if (e.getSource()  == txtTypingArea) {
 			((JTextField) e.getSource()).removeKeyListener(this);
@@ -99,12 +136,18 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
 	public void keyTyped(KeyEvent e) {
 		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 */
 	public void keyPressed(KeyEvent e) {
 		if (txtTypingArea.hasFocus()) {
 			txtTypingArea.setText(getInputText(e));
@@ -115,18 +158,27 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
 	public void keyReleased(KeyEvent e) {
 		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
 	public void mouseClicked(MouseEvent e) {
 		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
 	public void mousePressed(MouseEvent e) {
 		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
@@ -137,15 +189,31 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
 	public void mouseReleased(MouseEvent e) {
 		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
 	public void mouseEntered(MouseEvent e) { /* Do Nothing */ }
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
 	public void mouseExited(MouseEvent e) { /* Do Nothing */ }
 	
+	/**
+	 * Gets the input text.
+	 *
+	 * @param e the e
+	 * @return the input text
+	 */
 	private String getInputText(InputEvent e) {
 		String sReturn;
 		switch (e.getID()) {
@@ -202,6 +270,11 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		return sReturn;
 	}
 	
+	/**
+	 * Display event info.
+	 *
+	 * @param e the e
+	 */
 	private void displayEventInfo(KeyEvent e) {
 		String sEventText = txtEventInfo.getText() + "\n\n";;
 		
@@ -232,6 +305,11 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 	}
 	
+	/**
+	 * Display event info.
+	 *
+	 * @param e the e
+	 */
 	private void displayEventInfo(MouseEvent e) {
 		String sEventText = txtEventInfo.getText() + "\n\n";
 		
@@ -260,43 +338,92 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
     }
     
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		new NativeHookDemo();
 	}
 	
+	/**
+	 * The Class NoFocusTraversalPolicy.
+	 */
 	private class NoFocusTraversalPolicy extends FocusTraversalPolicy {
+		
+		/* (non-Javadoc)
+		 * @see java.awt.FocusTraversalPolicy#getComponentAfter(java.awt.Container, java.awt.Component)
+		 */
 		public Component getComponentAfter(Container container, Component component) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.FocusTraversalPolicy#getComponentBefore(java.awt.Container, java.awt.Component)
+		 */
 		public Component getComponentBefore(Container container, Component component) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.FocusTraversalPolicy#getDefaultComponent(java.awt.Container)
+		 */
 		public Component getDefaultComponent(Container container) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.FocusTraversalPolicy#getFirstComponent(java.awt.Container)
+		 */
 		public Component getFirstComponent(Container container) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.FocusTraversalPolicy#getLastComponent(java.awt.Container)
+		 */
 		public Component getLastComponent(Container container) {
 			return null;
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
 	public void windowActivated(WindowEvent e) { /* Do Nothing */ }
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+	 */
 	public void windowClosing(WindowEvent e) { /* Do Nothing */ }
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+	 */
 	public void windowDeactivated(WindowEvent e) { /* Do Nothing */ }
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+	 */
 	public void windowDeiconified(WindowEvent e) { /* Do Nothing */ }
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 */
 	public void windowIconified(WindowEvent e) { /* Do Nothing */ }
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 */
 	public void windowOpened(WindowEvent e) {
 		GlobalScreen.getInstance();
 		GlobalScreen.getInstance().addNativeKeyListener(this);		
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 */
 	public void windowClosed(WindowEvent e) {
 		System.runFinalization();
 		System.exit(0);

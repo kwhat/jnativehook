@@ -1,3 +1,18 @@
+/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+ * 
+ * JNativeHook is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.jnativehook;
 
 //Imports
@@ -22,13 +37,12 @@ import org.jnativehook.mouse.NativeMouseListener;
  * events and native input events.
  * <p>
  * This class also hanldes the loading and communicaiton with the native 
- * library.
- * of any new keys that we would like to listen for. 
+ * library.  That includes registering new key and button hooks and the event 
+ * dispatchers for each.
  * 
- * http://svnbook.red-bean.com/en/1.0/ch07s02.html#svn-ch-7-sect-2.3.4
- * @author Alex Barker ( <a href="mailto:alex@1stleg.com">alex@1stleg.com</a> )
- * @version $LastChangedRevision$ $Rev$, $LastChangedDate$
- * @since 0.9
+ * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	0.9
+ * @since	1.0
  */
 
 public class GlobalScreen extends Component {

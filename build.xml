@@ -8,7 +8,8 @@
 	<!-- Project Settings -->
 	<property name="project.name"		value="${ant.project.name}"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="0.9.191"/>
+	<property name="project.version"	value="0.9"/>
+	<buildnumber file="build.num"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
@@ -468,7 +469,7 @@
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo"/>
 				<section name="org/jnativehook">
 					<attribute name="Implementation-Title" value="${project.name} Library"/>
-					<attribute name="Implementation-Version" value="${project.version}"/> 
+					<attribute name="Implementation-Version" value="${project.version}.${build.number}"/> 
 					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
 				</section>
 			</manifest>
