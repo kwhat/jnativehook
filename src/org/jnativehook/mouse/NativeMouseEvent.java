@@ -32,16 +32,14 @@ public class NativeMouseEvent extends MouseEvent {
 	/**
 	 * Instantiates a new native mouse event.
 	 *
-	 * @param iId the i id
+	 * @param id the i id
 	 * @param iWhen the i when
 	 * @param iModifiers the i modifiers
 	 * @param iX the i x
 	 * @param iY the i y
-	 * @param iClickCount the i click count
-	 * @param bPopupTrigger the b popup trigger
 	 */
-	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iX, int iY, int iClickCount, boolean bPopupTrigger) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iX, iY, iClickCount, bPopupTrigger);
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y) {
+		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, 1, false);
 	}
 	
 	/**
@@ -52,11 +50,9 @@ public class NativeMouseEvent extends MouseEvent {
 	 * @param iModifiers the i modifiers
 	 * @param iX the i x
 	 * @param iY the i y
-	 * @param iClickCount the i click count
-	 * @param bPopupTrigger the b popup trigger
 	 * @param iButton the i button
 	 */
-	public NativeMouseEvent(int iId, long iWhen, int iModifiers, int iX, int iY, int iClickCount, boolean bPopupTrigger,  int iButton) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iX, iY, iClickCount, bPopupTrigger, iButton);
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int button) {
+		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, 1, false, button);
 	}
 }

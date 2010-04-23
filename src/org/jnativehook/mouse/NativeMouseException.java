@@ -20,7 +20,6 @@ package org.jnativehook.mouse;
  * The Class NativeMouseException.
  */
 public class NativeMouseException extends Exception {
-	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 4875934179277090021L;
 
@@ -36,8 +35,8 @@ public class NativeMouseException extends Exception {
 	 *
 	 * @param sMessage the s message
 	 */
-	public NativeMouseException(String sMessage) {
-		super(sMessage);
+	public NativeMouseException(String message) {
+		super(message);
 	}
 	
 	/**
@@ -46,8 +45,8 @@ public class NativeMouseException extends Exception {
 	 * @param sMessage the s message
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeMouseException(String sMessage, Throwable objThrowable) {
-		super(sMessage, objThrowable);
+	public NativeMouseException(String message, Throwable cause) {
+		super(message, cause);
 	}
 	
 	/**
@@ -55,7 +54,7 @@ public class NativeMouseException extends Exception {
 	 *
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeMouseException(Throwable objThrowable) {
-		super(objThrowable);
+	public NativeMouseException(Throwable cause) {
+		super(cause);
 	}
 }

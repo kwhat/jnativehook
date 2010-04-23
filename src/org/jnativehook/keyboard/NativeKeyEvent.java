@@ -38,8 +38,8 @@ public class NativeKeyEvent extends KeyEvent {
 	 * @param iKeyCode the i key code
 	 * @param cKeyChar the c key char
 	 */
-	public NativeKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar);
+	public NativeKeyEvent(int id, long when, int modifiers, int keyCode, char keyChar) {
+		super(GlobalScreen.getInstance(), id, when, modifiers, keyCode, keyChar);
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class NativeKeyEvent extends KeyEvent {
 	 * @param cKeyChar the c key char
 	 * @param iKeyLocation the i key location
 	 */
-	public NativeKeyEvent(int iId, long iWhen, int iModifiers, int iKeyCode, char cKeyChar, int iKeyLocation) {
-		super(GlobalScreen.getInstance(), iId, iWhen, iModifiers, iKeyCode, cKeyChar, iKeyLocation);
+	public NativeKeyEvent(int id, long when, int modifiers, int keyCode, char keyChar, int keyLocation) {
+		super(GlobalScreen.getInstance(), id, when, modifiers, keyCode, keyChar, keyLocation);
 	}
 }

@@ -17,6 +17,7 @@ package org.jnativehook;
 
 //Imports
 import java.awt.Component;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +30,7 @@ import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
+import org.jnativehook.mouse.NativeMouseMotionListener;
 
 /**
  * GlobalScreen is used as a class to represent the global screen area that
@@ -49,11 +51,11 @@ public class GlobalScreen extends Component {
 	//Instance Variables
 	private static final long serialVersionUID = 6504561173380322679L;
 	private static GlobalScreen instance = new GlobalScreen();
-	private EventListenerList objEventListeners;
+	private EventListenerList eventListeners;
 	
 	private GlobalScreen() {
 		//Setup instance variables.
-		objEventListeners = new EventListenerList();
+		eventListeners = new EventListenerList();
 		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
 		GlobalScreen.registerHook();
 	}
@@ -80,34 +82,43 @@ public class GlobalScreen extends Component {
 		return GlobalScreen.instance;
 	}
 	
-	public void addNativeKeyListener(NativeKeyListener objListener) {
-		objEventListeners.add(NativeKeyListener.class, objListener);
+	public void addNativeKeyListener(NativeKeyListener listener) {
+		eventListeners.add(NativeKeyListener.class, listener);
 	}
 	
-	public void removeNativeKeyListener(NativeKeyListener objListener) {
-		objEventListeners.remove(NativeKeyListener.class, objListener);
+	public void removeNativeKeyListener(NativeKeyListener listener) {
+		eventListeners.remove(NativeKeyListener.class, listener);
 	}
 	
-	public void addNativeButtonListener(NativeMouseListener objListener) {
-		objEventListeners.add(NativeMouseListener.class, objListener);
+	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
+		eventListeners.add(NativeMouseMotionListener.class, listener);
 	}
 	
-	public void removeNativeButtonListener(NativeMouseListener objListener) {
-		objEventListeners.remove(NativeMouseListener.class, objListener);
+	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
+		eventListeners.remove(NativeMouseMotionListener.class, listener);
 	}
 	
-	//Native hooks to add and remove key bindings.
-	public native void grabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
-	public native void ungrabKey(int iModifiers, int iKeyCode, int iKeyLocation) throws NativeKeyException;
-	public native void grabButton(int iButton) throws NativeKeyException;
-	public native void ungrabButton(int iButton) throws NativeKeyException;
+	public void addNativeMouseListener(NativeMouseListener listener) {
+		eventListeners.add(NativeMouseListener.class, listener);
+	}
+	
+	public void removeNativeMouseListener(NativeMouseListener listener) {
+		eventListeners.remove(NativeMouseListener.class, listener);
+	}
+	
+	//TODO TEST
+	public void addMouseListener(MouseListener listener) {
+		addNativeMouseListener((NativeMouseListener) listener);
+	}
+	
+	
 	
 	//Get seme keyboard information
 	public native long getAutoRepeatRate() throws NativeKeyException;
 	public native long getAutoRepeatDelay() throws NativeKeyException;
 	
 	protected void fireKeyPressed(NativeKeyEvent objEvent) {
-		Object[] objListeners = objEventListeners.getListenerList();
+		Object[] objListeners = eventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
 				((NativeKeyListener) objListeners[i + 1]).keyPressed( objEvent );
@@ -116,7 +127,7 @@ public class GlobalScreen extends Component {
 	}
 	
 	protected void fireKeyReleased(NativeKeyEvent objEvent) {
-		Object[] objListeners = objEventListeners.getListenerList();
+		Object[] objListeners = eventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
 				((NativeKeyListener) objListeners[i + 1]).keyReleased( objEvent );
@@ -125,7 +136,7 @@ public class GlobalScreen extends Component {
 	}
 	
 	protected void fireMousePressed(NativeMouseEvent objEvent) {
-		Object[] objListeners = objEventListeners.getListenerList();
+		Object[] objListeners = eventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
 				((NativeMouseListener) objListeners[i + 1]).mousePressed( objEvent );
@@ -134,7 +145,7 @@ public class GlobalScreen extends Component {
 	}
 	
 	protected void fireMouseReleased(NativeMouseEvent objEvent) {
-		Object[] objListeners = objEventListeners.getListenerList();
+		Object[] objListeners = eventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
 				((NativeMouseListener) objListeners[i + 1]).mouseReleased( objEvent );

@@ -84,28 +84,28 @@ public class NativeSystem {
 	 * @return the family
 	 */
 	public static Family getFamily() {
-		String os_name = System.getProperty("os.name");
+		String osName = System.getProperty("os.name");
 		Family family;
 		
-		if (os_name.equalsIgnoreCase("Windows NT") || 
-			os_name.equalsIgnoreCase("Windows 2000") || 
-			os_name.equalsIgnoreCase("Windows XP") ||
-			os_name.equalsIgnoreCase("Windows 2003") ||
-			os_name.equalsIgnoreCase("Windows Vista") ||
-			os_name.equalsIgnoreCase("Windows 7")
+		if (osName.equalsIgnoreCase("Windows NT") || 
+			osName.equalsIgnoreCase("Windows 2000") || 
+			osName.equalsIgnoreCase("Windows XP") ||
+			osName.equalsIgnoreCase("Windows 2003") ||
+			osName.equalsIgnoreCase("Windows Vista") ||
+			osName.equalsIgnoreCase("Windows 7")
 		) {
 			family = Family.WINDOWS;
 		}
-		else if (os_name.equalsIgnoreCase("Linux")) {
+		else if (osName.equalsIgnoreCase("Linux")) {
 			family = Family.LINUX;
 		}
-		else if (os_name.equalsIgnoreCase("FreeBSD")) {
+		else if (osName.equalsIgnoreCase("FreeBSD")) {
 			family = Family.FREEBSD;
 		}
-		else if (os_name.equalsIgnoreCase("OpenBSD")) {
+		else if (osName.equalsIgnoreCase("OpenBSD")) {
 			family = Family.OPENBSD;
 		}
-		else if (os_name.equalsIgnoreCase("Mac OS X")) {
+		else if (osName.equalsIgnoreCase("Mac OS X")) {
 			family = Family.OSX;
 		}
 		else {
@@ -121,29 +121,29 @@ public class NativeSystem {
 	 * @return the architecture
 	 */
 	public static Arch getArchitecture() {
-		String os_arch = System.getProperty("os.arch");
+		String osArch = System.getProperty("os.arch");
 		Arch arch;
 		
-		if (os_arch.equalsIgnoreCase("x86") || 
-			os_arch.equalsIgnoreCase("i386") || 
-			os_arch.equalsIgnoreCase("i486") ||
-			os_arch.equalsIgnoreCase("i586") ||
-			os_arch.equalsIgnoreCase("i686")
+		if (osArch.equalsIgnoreCase("x86") || 
+			osArch.equalsIgnoreCase("i386") || 
+			osArch.equalsIgnoreCase("i486") ||
+			osArch.equalsIgnoreCase("i586") ||
+			osArch.equalsIgnoreCase("i686")
 		) {
 			arch = Arch.I586;
 		}
-		else if (os_arch.equalsIgnoreCase("x86_64") || 
-				os_arch.equalsIgnoreCase("amd64") || 
-				os_arch.equalsIgnoreCase("k8")
+		else if (osArch.equalsIgnoreCase("x86_64") || 
+				osArch.equalsIgnoreCase("amd64") || 
+				osArch.equalsIgnoreCase("k8")
 		) {
 			arch = Arch.AMD64;
 		}
-		else if (os_arch.equalsIgnoreCase("ppc") ||
-				os_arch.equalsIgnoreCase("PowerPC")
+		else if (osArch.equalsIgnoreCase("ppc") ||
+				osArch.equalsIgnoreCase("PowerPC")
 		) {
 			arch = Arch.PPC;
 		}
-		else if (os_arch.equalsIgnoreCase("ppc64")) {
+		else if (osArch.equalsIgnoreCase("ppc64")) {
 			arch = Arch.PPC64;
 		}
 		else {

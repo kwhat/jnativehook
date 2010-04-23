@@ -36,8 +36,8 @@ public class NativeKeyException extends Exception {
 	 *
 	 * @param sMessage the s message
 	 */
-	public NativeKeyException(String sMessage) {
-		super(sMessage);
+	public NativeKeyException(String message) {
+		super(message);
 	}
 	
 	/**
@@ -46,8 +46,8 @@ public class NativeKeyException extends Exception {
 	 * @param sMessage the s message
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeKeyException(String sMessage, Throwable objThrowable) {
-		super(sMessage, objThrowable);
+	public NativeKeyException(String message, Throwable cause) {
+		super(message, cause);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class NativeKeyException extends Exception {
 	 *
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeKeyException(Throwable objThrowable) {
-		super(objThrowable);
+	public NativeKeyException(Throwable cause) {
+		super(cause);
 	}
 }

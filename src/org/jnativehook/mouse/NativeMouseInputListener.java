@@ -13,38 +13,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jnativehook.keyboard;
+package org.jnativehook.mouse;
 
-//Imports
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-// TODO: Auto-generated Javadoc
 /**
- * The listener interface for receiving nativeKey events.
- * The class that is interested in processing a nativeKey
+ * The listener interface for receiving nativeMouseInput events.
+ * The class that is interested in processing a nativeMouseInput
  * event implements this interface, and the object created
  * with that class is registered with a component using the
- * component's <code>addNativeKeyListener<code> method. When
- * the nativeKey event occurs, that object's appropriate
+ * component's <code>addNativeMouseInputListener<code> method. When
+ * the nativeMouseInput event occurs, that object's appropriate
  * method is invoked.
  *
- * @see NativeKeyEvent
+ * @see NativeMouseInputEvent
  */
-public interface NativeKeyListener extends KeyListener {
+public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {
 	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-	 */
-	public void keyPressed(KeyEvent e);
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
-	public void keyReleased(KeyEvent e);
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
-	public void keyTyped(KeyEvent e);
 }

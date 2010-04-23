@@ -15,46 +15,33 @@
  */
 package org.jnativehook.example;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FocusTraversalPolicy;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
-import org.jnativehook.mouse.NativeMouseListener;
+import org.jnativehook.mouse.NativeMouseInputListener;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeHookDemo.
  */
-public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyListener, MouseListener, NativeMouseListener, ActionListener, FocusListener, WindowListener {
-	
+public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, ActionListener, WindowListener {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5549783775591314629L;
-	
-	/** The txt typing area. */
-	private JTextField txtTypingArea;
-	
+
 	/** The txt event info. */
 	private JTextArea txtEventInfo;
 	
@@ -63,18 +50,11 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 	 */
 	public NativeHookDemo() {
 		setTitle("JNativeHook Demo");
-		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(300, 400);
 		setFocusTraversalPolicy(new NoFocusTraversalPolicy());
 		addWindowListener(this);
-		
-		txtTypingArea = new JTextField("Click to GrabKey");
-		txtTypingArea.setEditable(false);
-		txtTypingArea.setBackground(new Color(0xFF, 0xFF, 0xFF));
-		txtTypingArea.setForeground(new Color(0x00, 0x00, 0x00));
-		txtTypingArea.addFocusListener(this);
-		
 		
 		txtEventInfo = new JTextArea();
 		txtEventInfo.setEditable(false);
@@ -83,20 +63,7 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 		JScrollPane scrollPane = new JScrollPane(txtEventInfo);
 		scrollPane.setPreferredSize(new Dimension(375, 125));
 		
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(5, 5, 5, 5);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.weightx = 1.0;
-		c.weighty = 0.0;
-		c.gridx = 0;
-		c.gridy = 0;
-		add(txtTypingArea, c);
-		
-		c.gridy = 1;
-		c.fill = GridBagConstraints.BOTH;
-		c.weighty = 1.0;
-		add(scrollPane, c);
+		add(scrollPane, BorderLayout.CENTER);
 		
 		setVisible(true);
 	}
@@ -107,167 +74,58 @@ public class NativeHookDemo extends JFrame implements KeyListener, NativeKeyList
 	public void actionPerformed(ActionEvent e) {
 		//Clear the text components.
 		txtEventInfo.setText("");
-		txtTypingArea.setText("");
 		
 		//Return the focus to the window.
 		this.requestFocusInWindow();	
-	}
-    
-	/* (non-Javadoc)
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-	 */
-	public void focusGained(FocusEvent e) {
-		if (e.getSource() == txtTypingArea) {
-			((JTextField) e.getSource()).setBackground(new Color(0xFF, 0xF9, 0xB6));
-			((JTextField) e.getSource()).setText("Press Key to Bind");
-			((JTextField) e.getSource()).addKeyListener(this);
-			((JTextField) e.getSource()).addMouseListener(this);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-	 */
-	public void focusLost(FocusEvent e) {
-		if (e.getSource()  == txtTypingArea) {
-			((JTextField) e.getSource()).removeKeyListener(this);
-			((JTextField) e.getSource()).removeMouseListener(this);
-			((JTextField) e.getSource()).setBackground(new Color(0xFF, 0xFF, 0xFF));
-		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
-		if (!txtTypingArea.hasFocus()) {
-			displayEventInfo(e);
-		}
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
-		if (txtTypingArea.hasFocus()) {
-			txtTypingArea.setText(getInputText(e));
-			this.requestFocusInWindow();
-		}
-		else {
-			displayEventInfo(e);
-		}
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
-		if (!txtTypingArea.hasFocus()) {
-			displayEventInfo(e);
-		}
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 	 */
 	public void mouseClicked(MouseEvent e) {
-		if (!txtTypingArea.hasFocus()) {
-			displayEventInfo(e);
-		}
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	public void mousePressed(MouseEvent e) {
-		if (!txtTypingArea.hasFocus()) {
 			displayEventInfo(e);
-		}
-		else {
-			txtTypingArea.setText(getInputText(e));
-			this.requestFocusInWindow();
-		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
 	public void mouseReleased(MouseEvent e) {
-		if (!txtTypingArea.hasFocus()) {
-			displayEventInfo(e);
-		}
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
-	public void mouseEntered(MouseEvent e) { /* Do Nothing */ }
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
-	public void mouseExited(MouseEvent e) { /* Do Nothing */ }
-	
-	/**
-	 * Gets the input text.
-	 *
-	 * @param e the e
-	 * @return the input text
-	 */
-	private String getInputText(InputEvent e) {
-		String sReturn;
-		switch (e.getID()) {
-			case KeyEvent.KEY_PRESSED:
-			case KeyEvent.KEY_RELEASED:
-			case KeyEvent.KEY_TYPED:
-				sReturn = "Keyboard: ";
-				
-				int code = ((KeyEvent) e).getKeyCode();
-				if (code != KeyEvent.VK_SHIFT && 
-					code != KeyEvent.VK_CONTROL &&
-					code != KeyEvent.VK_ALT &&
-					code != KeyEvent.VK_META &&
-					e.getModifiers() != 0) {
-					sReturn += KeyEvent.getKeyModifiersText(e.getModifiers()) + " + ";
-				}
-				
-				int location = ((KeyEvent) e).getKeyLocation();
-				if (location == KeyEvent.KEY_LOCATION_LEFT) {
-					sReturn += " Left ";
-				}
-				else if (location == KeyEvent.KEY_LOCATION_RIGHT) {
-					sReturn += " Right ";
-				}
-				
-				sReturn += KeyEvent.getKeyText(code);
-				
-				try {
-					GlobalScreen.getInstance().grabKey(e.getModifiers(), code, location);
-				}
-				catch (NativeKeyException ex) {
-					ex.printStackTrace();
-				}
-			break;
-			
-			case MouseEvent.MOUSE_PRESSED:
-			case MouseEvent.MOUSE_RELEASED:
-			case MouseEvent.MOUSE_CLICKED:
-				int button = ((MouseEvent) e).getButton();
-				sReturn = "Mouse: Button" + button;
-				
-				try {
-					GlobalScreen.getInstance().grabButton(button);
-				}
-				catch (NativeKeyException ex) {
-					ex.printStackTrace();
-				}
-			break;
-			
-			default:
-				sReturn = "" + e.getID();
-		}
-		
-		return sReturn;
+	public void mouseMoved(MouseEvent e) {
+		displayEventInfo(e);
 	}
 	
 	/**

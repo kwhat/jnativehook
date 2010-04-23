@@ -36,8 +36,8 @@ public class NativeHookException extends RuntimeException {
 	 *
 	 * @param sMessage the s message
 	 */
-	public NativeHookException(String sMessage) {
-		super(sMessage);
+	public NativeHookException(String message) {
+		super(message);
 	}
 	
 	/**
@@ -46,8 +46,8 @@ public class NativeHookException extends RuntimeException {
 	 * @param sMessage the s message
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeHookException(String sMessage, Throwable objThrowable) {
-		super(sMessage, objThrowable);
+	public NativeHookException(String message, Throwable cause) {
+		super(message, cause);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class NativeHookException extends RuntimeException {
 	 *
 	 * @param objThrowable the obj throwable
 	 */
-	public NativeHookException(Throwable objThrowable) {
-		super(objThrowable);
+	public NativeHookException(Throwable cause) {
+		super(cause);
 	}
 }

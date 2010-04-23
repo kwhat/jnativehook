@@ -47,7 +47,7 @@ Compiling Options:
 #include "XMapModifers.h"
 
 //Instance Variables
-bool bRunning = true;
+bool isRunning = true;
 unsigned int xkb_timeout;
 unsigned int xkb_interval;
 
@@ -89,6 +89,8 @@ void throwException(char * message) {
 		//Unable to find exception class, Terminate with error.
 		jniFatalError("Unable to locate NativeKeyException class.");
 	}
+
+	free(message):
 }
 
 int xErrorToException(Display * dpy, XErrorEvent * e) {
@@ -104,6 +106,73 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 	return 0;
 }
 
+void callback(XPointer pointer, XRecordInterceptData* hook) {
+	fprintf(stderr, "got an XRecord event! (%i)\n", hook->category);
+
+	// FIXME: we need use XQueryPointer to get the first location
+	static int cur_x = 0;
+	static int cur_y = 0;
+
+	if (hook->category != XRecordFromServer && hook->category != XRecordFromClient) {
+		XRecordFreeData (hook);
+		return;
+	}
+
+
+	XRecordDatum *data = (XRecordDatum*) hook->data;
+
+	int event_type = data->type;
+
+	BYTE btncode, keycode;
+	btncode = keycode = data->event.u.u.detail;
+
+	int rootx = data->event.u.keyButtonPointer.rootX;
+	int rooty = data->event.u.keyButtonPointer.rootY;
+	int time = hook->server_time;
+
+	switch (event_type) {
+		case KeyPress:
+			// if escape is pressed, stop the loop and clean up, then exit
+			if (keycode == 9) {
+				stop = 1;
+				XRecordDisableContext(XOpenDisplay( NULL ), context);
+				break;
+			}
+
+			// Note: you should not use data_disp to do normal X operations !!!
+			printf ("KeyPress: \t%s", XKeysymToString(XKeycodeToKeysym( XOpenDisplay( NULL ), keycode, 0)));
+			//printf ("KeyPress: \t%i", XKeysymToKeycode( XOpenDisplay( NULL ), XK_A));
+			break;
+		case KeyRelease:
+			printf ("KeyRelease: \t%s", XKeysymToString(XKeycodeToKeysym( XOpenDisplay( NULL ), keycode, 0)));
+			break;
+		case ButtonPress:
+			printf ("ButtonPress: \t%d, rootX=%d, rootY=%d", btncode, cur_x, cur_y);
+			break;
+		case ButtonRelease:
+			printf ("ButtonRelease: \t%d, rootX=%d, rootY=%d", btncode, cur_x, cur_y);
+			break;
+		case MotionNotify:
+			printf ("MouseMove: \trootX=%d, rootY=%d",rootx, rooty);
+			cur_x = rootx;
+			cur_y = rooty;
+			break;
+		case CreateNotify:
+			break;
+		case DestroyNotify:
+			break;
+		case NoExpose:
+			break;
+		case Expose:
+			break;
+		default:
+			break;
+	}
+
+	printf (", time=%d\n", time);
+
+	XRecordFreeData (hook);
+}
 
 void MsgLoop() {
 	//Attach to the currently running jvm
@@ -137,7 +206,7 @@ void MsgLoop() {
 	jint jbutton;
 	jint modifiers;
 	jobject objEvent = NULL;
-	while (bRunning) {
+	while (isRunning) {
 		XNextEvent(disp, &xev);
 
 		//We need to check to see if we interrupted XNextEvent or if this was for a legitimate event.
@@ -226,238 +295,6 @@ void interruptMsgLoop() {
 	XFlush(xev.display);
 }
 
-int factorial(int n) {
-	if (n <= 1) {
-		return 1;
-	}
-	else {
-		return n * factorial( n - 1 );
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
-
-	JKeyCode jkey;
-	jkey.keycode = jkeycode;
-	jkey.location = jkeylocation;
-
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
-
-	#ifdef DEBUG
-	printf("Native: grabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
-	#endif
-
-	unsigned int mask_table[10];
-	unsigned int count = 0;
-
-	if (getCapsLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using CapsLockMask\n");
-		#endif
-		mask_table[count++] = getCapsLockMask();
-	}
-
-	if (getNumberLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using NumberLockMask\n");
-		#endif
-		mask_table[count++] = getNumberLockMask();
-	}
-
-	if (getScrollLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ScrollLockMask\n");
-		#endif
-		mask_table[count++] = getScrollLockMask();
-	}
-
-	if (jmodifiers & JK_SHIFT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ShiftMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
-	}
-
-	if (jmodifiers & JK_CTRL_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using ControlMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
-	}
-
-	if (jmodifiers & JK_META_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using MetaMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_META_MASK);
-	}
-
-	if (jmodifiers & JK_ALT_MASK) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using AltMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	if (jmodifiers & 0) {
-		#ifdef DEBUG
-		printf("Native: grabKey - Using No Mask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	int set_size, i, j;
-	for (set_size = count; set_size > 0; set_size--) {
-		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
-
-		int pos = 0;
-		for (i = 0; i < num_of_items; i++) {
-			int curr_mask = 0;
-			for (j = 0; j < set_size; j++) {
-				curr_mask |= mask_table[pos];
-				pos++;
-				pos %= count;
-			}
-
-			XGrabKey(disp, keycode, curr_mask, default_win, true, GrabModeAsync, GrabModeAsync);
-		}
-	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabKey(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jmodifiers, jint jkeycode, jint jkeylocation) {
-	XLockDisplay(disp);
-
-	JKeyCode jkey;
-	jkey.keycode = jkeycode;
-	jkey.location = jkeylocation;
-
-	KeySym keysym = JKeycodeToNative(jkey);
-	KeyCode keycode = XKeysymToKeycode(disp, keysym);
-
-	#ifdef DEBUG
-	printf("Native: ungrabKey - KeySym(%i) KeyCode(%i)\n", (unsigned int) keysym, (unsigned int) keycode);
-	#endif
-
-	unsigned int mask_table[10];
-	unsigned int count = 0;
-
-	if (getCapsLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using CapsLockMask\n");
-		#endif
-		mask_table[count++] = getCapsLockMask();
-	}
-
-	if (getNumberLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using NumberLockMask\n");
-		#endif
-		mask_table[count++] = getNumberLockMask();
-	}
-
-	if (getScrollLockMask() != 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ScrollLockMask\n");
-		#endif
-		mask_table[count++] = getScrollLockMask();
-	}
-
-	if (jmodifiers & JK_SHIFT_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ShiftMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_SHIFT_MASK);
-	}
-
-	if (jmodifiers & JK_CTRL_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using ControlMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_CTRL_MASK);
-	}
-
-	if (jmodifiers & JK_META_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using MetaMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_META_MASK);
-	}
-
-	if (jmodifiers & JK_ALT_MASK) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using AltMask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	if (jmodifiers & 0) {
-		#ifdef DEBUG
-		printf("Native: ungrabKey - Using No Mask\n");
-		#endif
-		mask_table[count++] = JModifierToNative(JK_ALT_MASK);
-	}
-
-	int set_size, i, j;
-	for (set_size = count; set_size > 0; set_size--) {
-		long num_of_items = factorial(count) / (factorial(set_size) * factorial(count - set_size));
-
-		int pos = 0;
-		for (i = 0; i < num_of_items; i++) {
-			int curr_mask = 0;
-			for (j = 0; j < set_size; j++) {
-				curr_mask |= mask_table[pos];
-				pos++;
-				pos %= count;
-			}
-
-			XUngrabKey(disp, keycode, curr_mask, default_win);
-		}
-	}
-
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_grabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
-	unsigned int button = JButtonToNative(jbutton);
-
-	#ifdef DEBUG
-	printf("Native: grabButton - Button(%i)\n", (unsigned int) button);
-	#endif
-
-	XGrabButton(disp, button, AnyModifier, default_win, true, ButtonPressMask | ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_ungrabButton(JNIEnv * UNUSED(env), jobject UNUSED(obj), jint jbutton) {
-	XLockDisplay(disp);
-	unsigned int button = JButtonToNative(jbutton);
-
-	#ifdef DEBUG
-	printf("Native: ungrabButton - Button(%i)\n", (unsigned int) button);
-	#endif
-
-	XUngrabKey(disp, button, AnyModifier, default_win);
-	XUnlockDisplay(disp);
-
-	//Refresh what XNextEvent is listening for.
-	interruptMsgLoop();
-}
-
-
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
 		#ifdef DEBUG
@@ -493,7 +330,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	#ifdef DEBUG
-	printf("Native: JNI_OnLoad - Shared Object Process Attach.\n");
+		printf("Native: JNI_OnLoad - Shared Object Process Attach.\n");
 	#endif
 
 	//Grab the currently running virtual machine so we can attach to it in
@@ -507,7 +344,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", jni_ret);
+			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", jni_ret);
 		#endif
 	}
 
@@ -529,59 +366,74 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		strcat(exceptoin_msg, disp_name);
 
 		throwException(exceptoin_msg);
-		free(exceptoin_msg);
 		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: XOpenDisplay successful\n");
+			printf("Native: XOpenDisplay successful.\n");
+		#endif
+	}
+
+	//Check to make sure XRecord is installed and enabled.
+	int major, minor;
+	if (!XRecordQueryVersion (disp, &major, &minor)) {
+		throwException("XRecord is not currently available");
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+	}
+	else {
+		#ifdef DEBUG
+			printf ("Native: XRecord version: %d.%d\n", major, minor);
+		#endif
+	}
+
+	//Setup XRecord range
+	XRecordClientSpec clients = XRecordAllClients;
+	XRecordRange * range = XRecordAllocRange();
+	if (range == NULL) {
+		throwException("Could not allocate XRecordRange");
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: XRecordAllocRange successful.\n");
+		#endif
+	}
+
+	//Create XRecord Context
+	range->device_events.first = KeyPress;
+	range->device_events.last = MotionNotify;
+	context = XRecordCreateContext(display, 0, &clients, 1, &range, 1);
+	XFree(range);
+	if (context == NULL) {
+		throwException("Could not create XRecordContext");
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: XRecordCreateContext successful.\n");
 		#endif
 	}
 
 
-	//Set allowed events and the default root window.
-	XAllowEvents(disp, AsyncBoth, CurrentTime);
-	default_win = DefaultRootWindow(disp);
-
-
-	/* Well XkbSetDetectableAutoRepeat doesnt work, big suprise right...
-	 * Look at https://bugs.freedesktop.org/show_bug.cgi?id=22515 and
-	 * http://www.x.org/wiki/Server16Branch for more information on
-	 * otherwise useful features that do not work.
-	 *
-	 * For the time being you should relay on the keyboard repeat rate
-	 * and delay functions to implement your own rate limitor in java.
-	 * This will allow for more flexible rate limit control regardless
-	 * of platform.
-	 */
+	//enable detectable autorepate.
 	Bool isAutoRepeat;
 	XkbSetDetectableAutoRepeat(disp, true, &isAutoRepeat);
 	if (!isAutoRepeat) {
 		#ifdef DEBUG
-		printf("Native: Could not enable detectable autorepeat.\n");
+			printf("Native: Could not enable detectable autorepeat.\n");
 		#endif
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: XkbSetDetectableAutoRepeat successful\n");
+			printf("Native: XkbSetDetectableAutoRepeat successful\n");
 		#endif
 	}
 
-
-	//Iterate over screens
-	int screen;
-	for (screen = 0; screen < ScreenCount(disp); screen++) {
-		#ifdef DEBUG
-		printf ("Native: Init Screen %i\n", screen);
-		#endif
-		XSelectInput(disp, RootWindow(disp, screen), KeyPressMask | KeyReleaseMask | ButtonPress | ButtonRelease);
-	}
-
-	//Setup modifieres
-	getModifiers(disp);
+	XRecordEnableContextAsync(display, context, callback, NULL);
+	//XRecordEnableContext(display, context, callback, NULL);
 
 	//Call listener
-	bRunning = true;
+	isRunning = true;
 
 	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
 		#ifdef DEBUG
@@ -601,13 +453,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
 	if (disp != NULL) {
-		XUngrabKey(disp, AnyKey, AnyModifier, default_win);
+		XRecordDisableContext(disp, context);
+		XRecordFreeContext(disp, context);
+
 		XCloseDisplay(disp);
 		disp = NULL;
 	}
 
+
 	//Try to exit the thread naturally.
-	bRunning = false;
+	isRunning = false;
 	interruptMsgLoop();
 	pthread_join(hookThreadId, NULL);
 
@@ -615,11 +470,11 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	//Make sure the thread has stopped.
 	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
 		#ifdef DEBUG
-		printf("Native: pthread_kill successful.\n");
+			printf("Native: pthread_kill successful.\n");
 		#endif
 	}
 
 	#ifdef DEBUG
-	printf("Native: JNI_OnUnload successful.\n");
+		printf("Native: JNI_OnUnload successful.\n");
 	#endif
 }
