@@ -119,27 +119,15 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 }
 
 void callback(XPointer pointer, XRecordInterceptData * hook) {
-	// FIXME: we need use XQueryPointer to get the first location
-	/*
-	Window w, r = DefaultRootWindow(disp_data);
-	int wx, wy, rx, ry;
-	unsigned m;
-	XQueryPointer (d, r, &r, &w, &rx, &ry, &wx, &wy, &m);
-
-	static int cur_x = 0;
-	static int cur_y = 0;
-	 */
 
 	if (hook->category != XRecordFromServer && hook->category != XRecordFromClient) {
 		XRecordFreeData(hook);
 		return;
 	}
 
-
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
 
 	//Class and getInstance method id for the GlobalScreen Object
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
@@ -184,9 +172,8 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
 			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
 
-			//ID's for the pressed, typed and released callbacks
+			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_PRESSED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
@@ -207,12 +194,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
 			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
 
-			//TODO Fire key typed event.
-			//ID's for the pressed, typed and released callbacks
+			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_RELEASED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
+
+			//Fire key typed event.
+			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_TYPED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
 		case ButtonPress:
@@ -226,16 +216,16 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			jbutton = NativeToJButton(event_code);
 			modifiers = 0;
+			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
 			/*
-			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
 			*/
 
-			//ID for pressed, typed and released callbacks
+			//Fire mouse released event.
 			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMousePressed, objMouseEvent);
 		break;
@@ -251,19 +241,23 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			jbutton = NativeToJButton(event_code);
 			modifiers = 0;
+			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
 			/*
-			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
 			*/
 
-			//TODO Fire mouse clicked event.
-			//ID for pressed, typed and released callbacks
+			//Fire mouse released event.
 			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
+
+			//Fire mouse clicked event.
+			jmethodID idFireMouseClicked = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseClicked", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+			objKeyEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseClicked, objKeyEvent);
 		break;
 
 		case MotionNotify:
@@ -276,14 +270,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 			modifiers = 0;
-			/* TODO Get Some Button Modifiers.
-			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
+			/*
+			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
 			*/
 
-			//ID for pressed, typed and released callbacks
+			//ID for pressed, typed and released call backs
 			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
