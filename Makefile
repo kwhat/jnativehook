@@ -15,4 +15,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) $(CFLAGS) $(DEBUG) $(INCLUDES) $< -o $@

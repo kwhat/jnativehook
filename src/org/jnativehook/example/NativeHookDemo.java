@@ -17,10 +17,7 @@ package org.jnativehook.example;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FocusTraversalPolicy;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -53,7 +50,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(300, 400);
-		setFocusTraversalPolicy(new NoFocusTraversalPolicy());
 		addWindowListener(this);
 		
 		txtEventInfo = new JTextArea();
@@ -111,7 +107,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	public void mousePressed(MouseEvent e) {
-			displayEventInfo(e);
+		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
@@ -184,67 +180,23 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				sEventText += "MOUSE_CLICKED:\n";
 			break;
 			
+			case MouseEvent.MOUSE_MOVED:
+				sEventText += "MOUSE_MOVED:\n";
+			break;
+			
 			default:
 				sEventText += "MOUSE_UNKNOWN:\n";
 		}
 		
 		sEventText += "\tButton:\t" + e.getButton() + "\n";
 		sEventText += "\tModifiers:\t" + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
+		sEventText += "\tCoordinates:\t" + e.getX() + ", " + e.getY() + "\n";
 		sEventText += "\n";
 		
 		txtEventInfo.setText(sEventText);
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
     }
-    
-	/**
-	 * The main method.
-	 *
-	 * @param args the arguments
-	 */
-	public static void main(String[] args) {
-		new NativeHookDemo();
-	}
 	
-	/**
-	 * The Class NoFocusTraversalPolicy.
-	 */
-	private class NoFocusTraversalPolicy extends FocusTraversalPolicy {
-		
-		/* (non-Javadoc)
-		 * @see java.awt.FocusTraversalPolicy#getComponentAfter(java.awt.Container, java.awt.Component)
-		 */
-		public Component getComponentAfter(Container container, Component component) {
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.awt.FocusTraversalPolicy#getComponentBefore(java.awt.Container, java.awt.Component)
-		 */
-		public Component getComponentBefore(Container container, Component component) {
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.awt.FocusTraversalPolicy#getDefaultComponent(java.awt.Container)
-		 */
-		public Component getDefaultComponent(Container container) {
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.awt.FocusTraversalPolicy#getFirstComponent(java.awt.Container)
-		 */
-		public Component getFirstComponent(Container container) {
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.awt.FocusTraversalPolicy#getLastComponent(java.awt.Container)
-		 */
-		public Component getLastComponent(Container container) {
-			return null;
-		}
-	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
@@ -276,7 +228,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowOpened(WindowEvent e) {
 		GlobalScreen.getInstance();
-		GlobalScreen.getInstance().addNativeKeyListener(this);		
+		GlobalScreen.getInstance().addNativeKeyListener(this);
+		GlobalScreen.getInstance().addNativeMouseListener(this);
+		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
 	}
 	
 	/* (non-Javadoc)
@@ -285,5 +239,15 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void windowClosed(WindowEvent e) {
 		System.runFinalization();
 		System.exit(0);
+	}
+	
+    
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
+	public static void main(String[] args) {
+		new NativeHookDemo();
 	}
 }

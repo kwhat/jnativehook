@@ -383,7 +383,7 @@
 		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -lX11 -fPIC">
+		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -lX11 -lXtst -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -fPIC">

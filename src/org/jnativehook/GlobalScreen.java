@@ -117,38 +117,47 @@ public class GlobalScreen extends Component {
 	public native long getAutoRepeatRate() throws NativeKeyException;
 	public native long getAutoRepeatDelay() throws NativeKeyException;
 	
-	protected void fireKeyPressed(NativeKeyEvent objEvent) {
+	protected void fireKeyPressed(NativeKeyEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				((NativeKeyListener) objListeners[i + 1]).keyPressed( objEvent );
+				((NativeKeyListener) objListeners[i + 1]).keyPressed(e);
 			}
 		}
 	}
 	
-	protected void fireKeyReleased(NativeKeyEvent objEvent) {
+	protected void fireKeyReleased(NativeKeyEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				((NativeKeyListener) objListeners[i + 1]).keyReleased( objEvent );
+				((NativeKeyListener) objListeners[i + 1]).keyReleased(e);
 			}
 		}
 	}
 	
-	protected void fireMousePressed(NativeMouseEvent objEvent) {
+	protected void fireMouseMoved(NativeMouseEvent e) {
+		Object[] objListeners = eventListeners.getListenerList();
+		for (int i = 0; i < objListeners.length; i += 2) {
+			if ( objListeners[ i ] == NativeMouseMotionListener.class ) {
+				((NativeMouseMotionListener) objListeners[i + 1]).mouseMoved(e);
+			}
+		}
+	}
+	
+	protected void fireMousePressed(NativeMouseEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				((NativeMouseListener) objListeners[i + 1]).mousePressed( objEvent );
+				((NativeMouseListener) objListeners[i + 1]).mousePressed(e);
 			}
 		}
 	}
 	
-	protected void fireMouseReleased(NativeMouseEvent objEvent) {
+	protected void fireMouseReleased(NativeMouseEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				((NativeMouseListener) objListeners[i + 1]).mouseReleased( objEvent );
+				((NativeMouseListener) objListeners[i + 1]).mouseReleased(e);
 			}
 		}
 	}

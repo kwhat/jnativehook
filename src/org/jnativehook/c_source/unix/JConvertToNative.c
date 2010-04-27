@@ -3,7 +3,7 @@
 #include <X11/keysym.h>
 #include <X11/Sunkeysym.h>
 #include "include/JConvertToNative.h"
-#include "XMapModifers.h"
+#include "xEventModifers.h"
 
 unsigned int JKeycodeToNative(JKeyCode jkey) {
 	switch (jkey.keycode) {
@@ -491,21 +491,20 @@ unsigned int JButtonToNative(jint button) {
 
 unsigned int JModifierToNative(jint modifier) {
 	switch (modifier) {
-		case JK_SHIFT_MASK:								return ShiftMask;
-		case JK_CTRL_MASK:								return ControlMask;
-		case JK_META_MASK:								return getMetaMask();
-		case JK_ALT_MASK:								return getAltMask();
-		default: 										return AnyModifier;
+		case JK_SHIFT_MASK:								return KeyButMaskShift;
+		case JK_CTRL_MASK:								return KeyButMaskControl;
+		case JK_META_MASK:								return KeyButMaskMod4;
+		case JK_ALT_MASK:								return KeyButMaskMod1;
+		default: 										return KeyButMaskAny;
 	}
 }
 
 jint NativeToJModifier(unsigned int modifier) {
 	switch (modifier) {
-		case ShiftMask:									return JK_SHIFT_MASK;
-		case ControlMask:								return JK_CTRL_MASK;
-		default:
-			if (modifier == getMetaMask())				return JK_META_MASK;
-			else if (modifier == getAltMask())			return JK_ALT_MASK;
-			return 0;
+		case KeyButMaskShift:							return JK_SHIFT_MASK;
+		case KeyButMaskControl:							return JK_CTRL_MASK;
+		case KeyButMaskMod4:							return JK_META_MASK;
+		case KeyButMaskMod1:							return JK_ALT_MASK;
+		default: 										return 0;
 	}
 }
