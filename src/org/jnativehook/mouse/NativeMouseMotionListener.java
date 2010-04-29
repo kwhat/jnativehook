@@ -16,7 +16,6 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.event.MouseEvent;
 import java.util.EventListener;
 
 
@@ -42,7 +41,7 @@ public interface NativeMouseMotionListener extends EventListener {
 	 *
 	 * @param e the e
 	 */
-	public void mouseMoved(MouseEvent e);
+	public void mouseMoved(NativeMouseEvent e);
 	
 	//The following are only included to provide MouseMotionListener compatibility.
 	//public void mouseDragged(MouseEvent e);

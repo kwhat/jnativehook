@@ -16,8 +16,7 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.util.EventListener;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -31,20 +30,20 @@ import java.awt.event.KeyListener;
  *
  * @see NativeKeyEvent
  */
-public interface NativeKeyListener extends KeyListener {
+public interface NativeKeyListener extends EventListener {
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
-	public void keyPressed(KeyEvent e);
+	public void keyPressed(NativeKeyEvent e);
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
-	public void keyReleased(KeyEvent e);
+	public void keyReleased(NativeKeyEvent e);
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
-	public void keyTyped(KeyEvent e);
+	public void keyTyped(NativeKeyEvent e);
 }

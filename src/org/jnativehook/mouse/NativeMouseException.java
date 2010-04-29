@@ -15,11 +15,14 @@
  */
 package org.jnativehook.mouse;
 
+//Imports
+import org.jnativehook.NativeHookException;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeMouseException.
  */
-public class NativeMouseException extends Exception {
+public class NativeMouseException extends NativeHookException {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 4875934179277090021L;
 

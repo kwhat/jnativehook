@@ -16,8 +16,6 @@
 package org.jnativehook;
 
 //Imports
-import java.awt.Component;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,7 +45,7 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
  * @since	1.0
  */
 
-public class GlobalScreen extends Component {
+public class GlobalScreen {
 	//Instance Variables
 	private static final long serialVersionUID = 6504561173380322679L;
 	private static GlobalScreen instance = new GlobalScreen();
@@ -82,38 +80,31 @@ public class GlobalScreen extends Component {
 		return GlobalScreen.instance;
 	}
 	
-	public void addNativeKeyListener(NativeKeyListener listener) {
+	public void addKeyListener(NativeKeyListener listener) {
 		eventListeners.add(NativeKeyListener.class, listener);
 	}
 	
-	public void removeNativeKeyListener(NativeKeyListener listener) {
+	public void removeKeyListener(NativeKeyListener listener) {
 		eventListeners.remove(NativeKeyListener.class, listener);
 	}
 	
-	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
+	public void addMouseMotionListener(NativeMouseMotionListener listener) {
 		eventListeners.add(NativeMouseMotionListener.class, listener);
 	}
 	
-	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
+	public void removeMouseMotionListener(NativeMouseMotionListener listener) {
 		eventListeners.remove(NativeMouseMotionListener.class, listener);
 	}
 	
-	public void addNativeMouseListener(NativeMouseListener listener) {
+	public void addMouseListener(NativeMouseListener listener) {
 		eventListeners.add(NativeMouseListener.class, listener);
 	}
 	
-	public void removeNativeMouseListener(NativeMouseListener listener) {
+	public void removeMouseListener(NativeMouseListener listener) {
 		eventListeners.remove(NativeMouseListener.class, listener);
 	}
 	
-	//TODO TEST
-	public void addMouseListener(MouseListener listener) {
-		addNativeMouseListener((NativeMouseListener) listener);
-	}
-	
-	
-	
-	//Get seme keyboard information
+	//Get some keyboard information
 	public native long getAutoRepeatRate() throws NativeKeyException;
 	public native long getAutoRepeatDelay() throws NativeKeyException;
 	
@@ -211,7 +202,7 @@ public class GlobalScreen extends Component {
 				objZipInputStream.close();
 			}
 			else if (objCode.isDirectory()) {
-				//Probably IDE enviroment, possible manual unpack.
+				//Probably IDE environment, possible manual unpack.
 				//Setup the java.library.path to the load path and attempt a lib load.
 				File objLibFolder = new File(objCode.getAbsoluteFile() + "/" + sLoadPath);
 				if (objLibFolder.isDirectory()) {

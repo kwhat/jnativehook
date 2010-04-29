@@ -2,7 +2,7 @@
 JNativeHook is a Java library to provide a global keyboard and mouse listening 
 capabilities for applications that may or may not have focus.  The library 
 directly extends Java's mouse and keyboard listeners to provide easy 
-inteagration.
+integration.
 
 *** License ***
 Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
@@ -22,8 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 *** Compiling ***
-JNativeHook should compile on all opperating systems that support Java.  Unix 
-and Linux based systems will require the X Window System for compliaiton and 
+JNativeHook should compile on all operating systems that support Java.  Unix 
+and Linux based systems will require the X Window System for compilation and 
 execution. 
 
 Unix/Linux:
@@ -57,7 +57,7 @@ Windows:
 			c:\ant
 		
 		After installing all the dependencies you will need to add a few 
-		enviroment variables.  Open the System Properties dialog and navigate 
+		environment variables.  Open the System Properties dialog and navigate 
 		to the Advanced tab.  Click the Environment Variables button and then 
 		locate the Environment Variables dialog.  Click the new button to add 
 		the following variables and their respective locations:
@@ -77,4 +77,22 @@ Mac OS X:
 		Create an account at http://connect.apple.com if you do not already 
 		have one.  Now download and Install Xcode Tools which should include 
 		Ant, GCC and Make.
-		
+
+
+Building:
+	Extract source to a folder without spaces and run ant in that folder.
+	If custom build configuration is needed use the "configure" task to
+	generate a build.properties file for modification.
+	
+	
+	native.os=linux
+	native.make=make
+	java.target=1.6
+	native.ld=ld
+	native.arch=k8
+	project.debug=false
+	java.include=/opt/sun-jdk-1.6.0.20/include
+	native.cc=gcc
+	native.arch.model=64
+
+	

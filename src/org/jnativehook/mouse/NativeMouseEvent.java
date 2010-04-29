@@ -16,7 +16,8 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.event.MouseEvent;
+import java.util.EventObject;
+
 import org.jnativehook.GlobalScreen;
  
 // TODO: Auto-generated Javadoc
@@ -25,10 +26,7 @@ import org.jnativehook.GlobalScreen;
  * 
  * @see MouseEvent
  */
-public class NativeMouseEvent extends MouseEvent {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 369524271252805186L;
-
+public class NativeMouseEvent extends EventObject {
 	/**
 	 * Instantiates a new native mouse event.
 	 *
@@ -54,5 +52,25 @@ public class NativeMouseEvent extends MouseEvent {
 	 */
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int button) {
 		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, 1, false, button);
+	}
+
+	public String getButton() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getY() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getX() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getModifiers() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

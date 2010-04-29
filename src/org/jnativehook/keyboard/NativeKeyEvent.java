@@ -16,18 +16,14 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import java.awt.event.KeyEvent;
-
+import java.util.EventObject;
 import org.jnativehook.GlobalScreen;
  
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeKeyEvent.
  */
-public class NativeKeyEvent extends KeyEvent {
-	
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -4226037291462485089L;
+public class NativeKeyEvent extends EventObject {
 	
 	/**
 	 * Instantiates a new native key event.
@@ -55,4 +51,30 @@ public class NativeKeyEvent extends KeyEvent {
 	public NativeKeyEvent(int id, long when, int modifiers, int keyCode, char keyChar, int keyLocation) {
 		super(GlobalScreen.getInstance(), id, when, modifiers, keyCode, keyChar, keyLocation);
 	}
+
+	public String getKeyCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static String getKeyText(String keyCode) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getKeyLocation() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object getModifiers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static String getKeyModifiersText(Object modifiers) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

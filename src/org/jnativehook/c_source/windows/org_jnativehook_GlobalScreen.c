@@ -94,14 +94,6 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
 
-	//Class and Constructor for the NativeKeyEvent Object
-	jclass clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-	jmethodID KeyEvent_ID = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
-
-	//Class and Constructor for the NativeMouseEvent Object
-	jclass clsButtonEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-	jmethodID MouseEvent_ID = (*env)->GetMethodID(env, clsButtonEvent, "<init>", "(IJIIIIZI)V");
-
 	//Class and getInstance method id for the GlobalScreen Object
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
@@ -109,12 +101,6 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//A reference to the GlobalScreen Object
 	jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 
-	//ID's for the pressed, typed and released callbacks
-	jmethodID fireKeyPressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-	jmethodID fireKeyReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-
-	jmethodID fireMousePressed_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-	jmethodID fireMouseReleased_ID = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
 	//MS Event Struct Data
 	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
@@ -132,10 +118,10 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	unsigned int modifiers = 0;
 
 	JKeyCode jkey;
-	jint jbutton = JNOBUTTON;
-	jobject objKeyEvent = NULL;
-	//KeyCode key;
-	//ButtonCode button;
+	jint jbutton;
+	jclass clsKeyEvent, clsMouseEvent;
+	jmethodID idKeyEvent, idMouseEvent;
+	jobject objKeyEvent, objMouseEvent;
 
 	switch (event_type) {
 		case WM_KEYDOWN:
@@ -211,14 +197,26 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 
 		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_MBUTTONDOWN:
+			#ifdef DEBUG
+				printf("Native: MsgLoop - Button pressed (%i)\n", VK_LBUTTON);
+			#endif
 
 			jbutton = NativeToJButton(VK_LBUTTON);
+			modifiers = 0;
+			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
+
+
 		goto btndown;
 
 		case WM_RBUTTONDOWN:
 			jbutton = NativeToJButton(VK_RBUTTON);
+			#ifdef DEBUG
+				printf("Native: LowLevelProc - Button pressed (%i)\n", (unsigned int) jbutton);
+			#endif
+
+
 		goto btndown;
 
 		case WM_MBUTTONDOWN:
@@ -235,9 +233,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 			btndown:
-			#ifdef DEBUG
-			printf("Native: LowLevelProc - Button pressed (%i)\n", (unsigned int) jbutton);
-			#endif
+
 
 			if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 			if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
@@ -246,7 +242,6 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) false, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
-			objEvent = NULL;
 		break;
 
 
@@ -284,6 +279,10 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) false, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
 			objEvent = NULL;
+
+		break;
+
+		case WM_MOUSEMOVE:
 
 		break;
 

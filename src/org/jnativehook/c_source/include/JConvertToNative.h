@@ -5,7 +5,7 @@
 #include "JKeyModifiers.h"
 #include "JKeyEvents.h"
 #include "JMouseButtons.h"
-#include "JMouseButtonEvents.h"
+#include "JMouseEvents.h"
 
 typedef struct {
 	jint keycode;		//Key Code

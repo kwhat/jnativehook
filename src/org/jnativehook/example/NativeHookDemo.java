@@ -28,7 +28,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.jnativehook.GlobalScreen;
+import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
+import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
 // TODO: Auto-generated Javadoc
@@ -78,49 +80,49 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
-	public void keyReleased(KeyEvent e) {
+	public void keyReleased(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 	 */
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
-	public void mouseReleased(MouseEvent e) {
+	public void mouseReleased(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
-	public void mouseMoved(MouseEvent e) {
+	public void mouseMoved(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
@@ -129,7 +131,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 *
 	 * @param e the e
 	 */
-	private void displayEventInfo(KeyEvent e) {
+	private void displayEventInfo(NativeKeyEvent e) {
 		String sEventText = txtEventInfo.getText() + "\n\n";;
 		
 		switch (e.getID()) {
@@ -150,9 +152,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		}
 		
 		sEventText += "\tKeyCode:\t" + e.getKeyCode() + "\n";
-		sEventText += "\tKeyText:\t" + KeyEvent.getKeyText(e.getKeyCode()) + "\n";
+		sEventText += "\tKeyText:\t" + NativeKeyEvent.getKeyText(e.getKeyCode()) + "\n";
 		sEventText += "\tLocation:\t" + e.getKeyLocation() + "\n";
-		sEventText += "\tModifiers:\t" + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
+		sEventText += "\tModifiers:\t" + NativeKeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
 		sEventText += "\n";
 		
 		txtEventInfo.setText(sEventText);
@@ -164,7 +166,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 *
 	 * @param e the e
 	 */
-	private void displayEventInfo(MouseEvent e) {
+	private void displayEventInfo(NativeMouseEvent e) {
 		String sEventText = txtEventInfo.getText() + "\n\n";
 		
 		switch (e.getID()) {
@@ -228,9 +230,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowOpened(WindowEvent e) {
 		GlobalScreen.getInstance();
-		GlobalScreen.getInstance().addNativeKeyListener(this);
-		GlobalScreen.getInstance().addNativeMouseListener(this);
-		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
+		GlobalScreen.getInstance().addKeyListener(this);
+		GlobalScreen.getInstance().addMouseListener(this);
+		GlobalScreen.getInstance().addMouseMotionListener(this);
 	}
 	
 	/* (non-Javadoc)

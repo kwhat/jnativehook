@@ -16,7 +16,6 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.event.MouseEvent;
 import java.util.EventListener;
 
 // TODO: Auto-generated Javadoc
@@ -36,17 +35,17 @@ public interface NativeMouseListener extends EventListener {
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 	 */
-	public void mouseClicked(MouseEvent e);
+	public void mouseClicked(NativeMouseEvent e);
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent e);
+	public void mousePressed(NativeMouseEvent e);
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
-	public void mouseReleased(MouseEvent e);
+	public void mouseReleased(NativeMouseEvent e);
 	
 	//The following are only included to provide MouseListener compatibility.
 	//public void mouseEntered(MouseEvent e);

@@ -9,7 +9,6 @@
 
 unsigned char modifiers = 0x00;
 
-
 void setModifierMask(unsigned char mod) {
 	modifiers |= mod;
 }

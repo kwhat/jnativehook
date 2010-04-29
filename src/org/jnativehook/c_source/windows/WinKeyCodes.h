@@ -9,22 +9,6 @@
 #define MOD_LSHIFT		MOD_SHIFT	<< 4
 #define MOD_LWIN		MOD_WIN		<< 4
 
-typedef struct {
-	unsigned char keycode;
-	bool shift_mask;
-	bool control_mask;
-	bool alt_mask;
-	bool meta_mask;
-} KeyCode;
-
-typedef struct {
-	unsigned char buttoncode;
-	bool shift_mask;
-	bool control_mask;
-	bool alt_mask;
-	bool meta_mask;
-} ButtonCode;
-
 void setModifierMask(unsigned char mod);
 void unsetModifierMask(unsigned char mod);
 bool isModifierMask(unsigned char mod);
