@@ -83,25 +83,24 @@ void jniFatalError(char * message) {
 	exit(1);
 }
 
-void throwException(char * message) {
+void throwException(char * classname, char * message) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
 
-	//FIXME use passed in excpetion class.
 	//Locate our exception class
-	jclass objExceptionClass = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyException");
+	jclass clsException = (*env)->FindClass(env, classname);
 
-	if (objExceptionClass != NULL) {
+	if (clsException != NULL) {
 		#ifdef DEBUG
 			printf("Native: Exception - %s\n", message);
 		#endif
 
-		(*env)->ThrowNew(env, objExceptionClass, message);
+		(*env)->ThrowNew(env, clsException, message);
 	}
 	else {
 		//Unable to find exception class, Terminate with error.
-		jniFatalError("Unable to locate NativeKeyException class.");
+		jniFatalError("Unable to locate exception class.");
 	}
 }
 
@@ -113,7 +112,7 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 		printf("Native: XError %i - %s.\n", e->error_code, message);
 	#endif
 
-	throwException(message);
+	throwException("org/jnativehook/NativeHookException", message);
 
 	return 0;
 }
@@ -163,7 +162,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
 			jkey = NativeToJKeycode(XKeycodeToKeysym(disp_data, event_code, 0));
 			modifiers = 0;
@@ -174,7 +173,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_PRESSED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -185,7 +184,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
 			jkey = NativeToJKeycode(XKeycodeToKeysym(disp_data, event_code, 0));
 			modifiers = 0;
@@ -196,12 +195,12 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_RELEASED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 
 			//Fire key typed event.
 			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_TYPED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
@@ -226,7 +225,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire mouse released event.
 			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMousePressed, objMouseEvent);
 		break;
 
@@ -251,12 +250,12 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire mouse released event.
 			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
 
 			//Fire mouse clicked event.
 			jmethodID idFireMouseClicked = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseClicked", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+			objKeyEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseClicked, objKeyEvent);
 		break;
 
@@ -281,7 +280,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			//ID for pressed, typed and released call backs
 			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseMoved, objMouseEvent);
 		break;
 
@@ -331,7 +330,7 @@ void MsgLoop() {
 	XRecordClientSpec clients = XRecordAllClients;
 	XRecordRange * range = XRecordAllocRange();
 	if (range == NULL) {
-		throwException("Could not allocate XRecordRange");
+		throwException("org/jnativehook/NativeHookException", "Could not allocate XRecordRange");
 		return; //Naturaly exit so jni exception is thrown.
 	}
 	else {
@@ -346,7 +345,7 @@ void MsgLoop() {
 	context = XRecordCreateContext(disp_hook, 0, &clients, 1, &range, 1);
 	XFree(range);
 	if (context == 0) {
-		throwException("Could not create XRecordContext");
+		throwException("org/jnativehook/NativeHookException", "Could not create XRecordContext");
 		return; //Naturaly exit so jni exception is thrown.
 	}
 	else {
@@ -373,7 +372,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 			printf("Native: XkbGetAutoRepeatRate failure\n");
 		#endif
 
-		throwException("Could not determine the keyboard auto repeat rate.");
+		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
 		return -1; //Naturaly exit so jni exception is thrown.
 	}
 
@@ -389,7 +388,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 			printf("Native: XkbGetAutoRepeatRate failure\n");
 		#endif
 
-		throwException("Could not determine the keyboard auto repeat delay.");
+		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat delay.");
 		return -1; //Naturaly exit so jni exception is thrown.
 	}
 
@@ -438,7 +437,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		strcat(exceptoin_msg, error_msg);
 		strcat(exceptoin_msg, disp_name);
 
-		throwException(exceptoin_msg);
+		throwException("org/jnativehook/NativeHookException", exceptoin_msg);
 		free(exceptoin_msg);
 
 		return JNI_ERR; //Naturaly exit so jni exception is thrown.
@@ -452,7 +451,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Check to make sure XRecord is installed and enabled.
 	int major, minor;
 	if (!XRecordQueryVersion(disp_hook, &major, &minor)) {
-		throwException("XRecord is not currently available");
+		throwException("org/jnativehook/NativeHookException", "XRecord is not currently available");
 		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {
@@ -483,7 +482,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			printf("Native: MsgLoop() start failure.\n");
 		#endif
 
-		throwException("Could not create message loop thread.");
+		throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
 		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {

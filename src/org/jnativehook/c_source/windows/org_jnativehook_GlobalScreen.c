@@ -67,24 +67,24 @@ void jniFatalError(char * message) {
 	exit(1);
 }
 
-void throwException(char * message) {
+void throwException(char * classname, char * message) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
 
 	//Locate our exception class
-	jclass objExceptionClass = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyException");
+	jclass clsException = (*env)->FindClass(env, classname);
 
-	if (objExceptionClass != NULL) {
+	if (clsException != NULL) {
 		#ifdef DEBUG
 			printf("Native: Exception - %s\n", message);
 		#endif
 
-		(*env)->ThrowNew(env, objExceptionClass, message);
+		(*env)->ThrowNew(env, clsException, message);
 	}
 	else {
 		//Unable to find exception class, Terminate with error.
-		jniFatalError("Unable to locate NativeKeyException class.");
+		jniFatalError("Unable to locate exception class.");
 	}
 }
 
@@ -107,14 +107,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
 
 	//Event Data
-	int event_type = wParam;
-	BYTE event_kbcode = data->event.u.u.detail;
-	//int event_mask = data->event.u.keyButtonPointer.state;
-	int event_root_x = data->event.u.keyButtonPointer.rootX;
-	int event_root_y = data->event.u.keyButtonPointer.rootY;
-	int event_time = hook->server_time;
-
-
+	unsigned int vk_code = 0;
 	unsigned int modifiers = 0;
 
 	JKeyCode jkey;
@@ -123,7 +116,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	jmethodID idKeyEvent, idMouseEvent;
 	jobject objKeyEvent, objMouseEvent;
 
-	switch (event_type) {
+	switch (wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			#ifdef DEBUG
@@ -132,7 +125,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)	setModifierMask(MOD_LSHIFT);
@@ -153,7 +146,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_PRESSED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -165,7 +158,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)	unsetModifierMask(MOD_LSHIFT);
@@ -186,100 +179,99 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_RELEASED, (jlong) kbhook->time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 
 			//Fire key typed event.
 			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_KEY_TYPED, (jlong) event_time, modifiers, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
 
 		case WM_LBUTTONDOWN:
-			#ifdef DEBUG
-				printf("Native: MsgLoop - Button pressed (%i)\n", VK_LBUTTON);
-			#endif
-
-			jbutton = NativeToJButton(VK_LBUTTON);
-			modifiers = 0;
-			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-
-
-		goto btndown;
-
 		case WM_RBUTTONDOWN:
-			jbutton = NativeToJButton(VK_RBUTTON);
-			#ifdef DEBUG
-				printf("Native: LowLevelProc - Button pressed (%i)\n", (unsigned int) jbutton);
-			#endif
-
-
-		goto btndown;
-
 		case WM_MBUTTONDOWN:
-			jbutton = NativeToJButton(VK_MBUTTON);
-		goto btndown;
-
 		case WM_XBUTTONDOWN:
 		case WM_NCXBUTTONDOWN:
-			if (HIWORD(mshook->mouseData) == XBUTTON1) {
-				jbutton = NativeToJButton(VK_XBUTTON1);
+			if (wParam == WM_LBUTTONDOWN) {
+				vk_code = VK_LBUTTON;
 			}
-			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-				jbutton = NativeToJButton(VK_XBUTTON2);
+			else if (wParam == WM_RBUTTONDOWN) {
+				vk_code = VK_RBUTTON;
+			}
+			else if (wParam == WM_MBUTTONDOWN) {
+				vk_code = VK_RBUTTON;
+			}
+			else if (wParam == WM_XBUTTONDOWN || wParam == WM_NCXBUTTONDOWN) {
+				if (HIWORD(mshook->mouseData) == XBUTTON1) {
+					vk_code = VK_XBUTTON1;
+				}
+				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+					vk_code = VK_XBUTTON2;
+				}
 			}
 
-			btndown:
+			#ifdef DEBUG
+				printf("Native: MsgLoop - Button pressed (%i)\n", vk_code);
+			#endif
 
+			jbutton = NativeToJButton(vk_code);
+			modifiers = 0;
+			if (wParam & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (wParam & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (wParam & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
 
 			if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 			if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) false, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objEvent);
+			objMouseEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, 1, (jboolean) false, jbutton);
+			(*env)->CallVoidMethod(env, objGlobalScreen, fireMousePressed_ID, objMouseEvent);
 		break;
 
 
 		case WM_LBUTTONUP:
-			jbutton = NativeToJButton(VK_LBUTTON);
-		goto btnup;
-
 		case WM_RBUTTONUP:
-			jbutton = NativeToJButton(VK_RBUTTON);
-		goto btnup;
-
 		case WM_MBUTTONUP:
-			jbutton = NativeToJButton(VK_MBUTTON);
-		goto btnup;
-
 		case WM_XBUTTONUP:
 		case WM_NCXBUTTONUP:
-			if (HIWORD(mshook->mouseData) == XBUTTON1) {
-				jbutton = NativeToJButton(VK_XBUTTON1);
+			if (wParam == WM_LBUTTONUP) {
+				vk_code = VK_LBUTTON;
 			}
-			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-				jbutton = NativeToJButton(VK_XBUTTON2);
+			else if (wParam == WM_RBUTTONUP) {
+				vk_code = VK_RBUTTON;
+			}
+			else if (wParam == WM_MBUTTONUP) {
+				vk_code = VK_RBUTTON;
+			}
+			else if (wParam == WM_XBUTTONUP || wParam == WM_NCXBUTTONUP) {
+				if (HIWORD(mshook->mouseData) == XBUTTON1) {
+					vk_code = VK_XBUTTON1;
+				}
+				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+					vk_code = VK_XBUTTON2;
+				}
 			}
 
-			btnup:
 			#ifdef DEBUG
-			printf("Native: LowLevelProc - Button released(%i)\n", wParam);
+				printf("Native: MsgLoop - Button released(%i)\n", vk_code);
 			#endif
+
+			jbutton = NativeToJButton(vk_code);
+			modifiers = 0;
+			if (wParam & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+			if (wParam & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+			if (wParam & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
 
 			if (isMaskSet(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 			if (isMaskSet(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
 			if (isMaskSet(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
 			if (isMaskSet(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
 
-			objEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) false, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objEvent);
-			objEvent = NULL;
-
+			objMouseEvent = (*env)->NewObject(env, clsButtonEvent, MouseEvent_ID, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, 0, (jboolean) false, jbutton);
+			(*env)->CallVoidMethod(env, objGlobalScreen, fireMouseReleased_ID, objMouseEvent);
 		break;
 
 		case WM_MOUSEMOVE:
@@ -293,7 +285,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 	#ifdef DEBUG
 	if ((*env)->ExceptionOccurred(env)) {
-		printf("Native: JNI Error Occured.\n");
+		printf("Native: JNI Error Occurred.\n");
 		((*env)->ExceptionDescribe(env));
 	}
 	#endif
@@ -317,7 +309,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
 		#endif
 
-		throwException("Failed to hook keyboard using SetWindowsHookEx");
+		throwException("org/jnativehook/NativeHookException", "Failed to hook keyboard using SetWindowsHookEx");
 		return 1; //Naturaly exit so jni exception is thrown.
 	}
 
@@ -333,7 +325,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
 		#endif
 
-		throwException("Failed to hook mouse using SetWindowsHookEx");
+		throwException("org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
 		return 1; //Naturaly exit so jni exception is thrown.
 	}
 
@@ -366,12 +358,12 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		printf("Native: SPI_GETKEYBOARDSPEED failure\n");
 		#endif
 
-		throwException("Could not determine the keyboard auto repeat rate.");
+		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
 		return -1; //Naturaly exit so jni exception is thrown.
 	}
 
 	#ifdef DEBUG
-	printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %ldd)\n", wkb_rate);
+		printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %ldd)\n", wkb_rate);
 	#endif
 	return (jlong) wkb_rate;
 }
@@ -383,7 +375,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 			printf("Native: SPI_GETKEYBOARDDELAY failure\n");
 		#endif
 
-		throwException("Could not determine the keyboard auto repeat rate.");
+		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
 		return -1; //Naturaly exit so jni exception is thrown.
 	}
 

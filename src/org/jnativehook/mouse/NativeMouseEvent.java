@@ -16,9 +16,9 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.util.EventObject;
-
+import java.awt.event.MouseEvent;
 import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeInputEvent;
  
 // TODO: Auto-generated Javadoc
 /**
@@ -26,7 +26,23 @@ import org.jnativehook.GlobalScreen;
  * 
  * @see MouseEvent
  */
-public class NativeMouseEvent extends EventObject {
+public class NativeMouseEvent extends NativeInputEvent {
+	private static final long serialVersionUID = -8191766795595766345L;
+	private int x;
+	private int y;
+	private int button;
+
+	public static final int NATIVE_MOUSE_FIRST = 2500;
+	public static final int NATIVE_MOUSE_LAST = 2507;
+	public static final int NATIVE_MOUSE_CLICKED = NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_PRESSED = 1 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_RELEASED = 2 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_MOVED = 3 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_ENTERED = 4 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_EXITED = 5 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_DRAGGED = 6 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_WHEEL = 7 + NATIVE_MOUSE_FIRST; 
+	
 	/**
 	 * Instantiates a new native mouse event.
 	 *
@@ -36,10 +52,15 @@ public class NativeMouseEvent extends EventObject {
 	 * @param iX the i x
 	 * @param iY the i y
 	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y) {
-		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, 1, false);
+	//TODO clickCount
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int button) {
+		super(GlobalScreen.getInstance(), id, when, modifiers);
+		
+		this.x = x;
+		this.y = y;
+		this.button = button;
 	}
-	
+
 	/**
 	 * Instantiates a new native mouse event.
 	 *
@@ -50,27 +71,82 @@ public class NativeMouseEvent extends EventObject {
 	 * @param iY the i y
 	 * @param iButton the i button
 	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int button) {
-		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, 1, false, button);
+	//TODO clickCount
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y) {
+		this(id, when, modifiers, x, y, MouseEvent.NOBUTTON);
 	}
 
-	public String getButton() {
-		// TODO Auto-generated method stub
-		return null;
+	public int getButton() {
+		return button;
 	}
 
-	public String getY() {
-		// TODO Auto-generated method stub
-		return null;
+	public int getY() {
+		return y;
 	}
 
-	public String getX() {
-		// TODO Auto-generated method stub
-		return null;
+	public int getX() {
+		return x;
 	}
-
-	public int getModifiers() {
-		// TODO Auto-generated method stub
-		return 0;
+	
+	public static String getMouseModifiersText(int modifiers) {
+		return MouseEvent.getMouseModifiersText(modifiers);
+	}
+	
+	public String  paramString() {
+		String param = "";
+		
+		switch(getId()) {
+			case NATIVE_MOUSE_PRESSED:
+				 param += "NATIVE_MOUSE_PRESSED";
+			break;
+			
+			case NATIVE_MOUSE_RELEASED:
+				param += "NATIVE_MOUSE_RELEASED";
+			break;
+			
+			case NATIVE_MOUSE_CLICKED:
+				param += "NATIVE_MOUSE_CLICKED";
+			break;
+			
+			case NATIVE_MOUSE_ENTERED:
+				param += "NATIVE_MOUSE_ENTERED";
+			break;
+			
+			case NATIVE_MOUSE_EXITED:
+				param += "NATIVE_MOUSE_EXITED";
+			break;
+			
+			case NATIVE_MOUSE_MOVED:
+				param += "NATIVE_MOUSE_MOVED";
+			break;
+			
+			case NATIVE_MOUSE_DRAGGED:
+				param += "NATIVE_MOUSE_DRAGGED";
+			break;
+			
+			case NATIVE_MOUSE_WHEEL:
+				param += "NATIVE_MOUSE_WHEEL";
+			break;
+			
+			default:
+				param += "unknown type";
+			break;
+		}
+		param += ",";
+		
+		param += "(" + x + "," + y + "),";
+		param += "button=" + button + ",";
+		
+		if (getModifiers() != 0) {
+			param += "modifiers=" + getMouseModifiersText(getModifiers()) + ",";
+		}
+		
+		if (getModifiersEx() != 0) {
+			param += "extModifiers=" + getModifiersExText(getModifiersEx()) + ",";
+		}
+		
+		param = param.substring(0, param.length() - 1);
+		
+		return param;
 	}
 }

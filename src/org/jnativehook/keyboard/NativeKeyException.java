@@ -16,13 +16,12 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import org.jnativehook.NativeHookException;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeKeyException.
  */
-public class NativeKeyException extends NativeHookException {
+public class NativeKeyException extends Exception {
 	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -6239432803200521634L;

@@ -16,65 +16,183 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import java.util.EventObject;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeInputEvent;
  
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeKeyEvent.
  */
-public class NativeKeyEvent extends EventObject {
+public class NativeKeyEvent extends NativeInputEvent {
+	private static final long serialVersionUID = 5228137904514960737L;
+	private int rawCode;
+	private int keyCode;
+	private char keyChar;
+	private int keyLocation;
+	
+	public static final int NATIVE_KEY_FIRST = 2400;
+	public static final int NATIVE_KEY_LAST = 2402;
+	public static final int NATIVE_KEY_TYPED = NATIVE_KEY_FIRST;
+	public static final int NATIVE_KEY_PRESSED = 1 + NATIVE_KEY_FIRST;
+	public static final int NATIVE_KEY_RELEASED = 2 + NATIVE_KEY_FIRST;
+
 	
 	/**
 	 * Instantiates a new native key event.
 	 *
-	 * @param iId the i id
 	 * @param iWhen the i when
 	 * @param iModifiers the i modifiers
 	 * @param iKeyCode the i key code
 	 * @param cKeyChar the c key char
 	 */
-	public NativeKeyEvent(int id, long when, int modifiers, int keyCode, char keyChar) {
-		super(GlobalScreen.getInstance(), id, when, modifiers, keyCode, keyChar);
+	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar) {
+		super(GlobalScreen.getInstance(), id, when, modifiers);
+		
+		this.rawCode = rawCode;
+		this.keyCode = keyCode;
+		this.keyChar = keyChar;
 	}
 	
 	/**
 	 * Instantiates a new native key event.
 	 *
-	 * @param iId the i id
 	 * @param iWhen the i when
 	 * @param iModifiers the i modifiers
 	 * @param iKeyCode the i key code
 	 * @param cKeyChar the c key char
 	 * @param iKeyLocation the i key location
 	 */
-	public NativeKeyEvent(int id, long when, int modifiers, int keyCode, char keyChar, int keyLocation) {
-		super(GlobalScreen.getInstance(), id, when, modifiers, keyCode, keyChar, keyLocation);
+	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation) {
+		this(id, when, modifiers, rawCode, keyCode, keyChar);
+		
+		this.keyLocation = keyLocation;
 	}
 
-	public String getKeyCode() {
-		// TODO Auto-generated method stub
-		return null;
+	public int getRawCode() {
+		return this.rawCode;
+	}
+	
+	public void setRawCode(int rawCode) {
+		 this.rawCode = rawCode;
+	}
+	
+	public char getKeyChar() {
+		return this.keyChar;
 	}
 
-	public static String getKeyText(String keyCode) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setKeyChar(char keyChar) {
+		 this.keyChar = keyChar;
 	}
 
-	public String getKeyLocation() {
-		// TODO Auto-generated method stub
-		return null;
+	public int getKeyCode() {
+		return this.keyCode;
 	}
-
-	public Object getModifiers() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public void setKeyCode(int keyCode) {
+		 this.keyCode = keyCode;
 	}
-
-	public static String getKeyModifiersText(Object modifiers) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public int getKeyLocation() {
+		return this.keyLocation;
 	}
+	
+	public static String getKeyText(int keyCode) {
+		return KeyEvent.getKeyText(keyCode);
+	}
+	
+	public static String getKeyModifiersText(int modifiers) {
+		return KeyEvent.getKeyModifiersText(modifiers);
+	}
+	
 
+	
+	public String paramString() {
+		String param = "";
+		
+		switch(getId()) {
+			case NATIVE_KEY_TYPED:
+				param += "NATIVE_KEY_TYPED";
+			break;
+			
+			case NATIVE_KEY_PRESSED:
+				param += "NATIVE_KEY_PRESSED";
+			break;
+			
+			case NATIVE_KEY_RELEASED:
+				param += "NATIVE_KEY_RELEASED";
+			break;
+			
+			default:
+				param += "unknown type";
+			break;
+		}
+		param += ",";
+		
+		param += "keyCode=" + keyCode + ",";
+		param += "keyText=" + getKeyText(keyCode) + ",";
+		
+		param += "keyChar=";
+		switch (keyChar) {
+			case KeyEvent.CHAR_UNDEFINED:
+				param += Toolkit.getProperty("AWT.undefined", "Undefined") + " keyChar";
+			break;
+			
+			case KeyEvent.VK_BACK_SPACE:
+			case KeyEvent.VK_TAB:
+			case KeyEvent.VK_ENTER:
+			case KeyEvent.VK_CANCEL:
+			case KeyEvent.VK_ESCAPE:
+			case KeyEvent.VK_DELETE:
+				param += getKeyText(keyChar);
+			break;
+			
+			default:
+				param += "'" + keyChar + "'";
+			break;
+		}
+		param += ",";
+		
+		
+		if (getModifiers() != 0) {
+			param += "modifiers=" + getKeyModifiersText(getModifiers()) + ",";
+		}
+		
+		if (getModifiersEx() != 0) {
+			param += "extModifiers=" + getModifiersExText(getModifiersEx()) + ",";
+		}
+
+		param += "keyLocation=";
+		switch (keyLocation) {
+			case KeyEvent.KEY_LOCATION_UNKNOWN:
+				param += "KEY_LOCATION_UNKNOWN";
+			break;
+			
+			case KeyEvent.KEY_LOCATION_STANDARD:
+				param += "KEY_LOCATION_STANDARD";
+			break;
+			
+			case KeyEvent.KEY_LOCATION_LEFT:
+				param += "KEY_LOCATION_LEFT";
+			break;
+			
+			case KeyEvent.KEY_LOCATION_RIGHT:
+				param += "KEY_LOCATION_RIGHT";
+			break;
+			
+			case KeyEvent.KEY_LOCATION_NUMPAD:
+				param += "KEY_LOCATION_NUMPAD";
+			break;
+			
+			default:
+				param += "KEY_LOCATION_UNKNOWN";;
+			break;
+		}
+		param += ",";
+		
+		param += "rawCode=" + rawCode;
+		
+		return param;
+	}
 }

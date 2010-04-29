@@ -20,8 +20,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.JFrame;
@@ -51,7 +49,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(300, 400);
+		setSize(450, 200);
 		addWindowListener(this);
 		
 		txtEventInfo = new JTextArea();
@@ -132,32 +130,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e the e
 	 */
 	private void displayEventInfo(NativeKeyEvent e) {
-		String sEventText = txtEventInfo.getText() + "\n\n";;
-		
-		switch (e.getID()) {
-			case KeyEvent.KEY_PRESSED:
-				sEventText += "KEY_PRESSED:\n";
-			break;
-			
-			case KeyEvent.KEY_RELEASED:
-				sEventText += "KEY_RELEASED:\n";
-			break;
-			
-			case KeyEvent.KEY_TYPED:
-				sEventText += "KEY_PRESSED:\n";
-			break;
-			
-			default:
-				sEventText += "KEY_UNKNOWN:\n";
-		}
-		
-		sEventText += "\tKeyCode:\t" + e.getKeyCode() + "\n";
-		sEventText += "\tKeyText:\t" + NativeKeyEvent.getKeyText(e.getKeyCode()) + "\n";
-		sEventText += "\tLocation:\t" + e.getKeyLocation() + "\n";
-		sEventText += "\tModifiers:\t" + NativeKeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
-		sEventText += "\n";
-		
-		txtEventInfo.setText(sEventText);
+		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 	}
 	
@@ -167,35 +140,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e the e
 	 */
 	private void displayEventInfo(NativeMouseEvent e) {
-		String sEventText = txtEventInfo.getText() + "\n\n";
-		
-		switch (e.getID()) {
-			case MouseEvent.MOUSE_PRESSED:
-				sEventText += "MOUSE_PRESSED:\n";
-			break;
-			
-			case MouseEvent.MOUSE_RELEASED:
-				sEventText += "MOUSE_RELEASED:\n";
-			break;
-			
-			case MouseEvent.MOUSE_CLICKED:
-				sEventText += "MOUSE_CLICKED:\n";
-			break;
-			
-			case MouseEvent.MOUSE_MOVED:
-				sEventText += "MOUSE_MOVED:\n";
-			break;
-			
-			default:
-				sEventText += "MOUSE_UNKNOWN:\n";
-		}
-		
-		sEventText += "\tButton:\t" + e.getButton() + "\n";
-		sEventText += "\tModifiers:\t" + KeyEvent.getKeyModifiersText(e.getModifiers()) + "\n";
-		sEventText += "\tCoordinates:\t" + e.getX() + ", " + e.getY() + "\n";
-		sEventText += "\n";
-		
-		txtEventInfo.setText(sEventText);
+		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
     }
 	

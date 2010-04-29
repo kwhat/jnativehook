@@ -1,11 +1,10 @@
 #include <jni.h>
 
+#include "JInputModifiers.h"
 #include "JKeyCodes.h"
 #include "JKeyLocations.h"
-#include "JKeyModifiers.h"
-#include "JKeyEvents.h"
 #include "JMouseButtons.h"
-#include "JMouseEvents.h"
+#include "JNativeEvents.h"
 
 typedef struct {
 	jint keycode;		//Key Code

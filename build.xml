@@ -341,7 +341,6 @@
 		</propertyfile>
 	</target>
 	
-	
 	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.dist}"/>
@@ -363,10 +362,19 @@
 			target="${java.target}"
 		/>
 		
+		
+		<echo>Creating JNI Headers...</echo>
+		<javah 
+			class="org.jnativehook.GlobalScreen" 
+			outputFile="src/org/jnativehook/c_source/include/org_jnativehook_GlobalScreen.h"
+			classpathref="classpath"
+			verbose="yes" 
+		/>
+		
+		
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${native.os}-${native.arch.name}"/>
-		
 		
 		<!-- set system specific src -->
 		<condition property="native.src" value="windows">
