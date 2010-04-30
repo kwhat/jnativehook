@@ -27,7 +27,7 @@ Compiling Options:
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
 #include <windows.h>
-#include <WinDef.h> //??? DWORD for the MSDLLSTRUCT
+//#include <WinDef.h> //??? DWORD for the MSDLLSTRUCT
 
 #ifdef DEBUG
 	#include <stdio.h>
@@ -417,7 +417,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 	else {
 		#ifdef DEBUG
-			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", jni_ret);
+			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
 		#endif
 	}
 
@@ -431,7 +431,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#ifdef DEBUG
 			printf("Native: MsgLoop() start failure.\n");
 		#endif
-		//TODO Throw an exception
+
+		throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
+		return JNI_ERR; //Naturaly exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
