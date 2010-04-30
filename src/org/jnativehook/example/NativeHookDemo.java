@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
@@ -175,6 +176,17 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowOpened(WindowEvent e) {
 		GlobalScreen.getInstance();
+		
+		try {
+			txtEventInfo.setText(txtEventInfo.getText() + "\n" + "Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
+			txtEventInfo.setText(txtEventInfo.getText() + "\n" + "Auto Repate Delay: " + GlobalScreen.getInstance().getAutoRepeatDelay());
+		}
+		catch (NativeKeyException ex) {
+			txtEventInfo.setText("Error: " + e.toString() + "\n");
+		}
+		
+		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+		
 		GlobalScreen.getInstance().addKeyListener(this);
 		GlobalScreen.getInstance().addMouseListener(this);
 		GlobalScreen.getInstance().addMouseMotionListener(this);

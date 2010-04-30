@@ -32,11 +32,9 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
 
 /**
  * GlobalScreen is used as a class to represent the global screen area that
- * Java does not usually have access to.  This allows our native events to 
- * extend Java's InputEvent class and maintain compatability between Java input 
- * events and native input events.
+ * Java does not usually have access to.  
  * <p>
- * This class also hanldes the loading and communicaiton with the native 
+ * This class also handles the loading and communication with the native 
  * library.  That includes registering new key and button hooks and the event 
  * dispatchers for each.
  * 
@@ -186,6 +184,7 @@ public class GlobalScreen {
 					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
 						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
 						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
+						System.out.println(objLibFile.getAbsolutePath());
 						
 						FileOutputStream objTempLibOutputStream = new FileOutputStream(objLibFile);
 						byte[] array = new byte[8192];

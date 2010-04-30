@@ -42,4 +42,8 @@ public class NativeInputEvent extends EventObject {
 	public long getWhen() {
 		return when;
 	}
+	
+	public String paramString() {
+		return null;
+	}
 }
