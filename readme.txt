@@ -80,19 +80,6 @@ Mac OS X:
 
 
 Building:
-	Extract source to a folder without spaces and run ant in that folder.
-	If custom build configuration is needed use the "configure" task to
-	generate a build.properties file for modification.
-	
-	
-	native.os=linux
-	native.make=make
-	java.target=1.6
-	native.ld=ld
-	native.arch=k8
-	project.debug=false
-	java.include=/opt/sun-jdk-1.6.0.20/include
-	native.cc=gcc
-	native.arch.model=64
-
-	
+	Extract source archive to a folder without spaces and run ant in that 
+	folder.  If custom build configuration is needed use the "configure" task 
+	to generate a build.properties file for modification.
