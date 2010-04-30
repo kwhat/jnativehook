@@ -6,10 +6,10 @@
 	<property file="build.properties"/>
 	
 	<!-- Project Settings -->
+	<buildnumber file="build.num"/>
 	<property name="project.name"		value="${ant.project.name}"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="0.9"/>
-	<buildnumber file="build.num"/>
+	<property name="project.version"	value="0.9.${build.number}"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
@@ -477,7 +477,7 @@
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo"/>
 				<section name="org/jnativehook">
 					<attribute name="Implementation-Title" value="${project.name} Library"/>
-					<attribute name="Implementation-Version" value="${project.version}.${build.number}"/> 
+					<attribute name="Implementation-Version" value="${project.version}"/> 
 					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
 				</section>
 			</manifest>
@@ -488,10 +488,20 @@
 	<target name="package" depends="jar" description="Builds the server binaries">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
-		<zip destfile="${dir.dist}/JNativeGrab.zip" duplicate="add" level="9">
+		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${dir.jar}" includes="*.jar"/>
 		</zip>
 		
+		<zip destfile="${dir.dist}/JNativeGrab-src-${project.version}.zip" duplicate="add" level="9">
+			<zipfileset dir="${basedir}">
+				<exclude name="**/.*"/>
+				<exclude name="bin/**"/>
+				<exclude name="build.properties"/>
+				<exclude name="dist/**"/>
+			</zipfileset>
+		</zip>
+		
+		<!--  We dont really need 3 archive formats for distribution
 		<tar destfile="${dir.dist}/JNativeGrab.tar.gz" compression="gzip">
 			<tarfileset dir="${dir.jar}" includes="*.jar"/>
 		</tar>
@@ -499,6 +509,7 @@
 		<tar destfile="${dir.dist}/JNativeGrab.tar.bz2" compression="bzip2">
 			<tarfileset dir="${dir.jar}" includes="*.jar"/>
 		</tar>
+		-->
 	</target>
 	
 	
