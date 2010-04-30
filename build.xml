@@ -399,7 +399,7 @@
 		</condition>
 		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-lgcc -O3 -fno-strict-aliasing -shared --kill-at">
+		<condition property="native.ldflags" value="-lgcc -O3 -fno-strict-aliasing -shared -Wl,--kill-at">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared -lX11 -L/usr/lib -L/usr/local/lib">
