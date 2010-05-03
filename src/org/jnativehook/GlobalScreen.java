@@ -52,6 +52,7 @@ public class GlobalScreen {
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
+		//TODO this needs to be passed in to java -D and not like this.
 		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
 		GlobalScreen.registerHook();
 	}
@@ -184,7 +185,6 @@ public class GlobalScreen {
 					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
 						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
 						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
-						System.out.println(objLibFile.getAbsolutePath());
 						
 						FileOutputStream objTempLibOutputStream = new FileOutputStream(objLibFile);
 						byte[] array = new byte[8192];

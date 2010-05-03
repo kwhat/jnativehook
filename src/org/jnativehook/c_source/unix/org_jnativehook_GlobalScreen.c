@@ -161,7 +161,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	int event_root_x = data->event.u.keyButtonPointer.rootX;
 	int event_root_y = data->event.u.keyButtonPointer.rootY;
 	int event_time = hook->server_time;
-
+	unsigned int keysym;
 
 	JKeyCode jkey;
 	jint jbutton;
@@ -180,7 +180,14 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
-			jkey = NativeToJKeycode(XKeycodeToKeysym(disp_data, event_code, 0));
+			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
+			//printf("KeyCode: %i %c\nKeySym: %i %c\n%i\n", event_code, event_code, keysym, keysym, event_mask);
+
+			unsigned long i1 = 0;
+			for (i1 = 0; i1 < hook->data_len; i1++)
+				printf("%X", hook->data[i1]);
+			printf("\t%c\n", keysym);
+			jkey = NativeToJKeycode(keysym);
 			modifiers = 0;
 			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
 			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
@@ -189,7 +196,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, keysym, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -202,7 +209,8 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
-			jkey = NativeToJKeycode(XKeycodeToKeysym(disp_data, event_code, 0));
+			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
+			jkey = NativeToJKeycode(keysym);
 			modifiers = 0;
 			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
 			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
@@ -211,12 +219,12 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, (jchar) jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 
 			//Fire key typed event.
 			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, keysym, JK_UNDEFINED, (jchar) jkey.keycode, JK_LOCATION_UNKNOWN);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 

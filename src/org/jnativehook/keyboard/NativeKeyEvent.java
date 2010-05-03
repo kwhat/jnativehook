@@ -73,6 +73,18 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar) {
 		super(GlobalScreen.getInstance(), id, when, modifiers);
 		
+		if (id == NativeKeyEvent.NATIVE_KEY_TYPED) {
+			if (keyChar == KeyEvent.CHAR_UNDEFINED) {
+				throw new IllegalArgumentException("invalid keyChar");
+			}
+			else if (keyCode != KeyEvent.VK_UNDEFINED) {
+				throw new IllegalArgumentException("invalid keyCode");
+			}
+			else if (keyLocation != KeyEvent.KEY_LOCATION_UNKNOWN) {
+				throw new IllegalArgumentException("invalid keyLocation");
+			}
+		}
+		
 		this.rawCode = rawCode;
 		this.keyCode = keyCode;
 		this.keyChar = keyChar;
@@ -226,6 +238,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case KeyEvent.VK_CANCEL:
 			case KeyEvent.VK_ESCAPE:
 			case KeyEvent.VK_DELETE:
+			case KeyEvent.VK_SHIFT:
+			case KeyEvent.VK_ALT:
+			case KeyEvent.VK_CONTROL:
+			case KeyEvent.VK_CONTEXT_MENU:
 				param += getKeyText(keyChar);
 			break;
 			
