@@ -23,15 +23,20 @@
 #include "JNativeEvents.h"
 
 typedef struct {
+	jint modifiers;		//Key Mask
 	jint keycode;		//Key Code
+	jchar keychar;		//Key Char
 	jint location;		//Key Location
-} JKeyCode;
+} JKeyDatum;
 
-unsigned int JKeycodeToNative(JKeyCode jkey);
-JKeyCode NativeToJKeycode(unsigned int keycode);
+typedef struct {
+	jint modifiers;		//Key Mask
+	jint button;		//Key Code
+} JButtonDatum;
+
+
+JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state);
 
 jint NativeToJButton(unsigned int button);
-unsigned int JButtonToNative(jint button);
 
-unsigned int JModifierToNative(jint modifier);
 jint NativeToJModifier(unsigned int modifier);

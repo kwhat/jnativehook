@@ -161,9 +161,9 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	int event_root_x = data->event.u.keyButtonPointer.rootX;
 	int event_root_y = data->event.u.keyButtonPointer.rootY;
 	int event_time = hook->server_time;
-	unsigned int keysym;
+	KeySym keysym, keychar;
 
-	JKeyCode jkey;
+	JKeyDatum jkey;
 	jint jbutton;
 	jint modifiers;
 	jclass clsKeyEvent, clsMouseEvent;
@@ -180,14 +180,29 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
-			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
-			//printf("KeyCode: %i %c\nKeySym: %i %c\n%i\n", event_code, event_code, keysym, keysym, event_mask);
+			if ()
 
-			unsigned long i1 = 0;
-			for (i1 = 0; i1 < hook->data_len; i1++)
-				printf("%X", hook->data[i1]);
-			printf("\t%c\n", keysym);
-			jkey = NativeToJKeycode(keysym);
+			KeySym lower_keysym, upper_keysym;
+			XConvertCase(keysym, &lower_keysym, &upper_keysym);
+
+			if (event_mask & KeyButMaskLock && lower_keysym != upper_keysym) {
+				if (event_mask & KeyButMaskShift) {
+					keysym = lower_keysym;
+				}
+				else {
+					keysym = upper_keysym;
+				}
+			}
+			else if (event_mask & KeyButMaskShift) {
+				keysym = XKeycodeToKeysym(disp_data, event_code, 1);
+			}
+			else {
+				keysym = XKeycodeToKeysym(disp_data, event_code, 0);
+			}
+
+			printf("%c\t%s\n", keysym, XKeysymToString(keysym));
+
+			jkey = NativeToJKeyCode(keysym, event_mask);
 			modifiers = 0;
 			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
 			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
@@ -210,7 +225,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 
 			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
-			jkey = NativeToJKeycode(keysym);
+			jkey = NativeToJKeyCode(keysym, event_mask);
 			modifiers = 0;
 			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
 			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);

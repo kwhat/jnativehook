@@ -229,4 +229,5 @@
 #define JK_ALT_GRAPH					0xFF7E
 #define JK_BEGIN						0xFF58
 
-#define JK_UNDEFINED					0x0		//Key Undefined
+#define JK_CHAR_UNDEFINED				0xFFFF; // KeyCode Has No Unicode Mapping
+#define JK_UNDEFINED					0x0		// KeyCode Unknown

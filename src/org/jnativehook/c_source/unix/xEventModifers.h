@@ -19,9 +19,9 @@
 #define KeyButMaskLock			2
 #define KeyButMaskControl		4
 #define KeyButMaskMod1			8		// Alt Mask
-#define KeyButMaskMod2			16
-#define KeyButMaskMod3			32
-#define KeyButMaskMod4			64		// Win Mask
+#define KeyButMaskMod2			16		// Number Lock Mask
+#define KeyButMaskMod3			32		// ??? Kana Lock Mask ???
+#define KeyButMaskMod4			64		// Meta Mask
 #define KeyButMaskMod5			128
 #define KeyButMaskButton1		256
 #define KeyButMaskButton2		512
