@@ -32,6 +32,25 @@ public class NativeMouseEvent extends NativeInputEvent {
 	private int y;
 	private int button;
 
+	/** Indicates no mouse buttons; used by getButton(). */
+	public static final int	NOBUTTON = 0x00;
+	
+	/** Indicates mouse button #1; used by getButton(). */
+	public static final int	BUTTON1 = 0x01;
+	
+	/** Indicates mouse button #2; used by getButton(). */
+	public static final int	BUTTON2 = 0x02;
+	
+	/** Indicates mouse button #3; used by getButton(). */
+	public static final int	BUTTON3 = 0x03;
+	
+	/** Indicates mouse button #4; used by getButton(). */
+	public static final int	BUTTON4 = 0x04;
+	
+	/** Indicates mouse button #5; used by getButton(). */
+	public static final int	BUTTON5 = 0x05;
+	
+	//TODO Javadoc
 	public static final int NATIVE_MOUSE_FIRST = 2500;
 	public static final int NATIVE_MOUSE_LAST = 2507;
 	public static final int NATIVE_MOUSE_CLICKED = NATIVE_MOUSE_FIRST;

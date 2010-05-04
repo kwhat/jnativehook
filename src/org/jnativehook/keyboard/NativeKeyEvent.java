@@ -61,21 +61,44 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int NATIVE_KEY_RELEASED = 2 + NATIVE_KEY_FIRST;
 
 	/** VK_0 thru VK_9 are the same as ASCII '0' thru '9' (0x30 - 0x39) */
-	public static final int VK_0 = KeyEvent.VK_0;
-	public static final int VK_1 = KeyEvent.VK_1;
-	public static final int VK_2 = KeyEvent.VK_2;
-	public static final int VK_3 = KeyEvent.VK_3;
-	public static final int VK_4 = KeyEvent.VK_4;
-	public static final int VK_5 = KeyEvent.VK_5;
-	public static final int VK_6 = KeyEvent.VK_6;
-	public static final int VK_7 = KeyEvent.VK_7;
-	public static final int VK_8 = KeyEvent.VK_8;
-	public static final int VK_9 = KeyEvent.VK_9;
+	public static final int VK_0 = 0x30;
+	public static final int VK_1 = 0x31;
+	public static final int VK_2 = 0x32;
+	public static final int VK_3 = 0x33;
+	public static final int VK_4 = 0x34;
+	public static final int VK_5 = 0x35;
+	public static final int VK_6 = 0x36;
+	public static final int VK_7 = 0x37;
+	public static final int VK_8 = 0x39;
+	public static final int VK_9 = 0x39;
 	
-	
-	public static final int VK_TAB = KeyEvent.VK_TAB;
-	public static final int VK_CAPS_LOCK = KeyEvent.VK_CAPS_LOCK;
-	
+	/** VK_A thru VK_Z are the same as ASCII 'A' thru 'Z' (0x41 - 0x5A) */
+	public static final int VK_A = 0x41;
+	public static final int VK_B = 0x42;
+	public static final int VK_C = 0x43;
+	public static final int VK_D = 0x44;
+	public static final int VK_E = 0x45;
+	public static final int VK_F = 0x46;
+	public static final int VK_G = 0x47;
+	public static final int VK_H = 0x48;
+	public static final int VK_I = 0x49;
+	public static final int VK_J = 0x4A;
+	public static final int VK_K = 0x4B;
+	public static final int VK_L = 0x4C;
+	public static final int VK_M = 0x4D;
+	public static final int VK_N = 0x4E;
+	public static final int VK_O = 0x4F;
+	public static final int VK_P = 0x50;
+	public static final int VK_Q = 0x51;
+	public static final int VK_R = 0x52;
+	public static final int VK_S = 0x53;
+	public static final int VK_T = 0x54;
+	public static final int VK_U = 0x55;
+	public static final int VK_V = 0x56;
+	public static final int VK_W = 0x57;
+	public static final int VK_X = 0x58;
+	public static final int VK_Y = 0x59;
+	public static final int VK_Z = 0x5A;
 	
 	public static final int VK_SHIFT = KeyEvent.VK_SHIFT;
 	public static final int VK_CONTROL = KeyEvent.VK_CONTROL;
@@ -83,39 +106,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_CONTEXT_MENU = KeyEvent.VK_CONTEXT_MENU;
 	public static final int VK_ALT = KeyEvent.VK_ALT;
 	
-	
-	/** VK_A thru VK_Z are the same as ASCII 'A' thru 'Z' (0x41 - 0x5A) */
-	public static final int VK_A = KeyEvent.VK_A;
-	public static final int VK_B = KeyEvent.VK_B;
-	public static final int VK_C = KeyEvent.VK_C;
-	public static final int VK_D = KeyEvent.VK_D;
-	public static final int VK_E = KeyEvent.VK_E;
-	public static final int VK_F = KeyEvent.VK_F;
-	public static final int VK_G = KeyEvent.VK_G;
-	public static final int VK_H = KeyEvent.VK_H;
-	public static final int VK_I = KeyEvent.VK_I;
-	public static final int VK_J = KeyEvent.VK_J;
-	public static final int VK_K = KeyEvent.VK_K;
-	public static final int VK_L = KeyEvent.VK_L;
-	public static final int VK_M = KeyEvent.VK_M;
-	public static final int VK_N = KeyEvent.VK_N;
-	public static final int VK_O = KeyEvent.VK_O;
-	public static final int VK_P = KeyEvent.VK_P;
-	public static final int VK_Q = KeyEvent.VK_Q;
-	public static final int VK_R = KeyEvent.VK_R;
-	public static final int VK_S = KeyEvent.VK_S;
-	public static final int VK_T = KeyEvent.VK_T;
-	public static final int VK_U = KeyEvent.VK_U;
-	public static final int VK_V = KeyEvent.VK_V;
-	public static final int VK_W = KeyEvent.VK_W;
-	public static final int VK_X = KeyEvent.VK_X;
-	public static final int VK_Y = KeyEvent.VK_Y;
-	public static final int VK_Z = KeyEvent.VK_Z;
+	public static final int VK_TAB = KeyEvent.VK_TAB;
+	public static final int VK_CAPS_LOCK = KeyEvent.VK_CAPS_LOCK;
 	
 	public static final int VK_SPACE = KeyEvent.VK_SPACE;
 	
-	//FIXME Tilde??? public static final int VK_ = KeyEvent.vk_
-	//FIXME dash??? public static final int VK_ = KeyEvent.vk_
+	public static final int VK_BACK_QUOTE = KeyEvent.VK_BACK_QUOTE;
+	public static final int VK_MINUS = KeyEvent.VK_MINUS;
 	public static final int VK_EQUALS = KeyEvent.VK_EQUALS;
 	
 	public static final int VK_OPEN_BRACKET = KeyEvent.VK_OPEN_BRACKET;
@@ -170,6 +167,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_PAGE_UP = KeyEvent.VK_PAGE_UP;
 	public static final int VK_PAGE_DOWN = KeyEvent.VK_PAGE_DOWN;
 	
+	public static final int VK_BEGIN = KeyEvent.VK_BEGIN;
+	
 	public static final int VK_UP = KeyEvent.VK_UP;
 	public static final int VK_DOWN = KeyEvent.VK_DOWN;
 	public static final int VK_LEFT = KeyEvent.VK_LEFT;
@@ -197,6 +196,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_MULTIPLY = KeyEvent.VK_MULTIPLY;
 	public static final int VK_SUBTRACT = KeyEvent.VK_SUBTRACT;
 	public static final int VK_PLUS = KeyEvent.VK_PLUS;
+	public static final int VK_DECIMAL = KeyEvent.VK_DECIMAL;
 	
 	
 	/**

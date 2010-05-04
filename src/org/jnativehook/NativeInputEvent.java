@@ -9,6 +9,20 @@ public class NativeInputEvent extends EventObject {
 	private long when;
 	private int modifiers;
 	
+	//InputEvent Values Used.
+	public static int SHIFT_MASK	= 1;
+	public static int CTRL_MASK		= 2;
+	public static int META_MASK		= 4;
+	public static int ALT_MASK		= 8; 
+	
+	//Custom Values
+	public static int BUTTON1_MASK	= 16;
+	public static int BUTTON2_MASK	= 32;
+	public static int BUTTON3_MASK	= 64;
+	public static int BUTTON4_MASK	= 128;
+	public static int BUTTON5_MASK	= 256;
+	
+	
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
 		
