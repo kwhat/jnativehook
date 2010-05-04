@@ -42,10 +42,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** The virtual key location. */
 	private int keyLocation;
 	
-	/** The first number in the range of ids used for native key events. */
+	
+	public static final char CHAR_UNDEFINED = KeyEvent.CHAR_UNDEFINED; 
+	
+	/** The first number in the range of id's used for native key events. */
 	public static final int NATIVE_KEY_FIRST = 2400;
 	
-	/** The last number in the range of ids used for native key events. */
+	/** The last number in the range of id's used for native key events. */
 	public static final int NATIVE_KEY_LAST = 2402;
 	
 	/** The "native key typed" event id. */
@@ -57,6 +60,144 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** The "native key released" event id. */
 	public static final int NATIVE_KEY_RELEASED = 2 + NATIVE_KEY_FIRST;
 
+	/** VK_0 thru VK_9 are the same as ASCII '0' thru '9' (0x30 - 0x39) */
+	public static final int VK_0 = KeyEvent.VK_0;
+	public static final int VK_1 = KeyEvent.VK_1;
+	public static final int VK_2 = KeyEvent.VK_2;
+	public static final int VK_3 = KeyEvent.VK_3;
+	public static final int VK_4 = KeyEvent.VK_4;
+	public static final int VK_5 = KeyEvent.VK_5;
+	public static final int VK_6 = KeyEvent.VK_6;
+	public static final int VK_7 = KeyEvent.VK_7;
+	public static final int VK_8 = KeyEvent.VK_8;
+	public static final int VK_9 = KeyEvent.VK_9;
+	
+	
+	public static final int VK_TAB = KeyEvent.VK_TAB;
+	public static final int VK_CAPS_LOCK = KeyEvent.VK_CAPS_LOCK;
+	
+	
+	public static final int VK_SHIFT = KeyEvent.VK_SHIFT;
+	public static final int VK_CONTROL = KeyEvent.VK_CONTROL;
+	public static final int VK_META = KeyEvent.VK_META;
+	public static final int VK_CONTEXT_MENU = KeyEvent.VK_CONTEXT_MENU;
+	public static final int VK_ALT = KeyEvent.VK_ALT;
+	
+	
+	/** VK_A thru VK_Z are the same as ASCII 'A' thru 'Z' (0x41 - 0x5A) */
+	public static final int VK_A = KeyEvent.VK_A;
+	public static final int VK_B = KeyEvent.VK_B;
+	public static final int VK_C = KeyEvent.VK_C;
+	public static final int VK_D = KeyEvent.VK_D;
+	public static final int VK_E = KeyEvent.VK_E;
+	public static final int VK_F = KeyEvent.VK_F;
+	public static final int VK_G = KeyEvent.VK_G;
+	public static final int VK_H = KeyEvent.VK_H;
+	public static final int VK_I = KeyEvent.VK_I;
+	public static final int VK_J = KeyEvent.VK_J;
+	public static final int VK_K = KeyEvent.VK_K;
+	public static final int VK_L = KeyEvent.VK_L;
+	public static final int VK_M = KeyEvent.VK_M;
+	public static final int VK_N = KeyEvent.VK_N;
+	public static final int VK_O = KeyEvent.VK_O;
+	public static final int VK_P = KeyEvent.VK_P;
+	public static final int VK_Q = KeyEvent.VK_Q;
+	public static final int VK_R = KeyEvent.VK_R;
+	public static final int VK_S = KeyEvent.VK_S;
+	public static final int VK_T = KeyEvent.VK_T;
+	public static final int VK_U = KeyEvent.VK_U;
+	public static final int VK_V = KeyEvent.VK_V;
+	public static final int VK_W = KeyEvent.VK_W;
+	public static final int VK_X = KeyEvent.VK_X;
+	public static final int VK_Y = KeyEvent.VK_Y;
+	public static final int VK_Z = KeyEvent.VK_Z;
+	
+	public static final int VK_SPACE = KeyEvent.VK_SPACE;
+	
+	//FIXME Tilde??? public static final int VK_ = KeyEvent.vk_
+	//FIXME dash??? public static final int VK_ = KeyEvent.vk_
+	public static final int VK_EQUALS = KeyEvent.VK_EQUALS;
+	
+	public static final int VK_OPEN_BRACKET = KeyEvent.VK_OPEN_BRACKET;
+	public static final int VK_CLOSE_BRACKET = KeyEvent.VK_CLOSE_BRACKET;
+	public static final int VK_BACK_SLASH = KeyEvent.VK_BACK_SLASH;
+	
+	public static final int VK_SEMICOLON = KeyEvent.VK_SEMICOLON;
+	public static final int VK_QUOTE = KeyEvent.VK_QUOTE;
+	public static final int VK_ENTER = KeyEvent.VK_ENTER;
+	
+	public static final int VK_COMMA = KeyEvent.VK_COMMA;
+	public static final int VK_PERIOD = KeyEvent.VK_PERIOD;
+	public static final int VK_SLASH = KeyEvent.VK_SLASH;
+	
+	public static final int VK_ESCAPE = KeyEvent.VK_ESCAPE;
+	public static final int VK_BACK_SPACE = KeyEvent.VK_BACK_SPACE;
+	
+	/** Constants for the F1 thru F24 function keys. */
+	public static final int VK_F1 = KeyEvent.VK_F1;
+	public static final int VK_F2 = KeyEvent.VK_F2;
+	public static final int VK_F3 = KeyEvent.VK_F3;
+	public static final int VK_F4 = KeyEvent.VK_F4;
+	public static final int VK_F5 = KeyEvent.VK_F5;
+	public static final int VK_F6 = KeyEvent.VK_F6;
+	public static final int VK_F7 = KeyEvent.VK_F7;
+	public static final int VK_F8 = KeyEvent.VK_F8;
+	public static final int VK_F9 = KeyEvent.VK_F9;
+	public static final int VK_F10 = KeyEvent.VK_F10;
+	public static final int VK_F11 = KeyEvent.VK_F11;
+	public static final int VK_F12 = KeyEvent.VK_F12;
+	public static final int VK_F13 = KeyEvent.VK_F13;
+	public static final int VK_F14 = KeyEvent.VK_F14;
+	public static final int VK_F15 = KeyEvent.VK_F15;
+	public static final int VK_F16 = KeyEvent.VK_F16;
+	public static final int VK_F17 = KeyEvent.VK_F17;
+	public static final int VK_F18 = KeyEvent.VK_F18;
+	public static final int VK_F19 = KeyEvent.VK_F19;
+	public static final int VK_F20 = KeyEvent.VK_F20;
+	public static final int VK_F21 = KeyEvent.VK_F21;
+	public static final int VK_F22 = KeyEvent.VK_F22;
+	public static final int VK_F23 = KeyEvent.VK_F23;
+	public static final int VK_F24 = KeyEvent.VK_F24;
+	
+	public static final int VK_PRINTSCREEN = KeyEvent.VK_PRINTSCREEN;
+	public static final int VK_SCROLL_LOCK = KeyEvent.VK_SCROLL_LOCK;
+	public static final int VK_PAUSE = KeyEvent.VK_PAUSE;
+	
+	public static final int VK_INSERT = KeyEvent.VK_INSERT;
+	public static final int VK_DELETE = KeyEvent.VK_DELETE;
+	public static final int VK_HOME = KeyEvent.VK_HOME;
+	public static final int VK_END = KeyEvent.VK_END;
+	public static final int VK_PAGE_UP = KeyEvent.VK_PAGE_UP;
+	public static final int VK_PAGE_DOWN = KeyEvent.VK_PAGE_DOWN;
+	
+	public static final int VK_UP = KeyEvent.VK_UP;
+	public static final int VK_DOWN = KeyEvent.VK_DOWN;
+	public static final int VK_LEFT = KeyEvent.VK_LEFT;
+	public static final int VK_RIGHT = KeyEvent.VK_RIGHT;
+	
+	
+	public static final int VK_NUMPAD0 = KeyEvent.VK_NUMPAD0;
+	public static final int VK_NUMPAD1 = KeyEvent.VK_NUMPAD1;
+	public static final int VK_NUMPAD2 = KeyEvent.VK_NUMPAD2;
+	public static final int VK_NUMPAD3 = KeyEvent.VK_NUMPAD3;
+	public static final int VK_NUMPAD4 = KeyEvent.VK_NUMPAD4;
+	public static final int VK_NUMPAD5 = KeyEvent.VK_NUMPAD5;
+	public static final int VK_NUMPAD6 = KeyEvent.VK_NUMPAD6;
+	public static final int VK_NUMPAD7 = KeyEvent.VK_NUMPAD7;
+	public static final int VK_NUMPAD8 = KeyEvent.VK_NUMPAD8;
+	public static final int VK_NUMPAD9 = KeyEvent.VK_NUMPAD9;
+	
+	public static final int VK_KP_UP = KeyEvent.VK_KP_UP;
+	public static final int VK_KP_DOWN = KeyEvent.VK_KP_DOWN;
+	public static final int VK_KP_LEFT = KeyEvent.VK_KP_LEFT;
+	public static final int VK_KP_RIGHT = KeyEvent.VK_KP_RIGHT;
+	
+	public static final int VK_NUM_LOCK = KeyEvent.VK_NUM_LOCK;
+	public static final int VK_DIVIDE = KeyEvent.VK_DIVIDE;
+	public static final int VK_MULTIPLY = KeyEvent.VK_MULTIPLY;
+	public static final int VK_SUBTRACT = KeyEvent.VK_SUBTRACT;
+	public static final int VK_PLUS = KeyEvent.VK_PLUS;
+	
 	
 	/**
 	 * Instantiates a new native key event.
