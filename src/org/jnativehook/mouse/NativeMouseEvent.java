@@ -16,7 +16,6 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.event.MouseEvent;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
  
@@ -32,35 +31,37 @@ public class NativeMouseEvent extends NativeInputEvent {
 	private int y;
 	private int button;
 
+	//TODO Javadoc
+	public static final int NATIVE_MOUSE_FIRST		= 2500;
+	public static final int NATIVE_MOUSE_LAST		= 2507;
+	public static final int NATIVE_MOUSE_CLICKED	= NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_PRESSED	= 1 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_RELEASED	= 2 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_MOVED		= 3 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_ENTERED	= 4 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_EXITED		= 5 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_DRAGGED	= 6 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_WHEEL		= 7 + NATIVE_MOUSE_FIRST; 
+
+	
 	/** Indicates no mouse buttons; used by getButton(). */
-	public static final int	NOBUTTON = 0x00;
+	public static final int	NOBUTTON	= 0;
 	
 	/** Indicates mouse button #1; used by getButton(). */
-	public static final int	BUTTON1 = 0x01;
+	public static final int	BUTTON1		= 1;
 	
 	/** Indicates mouse button #2; used by getButton(). */
-	public static final int	BUTTON2 = 0x02;
+	public static final int	BUTTON2		= 2;
 	
 	/** Indicates mouse button #3; used by getButton(). */
-	public static final int	BUTTON3 = 0x03;
+	public static final int	BUTTON3		= 3;
 	
 	/** Indicates mouse button #4; used by getButton(). */
-	public static final int	BUTTON4 = 0x04;
+	public static final int	BUTTON4		= 4;
 	
 	/** Indicates mouse button #5; used by getButton(). */
-	public static final int	BUTTON5 = 0x05;
+	public static final int	BUTTON5		= 5;
 	
-	//TODO Javadoc
-	public static final int NATIVE_MOUSE_FIRST = 2500;
-	public static final int NATIVE_MOUSE_LAST = 2507;
-	public static final int NATIVE_MOUSE_CLICKED = NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_PRESSED = 1 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_RELEASED = 2 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_MOVED = 3 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_ENTERED = 4 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_EXITED = 5 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_DRAGGED = 6 + NATIVE_MOUSE_FIRST;
-	public static final int NATIVE_MOUSE_WHEEL = 7 + NATIVE_MOUSE_FIRST; 
 	
 	/**
 	 * Instantiates a new native mouse event.
@@ -92,7 +93,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 */
 	//TODO clickCount
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y) {
-		this(id, when, modifiers, x, y, MouseEvent.NOBUTTON);
+		this(id, when, modifiers, x, y, NOBUTTON);
 	}
 
 	public int getButton() {
@@ -105,10 +106,6 @@ public class NativeMouseEvent extends NativeInputEvent {
 
 	public int getX() {
 		return x;
-	}
-	
-	public static String getMouseModifiersText(int modifiers) {
-		return MouseEvent.getMouseModifiersText(modifiers);
 	}
 	
 	public String  paramString() {
@@ -157,11 +154,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 		param += "button=" + button + ",";
 		
 		if (getModifiers() != 0) {
-			param += "modifiers=" + getMouseModifiersText(getModifiers()) + ",";
-		}
-		
-		if (getModifiersEx() != 0) {
-			param += "extModifiers=" + getModifiersExText(getModifiersEx()) + ",";
+			param += "modifiers=" + getModifiersText(getModifiers()) + ",";
 		}
 		
 		param = param.substring(0, param.length() - 1);

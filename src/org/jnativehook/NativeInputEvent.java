@@ -1,6 +1,6 @@
 package org.jnativehook;
 
-import java.awt.event.InputEvent;
+import java.awt.Toolkit;
 import java.util.EventObject;
 
 public class NativeInputEvent extends EventObject {
@@ -35,13 +35,67 @@ public class NativeInputEvent extends EventObject {
 		return this.modifiers;
 	}
 	
-	public static String getModifiersExText(int modifiers) {
-		return InputEvent.getModifiersExText(modifiers);
+	/**
+	 * Gets the key modifiers text.
+	 *
+	 * @param modifiers - the modifier keys down during event (shift, ctrl, alt, meta).
+	 * @return the key modifiers text
+	 */
+	public static String getModifiersText(int modifiers) {
+		String param = "";
+		
+		if ((modifiers & NativeInputEvent.SHIFT_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.shift", "Shift") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.CTRL_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.control", "Ctrl") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.META_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.meta", "Meta") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.ALT_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.alt", "Alt") + "+";
+		}
+		
+		
+		
+		if ((modifiers & NativeInputEvent.BUTTON1_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.button1", "Button1") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.BUTTON2_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.button2", "Button2") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.BUTTON3_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.button3", "Button1") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.BUTTON4_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.button4", "Button1") + "+";
+		}
+		
+		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
+			param += Toolkit.getProperty("AWT.button5", "Button1") + "+";
+		}
+		
+		if (param.length() > 0) {
+			//Remove the trailing '+'
+			param.substring(0, param.length() - 1);
+		}
+		
+		return param;
 	}
+	
 	
 	public void setModifiers(int modifiers) {
 		this.modifiers = modifiers;
 	}
+	
+	
 	
 	public int getId() {
 		return id;
