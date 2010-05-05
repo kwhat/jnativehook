@@ -32,13 +32,7 @@ public class NativeInputEvent extends EventObject {
 	}
 
 	public int getModifiers() {
-		//Return the lower 7 bits of the modifier mask
-		return this.modifiers & 0x3F;
-	}
-	
-	public int getModifiersEx() {
-		//Return the lower 7 bits of the modifier mask
-		return this.modifiers & ~0x3F;
+		return this.modifiers;
 	}
 	
 	public static String getModifiersExText(int modifiers) {

@@ -14,28 +14,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //Refernce: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java
+//http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED
 
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
 #define JK_TAB							'\t'
-#define JK_CLEAR						0x03
-#define JK_CANCEL						0x0C
+
+//#define JK_CLEAR						0x03
+//#define JK_CANCEL						0x0C
 #define JK_SHIFT						0x10
 #define JK_CONTROL						0x11
 #define JK_ALT							0x12	//option-alt key
+#define JK_META							0x9D	//osx: command
+//#define JK_WINDOWS					0x020C
+#define JK_CONTEXT_MENU					0x020D
+
 #define JK_PAUSE						0x13
 #define JK_CAPS_LOCK					0x14
 #define JK_ESCAPE						0x1B
 #define JK_SPACE						0x20
-#define JK_PAGE_UP						0x21
-#define JK_PAGE_DOWN					0x22
-#define JK_HOME							0x24
-#define JK_END							0x23
 
-#define JK_LEFT							0x25
 #define JK_UP							0x26
-#define JK_RIGHT						0x27
 #define JK_DOWN							0x28
+#define JK_LEFT							0x25
+#define JK_RIGHT						0x27
 
 #define JK_COMMA						0x2C	// ','
 #define JK_MINUS						0x2D	// '-'
@@ -97,11 +99,15 @@
 #define JK_NUMPAD7						0x67
 #define JK_NUMPAD8						0x68
 #define JK_NUMPAD9						0x69
+
+#define JK_KP_UP						0xE0
+#define JK_KP_DOWN						0xE1
+#define JK_KP_LEFT						0xE2
+#define JK_KP_RIGHT						0xE3
+
 #define JK_MULTIPLY						0x6A
 #define JK_ADD							0x6B
-
-#define JK_SEPARATOR					0x6C
-
+//#define JK_SEPARATOR					0x6C
 #define JK_SUBTRACT						0x6D
 #define JK_DECIMAL						0x6E
 #define JK_DIVIDE						0x6F
@@ -138,19 +144,19 @@
 
 #define JK_PRINTSCREEN					0x9A
 #define JK_INSERT						0x9B
-#define JK_HELP							0x9C
-#define JK_META							0x9D	//osx: command
+//#define JK_HELP						0x9C
+
+#define JK_PAGE_UP						0x21
+#define JK_PAGE_DOWN					0x22
+#define JK_HOME							0x24
+#define JK_END							0x23
 
 #define JK_BACK_QUOTE					0xC0
 #define JK_QUOTE						0xDE
 
-#define JK_KP_UP						0xE0
-#define JK_KP_DOWN						0xE1
-#define JK_KP_LEFT						0xE2
-#define JK_KP_RIGHT						0xE3
-
 
 /* For European keyboards */
+/* not implemented yet
 #define JK_DEAD_GRAVE					0x80
 #define JK_DEAD_ACUTE					0x81
 #define JK_DEAD_CIRCUMFLEX				0x82
@@ -167,32 +173,32 @@
 #define JK_DEAD_IOTA					0x8D
 #define JK_DEAD_VOICED_SOUND			0x8E
 #define JK_DEAD_SEMIVOICED_SOUND		0x8F
+*/
 
-#define JK_AMPERSAND					0x96
-#define JK_ASTERISK						0x97
-#define JK_QUOTEDBL						0x98
-#define JK_LESS							0x99
-#define JK_GREATER						0xA0
-#define JK_BRACELEFT					0xA1
-#define JK_BRACERIGHT					0xA2
+//#define JK_AMPERSAND					0x96
+//#define JK_ASTERISK					0x97
+//#define JK_QUOTEDBL					0x98
+//#define JK_LESS						0x99
+//#define JK_GREATER					0xA0
+//#define JK_BRACELEFT					0xA1
+//#define JK_BRACERIGHT					0xA2
 
-#define JK_AT							0x0200
-#define JK_COLON						0x0201
-#define JK_CIRCUMFLEX					0x0202
-#define JK_DOLLAR						0x0203
-#define JK_EURO_SIGN					0x0204
-#define JK_EXCLAMATION_MARK				0x0205
-#define JK_INVERTED_EXCLAMATION_MARK	0x0206
-#define JK_LEFT_PARENTHESIS				0x0207
-#define JK_NUMBER_SIGN					0x0208
-#define JK_PLUS							0x0209
-#define JK_RIGHT_PARENTHESIS			0x020A
-#define JK_UNDERSCORE					0x020B
+//#define JK_AT							0x0200
+//#define JK_COLON						0x0201
+//#define JK_CIRCUMFLEX					0x0202
+//#define JK_DOLLAR						0x0203
+//#define JK_EURO_SIGN					0x0204
+//#define JK_EXCLAMATION_MARK			0x0205
+//#define JK_INVERTED_EXCLAMATION_MARK	0x0206
+//#define JK_LEFT_PARENTHESIS			0x0207
+//#define JK_NUMBER_SIGN				0x0208
+//#define JK_PLUS							0x0209
+//#define JK_RIGHT_PARENTHESIS			0x020A
+//#define JK_UNDERSCORE					0x020B
 
-#define JK_WINDOWS						0x020C
-#define JK_CONTEXT_MENU					0x020D
 
 /* for input method support on Asian Keyboards */
+/* not implemented yet
 #define JK_FINAL						0x0018	//Unknown Win32 API
 #define JK_CONVERT						0x001C
 #define JK_NONCONVERT					0x001D
@@ -214,8 +220,10 @@
 #define JK_JAPANESE_ROMAN				0x0105
 #define JK_KANA_LOCK					0x0106
 #define JK_INPUT_METHOD_ON_OFF			0x0107
+*/
 
 /* for Sun keyboards */
+/* not implemented yet
 #define JK_CUT							0xFFD1
 #define JK_COPY							0xFFCD
 #define JK_PASTE						0xFFCF
@@ -224,10 +232,10 @@
 #define JK_FIND							0xFFD0
 #define JK_PROPS						0xFFCA
 #define JK_STOP							0xFFC8
+*/
 
-#define JK_COMPOSE						0xFF20
-#define JK_ALT_GRAPH					0xFF7E
+//#define JK_COMPOSE					0xFF20
+//#define JK_ALT_GRAPH					0xFF7E
 #define JK_BEGIN						0xFF58
 
-#define JK_CHAR_UNDEFINED				0xFFFF; // KeyCode Has No Unicode Mapping
 #define JK_UNDEFINED					0x0		// KeyCode Unknown
