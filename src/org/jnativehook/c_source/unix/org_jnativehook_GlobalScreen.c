@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,8 +20,6 @@
  *
  *	JNI Interface for setting a Keyboard Hook and monitoring
  *	it with java.
- *
- *  TODO Add LGPL License
  */
 
 /*
@@ -133,6 +131,23 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 	return 0;
 }
 
+int doModifierConvert(int event_mask) {
+	int modifiers = 0;
+
+	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
+	if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
+	if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
+	if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+
+	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
+	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
+
+	return modifiers;
+}
+
 void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 	if (hook->category != XRecordFromServer && hook->category != XRecordFromClient) {
@@ -178,40 +193,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-			if ()
-
-			KeySym lower_keysym, upper_keysym;
-			XConvertCase(keysym, &lower_keysym, &upper_keysym);
-
-			if (event_mask & KeyButMaskLock && lower_keysym != upper_keysym) {
-				if (event_mask & KeyButMaskShift) {
-					keysym = lower_keysym;
-				}
-				else {
-					keysym = upper_keysym;
-				}
-			}
-			else if (event_mask & KeyButMaskShift) {
-				keysym = XKeycodeToKeysym(disp_data, event_code, 1);
-			}
-			else {
-				keysym = XKeycodeToKeysym(disp_data, event_code, 0);
-			}
-
-			printf("%c\t%s\n", keysym, XKeysymToString(keysym));
-
-			jkey = NativeToJKeyCode(keysym, event_mask);
-			modifiers = 0;
-			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
+			jkey = NativeToJKey(keysym);
+			modifiers = doModifierConvert(event_mask);
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, keysym, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -222,24 +212,20 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			keysym = XKeycodeToKeysym(disp_data, event_code, 0);
-			jkey = NativeToJKeyCode(keysym, event_mask);
-			modifiers = 0;
-			if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-			if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-			if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-			if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+			jkey = NativeToJKey(keysym);
+			modifiers = doModifierConvert(event_mask);
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 
 			//Fire key typed event.
 			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, keysym, JK_UNDEFINED, (jchar) jkey.keycode, JK_LOCATION_UNKNOWN);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, keysym, JK_UNDEFINED, JK_LOCATION_UNKNOWN);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
@@ -253,14 +239,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			jbutton = NativeToJButton(event_code);
-			modifiers = 0;
-			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			/*
-			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
-			*/
+			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse released event.
 			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
@@ -278,14 +257,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			jbutton = NativeToJButton(event_code);
-			modifiers = 0;
-			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			/*
-			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
-			*/
+			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse released event.
 			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
@@ -307,14 +279,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
-			modifiers = 0;
-			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			/*
-			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
-			*/
+			modifiers = doModifierConvert(event_mask);
 
 			//ID for pressed, typed and released call backs
 			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
@@ -369,7 +334,7 @@ void MsgLoop() {
 	XRecordRange * range = XRecordAllocRange();
 	if (range == NULL) {
 		throwException("org/jnativehook/NativeHookException", "Could not allocate XRecordRange");
-		return; //Naturaly exit so jni exception is thrown.
+		return; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -384,7 +349,7 @@ void MsgLoop() {
 	XFree(range);
 	if (context == 0) {
 		throwException("org/jnativehook/NativeHookException", "Could not create XRecordContext");
-		return; //Naturaly exit so jni exception is thrown.
+		return; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -411,7 +376,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		#endif
 
 		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturaly exit so jni exception is thrown.
+		return -1; //Naturally exit so jni exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -427,7 +392,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 		#endif
 
 		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat delay.");
-		return -1; //Naturaly exit so jni exception is thrown.
+		return -1; //Naturally exit so jni exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -478,7 +443,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		throwException("org/jnativehook/NativeHookException", exceptoin_msg);
 		free(exceptoin_msg);
 
-		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -490,7 +455,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	int major, minor;
 	if (!XRecordQueryVersion(disp_hook, &major, &minor)) {
 		throwException("org/jnativehook/NativeHookException", "XRecord is not currently available");
-		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -498,7 +463,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#endif
 	}
 
-	//enable detectable autorepate.
+	//enable detectable autorepeat.
 	Bool isAutoRepeat;
 	XkbSetDetectableAutoRepeat(disp_data, true, &isAutoRepeat);
 	if (!isAutoRepeat) {
@@ -521,7 +486,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
-		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG

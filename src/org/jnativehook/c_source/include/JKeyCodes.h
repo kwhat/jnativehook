@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java
+//Reference: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java
 //http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED
 
 #define JK_ENTER						'\n'
@@ -26,7 +26,7 @@
 #define JK_CONTROL						0x11
 #define JK_ALT							0x12	//option-alt key
 #define JK_META							0x9D	//osx: command
-//#define JK_WINDOWS					0x020C
+#define JK_WINDOWS						0x020C
 #define JK_CONTEXT_MENU					0x020D
 
 #define JK_PAUSE						0x13
@@ -175,27 +175,30 @@
 #define JK_DEAD_SEMIVOICED_SOUND		0x8F
 */
 
-//#define JK_AMPERSAND					0x96
-//#define JK_ASTERISK					0x97
-//#define JK_QUOTEDBL					0x98
-//#define JK_LESS						0x99
-//#define JK_GREATER					0xA0
-//#define JK_BRACELEFT					0xA1
-//#define JK_BRACERIGHT					0xA2
+/*
+#define JK_AMPERSAND					0x96
+#define JK_ASTERISK						0x97
+#define JK_QUOTEDBL						0x98
+#define JK_LESS							0x99
+#define JK_GREATER						0xA0
+#define JK_BRACELEFT					0xA1
+#define JK_BRACERIGHT					0xA2
+*/
 
-//#define JK_AT							0x0200
-//#define JK_COLON						0x0201
-//#define JK_CIRCUMFLEX					0x0202
-//#define JK_DOLLAR						0x0203
-//#define JK_EURO_SIGN					0x0204
-//#define JK_EXCLAMATION_MARK			0x0205
-//#define JK_INVERTED_EXCLAMATION_MARK	0x0206
-//#define JK_LEFT_PARENTHESIS			0x0207
-//#define JK_NUMBER_SIGN				0x0208
-//#define JK_PLUS							0x0209
-//#define JK_RIGHT_PARENTHESIS			0x020A
-//#define JK_UNDERSCORE					0x020B
-
+/*
+#define JK_AT							0x0200
+#define JK_COLON						0x0201
+#define JK_CIRCUMFLEX					0x0202
+#define JK_DOLLAR						0x0203
+#define JK_EURO_SIGN					0x0204
+#define JK_EXCLAMATION_MARK				0x0205
+#define JK_INVERTED_EXCLAMATION_MARK	0x0206
+#define JK_LEFT_PARENTHESIS				0x0207
+#define JK_NUMBER_SIGN					0x0208
+#define JK_PLUS							0x0209
+#define JK_RIGHT_PARENTHESIS			0x020A
+#define JK_UNDERSCORE					0x020B
+*/
 
 /* for input method support on Asian Keyboards */
 /* not implemented yet
@@ -232,10 +235,10 @@
 #define JK_FIND							0xFFD0
 #define JK_PROPS						0xFFCA
 #define JK_STOP							0xFFC8
+#define JK_COMPOSE						0xFF20
+#define JK_ALT_GRAPH					0xFF7E
 */
 
-//#define JK_COMPOSE					0xFF20
-//#define JK_ALT_GRAPH					0xFF7E
 #define JK_BEGIN						0xFF58
 
 #define JK_UNDEFINED					0x0		// KeyCode Unknown

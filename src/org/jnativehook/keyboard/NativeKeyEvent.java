@@ -69,8 +69,11 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_CONTROL				= 0x11;
 	public static final int VK_ALT					= 0x12;
 	
-	/** Constant for the Windows, Meta, or Command key. */
+	/** Constant for the Meta, or Command key. */
 	public static final int VK_META					= 0x9D;
+	
+	/** Constant for the Microsoft Windows key. */
+	public static final int VK_WINDOWS				= 0x020C;
 	
 	/** Constant for the Microsoft Windows Context Menu key. */
 	public static final int VK_CONTEXT_MENU			= 0x020D;

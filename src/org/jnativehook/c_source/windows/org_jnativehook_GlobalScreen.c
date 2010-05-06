@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -94,6 +94,23 @@ void throwException(char * classname, char * message) {
 	}
 }
 
+int doModifierConvert() {
+	int modifiers = 0;
+
+	if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
+	if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
+	if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
+	if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
+
+
+	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
+	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
+
+	return modifiers;
+}
 
 LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
@@ -116,7 +133,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	unsigned int vk_code = 0;
 	unsigned int modifiers = 0;
 
-	JKeyCode jkey;
+	JKeyDatum jkey;
 	jint jbutton;
 	jclass clsKeyEvent, clsMouseEvent;
 	jmethodID idKeyEvent, idMouseEvent;
@@ -131,7 +148,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)	setModifierMask(MOD_LSHIFT);
@@ -143,7 +160,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
 			if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
-			jkey = NativeToJKeycode(kbhook->vkCode);
+			jkey = NativeToJKey(kbhook->vkCode);
 			modifiers = 0;
 			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
@@ -152,7 +169,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -164,7 +181,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Class and Constructor for the NativeKeyEvent Object
 			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)	unsetModifierMask(MOD_LSHIFT);
@@ -176,7 +193,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
 			if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
-			jkey = NativeToJKeycode(kbhook->vkCode);
+			jkey = NativeToJKey(kbhook->vkCode);
 			modifiers = 0;
 			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
 			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
@@ -185,12 +202,12 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 
 			//Fire key typed event.
 			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, (jchar) jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 

@@ -5,7 +5,7 @@ directly extends Java's mouse and keyboard listeners to provide easy
 integration.
 
 *** License ***
-Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  
 JNativeHook is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

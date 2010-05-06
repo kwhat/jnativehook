@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,19 +23,19 @@
 #include "JNativeEvents.h"
 
 typedef struct {
-	jint modifiers;		//Key Mask
+	jint modifiers;		//Mod Mask
 	jint keycode;		//Key Code
-	jchar keychar;		//Key Char
+	jchar rawcode;		//Raw Code
 	jint location;		//Key Location
 } JKeyDatum;
 
 typedef struct {
-	jint modifiers;		//Key Mask
-	jint button;		//Key Code
+	jint modifiers;		//Mod Mask
+	jint button;		//Btn Code
 } JButtonDatum;
 
 
-JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state);
+JKeyDatum NativeToJKey(unsigned int keysym);
 
 jint NativeToJButton(unsigned int button);
 

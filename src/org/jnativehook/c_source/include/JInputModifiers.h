@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -13,8 +13,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//Refernce: ${JAVA_HOME}/src.zip/java/awt/event/InputEvent.java
 
+//Reference: ${JAVA_HOME}/src.zip/java/awt/event/InputEvent.java
 #define JK_SHIFT_MASK			1
 #define JK_CTRL_MASK			2
 #define JK_META_MASK			4

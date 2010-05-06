@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -20,9 +21,9 @@
 #include "include/JConvertToNative.h"
 #include "xEventModifers.h"
 
-JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
+JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
-	jkey.keychar = JK_CHAR_UNDEFINED;
+	jkey.rawcode = keysym;
 	jkey.location = JK_LOCATION_STANDARD;
 
 	KeySym lower_keysym, upper_keysym;
@@ -44,19 +45,25 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_ALT;							return jkey;
 		case XK_Alt_R:
 			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_ALT;							return jkey;
+		case XK_Meta_L:
+			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_META;							return jkey;
+		case XK_Meta_R:
+			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_META;							return jkey;
+		case XK_Super_L:
+			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;
+		case XK_Super_R:
+			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;
+		case XK_Menu:									jkey.keycode = JK_CONTEXT_MENU;					return jkey;
+
 		case XK_Pause:									jkey.keycode = JK_PAUSE;						return jkey;
 		case XK_Caps_Lock:								jkey.keycode = JK_CAPS_LOCK;					return jkey;
 		case XK_Escape:									jkey.keycode = JK_ESCAPE;						return jkey;
 		case XK_space:									jkey.keycode = JK_SPACE;						return jkey;
-		case XK_Page_Up:								jkey.keycode = JK_PAGE_UP;						return jkey;
-		case XK_Page_Down:								jkey.keycode = JK_PAGE_DOWN;					return jkey;
-		case XK_Home:									jkey.keycode = JK_HOME;							return jkey;
-		case XK_End:									jkey.keycode = JK_END;							return jkey;
 
-		case XK_Left:									jkey.keycode = JK_LEFT;							return jkey;
-		case XK_Right:									jkey.keycode = JK_RIGHT;						return jkey;
 		case XK_Up:										jkey.keycode = JK_UP;							return jkey;
 		case XK_Down:									jkey.keycode = JK_DOWN;							return jkey;
+		case XK_Left:									jkey.keycode = JK_LEFT;							return jkey;
+		case XK_Right:									jkey.keycode = JK_RIGHT;						return jkey;
 
 		case XK_comma:									jkey.keycode = JK_COMMA;						return jkey;
 		case XK_minus:									jkey.keycode = JK_MINUS;						return jkey;
@@ -108,6 +115,7 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_backslash:								jkey.keycode = JK_BACK_SLASH;					return jkey;
 		case XK_bracketright:							jkey.keycode = JK_CLOSE_BRACKET;				return jkey;
 
+		//TODO KeyLocation needs to be number pad.
 		case XK_KP_0:									jkey.keycode = JK_NUMPAD0;						return jkey;
 		case XK_KP_1:									jkey.keycode = JK_NUMPAD1;						return jkey;
 		case XK_KP_2:									jkey.keycode = JK_NUMPAD2;						return jkey;
@@ -118,11 +126,15 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_KP_7:									jkey.keycode = JK_NUMPAD7;						return jkey;
 		case XK_KP_8:									jkey.keycode = JK_NUMPAD8;						return jkey;
 		case XK_KP_9:									jkey.keycode = JK_NUMPAD9;						return jkey;
+
+		case XK_KP_Up:									jkey.keycode = JK_KP_UP;						return jkey;
+		case XK_KP_Down:								jkey.keycode = JK_KP_DOWN;						return jkey;
+		case XK_KP_Left:								jkey.keycode = JK_KP_LEFT;						return jkey;
+		case XK_KP_Right:								jkey.keycode = JK_KP_RIGHT;						return jkey;
+
 		case XK_KP_Multiply:							jkey.keycode = JK_MULTIPLY;						return jkey;
 		case XK_KP_Add:									jkey.keycode = JK_ADD;							return jkey;
-
-		case XK_KP_Separator:							jkey.keycode = JK_SEPARATOR;					return jkey;
-
+		//case XK_KP_Separator:							jkey.keycode = JK_SEPARATOR;					return jkey;
 		case XK_KP_Subtract:							jkey.keycode = JK_SUBTRACT;						return jkey;
 		case XK_KP_Decimal:								jkey.keycode = JK_DECIMAL;						return jkey;
 		case XK_KP_Divide:								jkey.keycode = JK_DIVIDE;						return jkey;
@@ -142,6 +154,7 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_F10:									jkey.keycode = JK_F10;							return jkey;
 		case XK_F11:									jkey.keycode = JK_F11;							return jkey;
 		case XK_F12:									jkey.keycode = JK_F12;							return jkey;
+
 		case XK_F13:									jkey.keycode = JK_F13;							return jkey;
 		case XK_F14:									jkey.keycode = JK_F14;							return jkey;
 		case XK_F15:									jkey.keycode = JK_F15;							return jkey;
@@ -157,19 +170,17 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 
 		case XK_Print:									jkey.keycode = JK_PRINTSCREEN;					return jkey;
 		case XK_Insert:									jkey.keycode = JK_INSERT;						return jkey;
-		case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
-		case XK_Meta_L:
-			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_META;							return jkey;
-		case XK_Meta_R:
-			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_META;							return jkey;
+		//case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
+
+		case XK_Page_Up:								jkey.keycode = JK_PAGE_UP;						return jkey;
+		case XK_Page_Down:								jkey.keycode = JK_PAGE_DOWN;					return jkey;
+		case XK_Home:									jkey.keycode = JK_HOME;							return jkey;
+		case XK_End:									jkey.keycode = JK_END;							return jkey;
+
 		case XK_quoteright:								jkey.keycode = JK_QUOTE;						return jkey;
 		case XK_asciitilde:								jkey.keycode = JK_BACK_QUOTE;					return jkey;
 
-		case XK_KP_Up:									jkey.keycode = JK_KP_UP;						return jkey;
-		case XK_KP_Down:								jkey.keycode = JK_KP_DOWN;						return jkey;
-		case XK_KP_Left:								jkey.keycode = JK_KP_LEFT;						return jkey;
-		case XK_KP_Right:								jkey.keycode = JK_KP_RIGHT;						return jkey;
-
+		/*
 		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;
 		case XK_dead_acute:								jkey.keycode = JK_DEAD_ACUTE;					return jkey;
 		case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;
@@ -186,7 +197,9 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_dead_iota:								jkey.keycode = JK_DEAD_IOTA;					return jkey;
 		case XK_dead_voiced_sound:						jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;
 		case XK_dead_semivoiced_sound:					jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;
+		 */
 
+		/*
 		case XK_ampersand:								jkey.keycode = JK_AMPERSAND;					return jkey;
 		case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;
 		case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;
@@ -194,7 +207,9 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_greater:								jkey.keycode = JK_GREATER;						return jkey;
 		case XK_braceleft:								jkey.keycode = JK_BRACELEFT;					return jkey;
 		case XK_braceright:								jkey.keycode = JK_BRACERIGHT;					return jkey;
+		 */
 
+		/*
 		case XK_at:										jkey.keycode = JK_AT;							return jkey;
 		case XK_colon:									jkey.keycode = JK_COLON;						return jkey;
 		case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;
@@ -207,14 +222,11 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_plus:									jkey.keycode = JK_PLUS;							return jkey;
 		case XK_parenright:								jkey.keycode = JK_RIGHT_PARENTHESIS;			return jkey;
 		case XK_underscore:								jkey.keycode = JK_UNDERSCORE;					return jkey;
+		*/
 
-		case XK_Super_L:
-			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;
-		case XK_Super_R:
-			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;
-		case XK_Menu:									jkey.keycode = JK_CONTEXT_MENU;					return jkey;
 
 		/* for input method support on Asian Keyboards */
+		/*
 		case XK_Cancel:									jkey.keycode = JK_FINAL;						return jkey;
 		case XK_Henkan:									jkey.keycode = JK_CONVERT;						return jkey;
 		case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;
@@ -236,8 +248,10 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case XK_Romaji:									jkey.keycode = JK_JAPANESE_ROMAN;				return jkey;
 		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;
 		//case XK_VoidSymbol:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;
+		 */
 
 		/* for Sun keyboards */
+		/*
 		case SunXK_Cut:									jkey.keycode = JK_CUT;							return jkey;
 		case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;
 		case SunXK_Paste:								jkey.keycode = JK_PASTE;						return jkey;
@@ -245,10 +259,11 @@ JKeyDatum NativeToJKeyCode(unsigned int keysym, unsigned int state) {
 		case SunXK_Again:								jkey.keycode = JK_AGAIN;						return jkey;
 		case SunXK_Find:								jkey.keycode = JK_FIND;							return jkey;
 		case SunXK_Props:								jkey.keycode = JK_PROPS;						return jkey;
-		//case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;
-
+		case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;
 		case SunXK_Compose:								jkey.keycode = JK_COMPOSE;						return jkey;
-		//case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;
+		case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;
+		*/
+
 		case XK_Begin:									jkey.keycode = JK_BEGIN;						return jkey;
 
 		default:
@@ -274,6 +289,13 @@ jint NativeToJModifier(unsigned int modifier) {
 		case KeyButMaskControl:							return JK_CTRL_MASK;
 		case KeyButMaskMod4:							return JK_META_MASK;
 		case KeyButMaskMod1:							return JK_ALT_MASK;
+
+		case KeyButMaskButton1:							return JK_BUTTON1_MASK;
+		case KeyButMaskButton2:							return JK_BUTTON2_MASK;
+		case KeyButMaskButton3:							return JK_BUTTON3_MASK;
+		case KeyButMaskButton4:							return JK_BUTTON4_MASK;
+		case KeyButMaskButton5:							return JK_BUTTON5_MASK;
+
 		default: 										return 0;
 	}
 }

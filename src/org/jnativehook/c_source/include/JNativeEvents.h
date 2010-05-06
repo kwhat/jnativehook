@@ -1,4 +1,4 @@
-/* Copyright (c) 2007-2010 - Alex Barker (alex@1stleg.com)
+/* Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -13,14 +13,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-//Refernce: org/jnativehook/keyboard/NativeKeyEvent.java
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
 #define JK_NATIVE_KEY_FIRST			2400
 #define JK_NATIVE_KEY_LAST			2402
 #define JK_NATIVE_KEY_TYPED			JK_NATIVE_KEY_FIRST
 #define JK_NATIVE_KEY_PRESSED		1 + JK_NATIVE_KEY_FIRST
 #define JK_NATIVE_KEY_RELEASED		2 + JK_NATIVE_KEY_FIRST
 
-//Refernce: org/jnativehook/mouse/NativeMouseEvent.java
+//Reference: org/jnativehook/mouse/NativeMouseEvent.java
 #define JK_NATIVE_MOUSE_FIRST		2500
 #define JK_NATIVE_MOUSE_LAST		2507
 #define JK_NATIVE_MOUSE_CLICKED		JK_NATIVE_MOUSE_FIRST
