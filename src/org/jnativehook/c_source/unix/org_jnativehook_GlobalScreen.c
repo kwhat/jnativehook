@@ -222,11 +222,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
-
-			//Fire key typed event.
-			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, keysym, JK_UNDEFINED, JK_LOCATION_UNKNOWN);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
 		case ButtonPress:
@@ -263,11 +258,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
-
-			//Fire mouse clicked event.
-			jmethodID idFireMouseClicked = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseClicked", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseClicked, objKeyEvent);
 		break;
 
 		case MotionNotify:

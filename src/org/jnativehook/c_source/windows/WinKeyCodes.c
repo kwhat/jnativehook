@@ -23,19 +23,16 @@
 #include <string.h>
 #include "WinKeyCodes.h"
 
-unsigned char modifiers = 0x00;
+unsigned int modifiers = 0x0000;
 
-void setModifierMask(unsigned char mod) {
+void setModifierMask(unsigned int mod) {
 	modifiers |= mod;
 }
 
-void unsetModifierMask(unsigned char mod) {
+void unsetModifierMask(unsigned int mod) {
 	modifiers ^= mod;
 }
 
-bool isModifierMask(unsigned char mod) {
-	unsigned char left_mask = modifiers >> 4;
-	unsigned char right_mask = modifiers & 0x0F;
-
-	return (left_mask | right_mask) & mod;
+bool isModifierMask(unsigned int mod) {
+	return modifiers & mod;
 }

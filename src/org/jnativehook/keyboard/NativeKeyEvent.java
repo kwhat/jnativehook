@@ -45,7 +45,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** The last number in the range of id's used for native key events. */
 	public static final int NATIVE_KEY_LAST			= 2402;
 	
-	/** The "native key typed" event id. */
+	/** The "native key typed" event id. This event id is not currently implemented. */
 	public static final int NATIVE_KEY_TYPED		= NATIVE_KEY_FIRST;
 	
 	/** The "native key pressed" event id. */
@@ -224,15 +224,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode) {
 		super(GlobalScreen.getInstance(), id, when, modifiers);
 		
-		if (id == NativeKeyEvent.NATIVE_KEY_TYPED) {
-			if (keyCode != VK_UNDEFINED) {
-				throw new IllegalArgumentException("invalid keyCode");
-			}
-			else if (keyLocation != KEY_LOCATION_UNKNOWN) {
-				throw new IllegalArgumentException("invalid keyLocation");
-			}
-		}
-		
 		this.rawCode = rawCode;
 		this.keyCode = keyCode;
 	}
@@ -369,6 +360,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VK_CONTROL:		return Toolkit.getProperty("AWT.control", "Control");
 			case VK_ALT:			return Toolkit.getProperty("AWT.alt", "Alt");
 			case VK_META:			return Toolkit.getProperty("AWT.meta", "Meta");
+			case VK_WINDOWS:		return Toolkit.getProperty("AWT.windows", "Windows");
 			case VK_CONTEXT_MENU:	return Toolkit.getProperty("AWT.context", "Context Menu");
 
 			case VK_PAUSE:			return Toolkit.getProperty("AWT.pause", "Pause");

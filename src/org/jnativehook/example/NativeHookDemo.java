@@ -57,6 +57,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		txtEventInfo.setEditable(false);
 		txtEventInfo.setBackground(new Color(0xFF, 0xFF, 0xFF));
 		txtEventInfo.setForeground(new Color(0x00, 0x00, 0x00));
+		txtEventInfo.setText("");
 		JScrollPane scrollPane = new JScrollPane(txtEventInfo);
 		scrollPane.setPreferredSize(new Dimension(375, 125));
 		
@@ -76,12 +77,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		this.requestFocusInWindow();	
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
-	public void keyTyped(NativeKeyEvent e) {
-		displayEventInfo(e);
-	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
@@ -94,13 +89,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(NativeKeyEvent e) {
-		displayEventInfo(e);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
-	public void mouseClicked(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	

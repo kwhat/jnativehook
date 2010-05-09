@@ -116,15 +116,6 @@ public class GlobalScreen {
 		}
 	}
 	
-	protected void fireKeyTyped(NativeKeyEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				((NativeKeyListener) objListeners[i + 1]).keyTyped(e);
-			}
-		}
-	}
-	
 	protected void fireKeyReleased(NativeKeyEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
 		for ( int i = 0; i < objListeners.length; i += 2 ) {
@@ -148,15 +139,6 @@ public class GlobalScreen {
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
 				((NativeMouseListener) objListeners[i + 1]).mousePressed(e);
-			}
-		}
-	}
-	
-	protected void fireMouseClicked(NativeMouseEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				((NativeMouseListener) objListeners[i + 1]).mouseClicked(e);
 			}
 		}
 	}

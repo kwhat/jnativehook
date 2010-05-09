@@ -170,6 +170,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		case XK_Print:									jkey.keycode = JK_PRINTSCREEN;					return jkey;
 		case XK_Insert:									jkey.keycode = JK_INSERT;						return jkey;
+		//FIXME XK_Delete:								jkey.keycode = JK_DELETE;						return jkey;
 		//case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
 
 		case XK_Page_Up:								jkey.keycode = JK_PAGE_UP;						return jkey;
@@ -177,8 +178,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_Home:									jkey.keycode = JK_HOME;							return jkey;
 		case XK_End:									jkey.keycode = JK_END;							return jkey;
 
-		case XK_quoteright:								jkey.keycode = JK_QUOTE;						return jkey;
-		case XK_asciitilde:								jkey.keycode = JK_BACK_QUOTE;					return jkey;
+		case XK_apostrophe:								jkey.keycode = JK_QUOTE;						return jkey;
+		case XK_grave:									jkey.keycode = JK_BACK_QUOTE;					return jkey;
 
 		/*
 		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;
@@ -296,6 +297,6 @@ jint NativeToJModifier(unsigned int modifier) {
 		case KeyButMaskButton4:							return JK_BUTTON4_MASK;
 		case KeyButMaskButton5:							return JK_BUTTON5_MASK;
 
-		default: 										return 0;
+		default: 										return JK_UNDEFINED;
 	}
 }

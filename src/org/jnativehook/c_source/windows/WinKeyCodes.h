@@ -16,15 +16,28 @@
 
 #include <stdbool.h>
 
-#define MOD_RALT		MOD_ALT
-#define MOD_RCONTROL	MOD_CONTROL
-#define MOD_RSHIFT		MOD_SHIFT
-#define MOD_RWIN		MOD_WIN
-#define MOD_LALT		MOD_ALT		<< 4
-#define MOD_LCONTROL	MOD_CONTROL << 4
-#define MOD_LSHIFT		MOD_SHIFT	<< 4
-#define MOD_LWIN		MOD_WIN		<< 4
+/* Windows does not track the button masks of its events so we need to do it
+ * manually.  The left and right masks solve the problem of if both control
+ * keys are depressed a the same time and only one is removed we should still
+ * have a control mask but the key up event would have reset that.
+ */
 
-void setModifierMask(unsigned char mod);
-void unsetModifierMask(unsigned char mod);
-bool isModifierMask(unsigned char mod);
+#define MOD_LALT		MOD_ALT				// 1
+#define MOD_LCONTROL	MOD_CONTROL			// 2
+#define MOD_LSHIFT		MOD_SHIFT			// 4
+#define MOD_LWIN		MOD_WIN				// 8
+
+#define MOD_RALT		MOD_ALT		<< 4	// 16
+#define MOD_RCONTROL	MOD_CONTROL << 4	// 32
+#define MOD_RSHIFT		MOD_SHIFT	<< 4	// 64
+#define MOD_RWIN		MOD_WIN		<< 4	// 128
+
+#define MOD_RBUTTON		256
+#define MOD_LBUTTON		512
+#define MOD_MBUTTON		1024
+#define MOD_XBUTTON1	2048
+#define MOD_XBUTTON2	4096
+
+void setModifierMask(unsigned int mod);
+void unsetModifierMask(unsigned int mod);
+bool isModifierMask(unsigned int mod);

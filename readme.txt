@@ -45,27 +45,26 @@ Windows:
 		Java JDK 1.5 or later
 		MinGW 5.0 or later
 			MinGW base tools
-			g++ compiler
 			MinGW Make
 		
 	Setup:
 		Make sure that you install MinGW, Java JDK and Ant to a location that 
 		does not have spaces in the path.  For example:
-			c:\MinGW
-			c:\Java\jdk1.6.0_16
-			c:\Java\jre6
-			c:\ant
+			C:\MinGW
+			C:\Java\jdk1.6.0_16
+			C:\Java\jre6
+			C:\ant
 		
 		After installing all the dependencies you will need to add a few 
 		environment variables.  Open the System Properties dialog and navigate 
 		to the Advanced tab.  Click the Environment Variables button and then 
 		locate the Environment Variables dialog.  Click the new button to add 
 		the following variables and their respective locations:
-			ANT_HOME=c:\Ant
-			JAVA_HOME=c:\Java\jdk1.6.0_16
+			ANT_HOME=C:\Ant\apache-ant-1.8.1
+			JAVA_HOME=C:\Java\jdk1.6.0_20
 		
 		Now edit the Path variable and append the following:
-			c:\MinGW\bin\;%ANT_HOME%\bin\;%JAVA_HOME%\bin\
+			C:\MinGW\bin;%ANT_HOME%\bin;%JAVA_HOME%\bin
 
 
 Mac OS X:

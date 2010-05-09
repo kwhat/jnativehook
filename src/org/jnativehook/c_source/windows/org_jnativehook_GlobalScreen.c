@@ -94,23 +94,30 @@ void throwException(char * classname, char * message) {
 	}
 }
 
-int doModifierConvert() {
-	int modifiers = 0;
+jint getModifiers() {
+	jint modifiers = 0;
 
-	if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-	if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
-	if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
-	if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
+	if (isModifierMask(MOD_LSHIFT) || isModifierMask(MOD_RSHIFT))
+		modifiers |= NativeToJModifier(MOD_SHIFT);
 
+	if (isModifierMask(MOD_LCONTROL) || isModifierMask(MOD_RCONTROL))
+		modifiers |= NativeToJModifier(MOD_CONTROL);
 
-	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
+	if (isModifierMask(MOD_LALT) || isModifierMask(MOD_RALT))
+		modifiers |= NativeToJModifier(MOD_ALT);
+
+	if (isModifierMask(MOD_LWIN) || isModifierMask(MOD_RWIN))
+		modifiers |= NativeToJModifier(MOD_WIN);
+
+	if (isModifierMask(MOD_LBUTTON))	modifiers |= NativeToJModifier(MOD_LBUTTON);
+	if (isModifierMask(MOD_RBUTTON))	modifiers |= NativeToJModifier(MOD_RBUTTON);
+	if (isModifierMask(MOD_MBUTTON))	modifiers |= NativeToJModifier(MOD_MBUTTON);
+	if (isModifierMask(MOD_XBUTTON1))	modifiers |= NativeToJModifier(MOD_XBUTTON1);
+	if (isModifierMask(MOD_XBUTTON2))	modifiers |= NativeToJModifier(MOD_XBUTTON2);
 
 	return modifiers;
 }
+
 
 LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
@@ -151,21 +158,17 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			//Check and setup modifiers
-			if (kbhook->vkCode == VK_LSHIFT)	setModifierMask(MOD_LSHIFT);
-			if (kbhook->vkCode == VK_RSHIFT)	setModifierMask(MOD_RSHIFT);
-			if (kbhook->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
-			if (kbhook->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
-			if (kbhook->vkCode == VK_LMENU)		setModifierMask(MOD_LALT);
-			if (kbhook->vkCode == VK_RMENU)		setModifierMask(MOD_RALT);
-			if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
-			if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
+			if (kbhook->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
+			else if (kbhook->vkCode == VK_RSHIFT)	setModifierMask(MOD_RSHIFT);
+			else if (kbhook->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
+			else if (kbhook->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
+			else if (kbhook->vkCode == VK_LMENU)	setModifierMask(MOD_LALT);
+			else if (kbhook->vkCode == VK_RMENU)	setModifierMask(MOD_RALT);
+			else if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
+			else if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
 			jkey = NativeToJKey(kbhook->vkCode);
-			modifiers = 0;
-			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
-			if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
+			modifiers = getModifiers();
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
@@ -184,31 +187,22 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			//Check and setup modifiers
-			if (kbhook->vkCode == VK_LSHIFT)	unsetModifierMask(MOD_LSHIFT);
-			if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
-			if (kbhook->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
-			if (kbhook->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
-			if (kbhook->vkCode == VK_LMENU)		unsetModifierMask(MOD_LALT);
-			if (kbhook->vkCode == VK_RMENU)		unsetModifierMask(MOD_RALT);
-			if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
-			if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
+			if (kbhook->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
+			else if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
+			else if (kbhook->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
+			else if (kbhook->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
+			else if (kbhook->vkCode == VK_LMENU)	unsetModifierMask(MOD_LALT);
+			else if (kbhook->vkCode == VK_RMENU)	unsetModifierMask(MOD_RALT);
+			else if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
+			else if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
 			jkey = NativeToJKey(kbhook->vkCode);
-			modifiers = 0;
-			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
-			if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
+			modifiers = getModifiers();
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
-
-			//Fire key typed event.
-			jmethodID idFireKeyTyped = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyTyped", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->vkCode, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyTyped, objKeyEvent);
 		break;
 
 
@@ -219,19 +213,24 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_NCXBUTTONDOWN:
 			if (wParam == WM_LBUTTONDOWN) {
 				vk_code = VK_LBUTTON;
+				setModifierMask(MOD_LBUTTON);
 			}
 			else if (wParam == WM_RBUTTONDOWN) {
 				vk_code = VK_RBUTTON;
+				setModifierMask(MOD_RBUTTON);
 			}
 			else if (wParam == WM_MBUTTONDOWN) {
-				vk_code = VK_RBUTTON;
+				vk_code = VK_MBUTTON;
+				setModifierMask(MOD_MBUTTON);
 			}
 			else if (wParam == WM_XBUTTONDOWN || wParam == WM_NCXBUTTONDOWN) {
 				if (HIWORD(mshook->mouseData) == XBUTTON1) {
 					vk_code = VK_XBUTTON1;
+					setModifierMask(MOD_XBUTTON1);
 				}
 				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
 					vk_code = VK_XBUTTON2;
+					setModifierMask(MOD_XBUTTON2);
 				}
 			}
 
@@ -244,20 +243,11 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			jbutton = NativeToJButton(vk_code);
-			modifiers = 0;
-			/*
-			if (wParam & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (wParam & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (wParam & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			*/
-			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isModifierMask(MOD_CONTROL))		modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isModifierMask(MOD_ALT))			modifiers |= NativeToJModifier(MOD_ALT);
-			if (isModifierMask(MOD_WIN))			modifiers |= NativeToJModifier(MOD_WIN);
+			modifiers = getModifiers();
 
 			//Fire mouse released event.
 			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMousePressed, objMouseEvent);
 		break;
 
@@ -269,19 +259,24 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_NCXBUTTONUP:
 			if (wParam == WM_LBUTTONUP) {
 				vk_code = VK_LBUTTON;
+				unsetModifierMask(MOD_LBUTTON);
 			}
 			else if (wParam == WM_RBUTTONUP) {
 				vk_code = VK_RBUTTON;
+				unsetModifierMask(MOD_RBUTTON);
 			}
 			else if (wParam == WM_MBUTTONUP) {
-				vk_code = VK_RBUTTON;
+				vk_code = VK_MBUTTON;
+				unsetModifierMask(MOD_MBUTTON);
 			}
 			else if (wParam == WM_XBUTTONUP || wParam == WM_NCXBUTTONUP) {
 				if (HIWORD(mshook->mouseData) == XBUTTON1) {
 					vk_code = VK_XBUTTON1;
+					unsetModifierMask(MOD_XBUTTON1);
 				}
 				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
 					vk_code = VK_XBUTTON2;
+					unsetModifierMask(MOD_XBUTTON2);
 				}
 			}
 
@@ -294,26 +289,12 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			jbutton = NativeToJButton(vk_code);
-			modifiers = 0;
-			/*
-			if (wParam & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (wParam & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (wParam & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			 */
-			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
-			if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
+			modifiers = getModifiers();
 
 			//Fire mouse released event.
 			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
-
-			//Fire mouse clicked event.
-			jmethodID idFireMouseClicked = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseClicked", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_CLICKED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseClicked, objMouseEvent);
 		break;
 
 		case WM_MOUSEMOVE:
@@ -325,19 +306,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
-			modifiers = 0;
-			if (isModifierMask(MOD_SHIFT))		modifiers |= NativeToJModifier(MOD_SHIFT);
-			if (isModifierMask(MOD_CONTROL))	modifiers |= NativeToJModifier(MOD_CONTROL);
-			if (isModifierMask(MOD_ALT))		modifiers |= NativeToJModifier(MOD_ALT);
-			if (isModifierMask(MOD_WIN))		modifiers |= NativeToJModifier(MOD_WIN);
-
-			/*
-			if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-			if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-			if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-			if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-			if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
-			*/
+			modifiers = getModifiers();
 
 			//ID for pressed, typed and released call backs
 			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");

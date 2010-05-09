@@ -464,7 +464,7 @@
 		</copy>
 	</target>
 	
-	<target name="jar" depends="compile" description="Builds the required jar binaries">
+	<target name="jar" depends="compile" description="Creates the library jar file">
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
 		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.class}">
@@ -485,7 +485,7 @@
 	</target>
 	
 	
-	<target name="package" depends="jar" description="Builds the server binaries">
+	<target name="package" depends="jar" description="Creates zip files for distrobution">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
@@ -513,6 +513,6 @@
 	</target>
 	
 	
-	<target name="all" depends="package" description="builds all targets">
+	<target name="all" depends="jar" description="builds all targets">
 	</target>
 </project>

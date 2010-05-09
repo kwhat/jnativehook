@@ -19,6 +19,7 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 #include "include/JConvertToNative.h"
+#include "WinKeyCodes.h"
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
@@ -45,6 +46,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_LEFT; 			jkey.keycode = JK_WINDOWS; 						return jkey;
 		case VK_RWIN:
 			jkey.location = JK_LOCATION_RIGHT; 			jkey.keycode = JK_WINDOWS;						return jkey;
+		case VK_APPS:									jkey.keycode = JK_CONTEXT_MENU; 				return jkey;
 
 		case VK_PAUSE:									jkey.keycode = JK_PAUSE; 						return jkey;
 		case VK_CAPITAL:								jkey.keycode = JK_CAPS_LOCK; 					return jkey;
@@ -188,7 +190,6 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//case VK_OEM_PLUS:								jkey.keycode = JK_PLUS; 						return jkey;
 
 
-		//case VK_APPS:									jkey.keycode = JK_CONTEXT_MENU; 				return jkey;
 		//case VK_CANCEL:								jkey.keycode = JK_FINAL; 						return jkey;
 		//case VK_KANA:									jkey.keycode = JK_KANA; 						return jkey;
 		//case VK_KANJI:								jkey.keycode = JK_KANJI;						return jkey;
@@ -204,8 +205,8 @@ jint NativeToJButton (unsigned int button) {
 		case VK_MBUTTON:								return JBUTTON3;
 		case VK_XBUTTON1:								return JBUTTON4;
 		case VK_XBUTTON2:								return JBUTTON5;
-		default:
-		case 0x07:										return JNOBUTTON;
+
+		default:										return JNOBUTTON;
 	}
 }
 
@@ -215,6 +216,13 @@ jint NativeToJModifier(unsigned int mod) {
 		case MOD_CONTROL:								return JK_CTRL_MASK;
 		case MOD_WIN:									return JK_META_MASK;
 		case MOD_ALT:									return JK_ALT_MASK;
+
+		case MOD_LBUTTON:								return JK_BUTTON1_MASK;
+		case MOD_RBUTTON:								return JK_BUTTON2_MASK;
+		case MOD_MBUTTON:								return JK_BUTTON3_MASK;
+		case MOD_XBUTTON1:								return JK_BUTTON4_MASK;
+		case MOD_XBUTTON2:								return JK_BUTTON5_MASK;
+
 		default:										return JK_UNDEFINED;
 	}
 }

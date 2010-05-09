@@ -31,12 +31,6 @@ import java.util.EventListener;
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
-	public void mouseClicked(NativeMouseEvent e);
-	
 	/* (non-Javadoc)
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
@@ -48,6 +42,7 @@ public interface NativeMouseListener extends EventListener {
 	public void mouseReleased(NativeMouseEvent e);
 	
 	//The following are only included to provide MouseListener compatibility.
+	//public void mouseClicked(NativeMouseEvent e);
 	//public void mouseEntered(MouseEvent e);
 	//public void mouseExited(MouseEvent e);
 }

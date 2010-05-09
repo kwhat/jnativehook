@@ -42,8 +42,6 @@ public interface NativeKeyListener extends EventListener {
 	 */
 	public void keyReleased(NativeKeyEvent e);
 	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
-	public void keyTyped(NativeKeyEvent e);
+	//The following are only included to provide MouseListener compatibility.
+	//public void keyTyped(NativeKeyEvent e);
 }
