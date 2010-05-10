@@ -339,7 +339,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VK_NUMPAD6:
 			case VK_NUMPAD7:
 			case VK_NUMPAD8:
-			case VK_NUMPAD9:		param += Toolkit.getProperty("AWT.numpad", "NumPad");
+			case VK_NUMPAD9:		param += Toolkit.getProperty("AWT.numpad", "NumPad") + " ";
+									keyCode -= 0x30; //Dirty subtraction to bring us back in range.
+									//FIXME should probably cleanup the above code because the 
+									//difference may not always be 0x30.
 			
 			case VK_0:
 			case VK_1:

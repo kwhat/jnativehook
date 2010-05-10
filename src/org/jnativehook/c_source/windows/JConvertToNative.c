@@ -149,6 +149,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR; 					return jkey;
 		case VK_SUBTRACT:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SUBTRACT; 					return jkey;
+		//case XK_KP_Enter:
+		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_ENTER;						return jkey;
 		case VK_DECIMAL:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DECIMAL; 						return jkey;
 		case VK_DIVIDE:

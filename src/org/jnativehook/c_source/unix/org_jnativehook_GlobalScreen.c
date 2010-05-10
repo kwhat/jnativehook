@@ -176,7 +176,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	int event_root_x = data->event.u.keyButtonPointer.rootX;
 	int event_root_y = data->event.u.keyButtonPointer.rootY;
 	int event_time = hook->server_time;
-	KeySym keysym, keychar;
+	KeySym keysym;
 
 	JKeyDatum jkey;
 	jint jbutton;
