@@ -115,32 +115,54 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_backslash:								jkey.keycode = JK_BACK_SLASH;					return jkey;
 		case XK_bracketright:							jkey.keycode = JK_CLOSE_BRACKET;				return jkey;
 
-		//TODO KeyLocation needs to be number pad.
-		case XK_KP_0:									jkey.keycode = JK_NUMPAD0;						return jkey;
-		case XK_KP_1:									jkey.keycode = JK_NUMPAD1;						return jkey;
-		case XK_KP_2:									jkey.keycode = JK_NUMPAD2;						return jkey;
-		case XK_KP_3:									jkey.keycode = JK_NUMPAD3;						return jkey;
-		case XK_KP_4:									jkey.keycode = JK_NUMPAD4;						return jkey;
-		case XK_KP_5:									jkey.keycode = JK_NUMPAD5;						return jkey;
-		case XK_KP_6:									jkey.keycode = JK_NUMPAD6;						return jkey;
-		case XK_KP_7:									jkey.keycode = JK_NUMPAD7;						return jkey;
-		case XK_KP_8:									jkey.keycode = JK_NUMPAD8;						return jkey;
-		case XK_KP_9:									jkey.keycode = JK_NUMPAD9;						return jkey;
+		case XK_KP_0:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD0;						return jkey;
+		case XK_KP_1:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD1;						return jkey;
+		case XK_KP_2:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD2;						return jkey;
+		case XK_KP_3:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD3;						return jkey;
+		case XK_KP_4:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD4;						return jkey;
+		case XK_KP_5:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD5;						return jkey;
+		case XK_KP_6:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD6;						return jkey;
+		case XK_KP_7:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD7;						return jkey;
+		case XK_KP_8:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD8;						return jkey;
+		case XK_KP_9:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD9;						return jkey;
 
-		case XK_KP_Up:									jkey.keycode = JK_KP_UP;						return jkey;
-		case XK_KP_Down:								jkey.keycode = JK_KP_DOWN;						return jkey;
-		case XK_KP_Left:								jkey.keycode = JK_KP_LEFT;						return jkey;
-		case XK_KP_Right:								jkey.keycode = JK_KP_RIGHT;						return jkey;
+		case XK_KP_Up:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_UP;						return jkey;
+		case XK_KP_Down:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_DOWN;						return jkey;
+		case XK_KP_Left:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_LEFT;						return jkey;
+		case XK_KP_Right:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_RIGHT;						return jkey;
 
-		case XK_KP_Multiply:							jkey.keycode = JK_MULTIPLY;						return jkey;
-		case XK_KP_Add:									jkey.keycode = JK_ADD;							return jkey;
-		//case XK_KP_Separator:							jkey.keycode = JK_SEPARATOR;					return jkey;
-		case XK_KP_Subtract:							jkey.keycode = JK_SUBTRACT;						return jkey;
-		case XK_KP_Decimal:								jkey.keycode = JK_DECIMAL;						return jkey;
-		case XK_KP_Divide:								jkey.keycode = JK_DIVIDE;						return jkey;
-		case XK_KP_Delete:								jkey.keycode = JK_DELETE;						return jkey;
-		case XK_Num_Lock:								jkey.keycode = JK_NUM_LOCK;						return jkey;
-		case XK_Scroll_Lock:							jkey.keycode = JK_SCROLL_LOCK;					return jkey;
+		case XK_KP_Multiply:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_MULTIPLY;						return jkey;
+		case XK_KP_Add:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_ADD;							return jkey;
+		//case XK_KP_Separator:
+		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR;					return jkey;
+		case XK_KP_Subtract:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SUBTRACT;						return jkey;
+		case XK_KP_Decimal:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DECIMAL;						return jkey;
+		case XK_KP_Divide:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DIVIDE;						return jkey;
+		case XK_KP_Delete:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DELETE;						return jkey;
+		case XK_Num_Lock:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUM_LOCK;						return jkey;
+		case XK_Scroll_Lock:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SCROLL_LOCK;					return jkey;
 
 		case XK_F1:										jkey.keycode = JK_F1;							return jkey;
 		case XK_F2:										jkey.keycode = JK_F2;							return jkey;
@@ -170,7 +192,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		case XK_Print:									jkey.keycode = JK_PRINTSCREEN;					return jkey;
 		case XK_Insert:									jkey.keycode = JK_INSERT;						return jkey;
-		//FIXME XK_Delete:								jkey.keycode = JK_DELETE;						return jkey;
+		case XK_Delete:									jkey.keycode = JK_DELETE;						return jkey;
 		//case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
 
 		case XK_Page_Up:								jkey.keycode = JK_PAGE_UP;						return jkey;
