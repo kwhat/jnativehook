@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 #undef org_jnativehook_GlobalScreen_serialVersionUID
-#define org_jnativehook_GlobalScreen_serialVersionUID 6504561173380322679LL
+#define org_jnativehook_GlobalScreen_serialVersionUID 6504561173380322679i64
 /* Inaccessible static: instance */
 /*
  * Class:     org_jnativehook_GlobalScreen
