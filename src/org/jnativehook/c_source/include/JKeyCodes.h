@@ -19,12 +19,11 @@
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
 #define JK_TAB							'\t'
-
-//#define JK_CLEAR						0x03
 //#define JK_CANCEL						0x0C
+
 #define JK_SHIFT						0x10
 #define JK_CONTROL						0x11
-#define JK_ALT							0x12	//option-alt key
+#define JK_ALT							0x12	//option or alt key
 #define JK_META							0x9D	//osx: command
 #define JK_WINDOWS						0x020C
 #define JK_CONTEXT_MENU					0x020D
@@ -113,6 +112,7 @@
 #define JK_DIVIDE						0x6F
 #define JK_DELETE						0x7F
 #define JK_NUM_LOCK						0x90
+#define JK_CLEAR						0x03	//osx: number lock
 #define JK_SCROLL_LOCK					0x91
 
 #define JK_F1							0x70
@@ -144,7 +144,7 @@
 
 #define JK_PRINTSCREEN					0x9A
 #define JK_INSERT						0x9B
-//#define JK_HELP						0x9C
+#define JK_HELP							0x9C
 
 #define JK_PAGE_UP						0x21
 #define JK_PAGE_DOWN					0x22

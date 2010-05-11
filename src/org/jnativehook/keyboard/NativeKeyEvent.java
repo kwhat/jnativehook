@@ -163,6 +163,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_DECIMAL				= 0x6E;
 	public static final int VK_DIVIDE				= 0x6F;
 	public static final int VK_DELETE				= 0x7F;
+	public static final int VK_CLEAR				= 0x03;
 	public static final int VK_NUM_LOCK				= 0x90;
 	public static final int VK_SCROLL_LOCK			= 0x91;
 	
@@ -196,6 +197,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	
 	public static final int VK_PRINTSCREEN			= 0x9A;
 	public static final int VK_INSERT				= 0x9B;
+	public static final int VK_HELP					= 0x9C;
 
 	public static final int VK_PAGE_UP				= 0x21;
 	public static final int VK_PAGE_DOWN			= 0x22;
@@ -400,6 +402,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VK_DIVIDE:			return Toolkit.getProperty("AWT.divide", "NumPad /");
 			case VK_DELETE:			return Toolkit.getProperty("AWT.delete", "Delete");
 			case VK_NUM_LOCK:		return Toolkit.getProperty("AWT.numLock", "Num Lock");
+			case VK_CLEAR:			return Toolkit.getProperty("AWT.clear", "Clear");
 			case VK_SCROLL_LOCK:	return Toolkit.getProperty("AWT.scrollLock", "Scroll Lock");
 			
 			case VK_F1:				return Toolkit.getProperty("AWT.f1", "F1");
@@ -430,6 +433,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			
 			case VK_PRINTSCREEN:	return Toolkit.getProperty("AWT.printScreen", "Print Screen");
 			case VK_INSERT:			return Toolkit.getProperty("AWT.insert", "Insert");
+			case VK_HELP:			return Toolkit.getProperty("AWT.help", "Help");
 			
 			case VK_PAGE_UP:		return Toolkit.getProperty("AWT.pgup", "Page Up");
 			case VK_PAGE_DOWN:		return Toolkit.getProperty("AWT.pgdn", "Page Down");

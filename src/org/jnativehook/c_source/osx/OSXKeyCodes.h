@@ -13,8 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 //Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
+//Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
+//TODO This is probably not needed, maybe just for undefined keycodes.
+/*
 #define AK_ENTER						0x24
 #define AK_BACK_SPACE					0x33
 #define AK_TAB							0x30
@@ -148,7 +150,7 @@
 //#define AK_KP_RIGHT						0x
 
 
-/* For European keyboards */
+// For European keyboards
 //#define AK_DEAD_GRAVE					0x
 //#define AK_DEAD_ACUTE					0x
 //#define AK_DEAD_CIRCUMFLEX			0x
@@ -190,7 +192,7 @@
 #define AK_WINDOWS						AK_ALT
 #define AK_CONTEXT_MENU					0x3A	//OPTION KEY
 
-/* for input method support on Asian Keyboards */
+// for input method support on Asian Keyboards
 //#define AK_FINAL						0x	//Unknown Win32 API
 //#define AK_CONVERT					0x
 //#define AK_NONCONVERT					0x
@@ -219,3 +221,4 @@
 //#define AK_BEGIN						0x
 
 #define AK_UNDEFINED					0xFF		//Key Undefined
+*/

@@ -416,7 +416,7 @@
 		<condition property="native.include" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.include" value="">
+		<condition property="native.include" value="-I${java.include} -F/System/Library/Frameworks/Carbon.framework/Frameworks/">
 			<isset property="native.os.isMac"/>
 		</condition>
 		

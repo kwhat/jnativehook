@@ -15,8 +15,8 @@
  */
 
 //I don't think these are defined anywhere by apple.
-#define kVK_LBUTTON					1;
-#define kVK_RBUTTON					2;
-#define kVK_MBUTTON					3;
-#define kVK_XBUTTON1				4;
-#define kVK_XBUTTON2				5;
+#define kVK_LBUTTON					1
+#define kVK_RBUTTON					2
+#define kVK_MBUTTON					3
+#define kVK_XBUTTON1				4
+#define kVK_XBUTTON2				5

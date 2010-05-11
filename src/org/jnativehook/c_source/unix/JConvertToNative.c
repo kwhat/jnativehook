@@ -33,6 +33,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_Return:									jkey.keycode = JK_ENTER;						return jkey;
 		case XK_BackSpace:								jkey.keycode = JK_BACK_SPACE;					return jkey;
 		case XK_Tab:									jkey.keycode = JK_TAB;							return jkey;
+
 		case XK_Shift_L:
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_SHIFT;						return jkey;
 		case XK_Shift_R:
@@ -164,6 +165,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DELETE;						return jkey;
 		case XK_Num_Lock:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUM_LOCK;						return jkey;
+		case XK_Clear:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_CLEAR;						return jkey;
 		case XK_Scroll_Lock:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SCROLL_LOCK;					return jkey;
 
