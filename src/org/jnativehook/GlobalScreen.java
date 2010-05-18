@@ -53,7 +53,7 @@ public class GlobalScreen {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
 		//TODO this needs to be passed in to java -D and not like this.
-		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
+		//System.setProperty("sun.awt.enableExtraMouseButtons", "true");
 		GlobalScreen.registerHook();
 	}
 	
@@ -154,60 +154,69 @@ public class GlobalScreen {
 	
 	protected static void registerHook() {
 		try {
-			//Try to locate the jar file
-			String sLoadPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "-" +	NativeSystem.getArchitecture().toString().toLowerCase();
-			File objCode = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
-			
-			if (objCode.isFile()) {
-				//Found the jar file to load.
-				ZipInputStream objZipInputStream = new ZipInputStream(new FileInputStream(objCode));
-				ZipEntry objEntry;
-				
-				while ( (objEntry = objZipInputStream.getNextEntry()) != null) {
-					if (!objEntry.isDirectory() && objEntry.getName().toLowerCase().startsWith( sLoadPath.toLowerCase() )) {
-						String sFileName = objEntry.getName().substring(objEntry.getName().lastIndexOf('/'));
-						File objLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + sFileName);
-						
-						FileOutputStream objTempLibOutputStream = new FileOutputStream(objLibFile);
-						byte[] array = new byte[8192];
-					    int read = 0;
-					    while ( (read = objZipInputStream.read(array)) > 0) {
-					    	objTempLibOutputStream.write(array, 0, read);
-					    }
-					    objTempLibOutputStream.close();
-					    
-					    objLibFile.deleteOnExit();
-					    System.load(objLibFile.getPath());
-					}
-				}
-				objZipInputStream.close();
-			}
-			else if (objCode.isDirectory()) {
-				//Probably IDE environment, possible manual unpack.
-				//Setup the java.library.path to the load path and attempt a lib load.
-				File objLibFolder = new File(objCode.getAbsoluteFile() + "/" + sLoadPath);
-				if (objLibFolder.isDirectory()) {
-					System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + objLibFolder.getPath());
-					
-					//Refresh the library path
-					Field objSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-					objSysPath.setAccessible(true);
-					if (objSysPath != null) {
-						objSysPath.set(System.class.getClassLoader(), null);
-					}
-					
-					//Try to load the native library
-					System.loadLibrary("JNativeHook");
-				}
-			}
+			//Try to load the native library assuming the java.library.path was
+			//set correctly at launch.
+			System.loadLibrary("JNativeHook");
 		}
-		catch (Throwable e) {
-			//Known exceptions are: NoSuchFieldException, IllegalArgumentException, IllegalAccessException, UnsatisfiedLinkError
-			throw new NativeHookException(e);
+		catch (UnsatisfiedLinkError linkError) {
+			//The library is not in the java.library.path so try to extract it.
+			try {
+				//Try to locate the jar file
+				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "-" +	NativeSystem.getArchitecture().toString().toLowerCase();
+				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
+				
+				if (classFile.isFile()) {
+					//Found the jar file to load.
+					ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(classFile));
+					ZipEntry zipEntry;
+					
+					while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
+						//Check all the entires for the lib path
+						if (!zipEntry.isDirectory() && zipEntry.getName().toLowerCase().startsWith( libPath.toLowerCase() )) {
+							String libName = zipEntry.getName().substring(zipEntry.getName().lastIndexOf('/'));
+							File libFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + libName);
+							
+							FileOutputStream tempLibOutputStream = new FileOutputStream(libFile);
+							byte[] array = new byte[8192];
+						    int read = 0;
+						    while ( (read = zipInputStream.read(array)) > 0) {
+						    	tempLibOutputStream.write(array, 0, read);
+						    }
+						    tempLibOutputStream.close();
+						    
+						    libFile.deleteOnExit();
+						    System.load(libFile.getPath());
+						}
+					}
+					zipInputStream.close();
+				}
+				else if (classFile.isDirectory()) {
+					//Probably IDE environment, possible manual unpack.
+					//Setup the java.library.path to the load path and attempt a lib load.
+					File libFolder = new File(classFile.getAbsoluteFile() + "/" + libPath);
+
+					if (libFolder.isDirectory()) {
+						System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + libFolder.getPath());
+						
+						//Refresh the library path
+						Field sysPath = ClassLoader.class.getDeclaredField("sys_paths");
+						sysPath.setAccessible(true);
+						if (sysPath != null) {
+							sysPath.set(System.class.getClassLoader(), null);
+						}
+						
+						//Try to load the native library
+						System.loadLibrary("JNativeHook");
+					}
+				}
+			}
+			catch (Exception e) {
+				throw new NativeHookException(e.getMessage(), e.getCause());
+			}
 		}
 	}
 	
 	protected static void unregisterHook() {
-		//GlobalScreen.deinitialize();
+		//Do Nothing
 	}
 }

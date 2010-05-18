@@ -53,7 +53,7 @@ Windows:
 			C:\MinGW
 			C:\Java\jdk1.6.0_16
 			C:\Java\jre6
-			C:\ant
+			C:\ant\apache-ant-1.8.1
 		
 		After installing all the dependencies you will need to add a few 
 		environment variables.  Open the System Properties dialog and navigate 
