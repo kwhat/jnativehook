@@ -70,12 +70,12 @@ Windows:
 Mac OS X:
 	Dependencies:
 		Java 1.5 or later
-		Xcode Tools 2.2.1 or later
+		Xcode Developer Tools 2.2.1 or later
 
 	Setup:
 		Create an account at http://connect.apple.com if you do not already 
-		have one.  Now download and Install Xcode Tools which should include 
-		Ant, GCC and Make.
+		have one.  Now download and Install Xcode Tools.  Make sure you check 
+		the box to install "UNIX Dev Support" which includes Ant, GCC and Make.
 
 
 Building:
