@@ -15,6 +15,18 @@
  */
 //Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
 //Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
+//Reference: http://www.mactech.com/macintosh-c/chap02-1.html
+
+/* Apple's OSX does not track the button masks of its events so we need to do
+ * it manually.  The left and right masks solve the problem of if both control
+ * keys are depressed a the same time and only one is removed we should still
+ * have a control mask but the key up event would have reset that.
+ */
+
+void setModifierMask(unsigned short mod);
+void unsetModifierMask(unsigned short mod);
+bool isModifierMask(unsigned short mod);
+
 //TODO This is probably not needed, maybe just for undefined keycodes.
 /*
 #define AK_ENTER						0x24
@@ -220,5 +232,5 @@
 //#define AK_ALT_GRAPH					0x
 //#define AK_BEGIN						0x
 
-#define AK_UNDEFINED					0xFF		//Key Undefined
+#define kVK_UNDEFINED					0xFF		//Key Undefined
 */

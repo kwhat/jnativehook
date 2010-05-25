@@ -38,6 +38,6 @@
 #define MOD_XBUTTON1	2048
 #define MOD_XBUTTON2	4096
 
-void setModifierMask(unsigned int mod);
-void unsetModifierMask(unsigned int mod);
-bool isModifierMask(unsigned int mod);
+void setModifierMask(unsigned short mod);
+void unsetModifierMask(unsigned short mod);
+bool isModifierMask(unsigned short mod);

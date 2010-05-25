@@ -290,11 +290,18 @@ jint NativeToJButton(unsigned int button) {
 
 jint NativeToJModifier(unsigned int modifier) {
 	switch (modifier) {
-		case ShiftMask:									return JK_SHIFT_MASK;
-		case ControlMask:								return JK_CTRL_MASK;
-		default:
-			if (modifier == getMetaMask())				return JK_META_MASK;
-			else if (modifier == getAltMask())			return JK_ALT_MASK;
-			return 0;
+		case shiftKey:
+		case rightShiftKey:								return JK_SHIFT_MASK;
+
+		case controlKey:
+		case rightControlKey:							return JK_CTRL_MASK;
+
+		case optionKey:
+		case rightOptionKey:							return JK_ALT_MASK;
+
+		case cmdKey:									return JK_META_MASK;
+		//case rightCmdKey:								//Undefined
+
+		default:										return 0;
 	}
 }
