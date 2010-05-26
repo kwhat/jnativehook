@@ -21,6 +21,10 @@
 
 unsigned short modifiers = 0x0000;
 
+unsigned short getModifierMask() {
+	return modifiers;
+}
+
 void setModifierMask(unsigned short mod) {
 	modifiers |= mod;
 }
