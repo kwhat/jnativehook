@@ -9,7 +9,7 @@
 	<buildnumber file="build.num"/>
 	<property name="project.name"		value="${ant.project.name}"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="1.0.${build.number} Beta"/>
+	<property name="project.version"	value="0.9.${build.number}"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
@@ -394,7 +394,7 @@
 		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -shared -lX11 -lXtst -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -dylib -fPIC">
+		<condition property="native.cflags" value="-c -Wall -O3 -fno-strict-aliasing -fPIC">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -405,7 +405,7 @@
 		<condition property="native.ldflags" value="-lc -O3 -fno-strict-aliasing -shared -lX11 -L/usr/lib -L/usr/local/lib">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.ldflags" value="-lc -framework Carbon -dylib">
+		<condition property="native.ldflags" value="-lc -framework Carbon -framework JavaVM -dylib">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -427,7 +427,7 @@
 		<condition property="native.executable" value="lib${project.name}.so">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.executable" value="lib${project.name}.so">
+		<condition property="native.executable" value="lib${project.name}.dylib">
 			<isset property="native.os.isMac"/>
 		</condition>
 		

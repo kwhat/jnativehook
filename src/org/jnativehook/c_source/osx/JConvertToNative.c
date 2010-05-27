@@ -18,9 +18,10 @@
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
 
-#include <HIToolbox/CarbonEvents.h>
+#include <Carbon/Carbon.h>
+//#include <HIToolbox/CarbonEvents.h>
 
-JKeyDatum NativeToJKeycode(unsigned int keysym) {
+JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
 	jkey.location = JK_LOCATION_STANDARD;
 

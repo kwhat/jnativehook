@@ -201,7 +201,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key pressed event.
 			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
 		break;
 
@@ -220,7 +220,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			//Fire key released event.
 			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
 		break;
 
@@ -262,7 +262,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 		case MotionNotify:
 			#ifdef DEBUG
-				printf ("Native: MsgLoop - Motion Notified (%i,%i)\n",event_root_x, event_root_y);
+				printf ("Native: MsgLoop - Motion Notified (%i,%i)\n", event_root_x, event_root_y);
 			#endif
 
 			//Class and Constructor for the NativeMouseEvent Object

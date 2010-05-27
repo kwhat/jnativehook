@@ -19,6 +19,7 @@
 #include <string.h>
 #include "OSXKeyCodes.h"
 
+/*
 unsigned short modifiers = 0x0000;
 
 unsigned short getModifierMask() {
@@ -36,3 +37,60 @@ void unsetModifierMask(unsigned short mod) {
 bool isModifierMask(unsigned short mod) {
 	return modifiers & mod;
 }
+*/
+
+/*
+ * Translate the virtual keycode to a character representation.  This
+ * function does not handle the modifier keys.  It also translates
+ * certain keys to more human readable forms (e.g., "tab", "space",
+ * "up").  Because no modifiers are considered a "shift-n" will return
+ * "n", not "N".
+
+OSStatus translate_keycode(CGKeyCode keycode, CGEventSourceRef source, CFMutableStringRef result) {
+    TISInputSourceRef       currentKeyboard;
+    CFDataRef               uchr                = NULL;
+    UInt16                  keyAction           = kUCKeyActionDisplay;
+    UInt32                  modifierKeyState    = 0;
+    OptionBits              keyTranslateOptions = kUCKeyTranslateNoDeadKeysBit;
+    UInt32                  deadKeyState        = 0;
+    UInt32                  keyboardType;
+    UniCharCount            actualStringLength  = 0;
+    UniChar                 unicodeString[8];
+    const UCKeyboardLayout *keyboardLayout;
+
+    currentKeyboard = TISCopyCurrentKeyboardInputSource();
+    uchr = (CFDataRef) TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
+    keyboardLayout = (const UCKeyboardLayout *)CFDataGetBytePtr(uchr);
+    keyboardType = CGEventSourceGetKeyboardType(source);
+
+    if (keyboardLayout == NULL)
+        printf("no keyboard layout");
+
+    OSStatus status = UCKeyTranslate(keyboardLayout,
+                                     keycode,
+                                     keyAction,
+                                     modifierKeyState,
+                                     keyboardType,
+                                     keyTranslateOptions,
+                                     &deadKeyState,
+                                     ARRAY_SIZE(unicodeString),
+                                     &actualStringLength,
+                                     unicodeString);
+
+    if (status != noErr)
+        return status;
+
+    if (actualStringLength < 1)
+        return noErr;
+
+    for (size_t i = 0; i < ARRAY_SIZE(name2glyph_map); i++) {
+        if (name2glyph_map[i].glyph == unicodeString[0]) {
+            CFStringAppendCString(result, name2glyph_map[i].name, kCFStringEncodingASCII);
+            return noErr;
+        }
+    }
+
+    CFStringAppendCharacters(result, unicodeString, actualStringLength);
+    return noErr;
+}
+ */

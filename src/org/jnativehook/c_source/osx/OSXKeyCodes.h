@@ -23,10 +23,12 @@
  * have a control mask but the key up event would have reset that.
  */
 
+/*
 unsigned short getModifierMask();
 void setModifierMask(unsigned short mod);
 void unsetModifierMask(unsigned short mod);
 bool isModifierMask(unsigned short mod);
+*/
 
 //TODO This is probably not needed, maybe just for undefined keycodes.
 /*
