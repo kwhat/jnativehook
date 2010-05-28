@@ -18,34 +18,36 @@ package org.jnativehook.mouse;
 //Imports
 import java.util.EventListener;
 
+import org.jnativehook.GlobalScreen;
+
 /**
  * The listener interface for receiving native mouse motion events. 
- * (For clicks and other mouse events, use the NativeMouseListener.)
+ * (For clicks and other mouse events, use the <code>NativeMouseListener</code>.)
  * <p>
- * The class that is interested in processing a nativeMouseMotion
- * event implements this interface, and the object created
- * with that class is registered with a component using the
- * component's <code>addNativeMouseMotionListener<code> method. When
- * the nativeMouseMotion event occurs, that object's appropriate
- * method is invoked.
+ * The class that is interested in processing a <code>NativeMouseMotionEvent</code> 
+ * implements this interface, and the object created with that class is 
+ * registered with the <code>GlobalScreen</code> using the 
+ * {@link GlobalScreen#addMouseMotionListener} method. When the 
+ * NativeMouseMotion event occurs, that object's appropriate method is invoked.
  *
- * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	0.9
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
  * @since	1.0
+ * 
  * @see NativeMouseMotionEvent
  */
 public interface NativeMouseMotionListener extends EventListener {
 	
 	/**
-	 *  Invoked when the mouse has been moved.
+	 * Invoked when the mouse has been moved.
 	 *
 	 * @param e the native mouse event
 	 */
 	public void mouseMoved(NativeMouseEvent e);
 	
 	
-	/**
-	 * Note Implemented.
+	/* (non-Javadoc)
+	 * Currently Unimplemented
 	 *
 	 * @param e the native mouse event
 	 */

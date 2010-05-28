@@ -16,13 +16,12 @@
 package org.jnativehook.mouse;
 
 /**
- * The listener interface for receiving nativeMouseInput events.
- * The class that is interested in processing a nativeMouseInput
- * event implements this interface, and the object created
- * with that class is registered with a component using the
- * component's <code>addNativeMouseInputListener<code> method. When
- * the nativeMouseInput event occurs, that object's appropriate
- * method is invoked.
+ * A listener implementing all the methods in both the NativeMouseListener and 
+ * NativeMouseMotionListener interfaces.
+ *
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
  *
  * @see NativeMouseInputEvent
  */

@@ -17,32 +17,57 @@ package org.jnativehook.mouse;
 
 //Imports
 import java.util.EventListener;
+import org.jnativehook.GlobalScreen;
 
-// TODO: Auto-generated Javadoc
 /**
- * The listener interface for receiving nativeMouse events.
- * The class that is interested in processing a nativeMouse
- * event implements this interface, and the object created
- * with that class is registered with a component using the
- * component's <code>addNativeMouseListener<code> method. When
- * the nativeMouse event occurs, that object's appropriate
- * method is invoked.
- *
+ * The listener interface for receiving system wide native mouse events. 
+ * (To track native mouse moves and mouse drags, use the NativeMouseMotionListener.)
+ * <p>
+ * The class that is interested in processing a <code>NativeMouseEvent</code> 
+ * implements this interface, and the object created with that class is 
+ * registered with the <code>GlobalScreen</code> using the 
+ * {@link GlobalScreen#addNativeMouseListener} method. When the 
+ * NativeMouseMotion event occurs, that object's appropriate method is invoked.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	/** 
+	 * Invoked when a mouse button has been pressed
+	 * 
+	 * @param e the native mouse event
 	 */
 	public void mousePressed(NativeMouseEvent e);
 	
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	/** 
+	 * Invoked when a mouse button has been released
+	 * 
+	 * @param e the native mouse event
 	 */
 	public void mouseReleased(NativeMouseEvent e);
 	
-	//The following are only included to provide MouseListener compatibility.
+	/* (non-Javadoc)
+	 * Currently Unimplemented
+	 * 
+	 * @param e the native mouse event
+	 */
 	//public void mouseClicked(NativeMouseEvent e);
+	
+	/* (non-Javadoc)
+	 * Currently Unimplemented
+	 * 
+	 * @param e the native mouse event
+	 */
 	//public void mouseEntered(MouseEvent e);
+	
+	/* (non-Javadoc)
+	 * Currently Unimplemented
+	 * 
+	 * @param e the native mouse event
+	 */
 	//public void mouseExited(MouseEvent e);
 }

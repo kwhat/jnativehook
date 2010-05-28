@@ -14,6 +14,7 @@
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
 	<property name="dir.dist" value="${basedir}/dist"/>
+	<property name="dir.docs" value="${basedir}/docs"/>
 	
 	<property name="dir.jar" value="${dir.dist}/jar"/>
 	<property name="dir.lib" value="${dir.src}/org/jnativehook/lib"/>
@@ -26,6 +27,7 @@
 		<echo>Cleaning old build structure...</echo>
 		<delete includeemptydirs="false" verbose="true">
 			<fileset dir="${dir.class}" includes="**/*"/>
+			<fileset dir="${dir.docs}" includes="**/*"/>
 		</delete>
 		
 		<delete file="build.properties" verbose="true" failonerror="false"/>
@@ -510,8 +512,27 @@
 		</jar>
 	</target>
 	
+	<target name="document" depends="" description="Generates javadoc api documentation">
+		<javadoc destdir="${dir.docs}" windowtitle="${project.name}" author="true" version="true" use="true">
+			<packageset dir="src" defaultexcludes="yes">
+				<include name="org/jnativehook/**"/>
+				<exclude name="org/jnativehook/c_source/**"/>
+				<exclude name="org/jnativehook/lib/**"/>
+			</packageset>
+			
+			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2010 Alexander Barker. All Rights Reserved.</i>]]></bottom>
+			
+			<!--
+			<tag name="to.do" scope="all" description="To Do:"/>
+			<tag name="fix.me" scope="all" description="Fix Needed:"/>
+			-->
+			
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+		</javadoc>
+	</target>
 	
-	<target name="package" depends="jar" description="Creates zip files for distrobution">
+	<target name="package" depends="jar" description="Creates zip files for distribution">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">

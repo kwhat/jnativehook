@@ -17,45 +17,55 @@ package org.jnativehook.mouse;
 
 //Imports
 
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class NativeMouseException.
+ * Signals that a Native Mouse Exception has occurred.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
+ * @see java.lang.Exception
  */
 public class NativeMouseException extends Exception {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 4875934179277090021L;
 
 	/**
-	 * Instantiates a new native mouse exception.
+	 * Instantiates a new <code>NativeMouseException</code> with null as its 
+	 * detail message.
 	 */
 	public NativeMouseException() {
 		super();
 	}
 	
 	/**
-	 * Instantiates a new native mouse exception.
+	 * Instantiates a new <code>NativeMouseException</code> with a specified 
+	 * detail message.
 	 *
-	 * @param sMessage the s message
+	 * @param message the detail message
 	 */
 	public NativeMouseException(String message) {
 		super(message);
 	}
 	
 	/**
-	 * Instantiates a new native mouse exception.
+	 * Instantiates a new <code>NativeMouseException</code> with a specified 
+	 * detail message and cause.
 	 *
-	 * @param sMessage the s message
-	 * @param objThrowable the obj throwable
+	 * @param message the detail message
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeMouseException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
 	/**
-	 * Instantiates a new native mouse exception.
+	 * Instantiates a new <code>NativeMouseException</code> with a specified 
+	 * cause.
 	 *
-	 * @param objThrowable the obj throwable
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeMouseException(Throwable cause) {
 		super(cause);
