@@ -37,8 +37,6 @@ public class NativeInputEvent extends EventObject {
 	public static int BUTTON4_MASK	= 128;
 	public static int BUTTON5_MASK	= 256;
 	
-	//TODO Add CapsLock NumberLock and Scroll Lock?
-	
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
 		
