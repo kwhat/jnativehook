@@ -35,12 +35,19 @@ import org.jnativehook.mouse.NativeMouseInputListener;
 // TODO: Auto-generated Javadoc
 /**
  * The Class NativeHookDemo.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
+ * @see GlobalScreen
+ * @see NativeKeyListener
  */
 public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, ActionListener, WindowListener {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5549783775591314629L;
 
-	/** The txt event info. */
+	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
 	
 	/**
@@ -116,7 +123,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/**
 	 * Display event info.
 	 *
-	 * @param e the e
+	 * @param e the native key event
 	 */
 	private void displayEventInfo(NativeKeyEvent e) {
 		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
@@ -126,7 +133,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/**
 	 * Display event info.
 	 *
-	 * @param e the e
+	 * @param e the native mouse event
 	 */
 	private void displayEventInfo(NativeMouseEvent e) {
 		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
@@ -190,9 +197,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	
     
 	/**
-	 * The main method.
+	 * The demo entry point
 	 *
-	 * @param args the arguments
+	 * @param args unused
 	 */
 	public static void main(String[] args) {
 		new NativeHookDemo();

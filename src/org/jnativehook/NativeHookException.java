@@ -15,45 +15,55 @@
  */
 package org.jnativehook;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class NativeHookException.
+ * Signals that a Native Hook Exception has occurred.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
+ * @see java.lang.RuntimeException
  */
 public class NativeHookException extends RuntimeException {
-	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 6199753732102764333L;
 
 	/**
-	 * Instantiates a new native hook exception.
+	 * Instantiates a new <code>NativeHookException</code> with null as its 
+	 * detail message.
 	 */
 	public NativeHookException() {
 		super();
 	}
 	
 	/**
-	 * Instantiates a new native hook exception.
+	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * detail message.
 	 *
-	 * @param sMessage the s message
+	 * @param message the detail message
 	 */
 	public NativeHookException(String message) {
 		super(message);
 	}
 	
 	/**
-	 * Instantiates a new native hook exception.
+	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * detail message and cause.
 	 *
-	 * @param sMessage the s message
-	 * @param objThrowable the obj throwable
+	 * @param message the detail message
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeHookException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
 	/**
-	 * Instantiates a new native hook exception.
+	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * cause.
 	 *
-	 * @param objThrowable the obj throwable
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeHookException(Throwable cause) {
 		super(cause);

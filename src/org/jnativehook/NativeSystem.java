@@ -22,7 +22,7 @@ package org.jnativehook;
 public class NativeSystem {
 	
 	/**
-	 * The Enum Family.
+	 * The Operating System Family.
 	 */
 	public enum Family {
 		
@@ -50,28 +50,28 @@ public class NativeSystem {
 	 */
 	public enum Arch {
 		
-		/** The I586. */
+		/** The i586. */
 		I586,
 		
-		/** The AM d64. */
+		/** The amd64. */
 		AMD64,
 		
-		/** The PPC. */
+		/** The ppc. */
 		PPC,
 		
-		/** The PP c64. */
+		/** The ppc64. */
 		PPC64,
 		
-		/** The ARM. */
+		/** The arm. */
 		ARM,
 		
-		/** The MIPS. */
+		/** The mips. */
 		MIPS,
 		
-		/** The SPARC. */
+		/** The sparc. */
 		SPARC,
 		
-		/** The ALPHA. */
+		/** The alpha. */
 		ALPHA,
 		
 		/** The UNSUPPORTED. */

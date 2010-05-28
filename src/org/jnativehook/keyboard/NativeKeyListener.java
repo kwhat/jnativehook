@@ -18,30 +18,44 @@ package org.jnativehook.keyboard;
 //Imports
 import java.util.EventListener;
 
-// TODO: Auto-generated Javadoc
+import org.jnativehook.GlobalScreen;
+
 /**
- * The listener interface for receiving nativeKey events.
- * The class that is interested in processing a nativeKey
- * event implements this interface, and the object created
- * with that class is registered with a component using the
- * component's <code>addNativeKeyListener<code> method. When
- * the nativeKey event occurs, that object's appropriate
- * method is invoked.
- *
+ * The listener interface for receiving system wide <code>NativeKeyEvents</code>.
+ * <p/>
+ * 
+ * The class that is interested in processing a <code>NativeKeyEvent</code> 
+ * implements this interface, and the object created with that class is 
+ * registered with the <code>GlobalScreen</code> using the
+ * {@link GlobalScreen#addNativeKeyListener} method. When the 
+ * <code>NativeKeyEvent</code> occurs, that object's appropriate method is 
+ * invoked.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
  * @see NativeKeyEvent
  */
 public interface NativeKeyListener extends EventListener {
-	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	/** 
+	 * Invoked when a key has been pressed
+	 * 
+	 * @param e the native ket event
 	 */
 	public void keyPressed(NativeKeyEvent e);
 	
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	/** 
+	 * Invoked when a key has been released
+	 * 
+	 * @param e the native key event
 	 */
 	public void keyReleased(NativeKeyEvent e);
 	
-	//The following are only included to provide MouseListener compatibility.
+	/* (non-Javadoc)
+	 * Currently Unimplemented
+	 * 
+	 * @param e the native mouse event
+	 */
 	//public void keyTyped(NativeKeyEvent e);
 }

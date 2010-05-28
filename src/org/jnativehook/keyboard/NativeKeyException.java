@@ -17,45 +17,55 @@ package org.jnativehook.keyboard;
 
 //Imports
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class NativeKeyException.
+ * Signals that a Native Key Exception has occurred.
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
+ * @see java.lang.Exception
  */
 public class NativeKeyException extends Exception {
-	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -6239432803200521634L;
 
 	/**
-	 * Instantiates a new native key exception.
+	 * Instantiates a new <code>NativeKeyException</code> with null as its 
+	 * detail message.
 	 */
 	public NativeKeyException() {
 		super();
 	}
 	
 	/**
-	 * Instantiates a new native key exception.
+	 * Instantiates a new <code>NativeKeyException</code> with a specified 
+	 * detail message.
 	 *
-	 * @param sMessage the s message
+	 * @param message the detail message
 	 */
 	public NativeKeyException(String message) {
 		super(message);
 	}
 	
 	/**
-	 * Instantiates a new native key exception.
+	 * Instantiates a new <code>NativeKeyException</code> with a specified 
+	 * detail message and cause.
 	 *
-	 * @param sMessage the s message
-	 * @param objThrowable the obj throwable
+	 * @param message the detail message
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeKeyException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
 	/**
-	 * Instantiates a new native key exception.
+	 * Instantiates a new <code>NativeKeyException</code> with a specified 
+	 * cause.
 	 *
-	 * @param objThrowable the obj throwable
+	 * @param cause the cause of the exception (A null value is permitted, 
+	 * and indicates that the cause is nonexistent or unknown.)
 	 */
 	public NativeKeyException(Throwable cause) {
 		super(cause);

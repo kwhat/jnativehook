@@ -20,14 +20,15 @@ import java.util.EventListener;
 import org.jnativehook.GlobalScreen;
 
 /**
- * The listener interface for receiving system wide native mouse events. 
- * (To track native mouse moves and mouse drags, use the NativeMouseMotionListener.)
+ * The listener interface for receiving system wide <code>NativeMouseEvents</code>. 
+ * (To track native mouse moves use the <code>NativeMouseMotionListener</code>.)
  * <p>
  * The class that is interested in processing a <code>NativeMouseEvent</code> 
  * implements this interface, and the object created with that class is 
  * registered with the <code>GlobalScreen</code> using the 
  * {@link GlobalScreen#addNativeMouseListener} method. When the 
- * NativeMouseMotion event occurs, that object's appropriate method is invoked.
+ * <code>NativeMouseMotion</code> event occurs, that object's appropriate 
+ * method is invoked.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.0

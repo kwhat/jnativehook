@@ -31,37 +31,47 @@ import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 
 /**
- * GlobalScreen is used as a class to represent the global screen area that
- * Java does not usually have access to.  
+ * GlobalScreen is used to represent the native screen area that Java does not 
+ * usually have access to.  This class can be thought of as the source component 
+ * for native events.  
  * <p>
- * This class also handles the loading and communication with the native 
- * library.  That includes registering new key and button hooks and the event 
- * dispatchers for each.
+ * This class also handles the loading, unpacking and communication with the 
+ * native library.  That includes registering new key and button hooks and the 
+ * event dispatchers for each.
  * 
  * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	0.9
  * @since	1.0
  */
-
 public class GlobalScreen {
-	//Instance Variables
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 6504561173380322679L;
+	
+	/** The GlobalScreen singleton. */
 	private static GlobalScreen instance = new GlobalScreen();
+	
+	/** The list of event listeners to notify. */
 	private EventListenerList eventListeners;
 	
+	/**
+	 * Private constructor to prevent mutlipule instances of the global screen.
+	 * The {@link #registerHook} method will be called on construction to unpack 
+	 * and load the native library.
+	 */	
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
-		//TODO this needs to be passed in to java -D and not like this.
-		//System.setProperty("sun.awt.enableExtraMouseButtons", "true");
+		
+		//Unpack and Load the native library.
 		GlobalScreen.registerHook();
 	}
 	
 	/**
-	 * DeConstructor
-	 *
-	 * This will attempt to run some of the native cleanup 
-	 * when the class is garbage collected.
+	 * The deconstructor will attempt to run some of the native cleanup by 
+	 * calling the {@link #unregisterHook} method.  This method will not run 
+	 * until the class is garbage collected.
+	 * 
+	 * @throws java.lang.Throwable
 	 */
 	protected void finalize() throws Throwable {
 		try {

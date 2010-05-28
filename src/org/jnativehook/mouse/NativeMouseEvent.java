@@ -46,23 +46,23 @@ import org.jnativehook.NativeInputEvent;
  * </ul>
  * <p/>
  * 
- * A NativeMouseEvent object is passed to every NativeMouseListener object 
- * which is registered to receive mouse events using the  
+ * A NativeMouseEvent object is passed to every <code>NativeMouseListener</code> 
+ * object which is registered to receive mouse events using the  
  * {@link GlobalScreen#addNativeMouseListener} method. The GlobalScreen 
  * object then dispatches a NativeMouseEvent to each listener.
  * <p/>
  * 
- * A NativeMouseEvent object is also passed to every 
- * NativeMouseMotionListener object which is registered to receive mouse 
- * motion events using the {@link GlobalScreen#addNativeMouseListener}  
- * method. The GlobalScreen object then dispatches a NativeMouseEvent to 
- * each listener. 
+ * A <code>NativeMouseEvent</code> object is also passed to every 
+ * <code>NativeMouseMotionListener</code> object which has been registered to 
+ * receive mouse motion events using the 
+ * {@link GlobalScreen#addNativeMouseListener} method. The GlobalScreen object 
+ * then dispatches a NativeMouseEvent to each listener. 
  * <p/>
  * 
  * When a mouse button is clicked, events are generated and sent to the 
- * registered NativeMouseListeners. The state of modifiers can be retrieved 
- * using {@link NativeInputEvent#getModifiers}. All modifiers returned by 
- * {@link NativeInputEvent#getModifiers} reflect the current state of all 
+ * registered <code>NativeMouseListeners</code>. The state of modifiers can be 
+ * retrieved using {@link NativeInputEvent#getModifiers}. All modifiers returned 
+ * by {@link NativeInputEvent#getModifiers} reflect the current state of all 
  * modifiers and buttons.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)

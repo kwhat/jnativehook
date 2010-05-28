@@ -15,27 +15,68 @@
  */
 package org.jnativehook;
 
+//Imports
 import java.awt.Toolkit;
 import java.util.EventObject;
 
+import org.jnativehook.keyboard.NativeKeyListener;
+
+/**
+ * The root event class for all native-level input events.  Input events are 
+ * delivered to listeners as they are received by the native source. There is 
+ * no method for listeners or subclasses to prevent the events delivery to the 
+ * native system.  There is also no guarantee that the events will be received 
+ * by java before they are delivered natively.
+ * <p/>
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.0
+ * @since	1.0
+ * 
+ * @see NativeKeyListener
+ * @see NativeMouseListener
+ * @see NativeMouseMotionListener
+ */
 public class NativeInputEvent extends EventObject {
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5581084516392038598L;
+	
+	/** The type of event. */
 	private int id;
+	
+	/** The time the event occurred. */
 	private long when;
+	
+	/** The modifier keys down during event. */
 	private int modifiers;
 	
-	//InputEvent Values Used.
+	/** The Shift key modifier constant. */
 	public static int SHIFT_MASK	= 1;
+	
+	/** The Ctrl key modifier constant. */
 	public static int CTRL_MASK		= 2;
+	
+	/** The Meta key modifier constant. */
 	public static int META_MASK		= 4;
+	
+	/** The Alt key modifier constant. */
 	public static int ALT_MASK		= 8; 
 	
-	//Custom Values
+	/** The Button1 modifier constant. */
 	public static int BUTTON1_MASK	= 16;
+
+	/** The Button2 modifier constant. */
 	public static int BUTTON2_MASK	= 32;
+	
+	/** The Button3 modifier constant. */
 	public static int BUTTON3_MASK	= 64;
+	
+	/** The Button4 modifier constant. */
 	public static int BUTTON4_MASK	= 128;
+	
+	/** The Button5 modifier constant. */
 	public static int BUTTON5_MASK	= 256;
+	
 	
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
@@ -45,6 +86,7 @@ public class NativeInputEvent extends EventObject {
 		this.modifiers = modifiers;
 	}
 
+	
 	public int getModifiers() {
 		return this.modifiers;
 	}
@@ -119,6 +161,8 @@ public class NativeInputEvent extends EventObject {
 		return when;
 	}
 	
+	
+	//FIXME implement
 	public String paramString() {
 		return null;
 	}
