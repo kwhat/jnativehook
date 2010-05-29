@@ -15,63 +15,64 @@
  */
 package org.jnativehook;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class NativeSystem.
+ * A small class to determine the native systems operating system family and 
+ * architecture.  The class is only used to determine which library to unpack 
+ * and load at runtime. 
  */
 public class NativeSystem {
 	
 	/**
-	 * The Operating System Family.
+	 * The operating system family enum
 	 */
 	public enum Family {
 		
-		/** The WINDOWS. */
+		/** The Windows operating system family */
 		WINDOWS,
 		
-		/** The LINUX. */
+		/** The Linux operating system family */
 		LINUX,
 		
-		/** The FREEBSD. */
+		/** The FreeBSD operating system family */
 		FREEBSD,
 		
-		/** The OPENBSD. */
+		/** The OpenBSD operating system family */
 		OPENBSD,
 		
-		/** The OSX. */
+		/** The Apple OS X operating system family */
 		OSX,
 		
-		/** The UNSUPPORTED. */
+		/** Any unsupported operating system family */
 		UNSUPPORTED
 	}
 	
 	/**
-	 * The Enum Arch.
+	 * The system architecture enum
 	 */
 	public enum Arch {
 		
-		/** The i586. */
+		/** The i586 architecture */
 		I586,
 		
-		/** The amd64. */
+		/** The amd64 architecture */
 		AMD64,
 		
-		/** The ppc. */
+		/** The ppc architecture */
 		PPC,
 		
-		/** The ppc64. */
+		/** The ppc64 architecture */
 		PPC64,
 		
-		/** The arm. */
+		/** The arm architecture */
 		ARM,
 		
-		/** The mips. */
+		/** The mips architecture */
 		MIPS,
 		
-		/** The sparc. */
+		/** The sparc architecture */
 		SPARC,
 		
-		/** The alpha. */
+		/** The alpha architecture */
 		ALPHA,
 		
 		/** The UNSUPPORTED. */
@@ -79,9 +80,9 @@ public class NativeSystem {
 	}
 	
 	/**
-	 * Gets the family.
+	 * Determines the operating system family.
 	 *
-	 * @return the family
+	 * @return the operating system family enum item
 	 */
 	public static Family getFamily() {
 		String osName = System.getProperty("os.name");
@@ -102,9 +103,6 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("FreeBSD")) {
 			family = Family.FREEBSD;
 		}
-		else if (osName.equalsIgnoreCase("OpenBSD")) {
-			family = Family.OPENBSD;
-		}
 		else if (osName.equalsIgnoreCase("Mac OS X")) {
 			family = Family.OSX;
 		}
@@ -116,7 +114,7 @@ public class NativeSystem {
 	}
 	
 	/**
-	 * Gets the architecture.
+	 * Determines the current system architecture.
 	 *
 	 * @return the architecture
 	 */

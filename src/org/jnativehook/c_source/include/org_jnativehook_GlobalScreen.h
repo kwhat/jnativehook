@@ -10,6 +10,22 @@ extern "C" {
 #undef org_jnativehook_GlobalScreen_serialVersionUID
 #define org_jnativehook_GlobalScreen_serialVersionUID 6504561173380322679LL
 /* Inaccessible static: instance */
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatRate
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatDelay
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

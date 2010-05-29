@@ -40,7 +40,7 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
  * event dispatchers for each.
  * 
  * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	0.9
+ * @version	1.0
  * @since	1.0
  */
 public class GlobalScreen {
@@ -54,7 +54,7 @@ public class GlobalScreen {
 	private EventListenerList eventListeners;
 	
 	/**
-	 * Private constructor to prevent mutlipule instances of the global screen.
+	 * Private constructor to prevent multiple instances of the global screen.
 	 * The {@link #registerHook} method will be called on construction to unpack 
 	 * and load the native library.
 	 */	
@@ -67,11 +67,12 @@ public class GlobalScreen {
 	}
 	
 	/**
-	 * The deconstructor will attempt to run some of the native cleanup by 
-	 * calling the {@link #unregisterHook} method.  This method will not run 
-	 * until the class is garbage collected.
+	 * A deconstructor that will perform native cleanup by calling the
+	 * {@link #unregisterHook} method.  This method will not run until the
+	 * class is garbage collected.
 	 * 
-	 * @throws java.lang.Throwable
+	 * @throws Throwable the throwable
+	 * @see Object#finalize
 	 */
 	protected void finalize() throws Throwable {
 		try {
@@ -85,83 +86,189 @@ public class GlobalScreen {
 		}
 	}
 
+	/**
+	 * Gets the single instance of GlobalScreen.
+	 *
+	 * @return single instance of GlobalScreen
+	 */
 	public static synchronized GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
 	
-	public void addKeyListener(NativeKeyListener listener) {
-		eventListeners.add(NativeKeyListener.class, listener);
+	/**
+	 * Adds the specified native key listener to receive key events from the 
+	 * native system. If listener is null, no exception is thrown and no action 
+	 * is performed.
+	 *
+	 * @param listener the native key listener
+	 */
+	public void addNativeKeyListener(NativeKeyListener listener) {
+		if (listener != null) {
+			eventListeners.add(NativeKeyListener.class, listener);
+		}
 	}
 	
-	public void removeKeyListener(NativeKeyListener listener) {
-		eventListeners.remove(NativeKeyListener.class, listener);
+	/**
+	 * Removes the specified native key listener so that it no longer receives 
+	 * key events from the native system. This method performs no function if 
+	 * the listener specified by the argument was not previously added.  If 
+	 * listener is null, no exception is thrown and no action is performed.
+	 *
+	 * @param listener the native key listener
+	 */
+	public void removeNativeKeyListener(NativeKeyListener listener) {
+		if (listener != null) {
+			eventListeners.remove(NativeKeyListener.class, listener);
+		}
 	}
 	
-	public void addMouseMotionListener(NativeMouseMotionListener listener) {
-		eventListeners.add(NativeMouseMotionListener.class, listener);
-	}
-	
-	public void removeMouseMotionListener(NativeMouseMotionListener listener) {
-		eventListeners.remove(NativeMouseMotionListener.class, listener);
-	}
-	
-	public void addMouseListener(NativeMouseListener listener) {
+	/**
+	 * Adds the specified native mouse listener to receive mouse events from the 
+	 * native system. If listener is null, no exception is thrown and no action 
+	 * is performed.
+	 *
+	 * @param listener the native mouse listener
+	 */
+	public void addNativeMouseListener(NativeMouseListener listener) {
 		eventListeners.add(NativeMouseListener.class, listener);
 	}
 	
-	public void removeMouseListener(NativeMouseListener listener) {
+	/**
+	 * Removes the specified native mouse listener so that it no longer receives 
+	 * mouse events from the native system. This method performs no function if 
+	 * the listener specified by the argument was not previously added.  If 
+	 * listener is null, no exception is thrown and no action is performed.
+	 *
+	 * @param listener the native mouse listener
+	 */
+	public void removeNativeMouseListener(NativeMouseListener listener) {
 		eventListeners.remove(NativeMouseListener.class, listener);
 	}
 	
-	//Get some keyboard information
+	/**
+	 * Adds the specified native mouse motion listener to receive mouse motion 
+	 * events from the native system. If listener is null, no exception is 
+	 * thrown and no action is performed.
+	 *
+	 * @param listener the native mouse motion listener
+	 */
+	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
+		eventListeners.add(NativeMouseMotionListener.class, listener);
+	}
+	
+	/**
+	 * Removes the specified native mouse motion listener so that it no longer 
+	 * receives mouse motion events from the native system. This method performs 
+	 * no function if the listener specified by the argument was not previously 
+	 * added.  If listener is null, no exception is thrown and no action is 
+	 * performed.
+	 *
+	 * @param listener the native mouse motion listener
+	 */
+	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
+		eventListeners.remove(NativeMouseMotionListener.class, listener);
+	}
+	
+	/**
+	 * Gets the native keyboard auto repeat rate.
+	 *
+	 * @return the auto repeat rate in milliseconds
+	 * @throws NativeKeyException the native key exception
+	 */
 	public native long getAutoRepeatRate() throws NativeKeyException;
+	
+	/**
+	 * Gets the native keyboard auto repeat delay.
+	 *
+	 * @return the auto repeat delay in milliseconds
+	 * @throws NativeKeyException the native key exception
+	 */
 	public native long getAutoRepeatDelay() throws NativeKeyException;
 	
-	protected void fireKeyPressed(NativeKeyEvent e) {
+	/**
+	 * Dispatches an event to the appropriate processor.  This method is 
+	 * generally called by the native library but maybe used to synthesize 
+	 * native events from Java.
+	 * 
+	 * @param e the native input event
+	 */
+	public final void dispatchEvent(NativeInputEvent e) {
+		if (e instanceof NativeKeyEvent) {
+			processKeyEvent((NativeKeyEvent) e);
+		}
+		else if (e instanceof NativeMouseEvent) {
+			processMouseEvent((NativeMouseEvent) e);
+		}
+	}
+	
+	/**
+	 * Processes native key events by dispatching them to all registered 
+	 * <code>NativeKeyListener</code> objects.
+	 * 
+	 * @param e the native key event
+	 * @see NativeKeyEvent
+	 * @see NativeKeyListener
+	 * @see #addNativeKeyListener(NativeKeyListener)
+	 */
+	protected void processKeyEvent(NativeKeyEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
+		int id = e.getId();
+		
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				((NativeKeyListener) objListeners[i + 1]).keyPressed(e);
+				switch (id) {
+					case NativeKeyEvent.NATIVE_KEY_PRESSED:
+						((NativeKeyListener) objListeners[i + 1]).keyPressed(e);
+					break;
+					
+					case NativeKeyEvent.NATIVE_KEY_RELEASED:
+						((NativeKeyListener) objListeners[i + 1]).keyReleased(e);
+					break;
+				}
 			}
 		}
 	}
 	
-	protected void fireKeyReleased(NativeKeyEvent e) {
+	/**
+	 * Processes native mouse events by dispatching them to all registered 
+	 * <code>NativeMouseListener</code> objects.
+	 * 
+	 * @param e the native key event
+	 * @see NativeKeyEvent
+	 * @see NativeKeyListener
+	 * @see #addNativeKeyListener(NativeKeyListener)
+	 */
+	protected void processMouseEvent(NativeMouseEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
-		for ( int i = 0; i < objListeners.length; i += 2 ) {
-			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				((NativeKeyListener) objListeners[i + 1]).keyReleased(e);
-			}
-		}
-	}
-	
-	protected void fireMouseMoved(NativeMouseEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == NativeMouseMotionListener.class ) {
-				((NativeMouseMotionListener) objListeners[i + 1]).mouseMoved(e);
-			}
-		}
-	}
-	
-	protected void fireMousePressed(NativeMouseEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
+		int id = e.getId();
+		
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				((NativeMouseListener) objListeners[i + 1]).mousePressed(e);
+				switch (id) {
+					case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+						((NativeMouseListener) objListeners[i + 1]).mousePressed(e);
+					break;
+					
+					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+						((NativeMouseListener) objListeners[i + 1]).mouseReleased(e);
+					break;
+				}
+			}
+			else if ( objListeners[ i ] == NativeMouseMotionListener.class ) {
+				switch (id) {
+					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+						((NativeMouseMotionListener) objListeners[i + 1]).mouseMoved(e);
+					break;
+				}
 			}
 		}
 	}
 	
-	protected void fireMouseReleased(NativeMouseEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
-		for ( int i = 0; i < objListeners.length; i += 2 ) {
-			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				((NativeMouseListener) objListeners[i + 1]).mouseReleased(e);
-			}
-		}
-	}
 	
+	/**
+	 * Perform procedures to interface with the native library. These procedures 
+	 * include unpacking and loading the library into the Java Virtual Machine.
+	 */
 	protected static void registerHook() {
 		try {
 			//Try to load the native library assuming the java.library.path was
@@ -226,6 +333,10 @@ public class GlobalScreen {
 		}
 	}
 	
+	/**
+	 * Perform procedures to cleanup the native library. This method should be 
+	 * called on garbage collection to ensure proper native cleanup.
+	 */
 	protected static void unregisterHook() {
 		//Do Nothing
 	}

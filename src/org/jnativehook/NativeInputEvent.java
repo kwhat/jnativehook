@@ -19,8 +19,6 @@ package org.jnativehook;
 import java.awt.Toolkit;
 import java.util.EventObject;
 
-import org.jnativehook.keyboard.NativeKeyListener;
-
 /**
  * The root event class for all native-level input events.  Input events are 
  * delivered to listeners as they are received by the native source. There is 
@@ -33,9 +31,9 @@ import org.jnativehook.keyboard.NativeKeyListener;
  * @version	1.0
  * @since	1.0
  * 
- * @see NativeKeyListener
- * @see NativeMouseListener
- * @see NativeMouseMotionListener
+ * @see org.jnativehook.keyboard.NativeKeyListener
+ * @see org.jnativehook.mouse.NativeMouseListener
+ * @see org.jnativehook.mouse.NativeMouseMotionListener
  */
 public class NativeInputEvent extends EventObject {
 	/** The Constant serialVersionUID. */
@@ -51,33 +49,41 @@ public class NativeInputEvent extends EventObject {
 	private int modifiers;
 	
 	/** The Shift key modifier constant. */
-	public static int SHIFT_MASK	= 1;
+	public static final int SHIFT_MASK	= 1;
 	
 	/** The Ctrl key modifier constant. */
-	public static int CTRL_MASK		= 2;
+	public static final int CTRL_MASK		= 2;
 	
 	/** The Meta key modifier constant. */
-	public static int META_MASK		= 4;
+	public static final int META_MASK		= 4;
 	
 	/** The Alt key modifier constant. */
-	public static int ALT_MASK		= 8; 
+	public static final int ALT_MASK		= 8; 
 	
 	/** The Button1 modifier constant. */
-	public static int BUTTON1_MASK	= 16;
+	public static final int BUTTON1_MASK	= 16;
 
 	/** The Button2 modifier constant. */
-	public static int BUTTON2_MASK	= 32;
+	public static final int BUTTON2_MASK	= 32;
 	
 	/** The Button3 modifier constant. */
-	public static int BUTTON3_MASK	= 64;
+	public static final int BUTTON3_MASK	= 64;
 	
 	/** The Button4 modifier constant. */
-	public static int BUTTON4_MASK	= 128;
+	public static final int BUTTON4_MASK	= 128;
 	
 	/** The Button5 modifier constant. */
-	public static int BUTTON5_MASK	= 256;
+	public static final int BUTTON5_MASK	= 256;
 	
 	
+	/**
+	 * Instantiates a new native input event.
+	 *
+	 * @param source the source
+	 * @param id the id
+	 * @param when the when
+	 * @param modifiers the modifiers
+	 */
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
 		
@@ -85,17 +91,51 @@ public class NativeInputEvent extends EventObject {
 		this.when = when;
 		this.modifiers = modifiers;
 	}
-
 	
+	/**
+	 * Gets the event type.
+	 *
+	 * @return the event type
+	 */
+	public int getId() {
+		return id;
+	}
+	
+	/**
+	 * Gets the timestamp for what this event occurred.
+	 *
+	 * @return the timestamp in milliseconds
+	 */
+	public long getWhen() {
+		return when;
+	}
+	
+	
+	/**
+	 * Gets the modifier flags for this event.
+	 *
+	 * @return the modifier flags
+	 */
 	public int getModifiers() {
 		return this.modifiers;
 	}
 	
 	/**
-	 * Gets the key modifiers text.
+	 * Sets the modifier flags for this event.
 	 *
-	 * @param modifiers - the modifier keys down during event (shift, ctrl, alt, meta).
-	 * @return the key modifiers text
+	 * @param modifiers the new modifier flags
+	 */
+	public void setModifiers(int modifiers) {
+		this.modifiers = modifiers;
+	}
+	
+	/**
+	 * Gets a <code>String</code> describing the modifier flags, such as 
+	 * "Meta", or "Ctrl+Alt". These strings can be localized by changing the 
+	 * awt.properties file.
+	 *
+	 * @param modifiers the modifier keys down during event
+	 * @return the modifiers text
 	 */
 	public static String getModifiersText(int modifiers) {
 		String param = "";
@@ -146,24 +186,20 @@ public class NativeInputEvent extends EventObject {
 		return param;
 	}
 	
-	
-	public void setModifiers(int modifiers) {
-		this.modifiers = modifiers;
-	}
-	
-	
-	
-	public int getId() {
-		return id;
-	}
-	
-	public long getWhen() {
-		return when;
-	}
-	
-	
-	//FIXME implement
+	/**
+	 * Gets a <code>String</code> representation of this event. This method is useful 
+	 * for event-logging and for debugging.
+	 *
+	 * @return a string identifying the event and its attributes
+	 */
 	public String paramString() {
-		return null;
+		String param = "";
+		
+		param += "id=" + getId() + ",";
+		param += "when=" + getWhen() + ",";
+		param += "mask=" + Integer.toBinaryString(getModifiers()) + ",";
+		param += "modifiers=" + getModifiersText(getModifiers());
+		
+		return param;
 	}
 }

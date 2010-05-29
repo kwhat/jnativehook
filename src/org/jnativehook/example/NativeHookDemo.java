@@ -32,9 +32,8 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class NativeHookDemo.
+ * A demonstration of how on use the native hooks.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.0
@@ -73,7 +72,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setVisible(true);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
@@ -84,36 +83,35 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		this.requestFocusInWindow();	
 	}
 	
-	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
 	 */
 	public void mousePressed(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 	 */
 	public void mouseReleased(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
 	 */
 	public void mouseMoved(NativeMouseEvent e) {
@@ -121,7 +119,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	}
 	
 	/**
-	 * Display event info.
+	 * Write the <code>NativeKeyEvent</code> to the text window.
 	 *
 	 * @param e the native key event
 	 */
@@ -131,7 +129,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	}
 	
 	/**
-	 * Display event info.
+	 * Write the <code>NativeMouseEvent</code> to the text window.
 	 *
 	 * @param e the native mouse event
 	 */
@@ -141,32 +139,45 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
     }
 	
 
-	/* (non-Javadoc)
+	/**
+	 * Unimplemented
+	 * 
 	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
 	 */
 	public void windowActivated(WindowEvent e) { /* Do Nothing */ }
 	
-	/* (non-Javadoc)
+	/**
+	 * Unimplemented
+	 *
 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 	 */
 	public void windowClosing(WindowEvent e) { /* Do Nothing */ }
 	
-	/* (non-Javadoc)
+	/**
+	 * Unimplemented
+	 *
 	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
 	 */
 	public void windowDeactivated(WindowEvent e) { /* Do Nothing */ }
 	
-	/* (non-Javadoc)
+	/**
+	 * Unimplemented
+	 *
 	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
 	 */
 	public void windowDeiconified(WindowEvent e) { /* Do Nothing */ }
 	
-	/* (non-Javadoc)
+	/**
+	 * Unimplemented
+	 *
 	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
 	 */
 	public void windowIconified(WindowEvent e) { /* Do Nothing */ }
 
-	/* (non-Javadoc)
+	/**
+	 * Write the auto repeat rate and delay to the text window along with any 
+	 * errors that may have occurred.
+	 *
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
@@ -182,12 +193,14 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 		
-		GlobalScreen.getInstance().addKeyListener(this);
-		GlobalScreen.getInstance().addMouseListener(this);
-		GlobalScreen.getInstance().addMouseMotionListener(this);
+		GlobalScreen.getInstance().addNativeKeyListener(this);
+		GlobalScreen.getInstance().addNativeMouseListener(this);
+		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
 	}
 	
-	/* (non-Javadoc)
+	/**
+	 * Finalize and exit the program.
+	 * 
 	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
 	 */
 	public void windowClosed(WindowEvent e) {
@@ -197,7 +210,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	
     
 	/**
-	 * The demo entry point
+	 * The demo project entry point.
 	 *
 	 * @param args unused
 	 */

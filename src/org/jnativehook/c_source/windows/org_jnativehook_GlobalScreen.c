@@ -144,6 +144,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	jint jbutton;
 	jclass clsKeyEvent, clsMouseEvent;
 	jmethodID idKeyEvent, idMouseEvent;
+	jmethodID idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 	jobject objKeyEvent, objMouseEvent;
 
 	switch (wParam) {
@@ -171,9 +172,8 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire key pressed event.
-			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
 		case WM_KEYUP:
@@ -200,9 +200,8 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire key released event.
-			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
 
@@ -245,10 +244,9 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			jbutton = NativeToJButton(vk_code);
 			modifiers = getModifiers();
 
-			//Fire mouse released event.
-			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+			//Fire mouse pressed event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMousePressed, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 
@@ -292,9 +290,8 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse released event.
-			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 		case WM_MOUSEMOVE:
@@ -308,10 +305,9 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			modifiers = getModifiers();
 
-			//ID for pressed, typed and released call backs
-			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+			//Fire mouse moved event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseMoved, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 		case WM_MOUSEWHEEL:

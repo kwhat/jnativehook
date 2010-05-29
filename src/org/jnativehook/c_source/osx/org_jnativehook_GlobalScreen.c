@@ -132,6 +132,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 	jint modifiers;
 	jclass clsKeyEvent, clsMouseEvent;
 	jmethodID idKeyEvent, idMouseEvent;
+	jmethodID idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 	jobject objKeyEvent, objMouseEvent;
 
 
@@ -151,9 +152,8 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire key pressed event.
-			jmethodID idFireKeyPressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyPressed", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, (jint) keysym, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyPressed, objKeyEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
 		case kCGEventKeyUp:
@@ -170,9 +170,8 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire key released event.
-			jmethodID idFireKeyReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireKeyReleased", "(Lorg/jnativehook/keyboard/NativeKeyEvent;)V");
 			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireKeyReleased, objKeyEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
 		case kCGEventFlagsChanged:
@@ -198,10 +197,9 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			jbutton = NativeToJButton(button);
 			modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse released event.
-			jmethodID idFireMousePressed = (*env)->GetMethodID(env, clsGlobalScreen, "fireMousePressed", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+			//Fire mouse pressed event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMousePressed, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 		case kCGEventLeftMouseUp:
@@ -221,9 +219,8 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse released event.
-			jmethodID idFireMouseReleased = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseReleased", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseReleased, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 
@@ -239,10 +236,9 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 
 			modifiers = doModifierConvert(event_mask);
 
-			//ID for pressed, typed and released call backs
-			jmethodID idFireMouseMoved = (*env)->GetMethodID(env, clsGlobalScreen, "fireMouseMoved", "(Lorg/jnativehook/mouse/NativeMouseEvent;)V");
+			//Fire mouse moved event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idFireMouseMoved, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
 		case kCGEventLeftMouseDragged:
