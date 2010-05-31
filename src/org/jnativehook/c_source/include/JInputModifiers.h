@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//TODO These should probably be pulled by JNI from the java class.
 //Reference: ${JAVA_HOME}/src.zip/java/awt/event/InputEvent.java
 #define JK_SHIFT_MASK			1
 #define JK_CTRL_MASK			2

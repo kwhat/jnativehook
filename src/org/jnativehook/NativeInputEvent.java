@@ -22,9 +22,9 @@ import java.util.EventObject;
 /**
  * The root event class for all native-level input events.  Input events are 
  * delivered to listeners as they are received by the native source. There is 
- * no method for listeners or subclasses to prevent the events delivery to the 
- * native system.  There is also no guarantee that the events will be received 
- * by java before they are delivered natively.
+ * no method for listeners or subclasses to prevent delivery of the event to 
+ * the native system. There is no guarantee that the events will be received by 
+ * Java before they are delivered natively.
  * <p/>
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
@@ -79,10 +79,13 @@ public class NativeInputEvent extends EventObject {
 	/**
 	 * Instantiates a new native input event.
 	 *
-	 * @param source the source
-	 * @param id the id
-	 * @param when the when
-	 * @param modifiers the modifiers
+	 * @param source The source of the event.
+	 * @param id The type of event.
+	 * @param when The timestamp for the event.
+	 * @param modifiers the modifier keys down during event. 
+	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are 
+	 * not compatible with the extended _DOWN_MASK or the old _MASK InputEvent 
+	 * modifiers.
 	 */
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
@@ -97,12 +100,12 @@ public class NativeInputEvent extends EventObject {
 	 *
 	 * @return the event type
 	 */
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 	
 	/**
-	 * Gets the timestamp for what this event occurred.
+	 * Gets the timestamp for when this event occurred.
 	 *
 	 * @return the timestamp in milliseconds
 	 */
@@ -131,11 +134,12 @@ public class NativeInputEvent extends EventObject {
 	
 	/**
 	 * Gets a <code>String</code> describing the modifier flags, such as 
-	 * "Meta", or "Ctrl+Alt". These strings can be localized by changing the 
+	 * "Button1", or "Ctrl+Alt". These strings can be localized by changing the 
 	 * awt.properties file.
 	 *
-	 * @param modifiers the modifier keys down during event
-	 * @return the modifiers text
+	 * @param modifiers a modifier mask describing the modifier keys and mouse 
+	 * buttons of an event.
+	 * @return the modifier mask's textual representation
 	 */
 	public static String getModifiersText(int modifiers) {
 		String param = "";
@@ -155,7 +159,6 @@ public class NativeInputEvent extends EventObject {
 		if ((modifiers & NativeInputEvent.ALT_MASK) != 0) {
 			param += Toolkit.getProperty("AWT.alt", "Alt") + "+";
 		}
-		
 		
 		
 		if ((modifiers & NativeInputEvent.BUTTON1_MASK) != 0) {
@@ -187,15 +190,15 @@ public class NativeInputEvent extends EventObject {
 	}
 	
 	/**
-	 * Gets a <code>String</code> representation of this event. This method is useful 
-	 * for event-logging and for debugging.
+	 * Gets a <code>String</code> representation of this event. This method is 
+	 * useful for event-logging and debugging.
 	 *
 	 * @return a string identifying the event and its attributes
 	 */
 	public String paramString() {
 		String param = "";
 		
-		param += "id=" + getId() + ",";
+		param += "id=" + getID() + ",";
 		param += "when=" + getWhen() + ",";
 		param += "mask=" + Integer.toBinaryString(getModifiers()) + ",";
 		param += "modifiers=" + getModifiersText(getModifiers());

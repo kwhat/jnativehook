@@ -22,7 +22,7 @@ package org.jnativehook;
  * @version	1.0
  * @since	1.0
  * 
- * @see java.lang.RuntimeException
+ * @see RuntimeException
  */
 public class NativeHookException extends RuntimeException {
 	/** The Constant serialVersionUID. */
@@ -40,7 +40,7 @@ public class NativeHookException extends RuntimeException {
 	 * Instantiates a new <code>NativeHookException</code> with a specified 
 	 * detail message.
 	 *
-	 * @param message the detail message
+	 * @param message The detail message.
 	 */
 	public NativeHookException(String message) {
 		super(message);
@@ -50,9 +50,9 @@ public class NativeHookException extends RuntimeException {
 	 * Instantiates a new <code>NativeHookException</code> with a specified 
 	 * detail message and cause.
 	 *
-	 * @param message the detail message
-	 * @param cause the cause of the exception (A null value is permitted, 
-	 * and indicates that the cause is nonexistent or unknown.)
+	 * @param message The detail message.
+	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeHookException(String message, Throwable cause) {
 		super(message, cause);
@@ -62,8 +62,8 @@ public class NativeHookException extends RuntimeException {
 	 * Instantiates a new <code>NativeHookException</code> with a specified 
 	 * cause.
 	 *
-	 * @param cause the cause of the exception (A null value is permitted, 
-	 * and indicates that the cause is nonexistent or unknown.)
+	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeHookException(Throwable cause) {
 		super(cause);

@@ -33,7 +33,7 @@ import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
 /**
- * A demonstration of how on use the native hooks.
+ * A demonstration of how to use the JNativeHook library.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.0
@@ -121,7 +121,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/**
 	 * Write the <code>NativeKeyEvent</code> to the text window.
 	 *
-	 * @param e the native key event
+	 * @param e The native key event.
 	 */
 	private void displayEventInfo(NativeKeyEvent e) {
 		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
@@ -131,7 +131,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/**
 	 * Write the <code>NativeMouseEvent</code> to the text window.
 	 *
-	 * @param e the native mouse event
+	 * @param e The native mouse event.
 	 */
 	private void displayEventInfo(NativeMouseEvent e) {
 		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
@@ -212,7 +212,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/**
 	 * The demo project entry point.
 	 *
-	 * @param args unused
+	 * @param args unused.
 	 */
 	public static void main(String[] args) {
 		new NativeHookDemo();

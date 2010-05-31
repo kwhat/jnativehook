@@ -16,73 +16,73 @@
 package org.jnativehook;
 
 /**
- * A small class to determine the native systems operating system family and 
- * architecture.  The class is only used to determine which library to unpack 
+ * A small class to determine the native system's operating system family and 
+ * architecture. The class is only used to determine which library to unpack 
  * and load at runtime. 
  */
 public class NativeSystem {
 	
 	/**
-	 * The operating system family enum
+	 * The operating system family enum.
 	 */
 	public enum Family {
 		
-		/** The Windows operating system family */
+		/** The Windows operating system family. */
 		WINDOWS,
 		
-		/** The Linux operating system family */
+		/** The Linux operating system family. */
 		LINUX,
 		
-		/** The FreeBSD operating system family */
+		/** The FreeBSD operating system family. */
 		FREEBSD,
 		
-		/** The OpenBSD operating system family */
+		/** The OpenBSD operating system family. */
 		OPENBSD,
 		
-		/** The Apple OS X operating system family */
+		/** The Apple OS X operating system family. */
 		OSX,
 		
-		/** Any unsupported operating system family */
+		/** Any unsupported operating system family. */
 		UNSUPPORTED
 	}
 	
 	/**
-	 * The system architecture enum
+	 * The system architecture enum.
 	 */
 	public enum Arch {
 		
-		/** The i586 architecture */
+		/** The i586 architecture. */
 		I586,
 		
-		/** The amd64 architecture */
+		/** The amd64 architecture. */
 		AMD64,
 		
-		/** The ppc architecture */
+		/** The ppc architecture. */
 		PPC,
 		
-		/** The ppc64 architecture */
+		/** The ppc64 architecture. */
 		PPC64,
 		
-		/** The arm architecture */
+		/** The arm architecture. */
 		ARM,
 		
-		/** The mips architecture */
+		/** The mips architecture. */
 		MIPS,
 		
-		/** The sparc architecture */
+		/** The sparc architecture. */
 		SPARC,
 		
-		/** The alpha architecture */
+		/** The alpha architecture. */
 		ALPHA,
 		
-		/** The UNSUPPORTED. */
+		/** Any unsupported system architecture. */
 		UNSUPPORTED
 	}
 	
 	/**
-	 * Determines the operating system family.
+	 * Determines the current operating system family.
 	 *
-	 * @return the operating system family enum item
+	 * @return The current operating system family enum item.
 	 */
 	public static Family getFamily() {
 		String osName = System.getProperty("os.name");
@@ -116,7 +116,7 @@ public class NativeSystem {
 	/**
 	 * Determines the current system architecture.
 	 *
-	 * @return the architecture
+	 * @return The current system architecture.
 	 */
 	public static Arch getArchitecture() {
 		String osArch = System.getProperty("os.arch");

@@ -42,7 +42,7 @@ public class NativeKeyException extends Exception {
 	 * Instantiates a new <code>NativeKeyException</code> with a specified 
 	 * detail message.
 	 *
-	 * @param message the detail message
+	 * @param message The detail message.
 	 */
 	public NativeKeyException(String message) {
 		super(message);
@@ -52,9 +52,9 @@ public class NativeKeyException extends Exception {
 	 * Instantiates a new <code>NativeKeyException</code> with a specified 
 	 * detail message and cause.
 	 *
-	 * @param message the detail message
-	 * @param cause the cause of the exception (A null value is permitted, 
-	 * and indicates that the cause is nonexistent or unknown.)
+	 * @param message The detail message.
+	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeKeyException(String message, Throwable cause) {
 		super(message, cause);
@@ -64,8 +64,8 @@ public class NativeKeyException extends Exception {
 	 * Instantiates a new <code>NativeKeyException</code> with a specified 
 	 * cause.
 	 *
-	 * @param cause the cause of the exception (A null value is permitted, 
-	 * and indicates that the cause is nonexistent or unknown.)
+	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeKeyException(Throwable cause) {
 		super(cause);

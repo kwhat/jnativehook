@@ -32,11 +32,11 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
 
 /**
  * GlobalScreen is used to represent the native screen area that Java does not 
- * usually have access to.  This class can be thought of as the source component 
+ * usually have access to. This class can be thought of as the source component 
  * for native events.  
  * <p>
  * This class also handles the loading, unpacking and communication with the 
- * native library.  That includes registering new key and button hooks and the 
+ * native library. That includes registering new key and button hooks and the 
  * event dispatchers for each.
  * 
  * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
@@ -57,7 +57,7 @@ public class GlobalScreen {
 	 * Private constructor to prevent multiple instances of the global screen.
 	 * The {@link #registerHook} method will be called on construction to unpack 
 	 * and load the native library.
-	 */	
+	 */
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
@@ -71,7 +71,7 @@ public class GlobalScreen {
 	 * {@link #unregisterHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 * 
-	 * @throws Throwable the throwable
+	 * @throws Throwable The <code>Exception</code> raised by this method.
 	 * @see Object#finalize
 	 */
 	protected void finalize() throws Throwable {
@@ -205,14 +205,14 @@ public class GlobalScreen {
 	 * Processes native key events by dispatching them to all registered 
 	 * <code>NativeKeyListener</code> objects.
 	 * 
-	 * @param e the native key event
+	 * @param e The <code>NativeKeyEvent</code> to dispatch.
 	 * @see NativeKeyEvent
 	 * @see NativeKeyListener
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	protected void processKeyEvent(NativeKeyEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
-		int id = e.getId();
+		int id = e.getID();
 		
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeKeyListener.class ) {
@@ -233,14 +233,14 @@ public class GlobalScreen {
 	 * Processes native mouse events by dispatching them to all registered 
 	 * <code>NativeMouseListener</code> objects.
 	 * 
-	 * @param e the native key event
+	 * @param e The <code>NativeMouseEvent</code> to dispatch.
 	 * @see NativeKeyEvent
 	 * @see NativeKeyListener
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	protected void processMouseEvent(NativeMouseEvent e) {
 		Object[] objListeners = eventListeners.getListenerList();
-		int id = e.getId();
+		int id = e.getID();
 		
 		for (int i = 0; i < objListeners.length; i += 2) {
 			if ( objListeners[ i ] == NativeMouseListener.class ) {

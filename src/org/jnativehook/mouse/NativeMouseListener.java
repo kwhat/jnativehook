@@ -20,8 +20,8 @@ import java.util.EventListener;
 import org.jnativehook.GlobalScreen;
 
 /**
- * The listener interface for receiving system wide <code>NativeMouseEvents</code>. 
- * (To track native mouse moves use the <code>NativeMouseMotionListener</code>.)
+ * The listener interface for receiving systemwide <code>NativeMouseEvents</code>. 
+ * (To track native mouse moves, use the <code>NativeMouseMotionListener</code>.)
  * <p>
  * The class that is interested in processing a <code>NativeMouseEvent</code> 
  * implements this interface, and the object created with that class is 
@@ -40,14 +40,14 @@ public interface NativeMouseListener extends EventListener {
 	/** 
 	 * Invoked when a mouse button has been pressed
 	 * 
-	 * @param e the native mouse event
+	 * @param e The native mouse event.
 	 */
 	public void mousePressed(NativeMouseEvent e);
 	
 	/** 
 	 * Invoked when a mouse button has been released
 	 * 
-	 * @param e the native mouse event
+	 * @param e The native mouse event.
 	 */
 	public void mouseReleased(NativeMouseEvent e);
 	
@@ -56,19 +56,7 @@ public interface NativeMouseListener extends EventListener {
 	 * 
 	 * @param e the native mouse event
 	 */
-	//public void mouseClicked(NativeMouseEvent e);
+	//public void mouseWheel(NativeMouseEvent e);
 	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
-	 * 
-	 * @param e the native mouse event
-	 */
-	//public void mouseEntered(MouseEvent e);
-	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
-	 * 
-	 * @param e the native mouse event
-	 */
-	//public void mouseExited(MouseEvent e);
+
 }
