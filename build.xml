@@ -13,12 +13,11 @@
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
+	<property name="dir.doc" value="${basedir}/doc"/>
+	<property name="dir.jar" value="${basedir}/jar"/>
 	<property name="dir.dist" value="${basedir}/dist"/>
-	<property name="dir.docs" value="${basedir}/docs"/>
 	
-	<property name="dir.jar" value="${dir.dist}/jar"/>
 	<property name="dir.lib" value="${dir.src}/org/jnativehook/lib"/>
-	
 	<property name="dir.class" value="${basedir}/bin"/>
 	<property name="dir.obj" value="${basedir}/bin/obj"/>
 	
@@ -536,11 +535,23 @@
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.jar}" includes="*.jar"/>
+			<zipfileset dir="${dir.jar}" prefix="${project.name}/jar">
+				<include name="*.jar"/>
+			</zipfileset>
+			
+			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
+				<include name="${dir.doc}/**"/>
+				<exclude name="${dir.doc}/**/.*"/>
+			</zipfileset>	
+			
+			<zipfileset dir="${basedir}" prefix="${project.name}">
+				<include name="license.txt"/>
+				<include name="readme.txt"/>
+			</zipfileset>
 		</zip>
 		
 		<zip destfile="${dir.dist}/JNativeGrab-src-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${basedir}">
+			<zipfileset dir="${basedir}" prefix="${project.name}">
 				<exclude name="**/.*"/>
 				<exclude name="bin/**"/>
 				<exclude name="build.properties"/>
@@ -558,7 +569,6 @@
 		</tar>
 		-->
 	</target>
-	
 	
 	<target name="all" depends="jar" description="builds all targets">
 	</target>
