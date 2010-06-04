@@ -1,8 +1,7 @@
 *** About ***
 JNativeHook is a Java library to provide a global keyboard and mouse listening 
-capabilities for applications that may or may not have focus.  The library 
-directly extends Java's mouse and keyboard listeners to provide easy 
-integration.
+capabilities for applications regardless of focus.
+
 
 *** License ***
 Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
