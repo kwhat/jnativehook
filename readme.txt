@@ -42,9 +42,12 @@ Windows:
 	Dependencies:
 		Ant 1.7 or later
 		Java JDK 1.5 or later
-		MinGW 5.0 or later
-			MinGW base tools
-			MinGW Make
+		Windows x86:
+			MinGW 5.0 or later
+				MinGW base tools
+				MinGW Make
+		Windows x86_64
+			The latest mingw-w64-bin_i686
 		
 	Setup:
 		Make sure that you install MinGW, Java JDK and Ant to a location that 

@@ -159,8 +159,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DELETE; 						return jkey;
 		case VK_NUMLOCK:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUM_LOCK; 					return jkey;
-		case VK_SCROLL:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SCROLL_LOCK; 					return jkey;
+		case VK_SCROLL:									jkey.keycode = JK_SCROLL_LOCK; 					return jkey;
 
 		case VK_F1:										jkey.keycode = JK_F1; 							return jkey;
 		case VK_F2:										jkey.keycode = JK_F2; 							return jkey;

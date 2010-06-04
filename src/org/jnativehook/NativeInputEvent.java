@@ -170,15 +170,15 @@ public class NativeInputEvent extends EventObject {
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON3_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button3", "Button1") + "+";
+			param += Toolkit.getProperty("AWT.button3", "Button3") + "+";
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON4_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button4", "Button1") + "+";
+			param += Toolkit.getProperty("AWT.button4", "Button4") + "+";
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button5", "Button1") + "+";
+			param += Toolkit.getProperty("AWT.button5", "Button5") + "+";
 		}
 		
 		if (param.length() > 0) {

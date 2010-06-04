@@ -55,6 +55,17 @@
 //Instance Variables
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
+CGEventFlags prev_event_mask = 0;
+unsigned int event_modifiers[] = {
+	shiftKey,
+	rightShiftKey,
+	controlKey,
+	rightControlKey,
+	optionKey,
+	rightOptionKey,
+	cmdKey
+	/*, rightCmdKey */
+};
 
 void jniFatalError(char * message) {
 	//Attach to the currently running jvm
@@ -93,17 +104,13 @@ void throwException(char * message) {
 jint doModifierConvert(CGEventFlags event_mask) {
 	jint modifiers = 0;
 
-	if (event_mask & shiftKey)				modifiers |= NativeToJModifier(shiftKey);
-	if (event_mask & rightShiftKey)			modifiers |= NativeToJModifier(rightShiftKey);
-
-	if (event_mask & controlKey)			modifiers |= NativeToJModifier(controlKey);
-	if (event_mask & rightControlKey)		modifiers |= NativeToJModifier(rightControlKey);
-
-	if (event_mask & optionKey)				modifiers |= NativeToJModifier(optionKey);
-	if (event_mask & rightOptionKey)		modifiers |= NativeToJModifier(rightOptionKey);
-
-	if (event_mask & cmdKey)				modifiers |= NativeToJModifier(cmdKey);
-	//if (event_mask & rightCmdKey)			modifiers |= NativeToJModifier(rightCmdKey);
+	//Apply all our modifiers to the java modifiers return.
+	int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
+	for (i = 0; i < size; i++) {
+		if (event_mask & event_modifiers[i]) {
+			modifiers |= NativeToJModifier(event_modifiers[i]);
+		}
+	}
 
 	return modifiers;
 }
@@ -175,10 +182,54 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		break;
 
 		case kCGEventFlagsChanged:
-			event_mask = CGEventGetFlags(event);
+			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Modifiers changed (%X)\n", (unsigned int) event_mask);
+				printf("Native: eventHandlerCallback - Modifiers changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
 			#endif
+
+			//Class and Constructor for the NativeKeyEvent Object
+			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+
+			jkey = NativeToJKey(keysym);
+			modifiers = doModifierConvert(event_mask);
+
+			//Because of the way apple handles modifiers we need to send a key up or key down event for each time this changes.
+			/*	Outline of what is happening on the next 3 lines.
+				1010 1100	prev
+				1100 1010	curr
+				0110 0110	prev xor curr
+
+				//truned on - i.e. pressed
+				1100 1010	curr
+				0110 0110	(prev xor curr)
+				0100 0010	(prev xor curr) of prev
+
+				//turned off - i.e. released
+				1010 1100	prev
+				0110 0110	(prev xor curr)
+				0010 0100	(prev xor curr) and prev
+			 */
+			CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
+			CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+			CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
+
+			//Update the previous event mask.
+			prev_event_mask = event_mask;
+
+			int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
+			for (i = 0; i < size; i++) {
+				if (keydown_event_mask & event_modifiers[i]) {
+					//Fire key pressed event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, (jint) keysym, jkey.keycode, jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				}
+				else if (keyup_event_mask & event_modifiers[i]) {
+					//Fire key released event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				}
+			}
 		break;
 
 		case kCGEventLeftMouseDown:
@@ -244,9 +295,12 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventLeftMouseDragged:
 		case kCGEventRightMouseDragged:
 		case kCGEventOtherMouseDragged:
+			event_point = CGEventGetLocation(event);
 			#ifdef DEBUG
 				printf ("Native: EventHandlerCallback - MouseDragged (Unimplemented)\n");
 			#endif
+
+			//FIXME Call mouse move event for now.
 		break;
 
 		case kCGEventScrollWheel:

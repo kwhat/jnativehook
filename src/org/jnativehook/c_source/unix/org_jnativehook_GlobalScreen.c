@@ -131,8 +131,8 @@ int xErrorToException(Display * dpy, XErrorEvent * e) {
 	return 0;
 }
 
-int doModifierConvert(int event_mask) {
-	int modifiers = 0;
+jint doModifierConvert(int event_mask) {
+	jint modifiers = 0;
 
 	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
 	if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
@@ -177,6 +177,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	int event_root_y = data->event.u.keyButtonPointer.rootY;
 	int event_time = hook->server_time;
 	KeySym keysym;
+
 
 	JKeyDatum jkey;
 	jint jbutton;

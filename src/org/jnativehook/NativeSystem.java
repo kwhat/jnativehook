@@ -51,11 +51,11 @@ public class NativeSystem {
 	 */
 	public enum Arch {
 		
-		/** The i586 architecture. */
-		I586,
+		/** The x86 architecture. */
+		x86,
 		
 		/** The amd64 architecture. */
-		AMD64,
+		x86_64,
 		
 		/** The ppc architecture. */
 		PPC,
@@ -88,22 +88,16 @@ public class NativeSystem {
 		String osName = System.getProperty("os.name");
 		Family family;
 		
-		if (osName.equalsIgnoreCase("Windows NT") || 
-			osName.equalsIgnoreCase("Windows 2000") || 
-			osName.equalsIgnoreCase("Windows XP") ||
-			osName.equalsIgnoreCase("Windows 2003") ||
-			osName.equalsIgnoreCase("Windows Vista") ||
-			osName.equalsIgnoreCase("Windows 7")
-		) {
+		if (osName.toLowerCase().startsWith("windows")) {
 			family = Family.WINDOWS;
 		}
-		else if (osName.equalsIgnoreCase("Linux")) {
+		else if (osName.toLowerCase().equals("linux")) {
 			family = Family.LINUX;
 		}
-		else if (osName.equalsIgnoreCase("FreeBSD")) {
+		else if (osName.toLowerCase().equals("freebsd")) {
 			family = Family.FREEBSD;
 		}
-		else if (osName.equalsIgnoreCase("Mac OS X")) {
+		else if (osName.toLowerCase().equals("mac os x")) {
 			family = Family.OSX;
 		}
 		else {
@@ -128,13 +122,13 @@ public class NativeSystem {
 			osArch.equalsIgnoreCase("i586") ||
 			osArch.equalsIgnoreCase("i686")
 		) {
-			arch = Arch.I586;
+			arch = Arch.x86;
 		}
 		else if (osArch.equalsIgnoreCase("x86_64") || 
 				osArch.equalsIgnoreCase("amd64") || 
 				osArch.equalsIgnoreCase("k8")
 		) {
-			arch = Arch.AMD64;
+			arch = Arch.x86_64;
 		}
 		else if (osArch.equalsIgnoreCase("ppc") ||
 				osArch.equalsIgnoreCase("PowerPC")

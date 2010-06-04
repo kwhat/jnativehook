@@ -45,14 +45,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_ALT;							return jkey;
 		case kVK_Command:
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_META;							return jkey;
-		//FIXME Not sure where apple is hiding this one.
-		//case kVK_RightCommand:
-		//	jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_META;							return jkey;
+		case kVK_RightCommand:
+			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_META;							return jkey;
 		//case XK_Super_L:
-		//	jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;
+		//	jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
 		//case XK_Super_R:
-		//	jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;
-		//case XK_Menu:									jkey.keycode = JK_CONTEXT_MENU;					return jkey;
+		//	jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
+		case kMenuPowerGlyph:							jkey.keycode = JK_CONTEXT_MENU;					return jkey;
 
 		//case XK_Pause:								jkey.keycode = JK_PAUSE;						return jkey;	//No Apple Support
 		case kVK_CapsLock:								jkey.keycode = JK_CAPS_LOCK;					return jkey;

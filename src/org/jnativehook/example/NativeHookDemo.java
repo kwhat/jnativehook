@@ -56,7 +56,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(450, 200);
+		setSize(600, 250);
 		addWindowListener(this);
 		
 		txtEventInfo = new JTextArea();
