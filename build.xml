@@ -9,7 +9,7 @@
 	<buildnumber file="build.num"/>
 	<property name="project.name"		value="${ant.project.name}"/>
 	<property name="project.vendor" 	value="1stleg Development"/>
-	<property name="project.version"	value="1.0.${build.number}-Beta1"/>
+	<property name="project.version"	value="1.0.${build.number}-Beta"/>
 	
 	<!-- Path Settings -->
 	<property name="dir.src" value="${basedir}/src"/>
@@ -24,12 +24,13 @@
 	
 	<target name="clean" description="prepares the environment">
 		<echo>Cleaning old build structure...</echo>
-		<delete includeemptydirs="true" verbose="true" failonerror="false">
+		
+		<delete includeEmptyDirs="false" verbose="true" failonerror="false">
 			<fileset dir="${dir.doc}"/>
 			<fileset dir="${dir.jar}"/>
 			<fileset dir="${dir.dist}"/>
 			<fileset dir="${dir.class}"/>
-			<fileset dir="${dir.obj}"/>
+			<fileset file="build.properties"/>
 		</delete>
 	</target>
 	
