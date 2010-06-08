@@ -24,7 +24,7 @@
 
 typedef struct {
 	jint keycode;		//Key Code
-	jchar rawcode;		//Raw Code
+	jint rawcode;		//Raw Code
 	jint location;		//Key Location
 } JKeyDatum;
 

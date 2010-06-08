@@ -26,7 +26,6 @@
 		<echo>Cleaning old build structure...</echo>
 		
 		<delete includeEmptyDirs="false" verbose="true" failonerror="false">
-			<fileset dir="${dir.doc}"/>
 			<fileset dir="${dir.jar}"/>
 			<fileset dir="${dir.dist}"/>
 			<fileset dir="${dir.class}"/>
@@ -83,7 +82,7 @@
 		
 		
 		<!-- Figure out of the system arch is supported -->
-		<condition property="native.arch" value="i386">
+		<condition property="native.arch" value="i586">
 			<or>
 				<os arch="x86"/>
 				<os arch="i386"/>
@@ -94,6 +93,7 @@
 		</condition>
 		<condition property="native.arch" value="k8">
 			<or>
+				<os arch="x86-64"/>
 				<os arch="x86_64"/>
 				<os arch="amd64"/>
 				<os arch="k8"/>
@@ -112,14 +112,10 @@
 			</or>
 		</condition>
 		
-		<!-- Set the system tune -->
-		<condition property="native.tune" value="i586" else="${native.arch}">
-			<equals arg1="${native.arch}" arg2="i386" casesensitive="false" trim="true"/>
-		</condition>
 		
 		<!-- Set the system arch name -->
 		<condition property="native.arch.name" value="x86">
-			<equals arg1="${native.arch}" arg2="i386" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
 		</condition>
 		<condition property="native.arch.name" value="x86_64">
 			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true"/>
@@ -140,6 +136,22 @@
 		</fail>
 		<echo>Compatible system architecture: ${native.arch.name}</echo>
 		
+		
+		<!-- Special arch for osx -->
+		<condition property="native.arch.osx" value="i386">
+			<and>
+				<os family="mac"/>
+				<os family="unix"/>
+				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
+			</and>
+		</condition>
+		<condition property="native.arch.osx" value="${native.arch.name}">
+			<and>
+				<os family="mac"/>
+				<os family="unix"/>
+			</and>
+		</condition>
+			
 		
 		<!-- Set 32 or 64 bit flag -->
 		<property name="native.arch.model" value="${sun.arch.data.model}"/>
@@ -361,13 +373,14 @@
 		
 		
 		<!-- set system specific cflags -->
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=${native.tune} -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=${native.tune} -Wall -O3 -fno-strict-aliasing -shared -lX11 -lXtst -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -lX11 -lXtst -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -arch ${native.arch} -mtune=${native.tune} -Wall -O3 -fno-strict-aliasing -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall -O3 -fno-strict-aliasing -fPIC">
+			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -378,7 +391,7 @@
 		<condition property="native.ldflags" value="-lc -shared -lX11 -L/usr/lib -L/usr/local/lib">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.ldflags" value="-lc -dylib -framework Carbon -framework JavaVM">
+		<condition property="native.ldflags" value="-lc -arch ${native.arch.osx} -dylib -dynamic -ldylib1.o -framework Carbon -framework JavaVM">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -389,7 +402,8 @@
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.includes" value="-I${java.include} -F/System/Library/Frameworks/Carbon.framework/Frameworks/">
+		<!-- -F/System/Library/Frameworks/Carbon.framework/Frameworks -->
+		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -409,7 +423,6 @@
 	
 	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
 		<echo>Compiling java source...</echo>
-		<mkdir dir="${dir.doc}"/>
 		<mkdir dir="${dir.jar}"/>
 		<mkdir dir="${dir.dist}"/>
 		<mkdir dir="${dir.class}"/>
@@ -522,6 +535,9 @@
 	</target>
 	
 	<target name="document" depends="jar" description="Generates javadoc api documentation">
+		<delete dir="${dir.doc}"/>
+		<mkdir dir="${dir.doc}"/>
+		
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="src" defaultexcludes="yes">
 				<include name="org/jnativehook/**"/>

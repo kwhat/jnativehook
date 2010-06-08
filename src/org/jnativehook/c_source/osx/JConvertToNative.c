@@ -23,6 +23,7 @@
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
+	jkey.rawcode = keysym;
 	jkey.location = JK_LOCATION_STANDARD;
 
 	switch ((unsigned int) keysym) {

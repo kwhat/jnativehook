@@ -159,7 +159,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire key pressed event.
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, (jint) keysym, jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
@@ -177,7 +177,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire key released event.
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
@@ -221,12 +221,12 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			for (i = 0; i < size; i++) {
 				if (keydown_event_mask & event_modifiers[i]) {
 					//Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, (jint) keysym, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				}
 				else if (keyup_event_mask & event_modifiers[i]) {
 					//Fire key released event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, keysym, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				}
 			}
