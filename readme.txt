@@ -84,3 +84,24 @@ Building:
 	Extract source archive to a folder without spaces and run ant in that 
 	folder.  If custom build configuration is needed use the "configure" task 
 	to generate a build.properties file for modification.
+
+
+*** Installation ***
+The JNativeHook library ships with all the supported native libraries included 
+in the jar file.  The library will attempt to identify the host operating 
+system and extract the appropriate library to a temporary location and 
+dynamically load it.  All that is needed for most installations is placing the 
+jar file in the programs class path.
+
+There maybe specific circumstances where bundling the native library within the 
+jar is undesirable.  For these situations the native library can be loaded from 
+the java.library.path by specifying the location of the binary file.  For 
+example java -Djava.library.path=/usr/lib -jar JNativeHook.jar.  If both an 
+external and internal library are present the external library takes precedence.
+
+
+*** Known Issues ***
+The current native key code to virtual key code conversion method will probably 
+only work for standard united states keyboard layout.  A more effective solution 
+using a native key code to key string lookup should be implemented against the 
+current keyboard layout and then translated to a virtual key code.

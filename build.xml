@@ -18,7 +18,7 @@
 	<property name="dir.dist" value="${basedir}/dist"/>
 	
 	<property name="dir.lib" value="${dir.src}/org/jnativehook/lib"/>
-	<property name="dir.class" value="${basedir}/bin"/>
+	<property name="dir.bin" value="${basedir}/bin"/>
 	<property name="dir.obj" value="${basedir}/bin/obj"/>
 	
 	
@@ -425,11 +425,11 @@
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.jar}"/>
 		<mkdir dir="${dir.dist}"/>
-		<mkdir dir="${dir.class}"/>
+		<mkdir dir="${dir.bin}"/>
 		<mkdir dir="${dir.obj}"/>
 		
 		<path id="classpath">
-			<pathelement location="${dir.class}"/>
+			<pathelement location="${dir.bin}"/>
 			<!-- Use this to include addtional dependencies
 			<fileset dir="${project.lib}">
 				<include name="*.jar"/>
@@ -437,7 +437,7 @@
 			-->
 		</path>
 		<javac srcdir="${dir.src}"
-			destdir="${dir.class}"
+			destdir="${dir.bin}"
 			classpathref="classpath"
 			debug="${project.debug}"
 			deprecation="false"
@@ -459,7 +459,6 @@
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
 		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}"/>
-		
 		
 		<!-- set system specific src -->
 		<condition property="native.src" value="windows">
@@ -508,8 +507,8 @@
 		</exec>
 		
 		<echo>Copying libs...</echo>
-		<mkdir dir="${dir.class}/org/jnativehook/lib"/>
-		<copy overwrite="true" todir="${dir.class}/org/jnativehook/lib">
+		<mkdir dir="${dir.bin}/org/jnativehook/lib"/>
+		<copy overwrite="true" todir="${dir.bin}/org/jnativehook/lib">
 			<fileset dir="${dir.lib}" includes="**/*"/>
 		</copy>
 	</target>
@@ -517,7 +516,7 @@
 	<target name="jar" depends="compile" description="Creates the library jar file">
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
-		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.class}">
+		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin}">
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
 			<exclude name="org/jnativehook/c_source/**"/>
@@ -538,6 +537,8 @@
 		<delete dir="${dir.doc}"/>
 		<mkdir dir="${dir.doc}"/>
 		
+		<echo>Generating API Documenation...</echo>
+		<mkdir dir="${dir.doc}"/>
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="src" defaultexcludes="yes">
 				<include name="org/jnativehook/**"/>
@@ -557,7 +558,11 @@
 		</javadoc>
 	</target>
 	
+<<<<<<< .mine
+	<target name="package" depends="jar,document" description="Creates zip files for distribution">
+=======
 	<target name="package" depends="document" description="Creates zip files for distribution">
+>>>>>>> .r240
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
@@ -577,22 +582,21 @@
 		
 		<zip destfile="${dir.dist}/JNativeGrab-src-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<exclude name="**/.*"/>
-				<exclude name="bin/**"/>
+				<include name="*.txt"/>
+				<include name="build.*"/>
+				<include name="Makefile"/>
 				<exclude name="build.properties"/>
-				<exclude name="dist/**"/>
+			</zipfileset>
+			
+			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
+				<exclude name="**/.*"/>
+			</zipfileset>
+			
+			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
+				<exclude name="**/.*"/>
+				<exclude name="org/jnativehook/lib/**"/>
 			</zipfileset>
 		</zip>
-		
-		<!--  We dont really need 3 archive formats for distribution
-		<tar destfile="${dir.dist}/JNativeGrab.tar.gz" compression="gzip">
-			<tarfileset dir="${dir.jar}" includes="*.jar"/>
-		</tar>
-		
-		<tar destfile="${dir.dist}/JNativeGrab.tar.bz2" compression="bzip2">
-			<tarfileset dir="${dir.jar}" includes="*.jar"/>
-		</tar>
-		-->
 	</target>
 	
 	<target name="all" depends="jar" description="builds all targets">

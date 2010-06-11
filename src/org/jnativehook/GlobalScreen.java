@@ -279,7 +279,7 @@ public class GlobalScreen {
 			//The library is not in the java.library.path so try to extract it.
 			try {
 				//Try to locate the jar file
-				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "/" +	NativeSystem.getArchitecture().toString().toLowerCase();
+				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "-" +	NativeSystem.getArchitecture().toString().toLowerCase();
 				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 				
 				if (classFile.isFile()) {
@@ -288,7 +288,7 @@ public class GlobalScreen {
 					ZipEntry zipEntry;
 					
 					while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
-						//Check all the entires for the lib path
+						//Check all the entries for the lib path
 						if (!zipEntry.isDirectory() && zipEntry.getName().toLowerCase().startsWith( libPath.toLowerCase() )) {
 							String libName = zipEntry.getName().substring(zipEntry.getName().lastIndexOf('/'));
 							File libFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + libName);
