@@ -558,11 +558,7 @@
 		</javadoc>
 	</target>
 	
-<<<<<<< .mine
 	<target name="package" depends="jar,document" description="Creates zip files for distribution">
-=======
-	<target name="package" depends="document" description="Creates zip files for distribution">
->>>>>>> .r240
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">

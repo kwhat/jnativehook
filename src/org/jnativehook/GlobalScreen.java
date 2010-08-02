@@ -279,7 +279,7 @@ public class GlobalScreen {
 			//The library is not in the java.library.path so try to extract it.
 			try {
 				//Try to locate the jar file
-				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "-" +	NativeSystem.getArchitecture().toString().toLowerCase();
+				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "/" +	NativeSystem.getArchitecture().toString().toLowerCase();
 				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 				
 				if (classFile.isFile()) {
