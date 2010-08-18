@@ -388,7 +388,7 @@
 		<condition property="native.ldflags" value="-lgcc -shared -Wl,--kill-at">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.ldflags" value="-lc -shared --as-needed -lX11 -L/usr/lib -L/usr/local/lib">
+		<condition property="native.ldflags" value=" -lc -shared -lX11 -L/usr/lib -L/usr/local/lib">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-lc -arch ${native.arch.osx} -dylib -dynamic -ldylib1.o -framework Carbon -framework JavaVM">
@@ -533,7 +533,7 @@
 		</jar>
 	</target>
 	
-	<target name="document" depends="jar" description="Generates javadoc api documentation">
+	<target name="javadoc" depends="jar" description="Generates javadoc api documentation">
 		<delete dir="${dir.doc}"/>
 		<mkdir dir="${dir.doc}"/>
 		
@@ -558,7 +558,7 @@
 		</javadoc>
 	</target>
 	
-	<target name="package" depends="jar,document" description="Creates zip files for distribution">
+	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
