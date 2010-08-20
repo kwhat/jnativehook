@@ -149,7 +149,6 @@ jint doModifierConvert(int event_mask) {
 }
 
 void callback(XPointer pointer, XRecordInterceptData * hook) {
-
 	if (hook->category != XRecordFromServer && hook->category != XRecordFromClient) {
 		XRecordFreeData(hook);
 		return;
@@ -315,13 +314,17 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	XRecordFreeData(hook);
 }
 
-void MsgLoop() {
+void * MsgLoop() {
+	//throwException("org/jnativehook/NativeHookException", "Could not allocate TEST");
+	//pthread_exit((void *) 0);
+
 	//Setup XRecord range
 	XRecordClientSpec clients = XRecordAllClients;
 	XRecordRange * range = XRecordAllocRange();
 	if (range == NULL) {
 		throwException("org/jnativehook/NativeHookException", "Could not allocate XRecordRange");
-		return; //Naturally exit so jni exception is thrown.
+		pthread_exit((void *) 0);
+		//return; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -336,7 +339,8 @@ void MsgLoop() {
 	XFree(range);
 	if (context == 0) {
 		throwException("org/jnativehook/NativeHookException", "Could not create XRecordContext");
-		return; //Naturally exit so jni exception is thrown.
+		pthread_exit((void *) 0);
+		//return; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -467,7 +471,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Call listener
 	isRunning = true;
 
-	if( pthread_create( &hookThreadId, NULL, (void *) &MsgLoop, NULL) ) {
+pthread_attr_t attr = NULL;
+/*
+pthread_attr_init(&attr);
+pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); //sets system contention scope for thread
+//pthread_attr_setstacksize(&attr, 512*1024);
+*/
+	if( pthread_create( &hookThreadId, &attr, MsgLoop, NULL) ) {
 		#ifdef DEBUG
 			printf("Native: MsgLoop() start failure.\n");
 		#endif
@@ -485,6 +495,17 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
+	//Try to exit the thread naturally.
+	isRunning = false;
+	pthread_join(hookThreadId, NULL);
+
+	//Make sure the thread has stopped.
+	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
+		#ifdef DEBUG
+			printf("Native: pthread_kill successful.\n");
+		#endif
+	}
+
 	if (disp_hook != NULL) {
 		XRecordDisableContext(disp_hook, context);
 		XRecordFreeContext(disp_hook, context);
@@ -496,18 +517,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	if (disp_data != NULL) {
 		XCloseDisplay(disp_data);
 		disp_data = NULL;
-	}
-
-	//Try to exit the thread naturally.
-	isRunning = false;
-	pthread_join(hookThreadId, NULL);
-
-
-	//Make sure the thread has stopped.
-	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
-		#ifdef DEBUG
-			printf("Native: pthread_kill successful.\n");
-		#endif
 	}
 
 	#ifdef DEBUG
