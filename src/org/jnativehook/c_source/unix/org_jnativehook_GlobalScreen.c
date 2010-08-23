@@ -63,7 +63,7 @@ Compiling Options:
 #include "xEventModifers.h"
 
 //Instance Variables
-bool isRunning = true;
+Bool isRunning = true;
 unsigned int xkb_timeout;
 unsigned int xkb_interval;
 
@@ -323,8 +323,8 @@ void * MsgLoop() {
 	XRecordRange * range = XRecordAllocRange();
 	if (range == NULL) {
 		throwException("org/jnativehook/NativeHookException", "Could not allocate XRecordRange");
-		pthread_exit((void *) 0);
-		//return; //Naturally exit so jni exception is thrown.
+		//pthread_exit((void *) 0);
+		return NULL; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -339,8 +339,8 @@ void * MsgLoop() {
 	XFree(range);
 	if (context == 0) {
 		throwException("org/jnativehook/NativeHookException", "Could not create XRecordContext");
-		pthread_exit((void *) 0);
-		//return; //Naturally exit so jni exception is thrown.
+		//pthread_exit((void *) 0);
+		return NULL; //Naturally exit so jni exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -348,8 +348,9 @@ void * MsgLoop() {
 		#endif
 	}
 
-	XRecordEnableContextAsync(disp_hook, context, callback, NULL);
-	//XRecordEnableContext(disp_hook, context, callback, NULL);
+	//Async works without the loop and outside of threads.
+	//XRecordEnableContextAsync(disp_hook, context, callback, NULL);
+	XRecordEnableContext(disp_hook, context, callback, NULL);
 
 	while (isRunning) {
 		XRecordProcessReplies(disp_hook);
@@ -358,6 +359,8 @@ void * MsgLoop() {
 	#ifdef DEBUG
 		printf("Native: MsgLoop() stop successful.\n");
 	#endif
+
+	return NULL;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
@@ -471,13 +474,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Call listener
 	isRunning = true;
 
-pthread_attr_t attr = NULL;
-/*
-pthread_attr_init(&attr);
-pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); //sets system contention scope for thread
-//pthread_attr_setstacksize(&attr, 512*1024);
-*/
+	/*
+	 * We shall use the default pthread attributes: thread is joinable
+	 * (not detached) and has default (non real-time) scheduling policy.
+	pthread_attr_t attr = NULL;
+	pthread_attr_init(&attr);
+	pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); //sets system contention scope for thread
+	//pthread_attr_setstacksize(&attr, 512*1024);
 	if( pthread_create( &hookThreadId, &attr, MsgLoop, NULL) ) {
+	*/
+	if( pthread_create( &hookThreadId, NULL, MsgLoop, NULL) ) {
 		#ifdef DEBUG
 			printf("Native: MsgLoop() start failure.\n");
 		#endif

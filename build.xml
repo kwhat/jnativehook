@@ -376,7 +376,7 @@
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -lX11 -lXtst -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall -O3 -fno-strict-aliasing -fPIC">
@@ -388,7 +388,7 @@
 		<condition property="native.ldflags" value="-lgcc -shared -Wl,--kill-at">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.ldflags" value=" -lc -shared -lX11 -L/usr/lib -L/usr/local/lib">
+		<condition property="native.ldflags" value="-lc -shared -lX11 -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-lc -arch ${native.arch.osx} -dylib -dynamic -ldylib1.o -framework Carbon -framework JavaVM">
