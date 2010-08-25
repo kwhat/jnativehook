@@ -368,7 +368,6 @@
 		<condition property="project.isDebug" value="true">
 			<istrue value="${project.debug}"/>
 		</condition>
-		
 		<echo>Debug Mode: ${project.debug}</echo>
 		
 		
@@ -376,7 +375,7 @@
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -fPIC">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall -O3 -fno-strict-aliasing -fPIC">
@@ -385,16 +384,27 @@
 		</condition>
 		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-lgcc -shared -Wl,--kill-at">
+		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,-O3">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.ldflags" value="-lc -shared -lX11 -lXtst">
+		<condition property="native.ldflags" value="--as-needed -shared -O3">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.ldflags" value="-lc -arch ${native.arch.osx} -dylib -dynamic -ldylib1.o -framework Carbon -framework JavaVM">
+		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
+		<!-- set system specific libraries -->
+		<condition property="native.libs" value="-lgcc">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.libs" value="-lc -lX11 -lXtst">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
+			<isset property="native.os.isMac"/>
+		</condition>
+	
 		<!-- set system specific includes -->
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
 			<isset property="native.os.isWindows"/>
@@ -417,6 +427,7 @@
 			<entry key="native.make"			value="${native.make}"/>
 			<entry key="native.cflags"			value="${native.cflags}"/>
 			<entry key="native.ldflags"			value="${native.ldflags}"/>
+			<entry key="native.libs"			value="${native.libs}"/>
 			<entry key="native.includes"		value="${native.includes}"/>
 		</propertyfile>
 	</target>
@@ -499,9 +510,10 @@
 			<env key="LD" value="${native.ld}"/>
 			<env key="CFLAGS" value="${native.cflags}"/>
 			<env key="LDFLAGS" value="${native.ldflags}"/>
+			<env key="INCLUDES" value="${native.includes}"/>
+			<env key="LIBS" value="${native.libs}"/>
 			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
 			<env key="OBJ_DIR" value="${dir.obj}"/>
-			<env key="INCLUDES" value="${native.includes}"/>
 			<env key="DEBUG" value="${native.make.debug}"/>
 			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
