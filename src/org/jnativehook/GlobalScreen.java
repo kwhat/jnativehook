@@ -313,7 +313,7 @@ public class GlobalScreen {
 					File libFolder = new File(classFile.getAbsoluteFile() + "/" + libPath);
 
 					if (libFolder.isDirectory()) {
-						System.setProperty("java.library.path", System.getProperty("java.library.path", "") + System.getProperty("path.separator", ":") + libFolder.getPath());
+						System.setProperty("java.library.path", System.getProperty("java.library.path", ".") + System.getProperty("path.separator", ":") + libFolder.getPath());
 						
 						//Refresh the library path
 						Field sysPath = ClassLoader.class.getDeclaredField("sys_paths");
