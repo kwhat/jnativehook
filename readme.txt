@@ -42,7 +42,7 @@ GUI Demo Applcation:
 
 	Solaris OS
 		Oracle Solaris 8 or later
-		i586, amd64 or SPARC
+		i586, amd64, SPARC 32 or SPARC 64
 		64 MB of RAM
 
 	Windows 
