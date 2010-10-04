@@ -1,10 +1,59 @@
 *** About ***
-JNativeHook is a Java library to provide a global keyboard and mouse listening 
-capabilities for applications regardless of focus.
+JNativeHook is a library to provide global keyboard and mouse hooking for Java.
+The primary purpose is to allow Java applacations access to keyboard and mouse 
+events that would normally be outside of the scope of the running applcaiton.  
+
+Additianlly information about keyboard  
+
+Keyboard Events:
+	Capture native key events for system keycodes between 0-255.
+	System key codes will be translated to their virtual key code equivelents. 
+	Events will be delivered to java for system keycodes between 0-255.
+
+Keyboard Information:
+	Keyboard repeate rate and the keybaoard repeate delay in miliseconds are 
+	avaiable via their respective function calls.  
+
+Mouse Button Events:
+	Native mouse button events will be capture for mouse buttons 1-5.
+	Mouse buttons will be translated to their equivalent virtual button code.
+	The virutal button code will be delivered to Java.
+	
+Mouse Motion Events:
+	Native mouse motion events will be captured for all mouse movements.
+	Motion events will be returend to Java.
+
+GUI Demo Applcation:
+	Realtime dominstration of raw output for keyboard, button and mouse move
+	events.
+
+*** Software and Hardware Requirements ***
+	Java 1.5 or later
+
+	Linux / BSD Unix
+		i586 or amd64
+		X11 6.4 or Later with XRecord
+		64 MB of RAM
+		
+	Mac OS X
+		Apple Mac OS X 10.4 or Later
+		i586, amd64, ppc or ppc64
+		256 MB of RAM
+
+	Solaris OS
+		Oracle Solaris 8 or later
+		i586, amd64 or SPARC
+		64 MB of RAM
+
+	Windows 
+		Microsoft Windows 2000 or later
+		i586 or amd64
+		32-bit 64 MB of RAM
+		64-bit 128 MB of RAM
 
 
 *** License ***
-Copyright (c) 2006-2010 - Alexander Barker (alex@1stleg.com)
+Copyright (c) 2006-2010 Alexander Barker. All Rights Received.
  
 JNativeHook is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -50,10 +99,10 @@ Windows:
 			The latest mingw-w64-bin_i686
 		
 	Setup:
-		Make sure that you install MinGW, Java JDK and Ant to a location that 
-		does not have spaces in the path.  For example:
+		Install MinGW, Java JDK and Ant to a locations that do not include 
+		spaces in the path.  For example:
 			C:\MinGW
-			C:\Java\jdk1.6.0_16
+			C:\Java\jdk1.6.0_20
 			C:\Java\jre6
 			C:\ant\apache-ant-1.8.1
 		
@@ -71,7 +120,7 @@ Windows:
 
 Mac OS X:
 	Dependencies:
-		Java 1.5 or later
+		Java 1.5 or Later
 		Xcode Developer Tools 2.2.1 or later
 
 	Setup:
