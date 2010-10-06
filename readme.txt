@@ -1,37 +1,53 @@
 *** About ***
 JNativeHook is a library to provide global keyboard and mouse hooking for Java.
 The primary purpose is to allow Java applacations access to keyboard and mouse 
-events that would normally be outside of the scope of the running applcaiton.  
+events that would normally be outside the scope of a Java applcaiton.  
+
+
 
 Additianlly information about keyboard  
 
+
+
 Keyboard Events:
-	Capture native key events for system keycodes between 0-255.
-	System key codes will be translated to their virtual key code equivelents. 
-	Events will be delivered to java for system keycodes between 0-255.
+    Key event system codes and their modifier masks are captured at the native 
+    level. The acquired system codes are then translated to their respective 
+    key codes.  The key codes are then translated to virtual key codes, as 
+    specified in the application programming interface.  Modifier masks are 
+    translated directly from their native masks to a virtual mask.  After all 
+    native translations have taken place,the virtual key code and modifier mask 
+    are delivered to Java via a NativeKeyEvent object.
 
 Keyboard Information:
-	Keyboard repeate rate and the keybaoard repeate delay in miliseconds are 
-	avaiable via their respective function calls.  
+    Keyboard repeat rate and the repeat delay in milliseconds are provided via 
+    their respective function calls.
 
 Mouse Button Events:
-	Native mouse button events will be capture for mouse buttons 1-5.
-	Mouse buttons will be translated to their equivalent virtual button code.
-	The virutal button code will be delivered to Java.
-	
+    Mouse button events and their modifier masks are captured at the native 
+    level.  The acquired button codes are then translated to virtual button 
+	codes as specified in the application programming interface. Modifier masks 
+	are translated directly from their native masks to a virtual mask.  After 
+	all native translations have taken place, the virtual button code and 
+	modifier mask are delivered to Java via a NativeMouseEvent object.
+   
 Mouse Motion Events:
-	Native mouse motion events will be captured for all mouse movements.
-	Motion events will be returend to Java.
+    Mouse motion events and their modifier masks are captured at the native 
+    level.  The acquired pointer coordinates are untranslated from their native
+	position.  The coordinates are usually relative to the upper left corner of 
+	the native display, however that origin cannot be guaranteed.  Modifier 
+	masks are translated directly from their native masks to a virtual mask.  
+	After all native translations have taken place, the virtual key code and 
+	modifier mask are delivered to Java via a NativeMouseEvent object.
 
-GUI Demo Applcation:
-	Realtime dominstration of raw output for keyboard, button and mouse move
-	events.
+GUI Demo Application:
+    The graphical demonstration application was created to provided a real-time
+    demonstration of raw output for keyboard, button and mouse motion events.
 
 *** Software and Hardware Requirements ***
 	Java 1.5 or later
 
 	Linux / BSD Unix
-		i586 or amd64
+		i586, amd64, ppc, ppc64, SPARC 32 or SPARC 64
 		X11 6.4 or Later with XRecord
 		64 MB of RAM
 		
