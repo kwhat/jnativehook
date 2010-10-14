@@ -52,17 +52,17 @@ GUI Demo Application:
 		64 MB of RAM
 		
 	Mac OS X
-		Apple Mac OS X 10.4 or Later
+		Apple Mac OS X 10.4 to 10.6
 		i586, amd64, ppc or ppc64
 		256 MB of RAM
 
 	Solaris OS
-		Oracle Solaris 8 or later
+		Oracle Solaris 8 to 11
 		i586, amd64, SPARC 32 or SPARC 64
 		64 MB of RAM
 
 	Windows 
-		Microsoft Windows 2000 or later
+		Microsoft Windows 2000 to 7
 		i586 or amd64
 		32-bit 64 MB of RAM
 		64-bit 128 MB of RAM
