@@ -479,61 +479,68 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * @return A string identifying the event and its attributes.
 	 */
 	public String paramString() {
-		String param = "";
+		StringBuilder param = new StringBuilder(255); 
 		
 		switch(getID()) {
 			case NATIVE_KEY_PRESSED:
-				param += "NATIVE_KEY_PRESSED";
+				param.append("NATIVE_KEY_PRESSED");
 			break;
 			
 			case NATIVE_KEY_RELEASED:
-				param += "NATIVE_KEY_RELEASED";
+				param.append("NATIVE_KEY_RELEASED");
 			break;
 			
 			default:
-				param += "unknown type";
+				param.append("unknown type");
 			break;
 		}
-		param += ",";
+		param.append(',');
 		
-		param += "keyCode=" + keyCode + ",";
-		param += "keyText=" + getKeyText(keyCode) + ",";
+		param.append("keyCode=");
+		param.append(keyCode);
+		param.append(',');
 		
+		param.append("keyText=");
+		param.append(getKeyText(keyCode));
+		param.append(',');
 		
 		if (getModifiers() != 0) {
-			param += "modifiers=" + getModifiersText(getModifiers()) + ",";
+			param.append("modifiers=");
+			param.append(getModifiersText(getModifiers()));
+			param.append(',');
 		}
 
-		param += "keyLocation=";
+		param.append("keyLocation=");
 		switch (keyLocation) {
 			case KEY_LOCATION_UNKNOWN:
-				param += "KEY_LOCATION_UNKNOWN";
+				param.append("KEY_LOCATION_UNKNOWN");
 			break;
 			
 			case KEY_LOCATION_STANDARD:
-				param += "KEY_LOCATION_STANDARD";
+				param.append("KEY_LOCATION_STANDARD");
 			break;
 			
 			case KEY_LOCATION_LEFT:
-				param += "KEY_LOCATION_LEFT";
+				param.append("KEY_LOCATION_LEFT");
 			break;
 			
 			case KEY_LOCATION_RIGHT:
-				param += "KEY_LOCATION_RIGHT";
+				param.append("KEY_LOCATION_RIGHT");
 			break;
 			
 			case KEY_LOCATION_NUMPAD:
-				param += "KEY_LOCATION_NUMPAD";
+				param.append("KEY_LOCATION_NUMPAD");
 			break;
 			
 			default:
-				param += "KEY_LOCATION_UNKNOWN";;
+				param.append("KEY_LOCATION_UNKNOWN");
 			break;
 		}
-		param += ",";
+		param.append(',');
 		
-		param += "rawCode=" + rawCode;
+		param.append("rawCode=");
+		param.append(rawCode);
 		
-		return param;
+		return param.toString();
 	}
 }

@@ -270,6 +270,7 @@ public class GlobalScreen {
 	 * Perform procedures to interface with the native library. These procedures 
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
+	//TODO Replace with a custom class loader
 	protected static void registerHook() {
 		try {
 			//Try to load the native library assuming the java.library.path was
@@ -338,6 +339,7 @@ public class GlobalScreen {
 	 * Perform procedures to cleanup the native library. This method should be 
 	 * called on garbage collection to ensure proper native cleanup.
 	 */
+	//TODO Replace with a custom class loader
 	protected static void unregisterHook() {
 		//Do Nothing
 	}

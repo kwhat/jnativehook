@@ -142,51 +142,60 @@ public class NativeInputEvent extends EventObject {
 	 * @return the modifier mask's textual representation
 	 */
 	public static String getModifiersText(int modifiers) {
-		String param = "";
+		StringBuilder param = new StringBuilder(255); 
 		
 		if ((modifiers & NativeInputEvent.SHIFT_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.shift", "Shift") + "+";
+			param.append(Toolkit.getProperty("AWT.shift", "Shift"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.CTRL_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.control", "Ctrl") + "+";
+			param.append(Toolkit.getProperty("AWT.control", "Ctrl"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.META_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.meta", "Meta") + "+";
+			param.append(Toolkit.getProperty("AWT.meta", "Meta"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.ALT_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.alt", "Alt") + "+";
+			param.append(Toolkit.getProperty("AWT.alt", "Alt"));
+			param.append('+');
 		}
 		
 		
 		if ((modifiers & NativeInputEvent.BUTTON1_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button1", "Button1") + "+";
+			param.append(Toolkit.getProperty("AWT.button1", "Button1"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON2_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button2", "Button2") + "+";
+			param.append(Toolkit.getProperty("AWT.button2", "Button2"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON3_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button3", "Button3") + "+";
+			param.append(Toolkit.getProperty("AWT.button3", "Button3"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON4_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button4", "Button4") + "+";
+			param.append(Toolkit.getProperty("AWT.button4", "Button4"));
+			param.append('+');
 		}
 		
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
-			param += Toolkit.getProperty("AWT.button5", "Button5") + "+";
+			param.append(Toolkit.getProperty("AWT.button5", "Button5"));
+			param.append('+');
 		}
 		
 		if (param.length() > 0) {
 			//Remove the trailing '+'
-			param = param.substring(0, param.length() - 1);
+			param.deleteCharAt(param.length() - 1);
 		}
 		
-		return param;
+		return param.toString();
 	}
 	
 	/**
@@ -196,13 +205,24 @@ public class NativeInputEvent extends EventObject {
 	 * @return a string identifying the event and its attributes
 	 */
 	public String paramString() {
-		String param = "";
+		StringBuilder param = new StringBuilder(255); 
 		
-		param += "id=" + getID() + ",";
-		param += "when=" + getWhen() + ",";
-		param += "mask=" + Integer.toBinaryString(getModifiers()) + ",";
-		param += "modifiers=" + getModifiersText(getModifiers());
+		param.append("id=");
+		param.append(getID());
+		param.append(',');
 		
-		return param;
+		param.append("when=");
+		param.append(getWhen());
+		param.append(',');
+		
+		param.append("mask=");
+		param.append(Integer.toBinaryString(getModifiers()));
+		param.append(',');
+		
+		param.append("modifiers=");
+		param.append(getModifiersText(getModifiers()));
+		param.append(',');
+		
+		return param.toString();
 	}
 }

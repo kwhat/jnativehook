@@ -238,45 +238,52 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @return A string identifying the native event and its attributes.
 	 */
 	public String  paramString() {
-		String param = "";
+		StringBuilder param = new StringBuilder(255); 
 		
 		switch(getID()) {
 			case NATIVE_MOUSE_PRESSED:
-				 param += "NATIVE_MOUSE_PRESSED";
+				 param.append("NATIVE_MOUSE_PRESSED");
 			break;
 			
 			case NATIVE_MOUSE_RELEASED:
-				param += "NATIVE_MOUSE_RELEASED";
+				param.append("NATIVE_MOUSE_RELEASED");
 			break;
 			
-			
 			case NATIVE_MOUSE_MOVED:
-				param += "NATIVE_MOUSE_MOVED";
+				param.append("NATIVE_MOUSE_MOVED");
 			break;
 			
 			case NATIVE_MOUSE_DRAGGED:
-				param += "NATIVE_MOUSE_DRAGGED";
+				param.append("NATIVE_MOUSE_DRAGGED");
 			break;
 			
 			case NATIVE_MOUSE_WHEEL:
-				param += "NATIVE_MOUSE_WHEEL";
+				param.append("NATIVE_MOUSE_WHEEL");
 			break;
 			
 			default:
-				param += "unknown type";
+				param.append("unknown type");
 			break;
 		}
-		param += ",";
+		param.append(',');
 		
-		param += "(" + x + "," + y + "),";
-		param += "button=" + button + ",";
+		param.append('(');
+		param.append(x);
+		param.append(',');
+		param.append(y);
+		param.append(')');
+		param.append(',');
+		
+		
+		param.append("button=");
+		param.append(button);
 		
 		if (getModifiers() != 0) {
-			param += "modifiers=" + getModifiersText(getModifiers()) + ",";
+			param.append(',');
+			param.append("modifiers=");
+			param.append(getModifiersText(getModifiers()));
 		}
 		
-		param = param.substring(0, param.length() - 1);
-		
-		return param;
+		return param.toString();
 	}
 }
