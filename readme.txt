@@ -44,7 +44,7 @@ GUI Demo Application:
     demonstration of raw output for keyboard, button and mouse motion events.
 
 *** Software and Hardware Requirements ***
-	Java 1.5 or later
+	Java 1.5 or 1.6
 
 	Linux / BSD Unix
 		i586, amd64, ppc, ppc64, SPARC 32 or SPARC 64
@@ -69,8 +69,8 @@ GUI Demo Application:
 
 
 *** License ***
-Copyright (c) 2006-2010 Alexander Barker. All Rights Received.
- 
+Copyright (C) 2006-2010 Alexander Barker.  All Rights Received.
+
 JNativeHook is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -83,6 +83,19 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Alternate Licensing Options
+
+In addtion to the GNU Lesser General Public License business-friendly licensing 
+options are avaiable for JNativeHook.  If you wish to incorprate JNativeHook 
+into your commercial software package where the tearms of the GPL are not a 
+viable option you may choose to obtain a commercial license.  For more information on 
+avaiable licencing options please contact me via email at alex@1stleg.com or by
+paper mail at the following address:
+
+Alexander Barker
+3946 Verde Vista Dr.
+Thousand Oaks CA 91360 
 
 
 *** Compiling ***

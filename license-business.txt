@@ -1,0 +1,12 @@
+Alternate Licensing Options
+
+In addtion to the GNU Lesser General Public License business-friendly licensing 
+options are avaiable for JNativeHook.  If you wish to incorprate JNativeHook 
+into your commercial software package where the tearms of the GPL are not a 
+viable option you may choose to obtain a commercial license.  For more information on 
+avaiable licencing options please contact me via email at alex@1stleg.com or by
+paper mail at the following address:
+
+Alexander Barker
+3946 Verde Vista Dr.
+Thousand Oaks CA 91360 
