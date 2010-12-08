@@ -47,10 +47,10 @@ GUI Demo Application:
 	Java 1.5 or 1.6
 
 	Linux / BSD Unix
-		i586, amd64, ppc, ppc64, SPARC 32 or SPARC 64
-		X11 6.4 or Later with XRecord
+		i586 or amd64
+		X11 6.4 to 7.4 with working XRecord
 		64 MB of RAM
-		
+
 	Mac OS X
 		Apple Mac OS X 10.4 to 10.6
 		i586, amd64, ppc or ppc64
@@ -71,27 +71,27 @@ GUI Demo Application:
 *** License ***
 Copyright (C) 2006-2010 Alexander Barker.  All Rights Received.
 
-JNativeHook is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+GNU General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
+You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Alternate Licensing Options
 
-In addtion to the GNU Lesser General Public License business-friendly licensing 
-options are avaiable for JNativeHook.  If you wish to incorprate JNativeHook 
-into your commercial software package where the tearms of the GPL are not a 
-viable option you may choose to obtain a commercial license.  For more information on 
-avaiable licencing options please contact me via email at alex@1stleg.com or by
-paper mail at the following address:
+In addtion to the GNU General Public License, I offer business-friendly 
+licensing options for JNativeHook.  If you wish to incorporate JNativeHook 
+into your commercial software package where the terms of the GPL are not a 
+viable option, you may choose to obtain a commercial license.  For more 
+information on available licensing options, please contact me via email at 
+alex@1stleg.com or by paper mail at the following address:
 
 Alexander Barker
 3946 Verde Vista Dr.
@@ -105,12 +105,12 @@ execution.
 
 Unix/Linux:
 	Dependencies:
-		Ant 1.7 or later
-		Java JDK 1.5 or later
-		XOrg Server 1.8 or later
-		XOrg Server development headers
-		GCC 4.0 or later
-		Make 3.8 or later
+		Ant 1.7 or 1.8
+		Java JDK 1.5 or 1.6
+		libXtst 1.1.0
+		libX11 1.3.4
+		GCC 4.1, 4.2, 4.3, 4.4 or 4.5
+		Make 3.80, 3.81 or 3.82
 		
 	Setup:
 		Use your package manager to install all dependencies.
@@ -118,10 +118,10 @@ Unix/Linux:
 
 Windows:
 	Dependencies:
-		Ant 1.7 or later
-		Java JDK 1.5 or later
+		Ant 1.7 or 1.8
+		Java JDK 1.5 or 1.6
 		Windows x86:
-			MinGW 5.0 or later
+			MinGW 5.0
 				MinGW base tools
 				MinGW Make
 		Windows x86_64
@@ -149,8 +149,8 @@ Windows:
 
 Mac OS X:
 	Dependencies:
-		Java 1.5 or Later
-		Xcode Developer Tools 2.2.1 or later
+		Java 1.5 or 1.6
+		Xcode Developer Tools 2.2.1
 
 	Setup:
 		Create an account at http://connect.apple.com if you do not already 
@@ -180,6 +180,7 @@ external and internal library are present the external library takes precedence.
 
 *** Known Issues ***
 The current native key code to virtual key code conversion method will probably 
-only work for standard united states keyboard layout.  A more effective solution 
-using a native key code to key string lookup should be implemented against the 
-current keyboard layout and then translated to a virtual key code.
+only work for standard united states keyboard layouts.  A more effective 
+solution using a native key code to key string lookup should be implemented 
+against the current keyboard layout and then translated to a virtual key code.  
+This improvment has been planed for version 1.1.
