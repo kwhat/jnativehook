@@ -46,7 +46,7 @@ GUI Demo Application:
 *** Software and Hardware Requirements ***
 	Java 1.5 or 1.6
 
-	Linux / BSD Unix
+	Linux
 		i586 or amd64
 		X11 6.4 to 7.4 with working XRecord
 		64 MB of RAM

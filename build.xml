@@ -151,7 +151,7 @@
 				<os family="unix"/>
 			</and>
 		</condition>
-			
+		
 		
 		<!-- Set 32 or 64 bit flag -->
 		<property name="native.arch.model" value="${sun.arch.data.model}"/>
@@ -246,9 +246,6 @@
 		<condition property="native.cc" value="cc.exe">
 			<available filepath="${native.path}" file="cc.exe" type="file"/>
 		</condition>
-		<condition property="native.cc" value="x86_64-w64-mingw32-gcc.exe">
-			<available filepath="${native.path}" file="x86_64-w64-mingw32-gcc.exe" type="file"/>
-		</condition>
 		
 		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
 			<condition>
@@ -271,18 +268,12 @@
 		<condition property="native.ld" value="ld.exe">
 			<available filepath="${native.path}" file="ld.exe" type="file"/>
 		</condition>
-		<condition property="native.ld" value="x86_64-w64-mingw32-ld.exe">
-			<available filepath="${native.path}" file="x86_64-w64-mingw32-ld.exe" type="file"/>
-		</condition>
 		-->
 		<condition property="native.ld" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file"/>
 		</condition>
 		<condition property="native.ld" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file"/>
-		</condition>
-		<condition property="native.ld" value="x86_64-w64-mingw32-gcc.exe">
-			<available filepath="${native.path}" file="x86_64-w64-mingw32-gcc.exe" type="file"/>
 		</condition>
 		
 		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
