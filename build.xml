@@ -47,7 +47,7 @@
 			<available file="${java.home}/../include" type="dir"/>
 		</condition>
 		
-		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually specify your java.include location.">
+		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually specify java.include in the build.properties file.">
 			<condition>
 				<not>
 					<or>
@@ -91,7 +91,7 @@
 				<os arch="i686"/>
 			</or>
 		</condition>
-		<condition property="native.arch" value="k8">
+		<condition property="native.arch" value="x86-64">
 			<or>
 				<os arch="x86-64"/>
 				<os arch="x86_64"/>
@@ -118,7 +118,7 @@
 			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
 		</condition>
 		<condition property="native.arch.name" value="x86_64">
-			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="x86-64" casesensitive="false" trim="true"/>
 		</condition>
 		<condition property="native.arch.name" value="ppc">
 			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
@@ -252,7 +252,10 @@
 				<not>
 					<and>
 						<isset property="native.cc"/>
-						<available filepath="${native.path}" file="${native.cc}"/>
+						<or>
+							<available filepath="${native.path}" file="${native.cc}"/>
+							<available file="${native.cc}"/>
+						</or>
 					</and>
 				</not>
 			</condition>
@@ -281,11 +284,10 @@
 				<not>
 					<and>
 						<isset property="native.ld"/>
-						<available file="${native.ld}">
-							<filepath>
-								<pathelement path="${native.path}"/>
-							</filepath>
-						</available>
+						<or>
+							<available filepath="${native.path}" file="${native.ld}"/>
+							<available file="${native.ld}"/>
+						</or>
 					</and>
 				</not>
 			</condition>
@@ -303,21 +305,20 @@
 		<condition property="native.make" value="mingw32-make.exe">
 			<available filepath="${native.path}" file="mingw32-make.exe"/>
 		</condition>
-		<!-- <condition property="native.make" value="mingw64-make.exe">
+		<condition property="native.make" value="mingw64-make.exe">
 			<available filepath="${native.path}" file="mingw64-make.exe"/>
 		</condition>
-		-->
+
 		
 		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
 			<condition>
 				<not>
 					<and>
 						<isset property="native.make"/>
-						<available file="${native.make}">
-							<filepath>
-								<pathelement path="${native.path}"/>
-							</filepath>
-						</available>
+						<or>
+							<available filepath="${native.path}" file="${native.make}"/>
+							<available file="${native.make}"/>
+						</or>
 					</and>
 				</not>
 			</condition>
@@ -349,8 +350,8 @@
 			<and>
 				<isset property="project.debug"/>
 				<or>
-					<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="false"/>
-					<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="false"/>
+					<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="true"/>
+					<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="true"/>
 				</or>
 			</and>
 		</condition>
@@ -363,22 +364,42 @@
 		
 		
 		<!-- set system specific cflags -->
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -shared -D_JNI_IMPLEMENTATION_">
+		<condition property="native.cflags.pic" value="-fPIC">
+			<and>
+				<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
+				<or>
+					<isset property="native.os.isUnix"/>
+					<isset property="native.os.isMac"/>
+				</or>
+			</and>
+		</condition>
+		
+		<!-- set optimization level flag -->
+		<condition property="native.cflags.optimize" value="-O0" else="-O3">
+			<isset property="project.isDebug"/>
+		</condition>
+		
+		<!-- set debug flag -->
+		<condition property="native.cflags.debug" value="-g2 -ggdb -DDEBUG">
+			<isset property="project.isDebug"/>
+		</condition>
+		
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -ansi -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -Wall -O3 -fno-strict-aliasing -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -ansi -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall -O3 -fno-strict-aliasing -fPIC">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
 		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,-O3">
+		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,${native.cflags.optimize}">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.ldflags" value="--as-needed -shared -O3">
+		<condition property="native.ldflags" value="--as-needed -shared -static ${native.cflags.optimize}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
@@ -484,11 +505,6 @@
 			<isset property="native.os.isMac"/>
 		</condition>
 		
-		<!-- set debug flag -->
-		<condition property="native.make.debug" value="-g2 -DDEBUG">
-			<isset property="project.isDebug"/>
-		</condition>
-		
 		<!-- set system shell -->
 		<condition property="native.make.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
 			<isset property="native.os.isWindows"/>
@@ -505,7 +521,6 @@
 			<env key="LIBS" value="${native.libs}"/>
 			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
 			<env key="OBJ_DIR" value="${dir.obj}"/>
-			<env key="DEBUG" value="${native.make.debug}"/>
 			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
 		
