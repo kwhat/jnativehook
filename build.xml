@@ -375,7 +375,7 @@
 		</condition>
 		
 		<!-- set optimization level flag -->
-		<condition property="native.cflags.optimize" value="-O0" else="-O3">
+		<condition property="native.cflags.optimize" value="-O0" else="-O2">
 			<isset property="project.isDebug"/>
 		</condition>
 		

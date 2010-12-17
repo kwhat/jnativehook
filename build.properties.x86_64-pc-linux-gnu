@@ -1,0 +1,12 @@
+#ant configure for linux x86_64
+java.target=1.5
+native.arch=x86-64
+native.os=linux
+native.cc=/usr/bin/x86_64-pc-linux-gnu-gcc
+native.ld=/usr/bin/x86_64-pc-linux-gnu-ld
+native.make=/usr/bin/make
+native.cflags=-c -m64 -march\=x86-64 -mtune\=generic -std=c99 -pedantic -Wall -O2 -fno-strict-aliasing -fPIC
+native.ldflags=--as-needed -shared -static -O2
+native.libs=-L/usr/lib64 -lc -lX11 -lXtst
+native.includes=-I/etc/java-config-2/current-system-vm/include -I/etc/java-config-2/current-system-vm/include/linux -I/usr/local/include
+project.debug=false
