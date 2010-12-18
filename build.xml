@@ -391,20 +391,30 @@
 				<isset property="native.os.isUnix"/>
 			</and>
 		</condition>
-		<condition property="native.pkgconfig" value="pkg-config.exe">
-			<available filepath="${native.path}" file="pkg-config.exe"/>
-			<and>
-				<available filepath="${native.path}" file="pkg-config"/>
-				<isset property="native.os.isWindows"/>
-			</and>
-		</condition>
-		<condition property="_pkgconfig.level" value="info" else="warning">
-			<isset property="native.pkgconfig"/>
-		</condition>
-		<condition property="_pkgconfig.message" value="Native Pkgconfig: ${native.pkgconfig}" else="Could not locate a pkg-config utility.  Please review the generated build.properties.">
-			<isset property="native.pkgconfig"/>
-		</condition>
-		<echo level="${_pkgconfig.level}">${_pkgconfig.message}</echo>
+		<fail message="Currently pkg-config only functions on unix based systems.  Please remove the native.pkgconfig declaration from your build.properties file.">
+			<condition>
+				<and>
+					<isset property="native.pkgconfig"/>
+					<not>
+						<isset property="native.os.isUnix"/>
+					</not>
+				</and>
+			</condition>
+		</fail>
+		<fail message="Could not locate pkg-config command.  Please make sure pkg-config is in your PATH or manually specify your native.pkgconfig value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.pkgconfig"/>
+						<or>
+							<available filepath="${native.path}" file="${native.pkgconfig}"/>
+							<available file="${native.pkgconfig}"/>
+						</or>
+					</and>
+				</not>
+			</condition>
+		</fail>
+		<echo level="info">Native Pkg-config: ${native.pkgconfig}</echo>
 		
 	
 		<!-- Set the java compatible version -->
@@ -489,11 +499,21 @@
 	</target>
 	
 	<target name="-generate_ldflags">
+		<!-- set optimization level flag -->
+		<condition property="native.ldflags.optimize" value="-O0" else="-O1">
+			<isset property="project.isDebug"/>
+		</condition>
+		
+		<!-- set static flag -->
+		<condition property="native.ldflags.static" value="-static">
+			<isset property="project.isStatic"/>
+		</condition>
+		
 		<!-- set system specific ldflags -->
-		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,${native.cflags.optimize}">
+		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,${native.ldflags.optimize}">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.ldflags" value="--as-needed -shared -static ${native.cflags.optimize}">
+		<condition property="native.ldflags" value="--as-needed -shared ${native.ldflags.static} ${native.ldflags.optimize}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
@@ -529,7 +549,7 @@
 		</exec>
 		
 		<exec executable="${native.pkgconfig}" resultproperty="native.libs" failonerror="true">
-			<arg value="${native.pkgconfig.libs}"/>
+			<arg line="${native.pkgconfig.libs}"/>
 		</exec>
 	</target>
 	
@@ -625,7 +645,6 @@
 			<env key="OBJ_DIR" value="${dir.obj}"/>
 			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
-		
 		
 		<antcall target="-compile_strip"/>
 		
