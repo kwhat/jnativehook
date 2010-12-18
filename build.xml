@@ -8,7 +8,7 @@
 	<!-- Project Settings -->
 	<buildnumber file="build.num"/>
 	<property name="project.name"		value="${ant.project.name}"/>
-	<property name="project.vendor" 	value="1stleg Development"/>
+	<property name="project.vendor" 	value="Alexander Barker"/>
 	<property name="project.version"	value="1.0.${build.number}-Beta"/>
 	
 	<!-- Path Settings -->
@@ -36,6 +36,42 @@
 	<target name="configure" description="Automatically generates a configuration for this enviroment.">
 		<echo>Checking environment sanity...</echo>
 		
+		<!-- Set the project debug flag -->
+		<condition property="project.debug" value="true" else="false">
+			<and>
+				<isset property="project.debug"/>
+				<or>
+					<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="true"/>
+					<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="true"/>
+				</or>
+			</and>
+		</condition>
+		
+		<!-- Check for debug -->
+		<condition property="project.isDebug" value="true">
+			<istrue value="${project.debug}"/>
+		</condition>
+		<echo level="info">Build Debug: ${project.debug}</echo>
+		
+		
+		<!-- Set the project static flag -->
+		<condition property="project.static" value="true" else="false">
+			<and>
+				<isset property="project.static"/>
+				<or>
+					<equals arg1="${project.static}" arg2="true" casesensitive="false" trim="true"/>
+					<equals arg1="${project.static}" arg2="yes" casesensitive="false" trim="true"/>
+				</or>
+			</and>
+		</condition>
+		
+		<!-- Check for static -->
+		<condition property="project.isStatic" value="true">
+			<istrue value="${project.static}"/>
+		</condition>
+		<echo level="info">Build Static: ${project.static}</echo>
+		
+		
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="java.include" value="${java.home}${file.separator}include">
 			<available file="${java.home}/include" type="dir"/>
@@ -47,7 +83,7 @@
 			<available file="${java.home}/../include" type="dir"/>
 		</condition>
 		
-		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually specify java.include in the build.properties file.">
+		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually set java.include to the location of your java header files in the build.properties file.">
 			<condition>
 				<not>
 					<or>
@@ -57,7 +93,7 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Found java include location: ${java.include}</echo>
+		<echo level="info">Found java include location: ${java.include}</echo>
 		
 		
 		<!-- Try to locate the env path varaible -->
@@ -71,14 +107,14 @@
 			<isset property="env.path"/>
 		</condition>
 		
-		<fail message="Could not determine enviroemtn path.  Please set your PATH environment variable or manually specify native.path.">
+		<fail message="Could not determine environment path.  Please set your PATH environment variable or manually set native.path to a '${path.separator}' seperated list of folders to search for native applications.">
 			<condition>
 				<not>
 					<isset property="native.path"/>
 				</not>
 			</condition>
 		</fail>
-		<echo>Found Path: ${native.path}</echo>
+		<echo level="info">Found Path: ${native.path}</echo>
 		
 		
 		<!-- Figure out of the system arch is supported -->
@@ -134,7 +170,7 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Compatible system architecture: ${native.arch.name}</echo>
+		<echo level="info">Compatible system architecture: ${native.arch.name}</echo>
 		
 		
 		<!-- Special arch for osx -->
@@ -165,12 +201,12 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>System architecture data model: ${native.arch.model} bit</echo>
+		<echo level="info">System architecture data model: ${native.arch.model} bit</echo>
 		
 		
 		<!-- Set little or big endian
 		<property name="native.arch.endian" value="${sun.cpu.endian}"/>
-		<echo>System architecture endian: ${native.arch.endian}</echo>
+		<echo level="info">System architecture endian: ${native.arch.endian}</echo>
 		 -->
 		
 		
@@ -230,10 +266,10 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Operating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
+		<echo level="info">Operating System: ${os.name} ${os.version} (${native.os} compatible)</echo>
 		
 		
-		<!-- Try to locate a suitable C compiler -->
+		<!-- Try to locate the compiler -->
 		<condition property="native.cc" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file"/>
 		</condition>
@@ -260,18 +296,17 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Native Compiler: ${native.cc}</echo>
+		<echo level="info">Native Compiler: ${native.cc}</echo>
 		
 		
-		<!-- Try to locate a suitable linker compiler -->
+		<!-- Try to locate the linker -->
+		<!-- Having gcc does a much better job at passing all the correct libraries to the linker -->
 		<condition property="native.ld" value="ld">
 			<available filepath="${native.path}" file="ld" type="file"/>
 		</condition>
-		<!-- Having gcc call the linker passes all the correct libraries and "just works".
 		<condition property="native.ld" value="ld.exe">
 			<available filepath="${native.path}" file="ld.exe" type="file"/>
 		</condition>
-		-->
 		<condition property="native.ld" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file"/>
 		</condition>
@@ -292,7 +327,31 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Native Linker: ${native.ld}</echo>
+		<echo level="info">Native Linker: ${native.ld}</echo>
+		
+		
+		<!-- Try to locate strip -->
+		<condition property="native.strip" value="strip">
+			<available filepath="${native.path}" file="strip" type="file"/>
+		</condition>
+		<condition property="native.strip" value="strip.exe">
+			<available filepath="${native.path}" file="strip.exe" type="file"/>
+		</condition>
+		
+		<fail message="Could not locate strip command.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
+			<condition>
+				<not>
+					<and>
+						<isset property="native.strip"/>
+						<or>
+							<available filepath="${native.path}" file="${native.strip}"/>
+							<available file="${native.strip}"/>
+						</or>
+					</and>
+				</not>
+			</condition>
+		</fail>
+		<echo level="info">Native Strip: ${native.strip}</echo>
 		
 		
 		<!-- Try to locate make -->
@@ -308,7 +367,6 @@
 		<condition property="native.make" value="mingw64-make.exe">
 			<available filepath="${native.path}" file="mingw64-make.exe"/>
 		</condition>
-
 		
 		<fail message="Could not locate make command.  Please make sure make is in your PATH or manually specify your native.make value.">
 			<condition>
@@ -323,13 +381,36 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Native Make: ${native.make}</echo>
+		<echo level="info">Native Make: ${native.make}</echo>
 		
 		
+		<!-- Try to locate pkg-config -->
+		<condition property="native.pkgconfig" value="pkg-config">
+			<and>
+				<available filepath="${native.path}" file="pkg-config"/>
+				<isset property="native.os.isUnix"/>
+			</and>
+		</condition>
+		<condition property="native.pkgconfig" value="pkg-config.exe">
+			<available filepath="${native.path}" file="pkg-config.exe"/>
+			<and>
+				<available filepath="${native.path}" file="pkg-config"/>
+				<isset property="native.os.isWindows"/>
+			</and>
+		</condition>
+		<condition property="_pkgconfig.level" value="info" else="warning">
+			<isset property="native.pkgconfig"/>
+		</condition>
+		<condition property="_pkgconfig.message" value="Native Pkgconfig: ${native.pkgconfig}" else="Could not locate a pkg-config utility.  Please review the generated build.properties.">
+			<isset property="native.pkgconfig"/>
+		</condition>
+		<echo level="${_pkgconfig.level}">${_pkgconfig.message}</echo>
+		
+	
 		<!-- Set the java compatible version -->
 		<!-- property name="java.target" value="${ant.java.version}"/ -->
 		<property name="java.target" value="1.5"/>
-		<fail message="Invalid java target version.  Only java versions 1.5 and later have been tested.">
+		<fail message="Invalid java target version.  Only java versions 1.5 and 1.6 have been tested.">
 			<condition>
 				<not>
 					<and>
@@ -342,27 +423,38 @@
 				</not>
 			</condition>
 		</fail>
-		<echo>Java Compatibility: ${java.target}</echo>
+		<echo level="info">Java Compatibility: ${java.target}</echo>
 		
-		
-		<!-- Set the project debug flag -->
-		<condition property="project.debug" value="true" else="false">
-			<and>
-				<isset property="project.debug"/>
-				<or>
-					<equals arg1="${project.debug}" arg2="true" casesensitive="false" trim="true"/>
-					<equals arg1="${project.debug}" arg2="yes" casesensitive="false" trim="true"/>
-				</or>
-			</and>
+		<antcall target="-generate_cflags"/>
+		<antcall target="-generate_ldflags"/>
+	
+		<!-- set system specific includes -->
+		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<!-- -F/System/Library/Frameworks/Carbon.framework/Frameworks -->
+		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
+			<isset property="native.os.isMac"/>
 		</condition>
 		
-		<!-- Check for debug -->
-		<condition property="project.isDebug" value="true">
-			<istrue value="${project.debug}"/>
-		</condition>
-		<echo>Debug Mode: ${project.debug}</echo>
 		
-		
+		<propertyfile file="build.properties" comment="auto-generated by ant configure">
+			<entry key="java.target"			value="${java.target}"/>
+			<entry key="native.os"				value="${native.os}"/>
+			<entry key="native.cc"				value="${native.cc}"/>
+			<entry key="native.ld"				value="${native.ld}"/>
+			<entry key="native.make"			value="${native.make}"/>
+			<entry key="native.cflags"			value="${native.cflags}"/>
+			<entry key="native.ldflags"			value="${native.ldflags}"/>
+			<entry key="native.libs"			value="${native.libs}"/>
+			<entry key="native.includes"		value="${native.includes}"/>
+		</propertyfile>
+	</target>
+	
+	<target name="-generate_cflags">
 		<!-- set system specific cflags -->
 		<condition property="native.cflags.pic" value="-fPIC">
 			<and>
@@ -379,22 +471,24 @@
 			<isset property="project.isDebug"/>
 		</condition>
 		
-		<!-- set debug flag -->
+		<!-- set additional debug cflags -->
 		<condition property="native.cflags.debug" value="-g2 -ggdb -DDEBUG">
 			<isset property="project.isDebug"/>
 		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -ansi -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -ansi -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
-		
+	</target>
+	
+	<target name="-generate_ldflags">
 		<!-- set system specific ldflags -->
 		<condition property="native.ldflags" value="-shared -Wl,--kill-at,--as-needed,${native.cflags.optimize}">
 			<isset property="native.os.isWindows"/>
@@ -405,8 +499,42 @@
 		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
 			<isset property="native.os.isMac"/>
 		</condition>
-		
+	</target>
+	
+	<target name="-generate_libs" if="native.pkgconfig">
 		<!-- set system specific libraries -->
+		<echo>Checking for native dependencies...</echo>
+		
+		<condition property="native.pkgconfig.check" value="--exists x11 xtst">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		
+		<condition property="native.pkgconfig.libs" value="--libs x11 xtst">
+			<and>
+				<isset property="native.os.isUnix"/>
+				<not>
+					<isset property="project.isStatic"/>
+				</not>
+			</and>
+		</condition>
+		<condition property="native.pkgconfig.libs" value="--libs --static x11 xtst">
+			<and>
+				<isset property="native.os.isUnix"/>
+				<isset property="project.isStatic"/>
+			</and>
+		</condition>
+		
+		<exec executable="${native.pkgconfig}" failonerror="true">
+			<arg line="${native.pkgconfig.check}"/>
+		</exec>
+		
+		<exec executable="${native.pkgconfig}" resultproperty="native.libs" failonerror="true">
+			<arg value="${native.pkgconfig.libs}"/>
+		</exec>
+	</target>
+	
+	<target name="-guess_libs" unless="native.pkgconfig">
+		<!-- guess what system specific libraries to use -->
 		<condition property="native.libs" value="-lgcc">
 			<isset property="native.os.isWindows"/>
 		</condition>
@@ -416,33 +544,8 @@
 		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
 			<isset property="native.os.isMac"/>
 		</condition>
+	</target>	
 	
-		<!-- set system specific includes -->
-		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
-			<isset property="native.os.isUnix"/>
-		</condition>
-		<!-- -F/System/Library/Frameworks/Carbon.framework/Frameworks -->
-		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
-			<isset property="native.os.isMac"/>
-		</condition>
-		
-		
-		<propertyfile file="build.properties" comment="auto-generated by ant configure">
-			<entry key="project.debug"			value="${project.debug}"/>
-			<entry key="java.target"			value="${java.target}"/>
-			<entry key="native.os"				value="${native.os}"/>
-			<entry key="native.cc"				value="${native.cc}"/>
-			<entry key="native.ld"				value="${native.ld}"/>
-			<entry key="native.make"			value="${native.make}"/>
-			<entry key="native.cflags"			value="${native.cflags}"/>
-			<entry key="native.ldflags"			value="${native.ldflags}"/>
-			<entry key="native.libs"			value="${native.libs}"/>
-			<entry key="native.includes"		value="${native.includes}"/>
-		</propertyfile>
-	</target>
 	
 	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
 		<echo>Compiling java source...</echo>
@@ -463,12 +566,12 @@
 			destdir="${dir.bin}"
 			classpathref="classpath"
 			debug="${project.debug}"
+			optimize="${project.debug}"
 			deprecation="false"
 			includeantruntime="false"
 			source="${java.target}"
 			target="${java.target}"
 		/>
-		
 		
 		<echo>Creating JNI Headers...</echo>
 		<javah 
@@ -477,7 +580,6 @@
 			classpathref="classpath"
 			verbose="yes" 
 		/>
-		
 		
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.obj}"/>
@@ -524,11 +626,25 @@
 			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
 		
+		
+		<antcall target="-compile_strip"/>
+		
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.bin}/org/jnativehook/lib"/>
 		<copy overwrite="true" todir="${dir.bin}/org/jnativehook/lib">
 			<fileset dir="${dir.lib}" includes="**/*"/>
 		</copy>
+	</target>
+	
+	<!-- Private target to condtinally strip the native files -->
+	<target name="-compile_strip" unless="project.isDebug">
+		<echo>Stripping libs...</echo>
+		<exec executable="${native.strip}" dir="." failonerror="true">
+			<arg value="-v"/>
+			<arg value="--strip-unneeded"/>
+			<arg value="-R .comment"/>
+			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
+		</exec>
 	</target>
 	
 	<target name="jar" depends="compile" description="Creates the library jar file">
@@ -552,10 +668,12 @@
 	</target>
 	
 	<target name="javadoc" depends="jar" description="Generates javadoc api documentation">
+		<echo level="info">Generating API Documenation...</echo>
+	
+		<!-- Delete any previous javadocs -->
 		<delete dir="${dir.doc}"/>
 		<mkdir dir="${dir.doc}"/>
 		
-		<echo>Generating API Documenation...</echo>
 		<mkdir dir="${dir.doc}"/>
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="src" defaultexcludes="yes">
