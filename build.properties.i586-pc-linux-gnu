@@ -1,0 +1,11 @@
+#ant configure for linux i586
+
+java.target=1.5
+native.os=linux
+native.cc=gcc
+native.ld=gcc
+native.make=make
+native.cflags=-c -m32 -march\=i586 -mtune=generic -std\=c99 -pedantic -D_POSIX_C_SOURCE\=199506 -Wall -O2 -fomit-frame-pointer -fno-strict-aliasing
+native.ldflags=-shared -W1,--as-needed,-O1
+native.libs=-lX11 -lXtst
+native.includes=-I/usr/lib/jvm/sun-jdk-1.6/include -I/usr/lib/jvm/sun-jdk-1.6/include/linux -I/root/crossdev/i586-pc-linux-gnu/usr/include -I/root/crossdev/i586-pc-linux-gnu/usr/local/include

@@ -1,12 +1,11 @@
 #ant configure for linux x86_64
+
 java.target=1.5
-native.arch=x86-64
 native.os=linux
-native.cc=/usr/bin/x86_64-pc-linux-gnu-gcc
-native.ld=/usr/bin/x86_64-pc-linux-gnu-ld
-native.make=/usr/bin/make
-native.cflags=-c -m64 -march\=x86-64 -mtune\=generic -std=c99 -pedantic -Wall -O2 -fno-strict-aliasing -fPIC
-native.ldflags=--as-needed -shared -static -O2
-native.libs=-L/usr/lib64 -lc -lX11 -lXtst
-native.includes=-I/etc/java-config-2/current-system-vm/include -I/etc/java-config-2/current-system-vm/include/linux -I/usr/local/include
-project.debug=false
+native.cc=gcc
+native.ld=gcc
+native.make=make
+native.cflags=-c -m64 -march\=x86-64 -mtune=generic -std\=c99 -pedantic -D_POSIX_C_SOURCE\=199506 -Wall -O2 -fomit-frame-pointer -fno-strict-aliasing -fPIC
+native.ldflags=-shared -W1,--as-needed,-O1
+native.libs=-lX11 -lXtst -L/root/crossdev/x86_64-pc-linux-gnu/usr/lib64
+native.includes=-I/usr/lib/jvm/sun-jdk-1.6/include -I/usr/lib/jvm/sun-jdk-1.6/include/linux -I/root/crossdev/x86_64-pc-linux-gnu/usr/include -I/root/crossdev/x86_64-pc-linux-gnu/usr/local/include

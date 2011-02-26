@@ -51,25 +51,7 @@
 		<condition property="project.isDebug" value="true">
 			<istrue value="${project.debug}"/>
 		</condition>
-		<echo level="info">Build Debug: ${project.debug}</echo>
-		
-		
-		<!-- Set the project static flag -->
-		<condition property="project.static" value="true" else="false">
-			<and>
-				<isset property="project.static"/>
-				<or>
-					<equals arg1="${project.static}" arg2="true" casesensitive="false" trim="true"/>
-					<equals arg1="${project.static}" arg2="yes" casesensitive="false" trim="true"/>
-				</or>
-			</and>
-		</condition>
-		
-		<!-- Check for static -->
-		<condition property="project.isStatic" value="true">
-			<istrue value="${project.static}"/>
-		</condition>
-		<echo level="info">Build Static: ${project.static}</echo>
+		<echo level="info">Build debug: ${project.debug}</echo>
 		
 		
 		<!-- Try to locate the include folder for java headers -->
@@ -313,7 +295,11 @@
 		<condition property="native.ld" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file"/>
 		</condition>
+<<<<<<< .mine
+		-->
+=======
 		 -->
+>>>>>>> .r262
 		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
 			<condition>
 				<not>
@@ -385,8 +371,7 @@
 		
 		
 		<!-- Set the java compatible version -->
-		<!-- property name="java.target" value="${ant.java.version}"/ -->
-		<property name="java.target" value="1.5"/>
+		<property name="java.target" value="${ant.java.version}"/>
 		<fail message="Invalid java target version.  Only java versions 1.5 and 1.6 have been tested.">
 			<condition>
 				<not>
@@ -402,11 +387,20 @@
 		</fail>
 		<echo level="info">Java Compatibility: ${java.target}</echo>
 		
+<<<<<<< .mine
+		
+=======
 
 	
+>>>>>>> .r262
 		<!-- set system specific cflags -->
+<<<<<<< .mine
+		<condition property="native.cflags.pic" value="-fPIC" else="">
+			<and>
+=======
 		<condition property="native.cflags.pic" value="-fPIC" else="">
 			<or>
+>>>>>>> .r262
 				<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
 				
 				<or>
@@ -421,16 +415,32 @@
 			<isset property="project.isDebug"/>
 		</condition>
 		
+<<<<<<< .mine
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+=======
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+>>>>>>> .r262
 			<isset property="native.os.isWindows"/>
 		</condition>
+<<<<<<< .mine
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+=======
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+>>>>>>> .r262
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
+<<<<<<< .mine
+		
+		<!-- set optimization level flag -->
+		<condition property="native.ldflags.optimize" value="-O0" else="-O1">
+			<isset property="project.isDebug"/>
+		</condition>
+		
+=======
 		
 		<!-- set optimization level flag -->
 		<condition property="native.ldflags.optimize" value="-O0" else="-O1">
@@ -442,30 +452,58 @@
 			<isset property="project.isStatic"/>
 		</condition>
 		
+>>>>>>> .r262
 		<!-- set system specific ldflags -->
+<<<<<<< .mine
+		<condition property="native.ldflags" value="-shared -Wl,--as-needed -Wl,--kill-at,${native.ldflags.optimize}">
+=======
 		<condition property="native.ldflags" value="-shared ${native.ldflags.static} -Wl,--as-needed -Wl,--kill-at,${native.ldflags.optimize}">
+>>>>>>> .r262
 			<isset property="native.os.isWindows"/>
 		</condition>
+<<<<<<< .mine
+		<condition property="native.ldflags" value="-shared -W1,--as-needed,${native.ldflags.optimize}">
+=======
 		<condition property="native.ldflags" value="-shared ${native.ldflags.static} -W1,--as-needed,${native.ldflags.optimize}">
+>>>>>>> .r262
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
+<<<<<<< .mine
+		
+		<!-- guess what system specific libraries to use -->
+		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
+			<isset property="native.os.isWindows"/>
+=======
 		
 		
 		<!-- guess what system specific libraries to use -->
 		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
 			<isset property="native.os.isWindows"/>
+>>>>>>> .r262
 		</condition>
 		
+<<<<<<< .mine
+		<condition property="native.libs" value="-lX11 -lXtst">
+=======
 		<condition property="native.libs" value="-lXtst -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp">
+>>>>>>> .r262
 			<and>
 				<isset property="native.os.isUnix"/>
+<<<<<<< .mine
+=======
 				<isset property="project.isStatic"/>
+>>>>>>> .r262
 			</and>
 		</condition>
+<<<<<<< .mine
+		
+		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
+			<isset property="native.os.isMac"/>
+=======
 		<condition property="native.libs" value="-lX11 -lXtst">
 			<and>
 				<isset property="native.os.isUnix"/>
@@ -473,15 +511,24 @@
 					<isset property="project.isStatic"/>
 				</not>
 			</and>
+>>>>>>> .r262
 		</condition>
 		
+<<<<<<< .mine
+=======
 		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
 			<isset property="native.os.isMac"/>
 		</condition>
+>>>>>>> .r262
 		
+<<<<<<< .mine
+		<!-- set system specific includes -->
+		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
+=======
 		
 		<!-- set system specific includes -->
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
+>>>>>>> .r262
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
@@ -491,6 +538,22 @@
 		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
 			<isset property="native.os.isMac"/>
 		</condition>
+<<<<<<< .mine
+		
+		
+		<propertyfile file="build.properties" comment="auto-generated by ant configure">
+			<entry key="java.target"			value="${java.target}"/>
+			<entry key="native.os"				value="${native.os}"/>
+			<entry key="native.cc"				value="${native.cc}"/>
+			<entry key="native.ld"				value="${native.ld}"/>
+			<entry key="native.make"			value="${native.make}"/>
+			<entry key="native.cflags"			value="${native.cflags}"/>
+			<entry key="native.ldflags"			value="${native.ldflags}"/>
+			<entry key="native.libs"			value="${native.libs}"/>
+			<entry key="native.includes"		value="${native.includes}"/>
+		</propertyfile>
+	</target>
+=======
 		
 		
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
@@ -506,6 +569,7 @@
 			<entry key="native.includes"		value="${native.includes}"/>
 		</propertyfile>
 	</target>
+>>>>>>> .r262
 	
 	
 	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
@@ -569,7 +633,7 @@
 		</condition>
 		
 		<!-- set system shell -->
-		<condition property="native.make.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
+		<condition property="native.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
