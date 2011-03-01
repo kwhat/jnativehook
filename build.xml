@@ -56,13 +56,19 @@
 		
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="java.include" value="${java.home}${file.separator}include">
-			<available file="${java.home}/include" type="dir"/>
+			<available file="${java.home}${file.separator}include" type="dir"/>
 		</condition>
 		<condition property="java.include" value="${os.JAVA_HOME}${file.separator}include">
-			<available file="${os.JAVA_HOME}/include" type="dir"/>
+			<available file="${os.JAVA_HOME}${file.separator}include" type="dir"/>
 		</condition>
 		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}include">
-			<available file="${java.home}/../include" type="dir"/>
+			<available file="${java.home}${file.separator}..${file.separator}include" type="dir"/>
+		</condition>
+		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}Headers">
+			<available file="${java.home}${file.separator}..${file.separator}Headers" type="dir"/>
+		</condition>
+		<condition property="java.include" value="${java.home}${file.separator}Headers">
+			<available file="${java.home}${file.separator}Headers" type="dir"/>
 		</condition>
 		
 		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually set java.include to the location of your java header files in the build.properties file.">
@@ -295,11 +301,8 @@
 		<condition property="native.ld" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file"/>
 		</condition>
-<<<<<<< .mine
 		-->
-=======
-		 -->
->>>>>>> .r262
+		
 		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
 			<condition>
 				<not>
@@ -387,27 +390,18 @@
 		</fail>
 		<echo level="info">Java Compatibility: ${java.target}</echo>
 		
-<<<<<<< .mine
 		
-=======
-
-	
->>>>>>> .r262
 		<!-- set system specific cflags -->
-<<<<<<< .mine
 		<condition property="native.cflags.pic" value="-fPIC" else="">
 			<and>
-=======
-		<condition property="native.cflags.pic" value="-fPIC" else="">
-			<or>
->>>>>>> .r262
+				<!-- Only build the static archive with -fPIC on AMD64. On other architectures this is unneeded and will have a performance impact at execution time. -->
 				<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
 				
 				<or>
 					<isset property="native.os.isUnix"/>
 					<isset property="native.os.isMac"/>
 				</or>
-			</or>
+			</and>
 		</condition>
 		
 		<!-- set optimization level flag -->
@@ -415,120 +409,49 @@
 			<isset property="project.isDebug"/>
 		</condition>
 		
-<<<<<<< .mine
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
-=======
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -std=c99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
->>>>>>> .r262
 			<isset property="native.os.isWindows"/>
 		</condition>
-<<<<<<< .mine
+		
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
-=======
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
->>>>>>> .r262
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
-<<<<<<< .mine
 		
 		<!-- set optimization level flag -->
 		<condition property="native.ldflags.optimize" value="-O0" else="-O1">
 			<isset property="project.isDebug"/>
 		</condition>
 		
-=======
 		
-		<!-- set optimization level flag -->
-		<condition property="native.ldflags.optimize" value="-O0" else="-O1">
-			<isset property="project.isDebug"/>
-		</condition>
-		
-		<!-- set static flag -->
-		<condition property="native.ldflags.static" value="-static" else="">
-			<isset property="project.isStatic"/>
-		</condition>
-		
->>>>>>> .r262
 		<!-- set system specific ldflags -->
-<<<<<<< .mine
-		<condition property="native.ldflags" value="-shared -Wl,--as-needed -Wl,--kill-at,${native.ldflags.optimize}">
-=======
-		<condition property="native.ldflags" value="-shared ${native.ldflags.static} -Wl,--as-needed -Wl,--kill-at,${native.ldflags.optimize}">
->>>>>>> .r262
+		<condition property="native.ldflags" value="-shared -m${native.arch.model} -Wl,--as-needed,--kill-at,${native.ldflags.optimize}">
 			<isset property="native.os.isWindows"/>
 		</condition>
-<<<<<<< .mine
-		<condition property="native.ldflags" value="-shared -W1,--as-needed,${native.ldflags.optimize}">
-=======
-		<condition property="native.ldflags" value="-shared ${native.ldflags.static} -W1,--as-needed,${native.ldflags.optimize}">
->>>>>>> .r262
+		
+		<condition property="native.ldflags" value="-shared -m${native.arch.model} -W1,--as-needed,${native.ldflags.optimize}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
-<<<<<<< .mine
-		
 		<!-- guess what system specific libraries to use -->
 		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
 			<isset property="native.os.isWindows"/>
-=======
-		
-		
-		<!-- guess what system specific libraries to use -->
-		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
-			<isset property="native.os.isWindows"/>
->>>>>>> .r262
 		</condition>
-		
-<<<<<<< .mine
 		<condition property="native.libs" value="-lX11 -lXtst">
-=======
-		<condition property="native.libs" value="-lXtst -lXext -lX11 -lpthread -lxcb -lXau -lXdmcp">
->>>>>>> .r262
-			<and>
-				<isset property="native.os.isUnix"/>
-<<<<<<< .mine
-=======
-				<isset property="project.isStatic"/>
->>>>>>> .r262
-			</and>
+			<isset property="native.os.isUnix"/>
 		</condition>
-<<<<<<< .mine
-		
-		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
-			<isset property="native.os.isMac"/>
-=======
-		<condition property="native.libs" value="-lX11 -lXtst">
-			<and>
-				<isset property="native.os.isUnix"/>
-				<not>
-					<isset property="project.isStatic"/>
-				</not>
-			</and>
->>>>>>> .r262
-		</condition>
-		
-<<<<<<< .mine
-=======
 		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
 			<isset property="native.os.isMac"/>
 		</condition>
->>>>>>> .r262
-		
-<<<<<<< .mine
-		<!-- set system specific includes -->
-		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
-=======
 		
 		<!-- set system specific includes -->
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}win32">
->>>>>>> .r262
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
@@ -538,23 +461,6 @@
 		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
 			<isset property="native.os.isMac"/>
 		</condition>
-<<<<<<< .mine
-		
-		
-		<propertyfile file="build.properties" comment="auto-generated by ant configure">
-			<entry key="java.target"			value="${java.target}"/>
-			<entry key="native.os"				value="${native.os}"/>
-			<entry key="native.cc"				value="${native.cc}"/>
-			<entry key="native.ld"				value="${native.ld}"/>
-			<entry key="native.make"			value="${native.make}"/>
-			<entry key="native.cflags"			value="${native.cflags}"/>
-			<entry key="native.ldflags"			value="${native.ldflags}"/>
-			<entry key="native.libs"			value="${native.libs}"/>
-			<entry key="native.includes"		value="${native.includes}"/>
-		</propertyfile>
-	</target>
-=======
-		
 		
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
 			<entry key="java.target"			value="${java.target}"/>
@@ -563,14 +469,13 @@
 			<entry key="native.cc"				value="${native.cc}"/>
 			<entry key="native.ld"				value="${native.ld}"/>
 			<entry key="native.make"			value="${native.make}"/>
+			<entry key="native.strip"			value="${native.strip}"/>
 			<entry key="native.cflags"			value="${native.cflags}"/>
 			<entry key="native.ldflags"			value="${native.ldflags}"/>
 			<entry key="native.libs"			value="${native.libs}"/>
 			<entry key="native.includes"		value="${native.includes}"/>
 		</propertyfile>
 	</target>
->>>>>>> .r262
-	
 	
 	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
 		<echo>Compiling java source...</echo>

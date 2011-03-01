@@ -1,11 +1,11 @@
 *** About ***
 JNativeHook is a library to provide global keyboard and mouse hooking for Java.
-The primary purpose is to allow Java applacations access to keyboard and mouse 
-events that would normally be outside the scope of a Java applcaiton.  
+The primary purpose is to allow Java applications access to keyboard and mouse 
+events that would normally be outside the scope of a Java application.  
 
 
 
-Additianlly information about keyboard  
+Additionally information about keyboard  
 
 
 
@@ -86,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Alternate Licensing Options
 
-In addtion to the GNU General Public License, I offer business-friendly 
+In addition to the GNU General Public License, I offer business-friendly 
 licensing options for JNativeHook.  If you wish to incorporate JNativeHook 
 into your commercial software package where the terms of the GPL are not a 
 viable option, you may choose to obtain a commercial license.  For more 
