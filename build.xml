@@ -586,7 +586,7 @@
 		</exec>
 	</target>
 	
-	<target name="jar" depends="compile" description="Creates the library jar file">
+	<target name="jar" description="Creates the library jar file">
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
 		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin}">
@@ -606,7 +606,7 @@
 		</jar>
 	</target>
 	
-	<target name="javadoc" depends="jar" description="Generates javadoc api documentation">
+	<target name="javadoc" description="Generates javadoc api documentation">
 		<echo level="info">Generating API Documenation...</echo>
 	
 		<!-- Delete any previous javadocs -->
@@ -670,6 +670,6 @@
 		</zip>
 	</target>
 	
-	<target name="all" depends="jar" description="builds all targets">
+	<target name="all" depends="compile,jar" description="builds all targets">
 	</target>
 </project>
