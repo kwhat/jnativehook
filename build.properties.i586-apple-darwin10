@@ -1,0 +1,14 @@
+#ant configure for apple i586
+
+project.debug=false
+java.target=1.5
+native.arch=i586
+native.os=osx
+native.cc=/root/crossdev/i586-apple-darwin10/bin/i586-apple-darwin10-gcc
+native.ld=/root/crossdev/i586-apple-darwin10/bin/i586-apple-darwin10-gcc
+native.make=make
+native.strip=/root/crossdev/i586-apple-darwin10/bin/i586-apple-darwin10-strip
+native.cflags=-c -m32 -arch i386 -mtune\=i586 -Wall -O2 -fomit-frame-pointer -fno-strict-aliasing
+native.ldflags=-dynamiclib -m32 -arch i386
+native.libs=-framework Carbon -framework JavaVM
+native.includes=-I/root/crossdev/i586-apple-darwin10/usr/include -I/root/crossdev/i586-apple-darwin10/usr/lib/gcc/i686-apple-darwin10/4.0.1/include -I/root/crossdev/i586-apple-darwin10/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Headers
