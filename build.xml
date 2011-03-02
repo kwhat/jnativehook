@@ -610,10 +610,11 @@
 		<echo level="info">Generating API Documenation...</echo>
 	
 		<!-- Delete any previous javadocs -->
-		<delete dir="${dir.doc}"/>
 		<mkdir dir="${dir.doc}"/>
+		<delete includeemptydirs="true">
+			<fileset dir="${dir.doc}" includes="**/*"/>
+		</delete>
 		
-		<mkdir dir="${dir.doc}"/>
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="src" defaultexcludes="yes">
 				<include name="org/jnativehook/**"/>
@@ -622,7 +623,7 @@
 			</packageset>
 			
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2010 Alexander Barker. All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2011 Alexander Barker. All Rights Reserved.</i>]]></bottom>
 			
 			<!--
 			<tag name="to.do" scope="all" description="To Do:"/>
