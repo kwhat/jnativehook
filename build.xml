@@ -416,7 +416,7 @@
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.cflags" value="-c -m${native.arch.model} -mtune=${native.arch} -arch ${native.arch.osx} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -arch ${native.arch.osx} -mtune=${native.arch} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>
@@ -435,7 +435,7 @@
 		<condition property="native.ldflags" value="-shared -m${native.arch.model} -W1,--as-needed,${native.ldflags.optimize}">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.ldflags" value="-arch ${native.arch.osx} -dylib -dynamic">
+		<condition property="native.ldflags" value="-dynamiclib -m${native.arch.model} -arch ${native.arch.osx}">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -446,7 +446,7 @@
 		<condition property="native.libs" value="-lX11 -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.libs" value="-lc -ldylib1.o -framework Carbon -framework JavaVM">
+		<condition property="native.libs" value="-framework Carbon -framework JavaVM">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -568,10 +568,20 @@
 	<!-- Private target to condtinally strip the native files -->
 	<target name="-compile_strip" unless="project.isDebug">
 		<echo>Stripping libs...</echo>
+		
+		<!-- set system specific strip arguments -->
+		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
+			<or>
+				<isset property="native.os.isWindows"/>
+				<isset property="native.os.isUnix"/>
+			</or>
+		</condition>
+		<condition property="native.strip.args" value="-x -S">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
 		<exec executable="${native.strip}" dir="." failonerror="true">
-			<arg value="-v"/>
-			<arg value="--strip-unneeded"/>
-			<arg value="-R .comment"/>
+			<arg line="${native.strip.args}"/>
 			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
 	</target>
