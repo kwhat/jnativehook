@@ -11,4 +11,4 @@ native.strip=/usr/bin/strip
 native.cflags=-c -m64 -march\=x86-64 -mtune\=generic -std\=c99 -pedantic -D_POSIX_C_SOURCE\=199506 -Wall -O2 -fomit-frame-pointer -fno-strict-aliasing -fPIC
 native.ldflags=-shared -m64 -W1,--as-needed,-O1
 native.libs=-L/usr/lib64
-native.includes=-I/usr/lib/jvm/sun-jdk-1.6/include -I/usr/lib/jvm/sun-jdk-1.6/include/linux -I/root/crossdev/x86_64-pc-linux-gnu/usr/include -I/root/crossdev/x86_64-pc-linux-gnu/usr/local/include
+native.includes=-I/usr/lib/jvm/sun-jdk-1.6/include -I/usr/lib/jvm/sun-jdk-1.6/include/linux -I/usr/include -I/usr/local/include
