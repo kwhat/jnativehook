@@ -657,7 +657,7 @@
 				<include name="*.txt"/>
 				<include name="build.*"/>
 				<include name="Makefile"/>
-				<exclude name="build.properties"/>
+				<exclude name="build.properties*"/>
 			</zipfileset>
 			
 			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
