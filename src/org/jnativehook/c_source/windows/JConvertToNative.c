@@ -179,13 +179,21 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_F14:									jkey.keycode = JK_F14; 							return jkey;
 		case VK_F15:									jkey.keycode = JK_F15; 							return jkey;
 		case VK_F16:									jkey.keycode = JK_F16; 							return jkey;
+		case VK_OEM_F17:
 		case VK_F17:									jkey.keycode = JK_F17; 							return jkey;
+		case VK_OEM_F18:
 		case VK_F18:									jkey.keycode = JK_F18; 							return jkey;
+		case VK_OEM_F19:
 		case VK_F19:									jkey.keycode = JK_F19; 							return jkey;
+		case VK_OEM_F20:
 		case VK_F20:									jkey.keycode = JK_F20; 							return jkey;
+		case VK_OEM_F21:
 		case VK_F21:									jkey.keycode = JK_F21; 							return jkey;
+		case VK_OEM_F22:
 		case VK_F22:									jkey.keycode = JK_F22; 							return jkey;
+		case VK_OEM_F23:
 		case VK_F23:									jkey.keycode = JK_F23; 							return jkey;
+		case VK_OEM_F24:
 		case VK_F24:									jkey.keycode = JK_F24; 							return jkey;
 
 		case VK_SNAPSHOT:								jkey.keycode = JK_PRINTSCREEN; 					return jkey;

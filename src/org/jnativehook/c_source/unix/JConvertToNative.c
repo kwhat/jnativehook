@@ -17,7 +17,8 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
+//#include <X11/keysym.h> //Reduced symbol set
+#include <X11/keysymdef.h>  //Full symbol set
 #include <X11/Sunkeysym.h>
 #include "include/JConvertToNative.h"
 #include "xEventModifers.h"
