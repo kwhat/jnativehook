@@ -393,15 +393,11 @@
 		
 		<!-- set system specific cflags -->
 		<condition property="native.cflags.pic" value="-fPIC" else="">
-			<and>
-				<!-- Only build the static archive with -fPIC on AMD64. On other architectures this is unneeded and will have a performance impact at execution time. -->
-				<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
-				
-				<or>
-					<isset property="native.os.isUnix"/>
-					<isset property="native.os.isMac"/>
-				</or>
-			</and>
+			<!-- windows does not need pic support -->
+			<or>
+				<isset property="native.os.isUnix"/>
+				<isset property="native.os.isMac"/>
+			</or>
 		</condition>
 		
 		<!-- set optimization level flag -->
@@ -557,12 +553,6 @@
 		</exec>
 		
 		<antcall target="-compile_strip"/>
-		
-		<echo>Copying libs...</echo>
-		<mkdir dir="${dir.bin}/org/jnativehook/lib"/>
-		<copy overwrite="true" todir="${dir.bin}/org/jnativehook/lib">
-			<fileset dir="${dir.lib}" includes="**/*"/>
-		</copy>
 	</target>
 	
 	<!-- Private target to condtinally strip the native files -->
@@ -587,6 +577,12 @@
 	</target>
 	
 	<target name="jar" description="Creates the library jar file">
+		<echo>Copying libs...</echo>
+		<mkdir dir="${dir.bin}/org/jnativehook/lib"/>
+		<copy overwrite="true" todir="${dir.bin}/org/jnativehook/lib">
+			<fileset dir="${dir.lib}" includes="**/*"/>
+		</copy>
+		
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
 		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin}">

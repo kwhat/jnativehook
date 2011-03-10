@@ -19,7 +19,9 @@
 #include <X11/Xutil.h>
 //#include <X11/keysym.h> //Reduced symbol set
 #include <X11/keysymdef.h>  //Full symbol set
-#include <X11/Sunkeysym.h>
+#ifdef SUN_KEYBOARD
+	#include <X11/Sunkeysym.h>
+#endif
 #include "include/JConvertToNative.h"
 #include "xEventModifers.h"
 
@@ -35,6 +37,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_Return:									jkey.keycode = JK_ENTER;						return jkey;
 		case XK_BackSpace:								jkey.keycode = JK_BACK_SPACE;					return jkey;
 		case XK_Tab:									jkey.keycode = JK_TAB;							return jkey;
+		#ifndef SUN_KEYBOARD
+		case XK_Cancel:									jkey.keycode = JK_CANCEL;						return jkey;
+		#endif
 
 		case XK_Shift_L:
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_SHIFT;						return jkey;
@@ -153,8 +158,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_MULTIPLY;						return jkey;
 		case XK_KP_Add:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_ADD;							return jkey;
-		//case XK_KP_Separator:
-		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR;					return jkey;
+		case XK_KP_Separator:
+			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR;					return jkey;
 		case XK_KP_Subtract:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SUBTRACT;						return jkey;
 		case XK_KP_Enter:
@@ -200,7 +205,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_Print:									jkey.keycode = JK_PRINTSCREEN;					return jkey;
 		case XK_Insert:									jkey.keycode = JK_INSERT;						return jkey;
 		case XK_Delete:									jkey.keycode = JK_DELETE;						return jkey;
-		//case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
+		case XK_Help:									jkey.keycode = JK_HELP;							return jkey;
 
 		case XK_Page_Up:								jkey.keycode = JK_PAGE_UP;						return jkey;
 		case XK_Page_Down:								jkey.keycode = JK_PAGE_DOWN;					return jkey;
@@ -210,7 +215,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_apostrophe:								jkey.keycode = JK_QUOTE;						return jkey;
 		case XK_grave:									jkey.keycode = JK_BACK_QUOTE;					return jkey;
 
-		/*
+		/* For European keyboards */
 		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;
 		case XK_dead_acute:								jkey.keycode = JK_DEAD_ACUTE;					return jkey;
 		case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;
@@ -227,9 +232,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_dead_iota:								jkey.keycode = JK_DEAD_IOTA;					return jkey;
 		case XK_dead_voiced_sound:						jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;
 		case XK_dead_semivoiced_sound:					jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;
-		 */
 
-		/*
+		/* Unknown Keyboard Codes */
 		case XK_ampersand:								jkey.keycode = JK_AMPERSAND;					return jkey;
 		case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;
 		case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;
@@ -237,9 +241,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_greater:								jkey.keycode = JK_GREATER;						return jkey;
 		case XK_braceleft:								jkey.keycode = JK_BRACELEFT;					return jkey;
 		case XK_braceright:								jkey.keycode = JK_BRACERIGHT;					return jkey;
-		 */
 
-		/*
+		/* Unknown Extended Keyboard Codes */
 		case XK_at:										jkey.keycode = JK_AT;							return jkey;
 		case XK_colon:									jkey.keycode = JK_COLON;						return jkey;
 		case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;
@@ -252,36 +255,35 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_plus:									jkey.keycode = JK_PLUS;							return jkey;
 		case XK_parenright:								jkey.keycode = JK_RIGHT_PARENTHESIS;			return jkey;
 		case XK_underscore:								jkey.keycode = JK_UNDERSCORE;					return jkey;
-		*/
 
 
-		/* for input method support on Asian Keyboards */
-		/*
-		case XK_Cancel:									jkey.keycode = JK_FINAL;						return jkey;
-		case XK_Henkan:									jkey.keycode = JK_CONVERT;						return jkey;
-		case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;
-		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;
-		case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;
-		//case XK_Kana_Lock:							jkey.keycode = JK_KANA;							return jkey;
-		case XK_Kanji:									jkey.keycode = JK_KANJI;						return jkey;
-		case XK_Eisu_Shift:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;
-		case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;
-		case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;
-		case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;
-		case XK_Hankaku:								jkey.keycode = JK_HALF_WIDTH;					return jkey;
-		//case XK_Romaji:								jkey.keycode = JK_ROMAN_CHARACTERS;				return jkey;
-		case XK_Zen_Koho:								jkey.keycode = JK_ALL_CANDIDATES;				return jkey;
-		case XK_Mae_Koho:								jkey.keycode = JK_PREVIOUS_CANDIDATE;			return jkey;
-		case XK_Kanji_Bangou:							jkey.keycode = JK_CODE_INPUT;					return jkey;
-		case XK_Hiragana_Katakana:						jkey.keycode = JK_JAPANESE_KATAKANA;			return jkey;
-		//case XK_Hiragana_Katakana:					jkey.keycode = JK_JAPANESE_HIRAGANA;			return jkey;
-		case XK_Romaji:									jkey.keycode = JK_JAPANESE_ROMAN;				return jkey;
-		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;
-		//case XK_VoidSymbol:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;
-		 */
+		/* For input method support on Asian Keyboards */
+		//case XK_Cancel:								jkey.keycode = JK_FINAL;						return jkey;	//Unknown X11 Support
+		//case XK_Henkan:								jkey.keycode = JK_CONVERT;						return jkey;	//Unknown X11 Support
+		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown X11 Support
+		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown X11 Support
+		#ifndef SUN_KEYBOARD
+		case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	//TODO Testing Needed
+		#endif
+		case XK_Kana_Shift:								jkey.keycode = JK_KANA;							return jkey;	//TODO Testing Needed
+		case XK_Kanji:									jkey.keycode = JK_KANJI;						return jkey;	//TODO Testing Needed
+		case XK_Eisu_Shift:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	//TODO Testing Needed
+		case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;	//TODO Testing Needed
+		case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;	//TODO Testing Needed
+		case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;	//TODO Testing Needed
+		case XK_Hankaku:								jkey.keycode = JK_HALF_WIDTH;					return jkey;	//TODO Testing Needed
+		case XK_Romaji:									jkey.keycode = JK_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
+		case XK_MultipleCandidate:						jkey.keycode = JK_ALL_CANDIDATES;				return jkey;	//TODO Testing Needed
+		case XK_PreviousCandidate:						jkey.keycode = JK_PREVIOUS_CANDIDATE;			return jkey;	//TODO Testing Needed
+		case XK_Codeinput:								jkey.keycode = JK_CODE_INPUT;					return jkey;	//TODO Testing Needed
+		case XK_Hiragana_Katakana:						jkey.keycode = JK_JAPANESE_KATAKANA;			return jkey;	//TODO Testing Needed
+		case XK_Zenkaku_Hankaku:						jkey.keycode = JK_JAPANESE_HIRAGANA;			return jkey;	//TODO Testing Needed
+		//case XK_Romaji:								jkey.keycode = JK_JAPANESE_ROMAN;				return jkey;	//TODO Testing Needed
+		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;	//TODO Testing Needed
+		case XK_Eisu_toggle:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	//TODO Testing Needed
 
-		/* for Sun keyboards */
-		/*
+		/* For Sun keyboards */
+		#ifdef SUN_KEYBOARD
 		case SunXK_Cut:									jkey.keycode = JK_CUT;							return jkey;
 		case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;
 		case SunXK_Paste:								jkey.keycode = JK_PASTE;						return jkey;
@@ -292,7 +294,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;
 		case SunXK_Compose:								jkey.keycode = JK_COMPOSE;						return jkey;
 		case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;
-		*/
+		#endif
 
 		case XK_Begin:									jkey.keycode = JK_BEGIN;						return jkey;
 

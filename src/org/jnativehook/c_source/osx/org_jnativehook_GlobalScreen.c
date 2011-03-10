@@ -50,14 +50,10 @@ JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
 CGEventFlags prev_event_mask = 0;
 unsigned int event_modifiers[] = {
-	shiftKey,
-	rightShiftKey,
-	controlKey,
-	rightControlKey,
-	optionKey,
-	rightOptionKey,
-	cmdKey
-	/*, rightCmdKey */
+	kCGEventFlagMaskShift,
+	kCGEventFlagMaskControl,
+	kCGEventFlagMaskAlternate,
+	kCGEventFlagMaskCommand
 };
 
 void jniFatalError(char * message) {

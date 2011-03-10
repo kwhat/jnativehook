@@ -19,6 +19,7 @@
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
 #include <windows.h>
+#include <ime.h>
 #include "include/JConvertToNative.h"
 #include "WinKeyCodes.h"
 
@@ -31,6 +32,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_RETURN:									jkey.keycode = JK_ENTER; 						return jkey;
 		case VK_BACK:									jkey.keycode = JK_BACK_SPACE; 					return jkey;
 		case VK_TAB:									jkey.keycode = JK_TAB; 							return jkey;
+		case VK_CANCEL:									jkey.keycode = JK_CANCEL;						return jkey;
+
 		case VK_LSHIFT:
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_SHIFT; 						return jkey;
 		case VK_RSHIFT:
@@ -62,7 +65,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_OEM_COMMA:								jkey.keycode = JK_COMMA; 						return jkey;
 		case VK_OEM_MINUS:								jkey.keycode = JK_MINUS; 						return jkey;
 		case VK_OEM_PERIOD:								jkey.keycode = JK_PERIOD; 						return jkey;
-		case VK_OEM_2:									jkey.keycode = JK_SLASH; 						return jkey;
+		case VK_OEM_2:									jkey.keycode = JK_SLASH; 						return jkey;	//TODO Testing Needed
 
 		case 0x30:										jkey.keycode = JK_0; 							return jkey;
 		case 0x31:										jkey.keycode = JK_1; 							return jkey;
@@ -75,9 +78,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case 0x38:										jkey.keycode = JK_8; 							return jkey;
 		case 0x39:										jkey.keycode = JK_9; 							return jkey;
 
-		case VK_OEM_1:									jkey.keycode = JK_SEMICOLON; 					return jkey;
-		//TODO VK_OEM_PLUS needs testing.
-		case VK_OEM_PLUS:								jkey.keycode = JK_EQUALS;						return jkey;
+		case VK_OEM_1:									jkey.keycode = JK_SEMICOLON; 					return jkey;	//TODO Testing Needed
+		case VK_OEM_PLUS:								jkey.keycode = JK_EQUALS;						return jkey;	//TODO Testing Needed
 
 		case 0x41:										jkey.keycode = JK_A; 							return jkey;
 		case 0x42:										jkey.keycode = JK_B; 							return jkey;
@@ -106,9 +108,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case 0x59:										jkey.keycode = JK_Y; 							return jkey;
 		case 0x5A:										jkey.keycode = JK_Z; 							return jkey;
 
-		case VK_OEM_4:									jkey.keycode = JK_OPEN_BRACKET; 				return jkey;
-		case VK_OEM_5:									jkey.keycode = JK_BACK_SLASH; 					return jkey;
-		case VK_OEM_6:									jkey.keycode = JK_CLOSE_BRACKET;				return jkey;
+		case VK_OEM_4:									jkey.keycode = JK_OPEN_BRACKET; 				return jkey;	//TODO Testing Needed
+		case VK_OEM_5:									jkey.keycode = JK_BACK_SLASH; 					return jkey;	//TODO Testing Needed
+		case VK_OEM_6:									jkey.keycode = JK_CLOSE_BRACKET;				return jkey;	//TODO Testing Needed
 
 		case  VK_NUMPAD0:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD0;						return jkey;
@@ -130,17 +132,6 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD8;						return jkey;
 		case  VK_NUMPAD9:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUMPAD9;						return jkey;
-
-		/* Possibly Not Available?
-		case XK_KP_Up:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_UP;						return jkey;
-		case XK_KP_Down:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_DOWN;						return jkey;
-		case XK_KP_Left:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_LEFT;						return jkey;
-		case XK_KP_Right:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_KP_RIGHT;						return jkey;
-		*/
 
 		case VK_MULTIPLY:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_MULTIPLY; 					return jkey;
@@ -179,21 +170,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_F14:									jkey.keycode = JK_F14; 							return jkey;
 		case VK_F15:									jkey.keycode = JK_F15; 							return jkey;
 		case VK_F16:									jkey.keycode = JK_F16; 							return jkey;
-		case VK_OEM_F17:
 		case VK_F17:									jkey.keycode = JK_F17; 							return jkey;
-		case VK_OEM_F18:
 		case VK_F18:									jkey.keycode = JK_F18; 							return jkey;
-		case VK_OEM_F19:
 		case VK_F19:									jkey.keycode = JK_F19; 							return jkey;
-		case VK_OEM_F20:
 		case VK_F20:									jkey.keycode = JK_F20; 							return jkey;
-		case VK_OEM_F21:
 		case VK_F21:									jkey.keycode = JK_F21; 							return jkey;
-		case VK_OEM_F22:
 		case VK_F22:									jkey.keycode = JK_F22; 							return jkey;
-		case VK_OEM_F23:
 		case VK_F23:									jkey.keycode = JK_F23; 							return jkey;
-		case VK_OEM_F24:
 		case VK_F24:									jkey.keycode = JK_F24; 							return jkey;
 
 		case VK_SNAPSHOT:								jkey.keycode = JK_PRINTSCREEN; 					return jkey;
@@ -206,26 +189,98 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_HOME:									jkey.keycode = JK_HOME; 						return jkey;
 		case VK_END:									jkey.keycode = JK_END; 							return jkey;
 
-		case VK_OEM_7:									jkey.keycode = JK_QUOTE; 						return jkey;
-		case VK_OEM_3:									jkey.keycode = JK_BACK_QUOTE; 					return jkey;
+		case VK_OEM_7:									jkey.keycode = JK_QUOTE; 						return jkey;	//TODO Testing Needed
+		case VK_OEM_3:									jkey.keycode = JK_BACK_QUOTE; 					return jkey;	//TODO Testing Needed
 
+		/* For European keyboards */
 		/*
-		case VK_ampersand:								jkey.keycode = JK_AMPERSAND; 					return jkey;
-		case VK_asterisk:								jkey.keycode = JK_ASTERISK; 					return jkey;
-		case VK_quotedbl:								jkey.keycode = JK_QUOTEDBL; 					return jkey;
-		case VK_less:									jkey.keycode = JK_LESS; 						return jkey;
-		case VK_greater:								jkey.keycode = JK_GREATER; 						return jkey;
-		case VK_braceleft:								jkey.keycode = JK_BRACELEFT; 					return jkey;
-		case VK_braceright:								jkey.keycode = JK_BRACERIGHT; 					return jkey;
-		 */
+		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_acute:								jkey.keycode = JK_DEAD_ACUTE;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;	//Unknown Microsoft Support
+		case XK_dead_tilde:								jkey.keycode = JK_DEAD_TILDE;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_macron:							jkey.keycode = JK_DEAD_MACRON;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_breve:								jkey.keycode = JK_DEAD_BREVE;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_abovedot:							jkey.keycode = JK_DEAD_ABOVEDOT;				return jkey;	//Unknown Microsoft Support
+		case XK_dead_diaeresis:							jkey.keycode = JK_DEAD_DIAERESIS;				return jkey;	//Unknown Microsoft Support
+		case XK_dead_abovering:							jkey.keycode = JK_DEAD_ABOVERING;				return jkey;	//Unknown Microsoft Support
+		case XK_dead_doubleacute:						jkey.keycode = JK_DEAD_DOUBLEACUTE;				return jkey;	//Unknown Microsoft Support
+		case XK_dead_caron:								jkey.keycode = JK_DEAD_CARON;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_cedilla:							jkey.keycode = JK_DEAD_CEDILLA;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_ogonek:							jkey.keycode = JK_DEAD_OGONEK;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_iota:								jkey.keycode = JK_DEAD_IOTA;					return jkey;	//Unknown Microsoft Support
+		case XK_dead_voiced_sound:						jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;	//Unknown Microsoft Support
+		case XK_dead_semivoiced_sound:					jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;	//Unknown Microsoft Support
+		*/
 
-		//case VK_OEM_1:								jkey.keycode = JK_COLON; 						return jkey;
-		//case VK_OEM_PLUS:								jkey.keycode = JK_PLUS; 						return jkey;
+		/* Unknown Keyboard Codes */
+		/*
+		case XK_ampersand:								jkey.keycode = JK_AMPERSAND;					return jkey;	//No Microsoft Support
+		case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;	//No Microsoft Support
+		case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;	//No Microsoft Support
+		case XK_less:									jkey.keycode = JK_LESS;							return jkey;	//No Microsoft Support
+		case XK_greater:								jkey.keycode = JK_GREATER;						return jkey;	//No Microsoft Support
+		case XK_braceleft:								jkey.keycode = JK_BRACELEFT;					return jkey;	//No Microsoft Support
+		case XK_braceright:								jkey.keycode = JK_BRACERIGHT;					return jkey;	//No Microsoft Support
+		*/
 
+		/* Unknown Extended Keyboard Codes */
+		/*
+		case XK_at:										jkey.keycode = JK_AT;							return jkey;	//Unknown Microsoft Support
+		case VK_OEM_1:									jkey.keycode = JK_COLON;						return jkey;	//TODO Testing Needed
+		case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;	//Unknown Microsoft Support
+		case XK_dollar:									jkey.keycode = JK_DOLLAR;						return jkey;	//Unknown Microsoft Support
+		case XK_EuroSign:								jkey.keycode = JK_EURO_SIGN;					return jkey;	//Unknown Microsoft Support
+		case XK_exclam:									jkey.keycode = JK_EXCLAMATION_MARK;				return jkey;	//Unknown Microsoft Support
+		case XK_exclamdown:								jkey.keycode = JK_INVERTED_EXCLAMATION_MARK;	return jkey;	//Unknown Microsoft Support
+		case XK_parenleft:								jkey.keycode = JK_LEFT_PARENTHESIS;				return jkey;	//Unknown Microsoft Support
+		case XK_numbersign:								jkey.keycode = JK_NUMBER_SIGN;					return jkey;	//Unknown Microsoft Support
+		case VK_OEM_PLUS:								jkey.keycode = JK_PLUS;							return jkey;	//TODO Testing Needed
+		case XK_parenright:								jkey.keycode = JK_RIGHT_PARENTHESIS;			return jkey;	//Unknown Microsoft Support
+		case XK_underscore:								jkey.keycode = JK_UNDERSCORE;					return jkey;
+		*/
 
-		//case VK_CANCEL:								jkey.keycode = JK_FINAL; 						return jkey;
-		//case VK_KANA:									jkey.keycode = JK_KANA; 						return jkey;
-		//case VK_KANJI:								jkey.keycode = JK_KANJI;						return jkey;
+		/* For input method support on Asian Keyboards */
+		//case XK_Cancel:								jkey.keycode = JK_FINAL;						return jkey;	//Unknown Microsoft Support
+		//case XK_Henkan:								jkey.keycode = JK_CONVERT;						return jkey;	//Unknown Microsoft Support
+		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown Microsoft Support
+		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown Microsoft Support
+		//case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	//Unknown Microsoft Support
+		case VK_KANA:									jkey.keycode = JK_KANA;							return jkey;	//TODO Testing Needed
+		case VK_KANJI:									jkey.keycode = JK_KANJI;						return jkey;	//TODO Testing Needed
+		case VK_DBE_ALPHANUMERIC:						jkey.keycode = JK_ALPHANUMERIC;					return jkey;	//TODO Testing Needed
+		case VK_DBE_KATAKANA:							jkey.keycode = JK_KATAKANA;						return jkey;	//TODO Testing Needed
+		case VK_DBE_HIRAGANA:							jkey.keycode = JK_HIRAGANA;						return jkey;	//TODO Testing Needed
+		case VK_DBE_DBCSCHAR:							jkey.keycode = JK_FULL_WIDTH;					return jkey;	//TODO Testing Needed
+		case VK_DBE_SBCSCHAR:							jkey.keycode = JK_HALF_WIDTH;					return jkey;	//TODO Testing Needed
+		case VK_DBE_ROMAN:
+		case VK_DBE_NOROMAN:							jkey.keycode = JK_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
+		//case XK_Zen_Koho:								jkey.keycode = JK_ALL_CANDIDATES;				return jkey;	//Unknown Microsoft Support
+		//case XK_Mae_Koho:								jkey.keycode = JK_PREVIOUS_CANDIDATE;			return jkey;	//Unknown Microsoft Support
+		case VK_DBE_CODEINPUT:
+		case VK_DBE_NOCODEINPUT:						jkey.keycode = JK_CODE_INPUT;					return jkey;	//TODO Testing Needed
+		//case XK_Hiragana_Katakana:					jkey.keycode = JK_JAPANESE_KATAKANA;			return jkey;	//Unknown Microsoft Support
+		//case XK_Hiragana_Katakana:					jkey.keycode = JK_JAPANESE_HIRAGANA;			return jkey;	//Unknown Microsoft Support
+		//case XK_Romaji:								jkey.keycode = JK_JAPANESE_ROMAN;				return jkey;	//Unknown Microsoft Support
+		//case XK_Kana_Lock:							jkey.keycode = JK_KANA_LOCK;					return jkey;	//Unknown Microsoft Support
+		//case XK_VoidSymbol:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	//Unknown Microsoft Support
+
+		/* For Sun keyboards */
+		/*
+		#ifdef SUN_KEYBOARD
+		case SunXK_Cut:									jkey.keycode = JK_CUT;							return jkey;	//No Microsoft Support
+		case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;	//No Microsoft Support
+		case SunXK_Paste:								jkey.keycode = JK_PASTE;						return jkey;	//No Microsoft Support
+		case SunXK_Undo:								jkey.keycode = JK_UNDO;							return jkey;	//No Microsoft Support
+		case SunXK_Again:								jkey.keycode = JK_AGAIN;						return jkey;	//No Microsoft Support
+		case SunXK_Find:								jkey.keycode = JK_FIND;							return jkey;	//No Microsoft Support
+		case SunXK_Props:								jkey.keycode = JK_PROPS;						return jkey;	//No Microsoft Support
+		case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;	//No Microsoft Support
+		case SunXK_Compose:								jkey.keycode = JK_COMPOSE;						return jkey;	//No Microsoft Support
+		case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;	//No Microsoft Support
+		#endif
+		*/
+
+		//case XK_Begin:								jkey.keycode = JK_BEGIN;						return jkey;	//No Microsoft Support
 
 		default:										jkey.keycode = JK_UNDEFINED; 					return jkey;
 	}

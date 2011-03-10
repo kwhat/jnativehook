@@ -20,7 +20,7 @@
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
 #define JK_TAB							'\t'
-//#define JK_CANCEL						0x0C
+#define JK_CANCEL						0x0C
 
 #define JK_SHIFT						0x10
 #define JK_CONTROL						0x11
@@ -107,7 +107,7 @@
 
 #define JK_MULTIPLY						0x6A
 #define JK_ADD							0x6B
-//#define JK_SEPARATOR					0x6C
+#define JK_SEPARATOR					0x6C
 #define JK_SUBTRACT						0x6D
 #define JK_DECIMAL						0x6E
 #define JK_DIVIDE						0x6F
@@ -157,7 +157,6 @@
 
 
 /* For European keyboards */
-/* not implemented yet
 #define JK_DEAD_GRAVE					0x80
 #define JK_DEAD_ACUTE					0x81
 #define JK_DEAD_CIRCUMFLEX				0x82
@@ -174,9 +173,8 @@
 #define JK_DEAD_IOTA					0x8D
 #define JK_DEAD_VOICED_SOUND			0x8E
 #define JK_DEAD_SEMIVOICED_SOUND		0x8F
-*/
 
-/*
+/* Unknown Keyboard Codes */
 #define JK_AMPERSAND					0x96
 #define JK_ASTERISK						0x97
 #define JK_QUOTEDBL						0x98
@@ -184,9 +182,9 @@
 #define JK_GREATER						0xA0
 #define JK_BRACELEFT					0xA1
 #define JK_BRACERIGHT					0xA2
-*/
 
-/*
+
+/* Unknown Extended Keyboard Codes */
 #define JK_AT							0x0200
 #define JK_COLON						0x0201
 #define JK_CIRCUMFLEX					0x0202
@@ -199,10 +197,9 @@
 #define JK_PLUS							0x0209
 #define JK_RIGHT_PARENTHESIS			0x020A
 #define JK_UNDERSCORE					0x020B
-*/
 
-/* for input method support on Asian Keyboards */
-/* not implemented yet
+
+/* For input method support on Asian Keyboards */
 #define JK_FINAL						0x0018	//Unknown Win32 API
 #define JK_CONVERT						0x001C
 #define JK_NONCONVERT					0x001D
@@ -224,10 +221,8 @@
 #define JK_JAPANESE_ROMAN				0x0105
 #define JK_KANA_LOCK					0x0106
 #define JK_INPUT_METHOD_ON_OFF			0x0107
-*/
 
-/* for Sun keyboards */
-/* not implemented yet
+/* For Sun keyboards */
 #define JK_CUT							0xFFD1
 #define JK_COPY							0xFFCD
 #define JK_PASTE						0xFFCF
@@ -238,7 +233,6 @@
 #define JK_STOP							0xFFC8
 #define JK_COMPOSE						0xFF20
 #define JK_ALT_GRAPH					0xFF7E
-*/
 
 #define JK_BEGIN						0xFF58
 

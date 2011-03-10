@@ -60,15 +60,11 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_CapsLock:								jkey.keycode = JK_CAPS_LOCK;					return jkey;
 		case kVK_Escape:								jkey.keycode = JK_ESCAPE;						return jkey;
 		case kVK_Space:									jkey.keycode = JK_SPACE;						return jkey;
-		case kVK_PageUp:								jkey.keycode = JK_PAGE_UP;						return jkey;
-		case kVK_PageDown:								jkey.keycode = JK_PAGE_DOWN;					return jkey;
-		case kVK_Home:									jkey.keycode = JK_HOME;							return jkey;
-		case kVK_End:									jkey.keycode = JK_END;							return jkey;
 
-		case kVK_LeftArrow:								jkey.keycode = JK_LEFT;							return jkey;
-		case kVK_RightArrow:							jkey.keycode = JK_RIGHT;						return jkey;
 		case kVK_UpArrow:								jkey.keycode = JK_UP;							return jkey;
 		case kVK_DownArrow:								jkey.keycode = JK_DOWN;							return jkey;
+		case kVK_LeftArrow:								jkey.keycode = JK_LEFT;							return jkey;
+		case kVK_RightArrow:							jkey.keycode = JK_RIGHT;						return jkey;
 
 		case kVK_ANSI_Comma:							jkey.keycode = JK_COMMA;						return jkey;
 		case kVK_ANSI_Minus:							jkey.keycode = JK_MINUS;						return jkey;
@@ -172,6 +168,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_F10:									jkey.keycode = JK_F10;							return jkey;
 		case kVK_F11:									jkey.keycode = JK_F11;							return jkey;
 		case kVK_F12:									jkey.keycode = JK_F12;							return jkey;
+
 		case kVK_F13:									jkey.keycode = JK_F13;							return jkey;
 		case kVK_F14:									jkey.keycode = JK_F14;							return jkey;
 		case kVK_F15:									jkey.keycode = JK_F15;							return jkey;
@@ -190,62 +187,70 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_Help:									jkey.keycode = JK_HELP;							return jkey;
 		case kVK_ForwardDelete:							jkey.keycode = JK_DELETE;						return jkey;
 
+		case kVK_PageUp:								jkey.keycode = JK_PAGE_UP;						return jkey;
+		case kVK_PageDown:								jkey.keycode = JK_PAGE_DOWN;					return jkey;
+		case kVK_Home:									jkey.keycode = JK_HOME;							return jkey;
+		case kVK_End:									jkey.keycode = JK_END;							return jkey;
+
 		case kVK_ANSI_Quote:							jkey.keycode = JK_QUOTE;						return jkey;
 		case kVK_ANSI_Grave:							jkey.keycode = JK_BACK_QUOTE;					return jkey;
 
-		//case XK_KP_Up:								jkey.keycode = JK_KP_UP;						return jkey;	//No Apple Support
-		//case XK_KP_Down:								jkey.keycode = JK_KP_DOWN;						return jkey;	//No Apple Support
-		//case XK_KP_Left:								jkey.keycode = JK_KP_LEFT;						return jkey;	//No Apple Support
-		//case XK_KP_Right:								jkey.keycode = JK_KP_RIGHT;						return jkey;	//No Apple Support
+		/* For European keyboards */
+		/*
+		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;	//Unknown Apple Support
+		case XK_dead_acute:								jkey.keycode = JK_DEAD_ACUTE;					return jkey;	//Unknown Apple Support
+		case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;	//Unknown Apple Support
+		case XK_dead_tilde:								jkey.keycode = JK_DEAD_TILDE;					return jkey;	//Unknown Apple Support
+		case XK_dead_macron:							jkey.keycode = JK_DEAD_MACRON;					return jkey;	//Unknown Apple Support
+		case XK_dead_breve:								jkey.keycode = JK_DEAD_BREVE;					return jkey;	//Unknown Apple Support
+		case XK_dead_abovedot:							jkey.keycode = JK_DEAD_ABOVEDOT;				return jkey;	//Unknown Apple Support
+		case XK_dead_diaeresis:							jkey.keycode = JK_DEAD_DIAERESIS;				return jkey;	//Unknown Apple Support
+		case XK_dead_abovering:							jkey.keycode = JK_DEAD_ABOVERING;				return jkey;	//Unknown Apple Support
+		case XK_dead_doubleacute:						jkey.keycode = JK_DEAD_DOUBLEACUTE;				return jkey;	//Unknown Apple Support
+		case XK_dead_caron:								jkey.keycode = JK_DEAD_CARON;					return jkey;	//Unknown Apple Support
+		case XK_dead_cedilla:							jkey.keycode = JK_DEAD_CEDILLA;					return jkey;	//Unknown Apple Support
+		case XK_dead_ogonek:							jkey.keycode = JK_DEAD_OGONEK;					return jkey;	//Unknown Apple Support
+		case XK_dead_iota:								jkey.keycode = JK_DEAD_IOTA;					return jkey;	//Unknown Apple Support
+		case XK_dead_voiced_sound:						jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;	//Unknown Apple Support
+		case XK_dead_semivoiced_sound:					jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;	//Unknown Apple Support
+		*/
 
-		//case XK_dead_grave:							jkey.keycode = JK_DEAD_GRAVE;					return jkey;	//Unknown Apple Support
-		//case XK_dead_acute:							jkey.keycode = JK_DEAD_ACUTE;					return jkey;	//Unknown Apple Support
-		//case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;	//Unknown Apple Support
-		//case XK_dead_tilde:							jkey.keycode = JK_DEAD_TILDE;					return jkey;	//Unknown Apple Support
-		//case XK_dead_macron:							jkey.keycode = JK_DEAD_MACRON;					return jkey;	//Unknown Apple Support
-		//case XK_dead_breve:							jkey.keycode = JK_DEAD_BREVE;					return jkey;	//Unknown Apple Support
-		//case XK_dead_abovedot:						jkey.keycode = JK_DEAD_ABOVEDOT;				return jkey;	//Unknown Apple Support
-		//case XK_dead_diaeresis:						jkey.keycode = JK_DEAD_DIAERESIS;				return jkey;	//Unknown Apple Support
-		//case XK_dead_abovering:						jkey.keycode = JK_DEAD_ABOVERING;				return jkey;	//Unknown Apple Support
-		//case XK_dead_doubleacute:						jkey.keycode = JK_DEAD_DOUBLEACUTE;				return jkey;	//Unknown Apple Support
-		//case XK_dead_caron:							jkey.keycode = JK_DEAD_CARON;					return jkey;	//Unknown Apple Support
-		//case XK_dead_cedilla:							jkey.keycode = JK_DEAD_CEDILLA;					return jkey;	//Unknown Apple Support
-		//case XK_dead_ogonek:							jkey.keycode = JK_DEAD_OGONEK;					return jkey;	//Unknown Apple Support
-		//case XK_dead_iota:							jkey.keycode = JK_DEAD_IOTA;					return jkey;	//Unknown Apple Support
-		//case XK_dead_voiced_sound:					jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;	//Unknown Apple Support
-		//case XK_dead_semivoiced_sound:				jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;	//Unknown Apple Support
+		/* Unknown Keyboard Codes */
+		/*
+		case XK_ampersand:								jkey.keycode = JK_AMPERSAND;					return jkey;	//No Apple Support
+		case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;	//No Apple Support
+		case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;	//No Apple Support
+		case XK_less:									jkey.keycode = JK_LESS;							return jkey;	//No Apple Support
+		case XK_greater:								jkey.keycode = JK_GREATER;						return jkey;	//No Apple Support
+		case XK_braceleft:								jkey.keycode = JK_BRACELEFT;					return jkey;	//No Apple Support
+		case XK_braceright:								jkey.keycode = JK_BRACERIGHT;					return jkey;	//No Apple Support
+		*/
 
-		//case XK_ampersand:							jkey.keycode = JK_AMPERSAND;					return jkey;	//Unknown Apple Support
-		//case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;	//Unknown Apple Support
-		//case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;	//Unknown Apple Support
-		//case XK_less:									jkey.keycode = JK_LESS;							return jkey;	//Unknown Apple Support
-		//case XK_greater:								jkey.keycode = JK_GREATER;						return jkey;	//Unknown Apple Support
-		//case XK_braceleft:							jkey.keycode = JK_BRACELEFT;					return jkey;	//Unknown Apple Support
-		//case XK_braceright:							jkey.keycode = JK_BRACERIGHT;					return jkey;	//Unknown Apple Support
+		/* Unknown Extended Keyboard Codes */
+		/*
+		case XK_at:										jkey.keycode = JK_AT;							return jkey;	//Unknown Apple Support
+		case XK_colon:									jkey.keycode = JK_COLON;						return jkey;	//Unknown Apple Support
+		case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;	//Unknown Apple Support
+		case XK_dollar:									jkey.keycode = JK_DOLLAR;						return jkey;	//Unknown Apple Support
+		case XK_EuroSign:								jkey.keycode = JK_EURO_SIGN;					return jkey;	//Unknown Apple Support
+		case XK_exclam:									jkey.keycode = JK_EXCLAMATION_MARK;				return jkey;	//Unknown Apple Support
+		case XK_exclamdown:								jkey.keycode = JK_INVERTED_EXCLAMATION_MARK;	return jkey;	//Unknown Apple Support
+		case XK_parenleft:								jkey.keycode = JK_LEFT_PARENTHESIS;				return jkey;	//Unknown Apple Support
+		case XK_numbersign:								jkey.keycode = JK_NUMBER_SIGN;					return jkey;	//Unknown Apple Support
+		case XK_plus:									jkey.keycode = JK_PLUS;							return jkey;	//Unknown Apple Support
+		case XK_parenright:								jkey.keycode = JK_RIGHT_PARENTHESIS;			return jkey;	//Unknown Apple Support
+		case kVK_JIS_Underscore:						jkey.keycode = JK_UNDERSCORE;					return jkey;
+		*/
 
-		//case XK_at:									jkey.keycode = JK_AT;							return jkey;	//Unknown Apple Support
-		//case XK_colon:								jkey.keycode = JK_COLON;						return jkey;	//Unknown Apple Support
-		//case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;	//Unknown Apple Support
-		//case XK_dollar:								jkey.keycode = JK_DOLLAR;						return jkey;	//Unknown Apple Support
-		//case XK_EuroSign:								jkey.keycode = JK_EURO_SIGN;					return jkey;	//Unknown Apple Support
-		//case XK_exclam:								jkey.keycode = JK_EXCLAMATION_MARK;				return jkey;	//Unknown Apple Support
-		//case XK_exclamdown:							jkey.keycode = JK_INVERTED_EXCLAMATION_MARK;	return jkey;	//Unknown Apple Support
-		//case XK_parenleft:							jkey.keycode = JK_LEFT_PARENTHESIS;				return jkey;	//Unknown Apple Support
-		//case XK_numbersign:							jkey.keycode = JK_NUMBER_SIGN;					return jkey;	//Unknown Apple Support
-		//case XK_plus:									jkey.keycode = JK_PLUS;							return jkey;	//Unknown Apple Support
-		//case XK_parenright:							jkey.keycode = JK_RIGHT_PARENTHESIS;			return jkey;	//Unknown Apple Support
-		//case kVK_JIS_Underscore:						jkey.keycode = JK_UNDERSCORE;					return jkey;
-
-
-		/* for input method support on Asian Keyboards */
+		/* For input method support on Asian Keyboards */
 		//case XK_Cancel:								jkey.keycode = JK_FINAL;						return jkey;	//Unknown Apple Support
 		//case XK_Henkan:								jkey.keycode = JK_CONVERT;						return jkey;	//Unknown Apple Support
 		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown Apple Support
 		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown Apple Support
 		//case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	//Unknown Apple Support
-		//case kVK_JIS_Kana:							jkey.keycode = JK_KANA;							return jkey;	//Unknown Apple Support
+		case kVK_JIS_Kana:								jkey.keycode = JK_KANA;							return jkey;	//TODO Testing Needed
 		//case XK_Kanji:								jkey.keycode = JK_KANJI;						return jkey;	//Unknown Apple Support
-		//case kVK_JIS_Eisu:							jkey.keycode = JK_ALPHANUMERIC;					return jkey;
+		case kVK_JIS_Eisu:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	//TODO Testing Needed
 		//case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;	//Unknown Apple Support
 		//case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;	//Unknown Apple Support
 		//case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;	//Unknown Apple Support
@@ -260,18 +265,22 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//case XK_Kana_Lock:							jkey.keycode = JK_KANA_LOCK;					return jkey;	//Unknown Apple Support
 		//case XK_VoidSymbol:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	//Unknown Apple Support
 
-		/* for Sun keyboards */
-		//case SunXK_Cut:								jkey.keycode = JK_CUT;							return jkey;	//No Apple Support
-		//case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;	//No Apple Support
-		//case SunXK_Paste:								jkey.keycode = JK_PASTE;						return jkey;	//No Apple Support
-		//case SunXK_Undo:								jkey.keycode = JK_UNDO;							return jkey;	//No Apple Support
-		//case SunXK_Again:								jkey.keycode = JK_AGAIN;						return jkey;	//No Apple Support
-		//case SunXK_Find:								jkey.keycode = JK_FIND;							return jkey;	//No Apple Support
-		//case SunXK_Props:								jkey.keycode = JK_PROPS;						return jkey;	//No Apple Support
-		//case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;	//No Apple Support
+		/* For Sun keyboards */
+		/*
+		#ifdef SUN_KEYBOARD
+		case SunXK_Cut:									jkey.keycode = JK_CUT;							return jkey;	//No Apple Support
+		case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;	//No Apple Support
+		case SunXK_Paste:								jkey.keycode = JK_PASTE;						return jkey;	//No Apple Support
+		case SunXK_Undo:								jkey.keycode = JK_UNDO;							return jkey;	//No Apple Support
+		case SunXK_Again:								jkey.keycode = JK_AGAIN;						return jkey;	//No Apple Support
+		case SunXK_Find:								jkey.keycode = JK_FIND;							return jkey;	//No Apple Support
+		case SunXK_Props:								jkey.keycode = JK_PROPS;						return jkey;	//No Apple Support
+		case SunXK_Stop:								jkey.keycode = JK_STOP;							return jkey;	//No Apple Support
+		case SunXK_Compose:								jkey.keycode = JK_COMPOSE;						return jkey;	//No Apple Support
+		case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;	//No Apple Support
+		#endif
+		*/
 
-		//case SunXK_Compose:							jkey.keycode = JK_COMPOSE;						return jkey;	//No Apple Support
-		//case SunXK_AltGraph:							jkey.keycode = JK_ALT_GRAPH;					return jkey;	//No Apple Support
 		//case XK_Begin:								jkey.keycode = JK_BEGIN;						return jkey;	//No Apple Support
 
 		default:
@@ -293,18 +302,11 @@ jint NativeToJButton(unsigned int button) {
 
 jint NativeToJModifier(unsigned int modifier) {
 	switch (modifier) {
-		case shiftKey:
-		case rightShiftKey:								return JK_SHIFT_MASK;
+		case kCGEventFlagMaskShift:						return JK_SHIFT_MASK;
+		case kCGEventFlagMaskControl:					return JK_CTRL_MASK;
+		case kCGEventFlagMaskAlternate:					return JK_ALT_MASK;
+		case kCGEventFlagMaskCommand:					return JK_META_MASK;
 
-		case controlKey:
-		case rightControlKey:							return JK_CTRL_MASK;
-
-		case optionKey:
-		case rightOptionKey:							return JK_ALT_MASK;
-
-		case cmdKey:									return JK_META_MASK;
-		//case rightCmdKey:								//Undefined
-
-		default:										return 0;
+		default:										return JK_UNDEFINED;
 	}
 }
