@@ -264,6 +264,14 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		break;
 
 
+		case kCGEventLeftMouseDragged:
+		case kCGEventRightMouseDragged:
+		case kCGEventOtherMouseDragged:
+			//Call mouse move events for now.  Adding this functionality to other systems will be difficult.
+			#ifdef DEBUG
+				printf ("Native: EventHandlerCallback - MouseDragged forwarded to Motion Notified\n");
+			#endif
+
 		case kCGEventMouseMoved:
 			event_point = CGEventGetLocation(event);
 			#ifdef DEBUG
@@ -279,17 +287,6 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			//Fire mouse moved event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
-
-		case kCGEventLeftMouseDragged:
-		case kCGEventRightMouseDragged:
-		case kCGEventOtherMouseDragged:
-			event_point = CGEventGetLocation(event);
-			#ifdef DEBUG
-				printf ("Native: EventHandlerCallback - MouseDragged (Unimplemented)\n");
-			#endif
-
-			//FIXME Call mouse move event for now.
 		break;
 
 		case kCGEventScrollWheel:
