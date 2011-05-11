@@ -633,7 +633,7 @@
 	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
-		<zip destfile="${dir.dist}/JNativeGrab-${project.version}.zip" duplicate="add" level="9">
+		<zip destfile="${dir.dist}/${project.name}-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${dir.jar}" prefix="${project.name}/jar">
 				<include name="*.jar"/>
 			</zipfileset>
@@ -648,7 +648,7 @@
 			</zipfileset>
 		</zip>
 		
-		<zip destfile="${dir.dist}/JNativeGrab-src-${project.version}.zip" duplicate="add" level="9">
+		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${basedir}" prefix="${project.name}">
 				<include name="*.txt"/>
 				<include name="build.*"/>

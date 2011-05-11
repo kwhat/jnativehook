@@ -19,13 +19,22 @@ package org.jnativehook.example;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.ItemSelectable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.border.EtchedBorder;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
@@ -43,10 +52,13 @@ import org.jnativehook.mouse.NativeMouseInputListener;
  * @see GlobalScreen
  * @see NativeKeyListener
  */
-public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, ActionListener, WindowListener {
+public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, ActionListener, WindowListener, ItemListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -5549783775591314629L;
-
+	private static final long serialVersionUID = -5076634313730799059L;
+	
+	/** Checkbox's for event delivery options */
+	private JCheckBox chkKeyboard, chkButton, chkMotion;
+	
 	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
 	
@@ -54,23 +66,88 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * Instantiates a new native hook demo.
 	 */
 	public NativeHookDemo() {
+		//Setup the main window.
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(600, 250);
+		setSize(600, 300);
 		addWindowListener(this);
 		
+		//Create options panel
+		JPanel grpOptions = new JPanel();
+		grpOptions.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		grpOptions.setLayout(new FlowLayout(FlowLayout.LEADING));
+		add(grpOptions, BorderLayout.NORTH);
+		
+		//Create keyboard checkbox
+		chkKeyboard = new JCheckBox("Keyboard Events");
+		chkKeyboard.setMnemonic(KeyEvent.VK_K);
+		chkKeyboard.setSelected(true);
+		chkKeyboard.addItemListener(this);
+		grpOptions.add(chkKeyboard);
+		
+		//Create button checkbox
+		chkButton = new JCheckBox("Button Events");
+		chkButton.setMnemonic(KeyEvent.VK_B);
+		chkButton.setSelected(true);
+		chkButton.addItemListener(this);
+		grpOptions.add(chkButton);
+		
+		//Create motion checkbox
+		chkMotion = new JCheckBox("Motion Events");
+		chkMotion.setMnemonic(KeyEvent.VK_M);
+		chkMotion.setSelected(true);
+		chkMotion.addItemListener(this);
+		grpOptions.add(chkMotion);
+		
+		//Create feedback area
 		txtEventInfo = new JTextArea();
 		txtEventInfo.setEditable(false);
 		txtEventInfo.setBackground(new Color(0xFF, 0xFF, 0xFF));
 		txtEventInfo.setForeground(new Color(0x00, 0x00, 0x00));
 		txtEventInfo.setText("");
+		
 		JScrollPane scrollPane = new JScrollPane(txtEventInfo);
 		scrollPane.setPreferredSize(new Dimension(375, 125));
-		
 		add(scrollPane, BorderLayout.CENTER);
 		
 		setVisible(true);
+	}
+	
+
+	/**
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	 */
+	public void itemStateChanged(ItemEvent e) {
+		ItemSelectable item = e.getItemSelectable();
+		
+        if (item == chkKeyboard) {
+        	//Keyboard checkbox was changed, adjust listeners accordingly
+        	if (e.getStateChange() == ItemEvent.SELECTED) {
+        		GlobalScreen.getInstance().addNativeKeyListener(this);
+        	}
+        	else {
+        		GlobalScreen.getInstance().removeNativeKeyListener(this);
+        	}
+		}
+		else if (item == chkButton) {
+			//Button checkbox was changed, adjust listeners accordingly
+        	if (e.getStateChange() == ItemEvent.SELECTED) {
+        		GlobalScreen.getInstance().addNativeMouseListener(this);
+        	}
+        	else {
+        		GlobalScreen.getInstance().removeNativeMouseListener(this);
+        	}
+		}
+		else if (item == chkMotion) {
+			//Motion checkbox was changed, adjust listeners accordingly
+        	if (e.getStateChange() == ItemEvent.SELECTED) {
+        		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
+        	}
+        	else {
+        		GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
+        	}
+		}
 	}
 	
 	/**

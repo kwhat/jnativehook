@@ -1,7 +1,9 @@
 *** About ***
 JNativeHook is a library to provide global keyboard and mouse hooking for Java.
-The primary purpose is to allow Java applications access to keyboard and mouse 
-events that would normally be outside the scope of a Java application.  
+The primary purpose is to provide a portalbe and reliable method for delivering 
+keyboard and mouse events to a Java application that would otherwise be 
+inaccessible.  This is beneficial for applcatiions that run in the background 
+but may require user interaction though hotkeys or mouse events. 
 
 *** Breif Overview ***
 Keyboard Events:
@@ -9,7 +11,7 @@ Keyboard Events:
     level. The acquired system codes are then translated to their respective 
     key codes.  The key codes are then translated to virtual key codes, as 
     specified in the application programming interface.  Modifier masks are 
-    translated directly from their native masks to a virtual mask.  After all 
+    translated directly from their native masks to virtual masks.  After all 
     native translations have taken place,the virtual key code and modifier mask 
     are delivered to Java via a NativeKeyEvent object.
 
@@ -21,7 +23,7 @@ Mouse Button Events:
     Mouse button events and their modifier masks are captured at the native 
     level.  The acquired button codes are then translated to virtual button 
 	codes as specified in the application programming interface. Modifier masks 
-	are translated directly from their native masks to a virtual mask.  After 
+	are translated directly from their native masks to virtual masks.  After 
 	all native translations have taken place, the virtual button code and 
 	modifier mask are delivered to Java via a NativeMouseEvent object.
 
@@ -30,7 +32,7 @@ Mouse Motion Events:
     level.  The acquired pointer coordinates are untranslated from their native
 	position.  The coordinates are usually relative to the upper left corner of 
 	the native display, however that origin cannot be guaranteed.  Modifier 
-	masks are translated directly from their native masks to a virtual mask.  
+	masks are translated directly from their native masks to virtual masks.  
 	After all native translations have taken place, the virtual key code and 
 	modifier mask are delivered to Java via a NativeMouseEvent object.
 
@@ -131,7 +133,7 @@ Windows:
 			C:\Java\jre6
 			C:\ant\apache-ant-1.8.1
 		
-		After installing all the dependencies you will need to add a few 
+		After installing all the dependencies, you will need to add a few 
 		environment variables.  Open the System Properties dialog and navigate 
 		to the Advanced tab.  Click the Environment Variables button and then 
 		locate the Environment Variables dialog.  Click the new button to add 
@@ -155,8 +157,8 @@ Mac OS X:
 
 
 Building:
-	Extract source archive to a folder without spaces and run ant in that 
-	folder.  If custom build configuration is needed use the "configure" task 
+	Extract source archive to a folder without spaces and run Ant in that 
+	folder.  If custom build configuration is needed, use the "configure" task 
 	to generate a build.properties file for modification.
 
 
@@ -167,20 +169,20 @@ system and extract the appropriate library to a temporary location and
 dynamically load it.  All that is needed for most installations is placing the 
 jar file in the programs class path.
 
-There maybe specific circumstances where bundling the native library within the 
+There may be specific circumstances where bundling the native library within the 
 jar is undesirable.  For these situations the native library can be loaded from 
 the java.library.path by specifying the location of the binary file.  For 
-example java -Djava.library.path=/usr/lib -jar JNativeHook.jar.  If both an 
-external and internal library are present the external library takes precedence.
+example, java -Djava.library.path=/usr/lib -jar JNativeHook.jar.  If both an 
+external and internal library are present, the external library takes precedence.
 
 
 *** Known Issues ***
 The current native key code to virtual key code conversion method may fail for 
-some non-english keys.  If you encounter an incorrect key code please report the 
-issue and include the output of the NativeKeyEvent's paramString().
+some non-English keys.  If you encounter an incorrect key code, please report 
+the issue and include the output of the NativeKeyEvent's paramString().
 
 *** Solaris and BSD Support ***
-This program should compile and run on both Oralce Solaris and BSD Unix's.  No 
+This program should compile and run on both Oralce Solaris and BSD Unix.  No 
 binaries are provided for these platforms at this time due to cross compiler 
-difficulties and the lack of official Java support for BSD.  Please feel free to 
-build on these platforms and report any issues that may arise.
+difficulties and the lack of official Java support on the BSD platform.  Please 
+feel free to build on these platforms and report any issues that may arise.
