@@ -181,6 +181,7 @@ The current native key code to virtual key code conversion method may fail for
 some non-English keys.  If you encounter an incorrect key code, please report 
 the issue and include the output of the NativeKeyEvent's paramString().
 
+
 *** Solaris and BSD Support ***
 This program should compile and run on both Oralce Solaris and BSD Unix.  No 
 binaries are provided for these platforms at this time due to cross compiler 
