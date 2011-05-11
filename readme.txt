@@ -54,11 +54,6 @@ GUI Demo Application:
 		i586, amd64, ppc or ppc64
 		256 MB of RAM
 
-	Solaris OS
-		Oracle Solaris 8 to 11
-		i586, amd64, SPARC 32 or SPARC 64
-		64 MB of RAM
-
 	Windows 
 		Microsoft Windows 2000 to 7
 		i586 or amd64
@@ -113,6 +108,15 @@ Unix/Linux:
 	Setup:
 		Use your package manager to install all dependencies.
 
+Mac OS X:
+	Dependencies:
+		Java 1.5 or 1.6
+		Xcode Developer Tools 2.2.1
+
+	Setup:
+		Create an account at http://connect.apple.com if you do not already 
+		have one.  Now download and Install Xcode Tools.  Make sure you check 
+		the box to install "UNIX Dev Support" which includes Ant, GCC and Make.
 
 Windows:
 	Dependencies:
@@ -143,17 +147,6 @@ Windows:
 		
 		Now edit the Path variable and append the following:
 			C:\MinGW\bin;%ANT_HOME%\bin;%JAVA_HOME%\bin
-
-
-Mac OS X:
-	Dependencies:
-		Java 1.5 or 1.6
-		Xcode Developer Tools 2.2.1
-
-	Setup:
-		Create an account at http://connect.apple.com if you do not already 
-		have one.  Now download and Install Xcode Tools.  Make sure you check 
-		the box to install "UNIX Dev Support" which includes Ant, GCC and Make.
 
 
 Building:
