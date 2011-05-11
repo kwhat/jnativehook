@@ -1,6 +1,6 @@
 *** About ***
 JNativeHook is a library to provide global keyboard and mouse hooking for Java.
-The primary purpose is to provide a portalbe and reliable method for delivering 
+The primary purpose is to provide a portable and reliable method for delivering 
 keyboard and mouse events to a Java application that would otherwise be 
 inaccessible.  This is beneficial for applcatiions that run in the background 
 but may require user interaction though hotkeys or mouse events. 
