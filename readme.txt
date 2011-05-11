@@ -3,12 +3,7 @@ JNativeHook is a library to provide global keyboard and mouse hooking for Java.
 The primary purpose is to allow Java applications access to keyboard and mouse 
 events that would normally be outside the scope of a Java application.  
 
-
-
-Additionally information about keyboard  
-
-
-
+*** Breif Overview ***
 Keyboard Events:
     Key event system codes and their modifier masks are captured at the native 
     level. The acquired system codes are then translated to their respective 
@@ -29,7 +24,7 @@ Mouse Button Events:
 	are translated directly from their native masks to a virtual mask.  After 
 	all native translations have taken place, the virtual button code and 
 	modifier mask are delivered to Java via a NativeMouseEvent object.
-   
+
 Mouse Motion Events:
     Mouse motion events and their modifier masks are captured at the native 
     level.  The acquired pointer coordinates are untranslated from their native
@@ -40,8 +35,9 @@ Mouse Motion Events:
 	modifier mask are delivered to Java via a NativeMouseEvent object.
 
 GUI Demo Application:
-    The graphical demonstration application was created to provided a real-time
-    demonstration of raw output for keyboard, button and mouse motion events.
+    The graphical example application was created to provided a real-time
+    demonstration of raw output for keyboard, button and mouse motion events.  
+    To run the application simply exceute the jar file provided.
 
 *** Software and Hardware Requirements ***
 	Java 1.5 or 1.6
@@ -69,7 +65,7 @@ GUI Demo Application:
 
 
 *** License ***
-Copyright (C) 2006-2010 Alexander Barker.  All Rights Received.
+Copyright (C) 2006-2011 Alexander Barker.  All Rights Received.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -101,7 +97,7 @@ Thousand Oaks CA 91360
 *** Compiling ***
 JNativeHook should compile on all operating systems that support Java.  Unix 
 and Linux based systems will require the X Window System for compilation and 
-execution. 
+execution.
 
 Unix/Linux:
 	Dependencies:
@@ -125,7 +121,7 @@ Windows:
 				MinGW base tools
 				MinGW Make
 		Windows x86_64
-			The latest mingw-w64-bin_i686
+			The latest stable mingw-w64-bin_i686
 		
 	Setup:
 		Install MinGW, Java JDK and Ant to a locations that do not include 
@@ -179,8 +175,12 @@ external and internal library are present the external library takes precedence.
 
 
 *** Known Issues ***
-The current native key code to virtual key code conversion method will probably 
-only work for standard united states keyboard layouts.  A more effective 
-solution using a native key code to key string lookup should be implemented 
-against the current keyboard layout and then translated to a virtual key code.  
-This improvment has been planed for version 1.1.
+The current native key code to virtual key code conversion method may fail for 
+some non-english keys.  If you encounter an incorrect key code please report the 
+issue and include the output of the NativeKeyEvent's paramString().
+
+*** Solaris and BSD Support ***
+This program should compile and run on both Oralce Solaris and BSD Unix's.  No 
+binaries are provided for these platforms at this time due to cross compiler 
+difficulties and the lack of official Java support for BSD.  Please feel free to 
+build on these platforms and report any issues that may arise.
