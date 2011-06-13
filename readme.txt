@@ -2,10 +2,10 @@
 JNativeHook is a library to provide global keyboard and mouse hooking for Java.
 The primary purpose is to provide a portable and reliable method for delivering 
 keyboard and mouse events to a Java application that would otherwise be 
-inaccessible.  This is beneficial for applcatiions that run in the background 
+inaccessible.  This is beneficial for applications that run in the background 
 but may require user interaction though hotkeys or mouse events. 
 
-*** Breif Overview ***
+*** Brief Overview ***
 Keyboard Events:
     Key event system codes and their modifier masks are captured at the native 
     level. The acquired system codes are then translated to their respective 
@@ -39,7 +39,7 @@ Mouse Motion Events:
 GUI Demo Application:
     The graphical example application was created to provided a real-time
     demonstration of raw output for keyboard, button and mouse motion events.  
-    To run the application simply exceute the jar file provided.
+    To run the application simply execute the jar file provided.
 
 *** Software and Hardware Requirements ***
 	Java 1.5 or 1.6

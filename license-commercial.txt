@@ -1,6 +1,6 @@
 Alternate Licensing Options
 
-In addtion to the GNU General Public License, I offer business-friendly 
+In addition to the GNU General Public License, I offer business-friendly 
 licensing options for JNativeHook.  If you wish to incorporate JNativeHook 
 into your commercial software package where the terms of the GPL are not a 
 viable option, you may choose to obtain a commercial license.  For more 
