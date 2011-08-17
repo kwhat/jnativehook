@@ -538,27 +538,6 @@
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
-		<exec executable="${native.make}" dir="." failonerror="true">
-			<env key="ANT_TASK" value="true"/>
-			<env key="SHELL" value="${native.shell}"/>
-			<env key="CC" value="${native.cc}"/>
-			<env key="LD" value="${native.ld}"/>
-			<env key="CFLAGS" value="${native.cflags}"/>
-			<env key="LDFLAGS" value="${native.ldflags}"/>
-			<env key="INCLUDES" value="${native.includes}"/>
-			<env key="LIBS" value="${native.libs}"/>
-			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
-			<env key="OBJ_DIR" value="${dir.obj}"/>
-			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
-		</exec>
-		
-		<antcall target="-compile_strip"/>
-	</target>
-	
-	<!-- Private target to condtinally strip the native files -->
-	<target name="-compile_strip" unless="project.isDebug">
-		<echo>Stripping libs...</echo>
-		
 		<!-- set system specific strip arguments -->
 		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
 			<or>
@@ -570,9 +549,22 @@
 			<isset property="native.os.isMac"/>
 		</condition>
 		
-		<exec executable="${native.strip}" dir="." failonerror="true">
-			<arg line="${native.strip.args}"/>
-			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
+		<!-- execute make for native building -->
+		<exec executable="${native.make}" dir="." failonerror="true">
+			<env key="ANT_TASK" value="true"/>
+			<env key="DEBUG" value="${project.debug}"/>
+			<env key="SHELL" value="${native.shell}"/>
+			<env key="CC" value="${native.cc}"/>
+			<env key="LD" value="${native.ld}"/>
+			<env key="STRIP" value="${native.strip}"/>
+			<env key="CFLAGS" value="${native.cflags}"/>
+			<env key="LDFLAGS" value="${native.ldflags}"/>
+			<env key="STRIPARGS" value="${native.strip.args}"/>
+			<env key="INCLUDES" value="${native.includes}"/>
+			<env key="LIBS" value="${native.libs}"/>
+			<env key="SRC_DIR" value="${dir.src}/org/jnativehook/c_source/${native.src}"/>
+			<env key="OBJ_DIR" value="${dir.obj}"/>
+			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
 		</exec>
 	</target>
 	
