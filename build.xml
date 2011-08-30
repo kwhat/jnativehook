@@ -375,7 +375,7 @@
 		
 		<!-- Set the java compatible version -->
 		<property name="java.target" value="${ant.java.version}"/>
-		<fail message="Invalid java target version.  Only java versions 1.5 and 1.6 have been tested.">
+		<fail message="Invalid java target version.  Only java versions 1.5, 1.6 and 1.7 have been tested.">
 			<condition>
 				<not>
 					<and>
@@ -383,6 +383,7 @@
 						<or>
 							<equals arg1="${java.target}" arg2="1.5" casesensitive="false" trim="false"/>
 							<equals arg1="${java.target}" arg2="1.6" casesensitive="false" trim="false"/>
+							<equals arg1="${java.target}" arg2="1.7" casesensitive="false" trim="false"/>
 						</or>
 					</and>
 				</not>
@@ -442,7 +443,7 @@
 		<condition property="native.libs" value="-lX11 -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.libs" value="-framework Carbon -framework JavaVM">
+		<condition property="native.libs" value="-framework Carbon">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -618,7 +619,7 @@
 			<tag name="fix.me" scope="all" description="Fix Needed:"/>
 			-->
 			
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
 		</javadoc>
 	</target>
 	
@@ -630,13 +631,15 @@
 				<include name="*.jar"/>
 			</zipfileset>
 			
+			<zipfileset dir="${basedir}" prefix="${project.name}">
+				<include name="license*.txt"/>
+				<include name="readme.txt"/>
+			</zipfileset>
+		</zip>
+		
+		<zip destfile="${dir.dist}/${project.name}-doc-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
 				<exclude name="**/.*"/>
-			</zipfileset>	
-			
-			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<include name="license.txt"/>
-				<include name="readme.txt"/>
 			</zipfileset>
 		</zip>
 		
@@ -646,10 +649,6 @@
 				<include name="build.*"/>
 				<include name="Makefile"/>
 				<exclude name="build.properties*"/>
-			</zipfileset>
-			
-			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
-				<exclude name="**/.*"/>
 			</zipfileset>
 			
 			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
