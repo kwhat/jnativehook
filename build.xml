@@ -375,7 +375,7 @@
 		
 		<!-- Set the java compatible version -->
 		<property name="java.target" value="${ant.java.version}"/>
-		<fail message="Invalid java target version.  Only java versions 1.5 and 1.6 have been tested.">
+		<fail message="Invalid java target version.  Only java versions 1.5, 1.6 and 1.7 have been tested.">
 			<condition>
 				<not>
 					<and>
@@ -383,6 +383,7 @@
 						<or>
 							<equals arg1="${java.target}" arg2="1.5" casesensitive="false" trim="false"/>
 							<equals arg1="${java.target}" arg2="1.6" casesensitive="false" trim="false"/>
+							<equals arg1="${java.target}" arg2="1.7" casesensitive="false" trim="false"/>
 						</or>
 					</and>
 				</not>
@@ -442,7 +443,7 @@
 		<condition property="native.libs" value="-lX11 -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.libs" value="-framework Carbon -framework JavaVM">
+		<condition property="native.libs" value="-framework Carbon">
 			<isset property="native.os.isMac"/>
 		</condition>
 		

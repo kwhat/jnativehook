@@ -42,7 +42,7 @@ GUI Demo Application:
     To run the application simply execute the jar file provided.
 
 *** Software and Hardware Requirements ***
-	Java 1.5 or 1.6
+	Java 1.5, 1.6 or 1.7
 
 	Linux
 		i586 or amd64
@@ -99,7 +99,7 @@ execution.
 Unix/Linux:
 	Dependencies:
 		Ant 1.7 or 1.8
-		Java JDK 1.5 or 1.6
+		Java JDK 1.5, 1.6 or 1.7
 		libXtst 1.1.0
 		libX11 1.3.4
 		GCC 4.1, 4.2, 4.3, 4.4 or 4.5
@@ -110,7 +110,7 @@ Unix/Linux:
 
 Mac OS X:
 	Dependencies:
-		Java 1.5 or 1.6
+		Java JDK 1.5, 1.6 or 1.7
 		Xcode Developer Tools 2.2.1
 
 	Setup:
@@ -121,7 +121,7 @@ Mac OS X:
 Windows:
 	Dependencies:
 		Ant 1.7 or 1.8
-		Java JDK 1.5 or 1.6
+		Java JDK 1.5, 1.6 or 1.7
 		Windows x86:
 			MinGW 5.0
 				MinGW base tools
