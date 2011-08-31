@@ -24,6 +24,7 @@
 #endif
 #include "include/JConvertToNative.h"
 #include "xEventModifers.h"
+#include "xButtonCodes.h"
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
@@ -305,13 +306,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 jint NativeToJButton(unsigned int button) {
 	switch (button) {
-		case Button1:									return JBUTTON1;
-		case Button2:									return JBUTTON2;
-		case Button3:									return JBUTTON3;
-		case Button4:									return JBUTTON4;
-		case Button5:									return JBUTTON5;
+		case XK_Button1:									return JBUTTON1;
+		case XK_Button2:									return JBUTTON2;
+		case XK_Button3:									return JBUTTON3;
+		case XK_Button4:									return JBUTTON4;
+		case XK_Button5:									return JBUTTON5;
 		default:
-		case AnyButton:									return JNOBUTTON;
+		case XK_NoButton:									return JNOBUTTON;
 	}
 }
 

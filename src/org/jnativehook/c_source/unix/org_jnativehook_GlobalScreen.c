@@ -219,12 +219,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
-			jbutton = NativeToJButton(event_code);
-			modifiers = doModifierConvert(event_mask);
+			//FIXME Dirty hack to prevent scroll events.
+			if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+				jbutton = NativeToJButton(event_code);
+				modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+				//Fire mouse released event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			}
 		break;
 
 		case ButtonRelease:
@@ -236,12 +239,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
-			jbutton = NativeToJButton(event_code);
-			modifiers = doModifierConvert(event_mask);
+			//FIXME Dirty hack to prevent scroll events.
+			if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+				jbutton = NativeToJButton(event_code);
+				modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+				//Fire mouse released event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			}
 		break;
 
 		case MotionNotify:
@@ -258,30 +264,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 			//Fire mouse moved event.
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
-
-		case CreateNotify:
-			#ifdef DEBUG
-				printf ("Native: MsgLoop - Create Notified (Unimplemented)\n");
-			#endif
-		break;
-
-		case DestroyNotify:
-			#ifdef DEBUG
-				printf ("Native: MsgLoop - Destroy Notified (Unimplemented)\n");
-			#endif
-		break;
-
-		case NoExpose:
-			#ifdef DEBUG
-				printf ("Native: MsgLoop - Not Exposed (Unimplemented)\n");
-			#endif
-		break;
-
-		case Expose:
-			#ifdef DEBUG
-				printf ("Native: MsgLoop - Exposed (Unimplemented)\n");
-			#endif
 		break;
 
 		default:
