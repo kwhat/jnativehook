@@ -60,6 +60,9 @@ public class GlobalScreen {
 	 * and load the native library.
 	 */
 	private GlobalScreen() {
+		//Enable extra mouse button support in java.
+		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
+		
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
 		
