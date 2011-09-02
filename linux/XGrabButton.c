@@ -2,9 +2,6 @@
 #include <X11/keysym.h>
 #include <stdio.h>
 
-//System.setProperty("sun.awt.enableExtraMouseButtons", "true");
-
-
 unsigned int NumberLockMask = 0;
 unsigned int ScrollLockMask = 0;
 unsigned int CapsLockMask = 0;
