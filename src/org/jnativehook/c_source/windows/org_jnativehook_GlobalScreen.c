@@ -174,7 +174,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 			#ifdef DEBUG
-				printf("Native: LowLevelProc - Key released(%i)\n", (unsigned int) kbhook->vkCode);
+				printf("Native: LowLevelProc - Key released (%i)\n", (unsigned int) kbhook->vkCode);
 			#endif
 
 			//Class and Constructor for the NativeKeyEvent Object
@@ -274,7 +274,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 			#ifdef DEBUG
-				printf("Native: MsgLoop - Button released(%i)\n", vk_code);
+				printf("Native: MsgLoop - Button released (%i)\n", vk_code);
 			#endif
 
 			//Class and Constructor for the NativeMouseEvent Object
@@ -291,7 +291,7 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		case WM_MOUSEMOVE:
 			#ifdef DEBUG
-				printf ("Native: MsgLoop - Motion Notified (%li,%li)\n", mshook->pt.x, mshook->pt.y);
+				printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 			#endif
 
 			//Class and Constructor for the NativeMouseEvent Object
@@ -343,7 +343,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Failed to hook keyboard using SetWindowsHookEx");
-		return 1; //Naturaly exit so jni exception is thrown.
+		return 1; //Naturally exit so JNI exception is thrown.
 	}
 
 
@@ -359,7 +359,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
-		return 1; //Naturaly exit so jni exception is thrown.
+		return 1; //Naturally exit so JNI exception is thrown.
 	}
 
 
@@ -367,7 +367,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	while (isRunning && (bRet = GetMessage(&message, NULL, 0, 0)) != 0) {
 		if (bRet == -1) {
 			#ifdef DEBUG
-				printf("Native: MsgLoop() GetMessage returend -1.\n");
+				printf("Native: MsgLoop() GetMessage returned -1.\n");
 			#endif
 			//TODO Not sure if this can be recovered.
 		}
@@ -392,7 +392,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		#endif
 
 		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturaly exit so jni exception is thrown.
+		return -1; //Naturally exit so JNI exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -409,7 +409,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 		#endif
 
 		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturaly exit so jni exception is thrown.
+		return -1; //Naturally exit so JNI exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -447,7 +447,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
-		return JNI_ERR; //Naturaly exit so jni exception is thrown.
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
 	}
 	else {
 		#ifdef DEBUG
@@ -497,9 +497,6 @@ BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 			#ifdef DEBUG
 				printf("Native: DllMain - DLL Process Detach.\n");
 			#endif
-		break;
-
-		default:
 		break;
 	}
 
