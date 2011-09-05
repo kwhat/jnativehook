@@ -317,9 +317,9 @@ void * MsgLoop() {
 		#endif
 	}
 
-	//Async works without the loop and outside of threads.
-	//XRecordEnableContextAsync(disp_hook, context, callback, NULL);
-	XRecordEnableContext(disp_hook, context, callback, NULL);
+	//Async works with the loop and outside of threads.
+	XRecordEnableContextAsync(disp_hook, context, callback, NULL);
+	//XRecordEnableContext(disp_hook, context, callback, NULL);
 
 	while (isRunning) {
 		XRecordProcessReplies(disp_hook);
@@ -481,17 +481,16 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 		#endif
 	}
 
-	if (disp_hook != NULL) {
-		XRecordDisableContext(disp_hook, context);
-		XRecordFreeContext(disp_hook, context);
-
-		XCloseDisplay(disp_hook);
-		disp_hook = NULL;
-	}
-
 	if (disp_data != NULL) {
+		XRecordDisableContext(disp_data, context);
 		XCloseDisplay(disp_data);
 		disp_data = NULL;
+	}
+
+	if (disp_hook != NULL) {
+		XRecordFreeContext(disp_hook, context);
+		XCloseDisplay(disp_hook);
+		disp_hook = NULL;
 	}
 
 	#ifdef DEBUG
