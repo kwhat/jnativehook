@@ -20,6 +20,8 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xevie.h>
 
+bool running = true;
+
 int main(int argc, const char * argv[]) {
 	Display * display;
 	XEvent xev;
@@ -40,13 +42,17 @@ int main(int argc, const char * argv[]) {
 	//Select the input masks we would like to listen for.
 	XevieSelectInput(display, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask);
 	
-	int i;
-	for(i = 0; i < 10; i++) {
+	while(running) {
 		//Block waiting for the next event.
 		XNextEvent(display, &xev);
 		
 		switch(xev.type) {
 			case KeyPress:
+				//Stop looping if the escape key is pressed.
+				if (XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0) == XK_Escape) {
+					running = false;
+				}
+
 				printf("Key Press - %i\n", (int) XLookupKeysym(&xev.xkey, 0));
 			break;
 

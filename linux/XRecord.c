@@ -50,7 +50,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 	switch(data->type) {
 		case KeyPress:
-			// if escape is pressed, stop the loop and clean up, then exit
+			//Stop looping if the escape key is pressed.
 			if (XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0) == XK_Escape) {
 				running = false;
 			}

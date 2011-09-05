@@ -1,15 +1,13 @@
 CC := gcc
-CFLAGS := -march=native -O0 -g2 -ggdb -pipe
+CFLAGS := -march=native -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O1
 
-LIBS = -lXtst
-
-PROGRAMS = EventMonitor
+PROGRAMS = SetWindowsHookEx
 
 all: $(PROGRAMS)
 
-EventMonitor: EventMonitor.c EventMonitor.h
-	$(CC) $(CFLAGS) $(LIBS) $< -o $@
+SetWindowsHookEx: SetWindowsHookEx.c
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	-del /p $(PROGRAMS)
+	-del /F /Q $(PROGRAMS)
