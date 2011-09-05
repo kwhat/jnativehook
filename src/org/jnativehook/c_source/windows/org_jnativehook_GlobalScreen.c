@@ -46,7 +46,6 @@
 #include "WinKeyCodes.h"
 
 //Instance Variables
-bool isRunning = true;
 HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
@@ -362,19 +361,10 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		return 1; //Naturally exit so JNI exception is thrown.
 	}
 
-
-	signed char bRet;
-	while (isRunning && (bRet = GetMessage(&message, NULL, 0, 0)) != 0) {
-		if (bRet == -1) {
-			#ifdef DEBUG
-				printf("Native: MsgLoop() GetMessage returned -1.\n");
-			#endif
-			//TODO Not sure if this can be recovered.
-		}
-		else {
-			TranslateMessage(&message);
-			DispatchMessage(&message);
-		}
+	//Keep running until we get a WM_QUIT request.
+	while (GetMessage(&message, NULL, 0, 0)) {
+		TranslateMessage(&message);
+		DispatchMessage(&message);
 	}
 
 	#ifdef DEBUG
@@ -436,7 +426,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 
 
-	isRunning = true;
 	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
 	//LPVOID lpParameter = lpStartAddress;
 	//hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, CREATE_SUSPENDED, &hookThreadId );
@@ -465,7 +454,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	}
 
 	//Try to exit the thread naturally.
-	isRunning = false;
+	PostQuitMessage(0);
 	WaitForSingleObject(hookThreadHandle, 1000);
 
 	CloseHandle(hookThreadHandle);

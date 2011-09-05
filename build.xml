@@ -260,11 +260,17 @@
 		<condition property="native.cc" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file"/>
 		</condition>
+		<condition property="native.cc" value="cc">
+			<available filepath="${native.path}" file="cc" type="file"/>
+		</condition>
 		<condition property="native.cc" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file"/>
 		</condition>
-		<condition property="native.cc" value="cc">
-			<available filepath="${native.path}" file="cc" type="file"/>
+		<condition property="native.cc" value="mingw32-gcc.exe">
+			<available filepath="${native.path}" file="mingw32-gcc.exe"/>
+		</condition>
+		<condition property="native.cc" value="mingw64-gcc.exe">
+			<available filepath="${native.path}" file="mingw64-gcc.exe"/>
 		</condition>
 		<condition property="native.cc" value="cc.exe">
 			<available filepath="${native.path}" file="cc.exe" type="file"/>
@@ -326,7 +332,13 @@
 		<condition property="native.strip" value="strip.exe">
 			<available filepath="${native.path}" file="strip.exe" type="file"/>
 		</condition>
-		
+		<condition property="native.strip" value="mingw32-strip.exe">
+			<available filepath="${native.path}" file="mingw32-strip.exe"/>
+		</condition>
+		<condition property="native.strip" value="mingw64-strip.exe">
+			<available filepath="${native.path}" file="mingw64-strip.exe"/>
+		</condition>
+	
 		<fail message="Could not locate strip command.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
 			<condition>
 				<not>
