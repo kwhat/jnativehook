@@ -2,11 +2,11 @@ CC := gcc
 CFLAGS := -march=native -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O1
 
-PROGRAMS = XGrabButton XGrabKey XGrabPointer XRecord
+PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord
 
 all: $(PROGRAMS)
 
-XEvIE: XGrabButton.c
+XEvIE: XEvIE.c
 	$(CC) $(CFLAGS) -lX11 -lXevie $< -o $@
 
 XGrabButton: XGrabButton.c

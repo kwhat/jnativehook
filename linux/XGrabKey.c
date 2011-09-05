@@ -1,18 +1,36 @@
+/* JNativeHook: Global keyboard and mouse hooking for Java.
+ * Copyright (C) 2006-2011 Alexander Barker.  All Rights Received.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <stdio.h>
+#include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
-#include <stdio.h>
 
 unsigned int NumberLockMask = 0;
 unsigned int ScrollLockMask = 0;
 unsigned int CapsLockMask = 0;
 
 /* 
-This method locates key masks like scroll lock, number lock and caps lock
-because x does not provide fixed constatns for them.  Vars to populate are 
-located above this comment.
-*/
-void getModifiers (Display * dpy) {
+ * This method locates key masks like scroll lock, number lock and caps lock
+ * because X11 does not provide fixed constants for them.  Variables populated
+ * are located above this comment.
+ */
+void getModifiers(Display * display) {
 	int i;
 	XModifierKeymap *modmap;
 	KeyCode nlock, slock;
@@ -21,12 +39,12 @@ void getModifiers (Display * dpy) {
 		Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
 	};
 	
-	nlock = XKeysymToKeycode (dpy, XK_Num_Lock);
-	slock = XKeysymToKeycode (dpy, XK_Scroll_Lock);
+	nlock = XKeysymToKeycode (display, XK_Num_Lock);
+	slock = XKeysymToKeycode (display, XK_Scroll_Lock);
 	
-	// Find out the masks for the NumLock and ScrollLock modifiers,
-	// so that we can bind the grabs for when they are enabled too.
-	modmap = XGetModifierMapping (dpy);
+	//Find out the masks for the NumLock and ScrollLock modifiers, so that we
+	//can bind the grabs for when they are enabled too.
+	modmap = XGetModifierMapping (display);
 	
 	if (modmap != NULL && modmap->max_keypermod > 0) {
 		for (i = 0; i < 8 * modmap->max_keypermod; i++) {
@@ -42,100 +60,104 @@ void getModifiers (Display * dpy) {
 	CapsLockMask = LockMask;
 	
 	if (modmap) {
-		XFreeModifiermap (modmap);
+		XFreeModifiermap(modmap);
 	}
 }
 
-int main( int argc, const char* argv[] ) {
-	char *dispName = XDisplayName(NULL);
-	Display *disp = XOpenDisplay(dispName);
-	Window grabWin = DefaultRootWindow(disp);
-	XAllowEvents(disp, AsyncKeyboard, CurrentTime);
-	XkbSetDetectableAutoRepeat(disp, 1, NULL);
+int main(int argc, const char * argv[]) {
+	Display * display;
+	XEvent xev;
 
-	// Print repate reate and repate delay.	
-	unsigned int xkb_timeout;
-	unsigned int xkb_interval;
-	if (! XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
-		printf("XkbGetAutoRepeatRate failure!\n", xkb_interval, xkb_timeout);
-	}
-	else {
-		printf("XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
+	//Try to attach to the default X11 display.
+	display = XOpenDisplay(NULL);
+	if(display == NULL) {
+		printf("Error: Could not open display!\n");
+		return 1;
 	}
 
-	//Itterate over screens
-	int screen;
-	for (screen = 0; screen < ScreenCount (disp); screen++) {
-		printf ("Init Screen %i\n", screen);
-		XSelectInput (disp, RootWindow (disp, screen), KeyPressMask | KeyReleaseMask);
-	}
+	//Get the default global window to listen on for the selected X11 display.
+	Window grabWin = DefaultRootWindow(display);
+	XAllowEvents(display, AsyncKeyboard, CurrentTime);
+	XkbSetDetectableAutoRepeat(display, true, NULL);
 
-	//This will grab the number lock and scroll lock masks.
-	getModifiers (disp);
+	//Locate the number lock and scroll lock masks.
+	getModifiers(display);
 	
-	/*
-	int min_keycode, max_keycode;
-	XDisplayKeycodes (disp, &min_keycode, &max_keycode);
-	printf("Key Codes %i %i\n", min_keycode, max_keycode);
-	*/
-	
-	// char * key_string = "b";
-	KeyCode key = XKeysymToKeycode(disp, XK_B);
-	printf ("keycode=%d\n", key);
+	//Find the X11 KeyCode we are listening for.
+	KeyCode key = XKeysymToKeycode(display, XK_B);
 
-	int modMask = 0;
-	//modmask |= AnyModifier;
-	//modmask = LockMask;
-	//modmask |= numlock_mask | capslock_mask | scrolllock_mask;
-	//modmask = NumberLockMask;
-	//printf ("modmask=%d\n", modmask);
-
-	//*
 	//No Modifier
-	XGrabKey(disp, key, modMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, None, grabWin, true, GrabModeAsync, GrabModeAsync);
 	
 	//ShiftMask
-	XGrabKey(disp, key, modMask | ShiftMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, ShiftMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
 	//NumberLockMask
-	XGrabKey(disp, key, modMask | NumberLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, NumberLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
 	//ScrollLockMask
-	XGrabKey(disp, key, modMask | ScrollLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, ScrollLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
 	//CapsLockMask
-	XGrabKey(disp, key, modMask | CapsLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, CapsLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
 	//NumberLockMask | ScrollLockMask
-	XGrabKey(disp, key, modMask | NumberLockMask | ScrollLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, NumberLockMask | ScrollLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
 	//NumberLockMask | CapsLockMask
-	XGrabKey(disp, key, modMask | NumberLockMask | CapsLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, NumberLockMask | CapsLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 	
 	//ScrollLockMask | CapsLockMask
-	XGrabKey(disp, key, modMask | ScrollLockMask | CapsLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, key, ScrollLockMask | CapsLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 	
 	//NumberLockMask | ScrollLockMask | CapsLockMask
-	XGrabKey(disp, key, modMask | NumberLockMask | ScrollLockMask | CapsLockMask, grabWin, True, GrabModeAsync, GrabModeAsync);
-	//*/
+	XGrabKey(display, key, NumberLockMask | ScrollLockMask | CapsLockMask, grabWin, true, GrabModeAsync, GrabModeAsync);
 
-	XEvent e;
-	while ( True ) {
-		//Block waiting for the next event
-		XNextEvent(disp, &e);
+	int i;
+	for(i = 0; i < 10; i++) {
+		//Block waiting for the next event.
+		XNextEvent(display, &xev);
 
-		switch (e.type) {
+		switch (xev.type) {
 			case KeyPress:
-				printf ("Key press !\n");
-				printf ("e.xkey.keycode=%d\n", e.xkey.keycode);
-				printf ("e.xkey.state=%d\n", e.xkey.state);
+				printf("Key Press - %i\n", (int) XLookupKeysym(&xev.xkey, 0));
 			break;
-			
+
 			case KeyRelease:
-				printf ("Key release !\n");
-				printf ("e.xkey.keycode=%d\n", e.xkey.keycode);
-				printf ("e.xkey.state=%d\n", e.xkey.state);
+				printf("Key Release - %i\n", (int) XLookupKeysym(&xev.xkey, 0));
 			break;
 		}
 	}
+
+	//No Modifier
+	XUngrabKey(display, key, None, grabWin);
+
+	//ShiftMask
+	XUngrabKey(display, key, ShiftMask, grabWin);
+
+	//NumberLockMask
+	XUngrabKey(display, key, NumberLockMask, grabWin);
+
+	//ScrollLockMask
+	XUngrabKey(display, key, ScrollLockMask, grabWin);
+
+	//CapsLockMask
+	XUngrabKey(display, key, CapsLockMask, grabWin);
+
+	//NumberLockMask | ScrollLockMask
+	XUngrabKey(display, key, NumberLockMask | ScrollLockMask, grabWin);
+
+	//NumberLockMask | CapsLockMask
+	XUngrabKey(display, key, NumberLockMask | CapsLockMask, grabWin);
+
+	//ScrollLockMask | CapsLockMask
+	XUngrabKey(display, key, ScrollLockMask | CapsLockMask, grabWin);
+
+	//NumberLockMask | ScrollLockMask | CapsLockMask
+	XUngrabKey(display, key, NumberLockMask | ScrollLockMask | CapsLockMask, grabWin);
+
+	//Close the connection to the selected X11 display.
+	XCloseDisplay(display);
+
+	return 0;
 }
