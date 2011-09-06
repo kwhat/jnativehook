@@ -425,6 +425,7 @@
 		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
+		
 		<condition property="native.cflags" value="-c -m${native.arch.model} -arch ${native.arch.osx} -mtune=${native.arch} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
@@ -444,6 +445,7 @@
 		<condition property="native.ldflags" value="-shared -m${native.arch.model} -W1,--as-needed,${native.ldflags.optimize}">
 			<isset property="native.os.isUnix"/>
 		</condition>
+		
 		<condition property="native.ldflags" value="-dynamiclib -m${native.arch.model} -arch ${native.arch.osx}">
 			<isset property="native.os.isMac"/>
 		</condition>

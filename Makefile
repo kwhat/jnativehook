@@ -4,12 +4,9 @@ endif
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(subst $(SRC_DIR),$(OBJ_DIR),$(SOURCES:.c=.o))
-
-#$INCLUDES += $(NATIVE_INCLUDE)
-#INCLUDES += $(JAVA_INCLUDE)
 INCLUDES += -I$(SRC_DIR)/..
 
-all: $(SOURCES) $(EXECUTABLE) strip
+all: $(EXECUTABLE) strip
 
 strip:
 ifeq ($(DEBUG), true)
