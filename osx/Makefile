@@ -1,13 +1,16 @@
 CC := gcc
-CFLAGS := -march=native -O0 -g2 -ggdb -pipe
+CFLAGS := -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O1
 
-PROGRAMS = EventMonitor
+PROGRAMS = EventMonitor RegisterEventHotKey
 
 all: $(PROGRAMS)
 
 EventMonitor: EventMonitor.c EventMonitor.h
-	$(CC) $(CFLAGS) $(LIBS) $< -o $@
+	$(CC) $(CFLAGS) -framework Carbon $< -o $@
+
+RegisterEventHotKey: RegisterEventHotKey.c
+	$(CC) $(CFLAGS) -framework Carbon $< -o $@
 
 clean:
 	-rm -f $(PROGRAMS)

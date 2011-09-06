@@ -6,24 +6,24 @@ OSStatus handler(EventHandlerCallRef nextHandler, EventRef theEvent, void* userD
 }
 
 int main() {
-  EventTypeSpec eventType;
-  eventType.eventClass = kEventClassKeyboard;
-  eventType.eventKind  = kEventHotKeyPressed;
-  
-  InstallApplicationEventHandler(&handler, 1, &eventType, NULL, NULL);
-  
-  EventHotKeyID g_HotKeyID;
-  g_HotKeyID.id = 1;
+	EventTypeSpec eventType;
+	eventType.eventClass = kEventClassKeyboard;
+	eventType.eventKind  = kEventHotKeyPressed;
 
-  EventHotKeyRef g_HotKeyRef;
+	InstallApplicationEventHandler(&handler, 1, &eventType, NULL, NULL);
 
-  //http://boredzo.org/blog/wp-content/uploads/2007/05/IMTx-virtual-keycodes.pdf
-  //Keycode 11 is the B key.
-  RegisterEventHotKey(11, controlKey + cmdKey, g_HotKeyID, GetApplicationEventTarget(), 0, &g_HotKeyRef);
+	EventHotKeyID g_HotKeyID;
+	g_HotKeyID.id = 1;
 
-  printf("Press the global keyboard shortcut!\n");
+	EventHotKeyRef g_HotKeyRef;
 
-  RunApplicationEventLoop();
+	//http://boredzo.org/blog/wp-content/uploads/2007/05/IMTx-virtual-keycodes.pdf
+	//Keycode 11 is the B key.
+	RegisterEventHotKey(11, controlKey + cmdKey, g_HotKeyID, GetApplicationEventTarget(), 0, &g_HotKeyRef);
 
-  return 0;
+	printf("Press the global keyboard shortcut!\n");
+
+	RunApplicationEventLoop();
+
+	return 0;
 }
