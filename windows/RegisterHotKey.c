@@ -23,22 +23,19 @@
 
 int main( int argc, const char* argv[] ) {
 	MSG message;
-	HINSTANCE hWnd = NULL;
+	HWND hWnd = NULL;
 	int id = 1;
 	unsigned int vk_code = 0x42;
 
-	if (!RegisterHotKey(hWnd, id, MOD_ALT | MOD_NOREPEAT, vk_code)) {
-		printf("RegisterHotKey(hWnd, %i, MOD_ALT | MOD_NOREPEAT, %X) failed\n", id, vk_code);
+	if (!RegisterHotKey(hWnd, id, 0x0000, vk_code)) {
+		printf("RegisterHotKey(hWnd, %i, 0x0000, %i) failed\n", id, vk_code);
 		return 1;
 	}
 
 	while (GetMessage(&message, NULL, 0, 0)) {
 		if (message.message == WM_HOTKEY) {
-			printf("Hot Key Press - %i\n", (unsigned int) message.lParam->vkCode);
+			printf("Key Press - %i\n", (unsigned int) HIWORD(message.lParam));
 		}
-
-		TranslateMessage(&message);
-		DispatchMessage(&message);
 	}
 
 	UnregisterHotKey(hWnd, id);

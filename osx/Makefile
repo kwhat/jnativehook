@@ -1,16 +1,19 @@
 CC := gcc
 CFLAGS := -O0 -g2 -ggdb -pipe -Wall
-LDFLAGS := -Wl,--as-needed,-O1
+LDFLAGS := -Wl,-execute
 
-PROGRAMS = EventMonitor RegisterEventHotKey
+PROGRAMS = EventMonitor EventTap RegisterEventHotKey
 
 all: $(PROGRAMS)
 
-EventMonitor: EventMonitor.c EventMonitor.h
-	$(CC) $(CFLAGS) -framework Carbon $< -o $@
+EventMonitor: EventMonitor.c
+	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
+
+EventTap: EventTap.c
+	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
 
 RegisterEventHotKey: RegisterEventHotKey.c
-	$(CC) $(CFLAGS) -framework Carbon $< -o $@
+	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
 
 clean:
-	-rm -f $(PROGRAMS)
+	-rm -Rf $(PROGRAMS) *.dSYM
