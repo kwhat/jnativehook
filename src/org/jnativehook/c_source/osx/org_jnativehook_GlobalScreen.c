@@ -49,6 +49,7 @@
 JavaVM * jvm = NULL;
 pthread_t hookThreadId = 0;
 CGEventFlags prev_event_mask = 0;
+CFRunLoopRef event_loop;
 unsigned int event_modifiers[] = {
 	kCGEventFlagMaskShift,
 	kCGEventFlagMaskControl,
@@ -423,7 +424,7 @@ void MsgLoop() {
 	}
 
 
-	CFRunLoopRef event_loop = CFRunLoopGetCurrent();
+	event_loop = CFRunLoopGetCurrent();
 	if (event_loop == NULL) {
 		#ifdef DEBUG
 			printf("Native: CFRunLoopGetCurrent() failure.\n");
@@ -435,6 +436,7 @@ void MsgLoop() {
 
 	CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
 	CFRunLoopRun();
+	CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
@@ -487,6 +489,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
+	//Terminate the RunLoop.
+	CFRunLoopStop(event_loop);
+
 	//Make sure the thread has stopped.
 	if (pthread_kill(hookThreadId, SIGKILL) == 0) {
 		#ifdef DEBUG
