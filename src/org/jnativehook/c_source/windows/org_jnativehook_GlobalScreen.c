@@ -363,6 +363,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 
 	//Keep running until we get a WM_QUIT request.
 	while (GetMessage(&message, NULL, 0, 0)) {
+		//TODO Look into if we need to keep doing this when using LowLevel Mouse/Keyboard Proc
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
