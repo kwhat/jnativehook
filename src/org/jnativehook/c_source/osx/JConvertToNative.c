@@ -20,7 +20,8 @@
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
 
-#include <Carbon/Carbon.h>
+//Trying to move away from legacy Carbon dependencies.
+//#include <Carbon/Carbon.h>
 //#include <HIToolbox/CarbonEvents.h>
 
 JKeyDatum NativeToJKey(unsigned int keysym) {

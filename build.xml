@@ -457,7 +457,7 @@
 		<condition property="native.libs" value="-lX11 -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<condition property="native.libs" value="-framework Carbon">
+		<condition property="native.libs" value="-framework ApplicationServices">
 			<isset property="native.os.isMac"/>
 		</condition>
 		
@@ -468,7 +468,7 @@
 		<condition property="native.includes" value="-I${java.include} -I${java.include}${file.separator}${native.os} -I/usr/include -I/usr/local/include">
 			<isset property="native.os.isUnix"/>
 		</condition>
-		<!-- -F/System/Library/Frameworks/Carbon.framework/Frameworks -->
+		<!-- -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -->
 		<condition property="native.includes" value="-I/usr/lib -I${java.include}">
 			<isset property="native.os.isMac"/>
 		</condition>

@@ -113,7 +113,7 @@ jint getModifiers() {
 }
 
 
-LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
 	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
@@ -325,11 +325,11 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
-//void MsgLoop() {
 DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	MSG message;
 
 	//Setup the native hooks and their callbacks.
+	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
 	if (handleKeyboardHook != NULL) {
 		#ifdef DEBUG
@@ -346,7 +346,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	}
 
 
-	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, GetModuleHandle(NULL), 0);
+	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
 	if (handleMouseHook != NULL) {
 		#ifdef DEBUG
 			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) successful\n");
@@ -362,7 +362,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	}
 
 	//Keep running until we get a WM_QUIT request.
-	while (GetMessage(&message, NULL, 0, 0)) {
+	while (GetMessage(&message, NULL, WM_QUIT, WM_QUIT)) {
 		//TODO Look into if we need to keep doing this when using LowLevel Mouse/Keyboard Proc
 		TranslateMessage(&message);
 		DispatchMessage(&message);

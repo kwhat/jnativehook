@@ -37,7 +37,7 @@
 #include <pthread.h>
 #include <signal.h>
 
-#include <Carbon/Carbon.h>
+#include <ApplicationServices/ApplicationServices.h>
 
 #include <jni.h>
 

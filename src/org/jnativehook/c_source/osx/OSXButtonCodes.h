@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//I don't think these are defined anywhere by apple.
+//These codes do not appear to be defined anywhere by Apple.
 #define kVK_LBUTTON					1
 #define kVK_RBUTTON					2
 #define kVK_MBUTTON					3
