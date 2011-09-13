@@ -17,9 +17,9 @@
 
 #include <Carbon/Carbon.h>
 
-OSStatus handler(EventHandlerCallRef nextHandler, EventRef theEvent, void* userData) {
-  printf("Global keyboard shortcut pressed!\n");
-  return noErr;
+OSStatus handler(EventHandlerCallRef nextHandler, EventRef event, void* userData) {
+	printf("Global keyboard shortcut pressed!\n");
+	return noErr;
 }
 
 int main() {
@@ -27,19 +27,21 @@ int main() {
 	eventType.eventClass = kEventClassKeyboard;
 	eventType.eventKind  = kEventHotKeyPressed;
 
+	//Install an event handler for keyboard hotkey pressed.
 	InstallApplicationEventHandler(&handler, 1, &eventType, NULL, NULL);
 
-	EventHotKeyID g_HotKeyID;
-	g_HotKeyID.id = 1;
+	EventHotKeyID eventHotKey;
+	eventHotKey.id = 1;
 
-	EventHotKeyRef g_HotKeyRef;
+	EventHotKeyRef eventHotKeyRef;
 
 	//http://boredzo.org/blog/wp-content/uploads/2007/05/IMTx-virtual-keycodes.pdf
 	//Keycode 11 is the B key.
-	RegisterEventHotKey(11, controlKey + cmdKey, g_HotKeyID, GetApplicationEventTarget(), 0, &g_HotKeyRef);
+	RegisterEventHotKey(11, controlKey + cmdKey, eventHotKey, GetApplicationEventTarget(), 0, &eventHotKeyRef);
 
-	printf("Press the global keyboard shortcut!\n");
+	printf("Press control + command + b...\n");
 
+	//Wait for events.
 	RunApplicationEventLoop();
 
 	return 0;

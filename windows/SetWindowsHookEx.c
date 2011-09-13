@@ -21,7 +21,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//MS Event Struct Data
 	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *) lParam;
 	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
@@ -110,28 +110,34 @@ LRESULT WINAPI LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 
 int main( int argc, const char* argv[] ) {
-	MSG message;
-	HINSTANCE hInst = NULL;
+	//Get the handle of this process.
+	HINSTANCE hInst = GetModuleHandle(NULL);
 
-	//Setup the native hooks and their callbacks.
+	//Setup the low level keyboard hook.
 	HHOOK handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
 	if (handleKeyboardHook == NULL) {
 		printf("SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
 		return 1;
 	}
 
-	HHOOK handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, GetModuleHandle(NULL), 0);
+	//Setup the low level mouse hook.
+	HHOOK handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
 	if (handleMouseHook == NULL) {
 		printf("SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
 		return 1;
 	}
 
-	while (GetMessage(&message, NULL, 0, 0)) {
+	//Block while we wait for a WM_QUIT messgae to be delivered.
+	MSG message;
+	while (GetMessage(&message, hInst, WM_QUIT, WM_QUIT)) {
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
 
+	//Unhook the low level keyboard.
 	UnhookWindowsHookEx(handleKeyboardHook);
+
+	//Unhook the low level mouse.
 	UnhookWindowsHookEx(handleMouseHook);
 
 	return 0;

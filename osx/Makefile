@@ -10,7 +10,7 @@ EventMonitor: EventMonitor.c
 	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
 
 EventTap: EventTap.c
-	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -framework ApplicationServices $(LDFLAGS) $< -o $@
 
 RegisterEventHotKey: RegisterEventHotKey.c
 	$(CC) $(CFLAGS) -framework Carbon $(LDFLAGS) $< -o $@
