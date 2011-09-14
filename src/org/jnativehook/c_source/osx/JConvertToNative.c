@@ -19,10 +19,7 @@
 #include "include/JConvertToNative.h"
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
-
-//Trying to move away from legacy Carbon dependencies.
-//#include <Carbon/Carbon.h>
-//#include <HIToolbox/CarbonEvents.h>
+#include <ApplicationServices/ApplicationServices.h> //For CoreGraphics kCGEventFlagMask constants
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
@@ -55,7 +52,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//	jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
 		//case XK_Super_R:
 		//	jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
-		case kMenuPowerGlyph:							jkey.keycode = JK_CONTEXT_MENU;					return jkey;
+		case kVK_ContextMenu:							jkey.keycode = JK_CONTEXT_MENU;					return jkey;	//TODO Figure out what Key this should be.
 
 		//case XK_Pause:								jkey.keycode = JK_PAUSE;						return jkey;	//No Apple Support
 		case kVK_CapsLock:								jkey.keycode = JK_CAPS_LOCK;					return jkey;

@@ -150,3 +150,4 @@
 
 //Suplemental virtual key information
 #define kVK_RightCommand				0x36
+#define kVK_ContextMenu					0x6E	//AKA kMenuPowerGlyph
