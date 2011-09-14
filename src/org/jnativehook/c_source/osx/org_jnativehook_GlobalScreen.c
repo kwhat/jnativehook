@@ -325,20 +325,11 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		#endif
 	}
 	else {
-		interval = LMGetKeyRepThresh() * 60;
-		if (interval < 0) {
-			#ifdef DEBUG
-				printf("Native: LMGetKeyRepThresh failure\n");
-			#endif
+		#ifdef DEBUG
+			printf("Native: CFPreferencesCopyAppValue failure\n");
+		#endif
 
-			throwException("Could not determine the keyboard auto repeat rate.");
-			return -1; //Naturaly exit so jni exception is thrown.
-		}
-		else {
-			#ifdef DEBUG
-				printf("Native: LMGetKeyRepThresh successful (rate: %i)\n", (int) interval);
-			#endif
-		}
+		throwException("Could not determine the keyboard auto repeat rate.");
 	}
 
 	return (jlong) interval;
@@ -355,20 +346,11 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 		#endif
 	}
 	else {
-		interval = LMGetKeyThresh() * 60;
-		if (interval < 0) {
-			#ifdef DEBUG
-				printf("Native: LMGetKeyRepThresh failure\n");
-			#endif
+		#ifdef DEBUG
+			printf("Native: CFPreferencesCopyAppValue failure\n");
+		#endif
 
-			throwException("Could not determine the keyboard auto repeat delay.");
-			return -1; //Naturaly exit so jni exception is thrown.
-		}
-		else {
-			#ifdef DEBUG
-				printf("Native: LMGetKeyThresh successful (delay: %i)\n", (int) interval);
-			#endif
-		}
+		throwException("Could not determine the keyboard auto repeat delay.");
 	}
 
 	return (jlong) interval;

@@ -19,9 +19,9 @@
 //Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
 //Reference: http://www.mactech.com/macintosh-c/chap02-1.html
 
-#include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants.
+//#include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants.
 
-/* Used in lieu of the Carbon frameworks HIToolbox.
+//Used in lieu of the Carbon frameworks HIToolbox.
 //keycodes for ansi keys
 #define kVK_ANSI_A						0x00
 #define kVK_ANSI_S						0x01
@@ -147,7 +147,6 @@
 #define kVK_JIS_KeypadComma		 		0x5F
 #define kVK_JIS_Eisu					0x66
 #define kVK_JIS_Kana					0x68
-*/
 
 //Suplemental virtual key information
 #define kVK_RightCommand				0x36
