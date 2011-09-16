@@ -24,20 +24,23 @@
 int main( int argc, const char* argv[] ) {
 	MSG message;
 	HWND hWnd = NULL;
-	int id = 1;
-	unsigned int vk_code = 0x42;
+	int id = 1; //Hot key unique ID.
+	unsigned int vk_code = 0x42; //'B' Key
 
+	//Attempt the register a global hot key for virtual code 0x42 and no modifiers.
 	if (!RegisterHotKey(hWnd, id, 0x0000, vk_code)) {
 		printf("RegisterHotKey(hWnd, %i, 0x0000, %i) failed\n", id, vk_code);
 		return 1;
 	}
 
+	//Loop over messages looking for hot key events.
 	while (GetMessage(&message, NULL, 0, 0)) {
 		if (message.message == WM_HOTKEY) {
 			printf("Key Press - %i\n", (unsigned int) HIWORD(message.lParam));
 		}
 	}
 
+	//Unregister the hot key ID.
 	UnregisterHotKey(hWnd, id);
 
 	return 0;
