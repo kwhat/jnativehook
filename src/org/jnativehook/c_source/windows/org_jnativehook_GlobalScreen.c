@@ -478,7 +478,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 
 	//Try to exit the thread naturally.
 	PostQuitMessage(0);
-	WaitForSingleObject(hookThreadHandle, 500);
+	WaitForSingleObject(hookThreadHandle, 250);
 
 	CloseHandle(hookThreadHandle);
 	if(hookThreadHandle != NULL) {
