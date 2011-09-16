@@ -47,6 +47,10 @@
 
 //Instance Variables
 JavaVM * jvm = NULL;
+jobject objGlobalScreen = NULL;
+jmethodID idKeyEvent, idMouseEvent;
+jmethodID idDispatchEvent;
+
 pthread_t hookThreadId = 0;
 CGEventFlags prev_event_mask = 0;
 CFRunLoopRef event_loop;
@@ -109,199 +113,198 @@ jint doModifierConvert(CGEventFlags event_mask) {
 CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void * refcon) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == 0) {
 
-	//Class and getInstance method id for the GlobalScreen Object
-	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
-	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
+		//Event Data
+		CGPoint event_point;
+		CGEventTimestamp event_time = CGEventGetTimestamp(event);
+		UInt64	keysym, button;
+		CGEventFlags event_mask = CGEventGetFlags(event);
 
-	//A reference to the GlobalScreen Object
-	jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
+		//Java Event Data
+		JKeyDatum jkey;
+		jint jbutton;
+		jint modifiers;
 
-	//Event Data
-	CGPoint event_point;
-	CGEventTimestamp event_time = CGEventGetTimestamp(event);
-	UInt64	keysym, button;
-	CGEventFlags event_mask = CGEventGetFlags(event);
+		//Java callback classes and objects
+		jclass clsKeyEvent, clsMouseEvent;
+		jobject objKeyEvent, objMouseEvent;
 
-	JKeyDatum jkey;
-	jint jbutton;
-	jint modifiers;
-	jclass clsKeyEvent, clsMouseEvent;
-	jmethodID idKeyEvent, idMouseEvent;
-	jmethodID idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
-	jobject objKeyEvent, objMouseEvent;
+		// get the event class
+		switch (CGEventGetType(event)) {
+			case kCGEventKeyDown:
+				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+				#ifdef DEBUG
+					printf("Native: eventHandlerCallback - Key pressed (%i)\n", (unsigned int) keysym);
+				#endif
 
+				//Class and Constructor for the NativeKeyEvent Object
+				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-	// get the event class
-	switch (CGEventGetType(event)) {
-		case kCGEventKeyDown:
-			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
-			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Key pressed (%i)\n", (unsigned int) keysym);
-			#endif
+				jkey = NativeToJKey(keysym);
+				modifiers = doModifierConvert(event_mask);
 
-			//Class and Constructor for the NativeKeyEvent Object
-			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+				//Fire key pressed event.
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+			break;
 
-			jkey = NativeToJKey(keysym);
-			modifiers = doModifierConvert(event_mask);
+			case kCGEventKeyUp:
+				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+				#ifdef DEBUG
+					printf("Native: eventHandlerCallback - Key released (%i)\n", (unsigned int) keysym);
+				#endif
 
-			//Fire key pressed event.
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-		break;
+				//Class and Constructor for the NativeKeyEvent Object
+				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-		case kCGEventKeyUp:
-			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
-			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Key released (%i)\n", (unsigned int) keysym);
-			#endif
+				jkey = NativeToJKey(keysym);
+				modifiers = doModifierConvert(event_mask);
 
-			//Class and Constructor for the NativeKeyEvent Object
-			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+				//Fire key released event.
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+			break;
 
-			jkey = NativeToJKey(keysym);
-			modifiers = doModifierConvert(event_mask);
+			case kCGEventFlagsChanged:
+				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+				#ifdef DEBUG
+					printf("Native: eventHandlerCallback - Modifiers changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
+				#endif
 
-			//Fire key released event.
-			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-		break;
+				//Class and Constructor for the NativeKeyEvent Object
+				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-		case kCGEventFlagsChanged:
-			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
-			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Modifiers changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
-			#endif
+				jkey = NativeToJKey(keysym);
+				modifiers = doModifierConvert(event_mask);
 
-			//Class and Constructor for the NativeKeyEvent Object
-			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+				//Because of the way apple handles modifiers we need to send a key up or key down event for each time this changes.
+				/*	Outline of what is happening on the next 3 lines.
+					1010 1100	prev
+					1100 1010	curr
+					0110 0110	prev xor curr
 
-			jkey = NativeToJKey(keysym);
-			modifiers = doModifierConvert(event_mask);
+					//truned on - i.e. pressed
+					1100 1010	curr
+					0110 0110	(prev xor curr)
+					0100 0010	(prev xor curr) of prev
 
-			//Because of the way apple handles modifiers we need to send a key up or key down event for each time this changes.
-			/*	Outline of what is happening on the next 3 lines.
-				1010 1100	prev
-				1100 1010	curr
-				0110 0110	prev xor curr
+					//turned off - i.e. released
+					1010 1100	prev
+					0110 0110	(prev xor curr)
+					0010 0100	(prev xor curr) and prev
+				 */
+				CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
+				CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+				CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
 
-				//truned on - i.e. pressed
-				1100 1010	curr
-				0110 0110	(prev xor curr)
-				0100 0010	(prev xor curr) of prev
+				//Update the previous event mask.
+				prev_event_mask = event_mask;
 
-				//turned off - i.e. released
-				1010 1100	prev
-				0110 0110	(prev xor curr)
-				0010 0100	(prev xor curr) and prev
-			 */
-			CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
-			CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
-			CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
-
-			//Update the previous event mask.
-			prev_event_mask = event_mask;
-
-			int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
-			for (i = 0; i < size; i++) {
-				if (keydown_event_mask & event_modifiers[i]) {
-					//Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
+				for (i = 0; i < size; i++) {
+					if (keydown_event_mask & event_modifiers[i]) {
+						//Fire key pressed event.
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					}
+					else if (keyup_event_mask & event_modifiers[i]) {
+						//Fire key released event.
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					}
 				}
-				else if (keyup_event_mask & event_modifiers[i]) {
-					//Fire key released event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-				}
-			}
-		break;
+			break;
 
-		case kCGEventLeftMouseDown:
-		case kCGEventRightMouseDown:
-		case kCGEventOtherMouseDown:
-			button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
-			event_point = CGEventGetLocation(event);
-			#ifdef DEBUG
-				printf("Native: MsgLoop - Button pressed (%i)\n", (unsigned int) button);
-			#endif
+			case kCGEventLeftMouseDown:
+			case kCGEventRightMouseDown:
+			case kCGEventOtherMouseDown:
+				button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
+				event_point = CGEventGetLocation(event);
+				#ifdef DEBUG
+					printf("Native: MsgLoop - Button pressed (%i)\n", (unsigned int) button);
+				#endif
 
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+				//Class and Constructor for the NativeMouseEvent Object
+				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
-			jbutton = NativeToJButton(button);
-			modifiers = doModifierConvert(event_mask);
+				jbutton = NativeToJButton(button);
+				modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse pressed event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
+				//Fire mouse pressed event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			break;
 
-		case kCGEventLeftMouseUp:
-		case kCGEventRightMouseUp:
-		case kCGEventOtherMouseUp:
-			button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
-			event_point = CGEventGetLocation(event);
-			#ifdef DEBUG
-				printf("Native: MsgLoop - Button released (%i)\n", (unsigned int) button);
-			#endif
+			case kCGEventLeftMouseUp:
+			case kCGEventRightMouseUp:
+			case kCGEventOtherMouseUp:
+				button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
+				event_point = CGEventGetLocation(event);
+				#ifdef DEBUG
+					printf("Native: MsgLoop - Button released (%i)\n", (unsigned int) button);
+				#endif
 
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+				//Class and Constructor for the NativeMouseEvent Object
+				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
-			jbutton = NativeToJButton(button);
-			modifiers = doModifierConvert(event_mask);
+				jbutton = NativeToJButton(button);
+				modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
+				//Fire mouse released event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			break;
 
 
-		case kCGEventLeftMouseDragged:
-		case kCGEventRightMouseDragged:
-		case kCGEventOtherMouseDragged:
-			//Call mouse move events for now.  Adding this functionality to other systems will be difficult.
-			#ifdef DEBUG
-				printf ("Native: EventHandlerCallback - MouseDragged forwarded to Motion Notified\n");
-			#endif
+			case kCGEventLeftMouseDragged:
+			case kCGEventRightMouseDragged:
+			case kCGEventOtherMouseDragged:
+				//Call mouse move events for now.  Adding this functionality to other systems will be difficult.
+				#ifdef DEBUG
+					printf ("Native: EventHandlerCallback - MouseDragged forwarded to Motion Notified\n");
+				#endif
 
-		case kCGEventMouseMoved:
-			event_point = CGEventGetLocation(event);
-			#ifdef DEBUG
-				printf ("Native: MsgLoop - Motion Notified (%f,%f)\n", event_point.x, event_point.y);
-			#endif
+			case kCGEventMouseMoved:
+				event_point = CGEventGetLocation(event);
+				#ifdef DEBUG
+					printf ("Native: MsgLoop - Motion Notified (%f,%f)\n", event_point.x, event_point.y);
+				#endif
 
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+				//Class and Constructor for the NativeMouseEvent Object
+				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
-			modifiers = doModifierConvert(event_mask);
+				modifiers = doModifierConvert(event_mask);
 
-			//Fire mouse moved event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
+				//Fire mouse moved event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			break;
 
-		case kCGEventScrollWheel:
-			#ifdef DEBUG
-				printf ("Native: EventHandlerCallback - MouseWheelMoved (Unimplemented)\n");
-			#endif
-		break;
+			case kCGEventScrollWheel:
+				#ifdef DEBUG
+					printf ("Native: EventHandlerCallback - MouseWheelMoved (Unimplemented)\n");
+				#endif
+			break;
 
 
-		default:
-			#ifdef DEBUG
-				printf ("Native: eventHandlerCallback - Unhandled Event Type\n");
-			#endif
-		break;
+			default:
+				#ifdef DEBUG
+					printf ("Native: eventHandlerCallback - Unhandled Event Type\n");
+				#endif
+			break;
+		}
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: Could not attach to the currently running JVM.");
+		#endif
 	}
 
 	#ifdef DEBUG
@@ -357,6 +360,20 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 }
 
 void MsgLoop() {
+	JNIEnv * env = NULL;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
+	//Class and getInstance method id for the GlobalScreen Object
+	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
+	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
+
+	//A reference to the GlobalScreen Object
+	jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
+	objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
+
+	idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+
+
 	CGEventMask event_mask =	CGEventMaskBit(kCGEventKeyDown) |
 								CGEventMaskBit(kCGEventKeyUp) |
 								CGEventMaskBit(kCGEventFlagsChanged) |
@@ -419,6 +436,13 @@ void MsgLoop() {
 	CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
 	CFRunLoopRun();
 	CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
+
+	//Make sure we clean up the global screen object.
+	(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
+	#ifdef DEBUG
+		printf("Native: MsgLoop() stop successful.\n");
+	#endif
 }
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
