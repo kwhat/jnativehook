@@ -52,7 +52,8 @@ HINSTANCE hInst = NULL;
 
 JavaVM * jvm = NULL;
 jobject objGlobalScreen = NULL;
-jmethodID idKeyEvent, idMouseEvent, idDispatchEvent;
+jmethodID idKeyEvent, idMouseEvent;
+jmethodID idDispatchEvent;
 
 HANDLE hookThreadHandle = NULL;
 LPDWORD hookThreadId = NULL;
@@ -93,7 +94,7 @@ void throwException(char * classname, char * message) {
 
 jint getModifiers() {
 	jint modifiers = 0;
-/*
+
 	if (isModifierMask(MOD_LSHIFT) || isModifierMask(MOD_RSHIFT))
 		modifiers |= NativeToJModifier(MOD_SHIFT);
 
@@ -111,7 +112,7 @@ jint getModifiers() {
 	if (isModifierMask(MOD_MBUTTON))	modifiers |= NativeToJModifier(MOD_MBUTTON);
 	if (isModifierMask(MOD_XBUTTON1))	modifiers |= NativeToJModifier(MOD_XBUTTON1);
 	if (isModifierMask(MOD_XBUTTON2))	modifiers |= NativeToJModifier(MOD_XBUTTON2);
-*/
+
 	return modifiers;
 }
 
@@ -119,29 +120,30 @@ jint getModifiers() {
 LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == 0) {
+
+	}
+	else {
 		printf("Bad Things\n");
 	}
-
-
-
 
 	//MS Event Struct Data
 	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
 	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
 
-	//Event Data
+	//Native Event Data
 	unsigned int vk_code = 0;
 	unsigned int modifiers = 0;
 
+	//Java Event Data
 	JKeyDatum jkey;
 	jint jbutton;
-	jclass clsKeyEvent, clsMouseEvent;
 
+	//Java callback classes and objects
+	jclass clsKeyEvent, clsMouseEvent;
 	jobject objKeyEvent, objMouseEvent;
 
 	switch (wParam) {
-		/*
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			#ifdef DEBUG
@@ -241,7 +243,6 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
-*/
 
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
@@ -283,16 +284,10 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse released event.
-			objMouseEvent = (*env)->NewGlobalRef(env, (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) 0, 0, (jint) 0, (jint) 0, jbutton));
-
-			printf("Created Obj %x %x %x \n", objGlobalScreen, idDispatchEvent, objMouseEvent);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-
-			printf("\tCRASH\n");
-			(*env)->DeleteGlobalRef(env, objMouseEvent);
-
 		break;
-/*
+
 		case WM_MOUSEMOVE:
 			#ifdef DEBUG
 				printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
@@ -318,7 +313,6 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				printf ("Native: MsgLoop - Unhandled Event Type\n");
 			#endif
 		break;
-*/
 	}
 
 	#ifdef DEBUG
@@ -390,6 +384,8 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
+
+	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 
 	#ifdef DEBUG
 		printf("Native: MsgLoop() stop successful.\n");
@@ -477,6 +473,11 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 		handleKeyboardHook = NULL;
 	}
 
+	if (handleMouseHook != NULL) {
+		UnhookWindowsHookEx(handleMouseHook);
+		handleMouseHook = NULL;
+	}
+
 	//Try to exit the thread naturally.
 	PostQuitMessage(0);
 	WaitForSingleObject(hookThreadHandle, 1000);
@@ -490,20 +491,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 			printf("Native: HeapFree successful.\n");
 		#endif
 	}
-
-	JNIEnv * env = 0;
-	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
-	if (jni_ret == JNI_OK) {
-		jni_ret = JNI_VERSION_1_4;
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
-		#endif
-	}
-
-	(*env)->DeleteGlobalRef(env, objGlobalScreen);
-
 
 	#ifdef DEBUG
 		printf("Native: Thread terminated successful.\n");
