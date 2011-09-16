@@ -51,6 +51,9 @@ HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
 
 JavaVM * jvm = NULL;
+jobject objGlobalScreen = NULL;
+jmethodID idKeyEvent, idMouseEvent, idDispatchEvent;
+
 HANDLE hookThreadHandle = NULL;
 LPDWORD hookThreadId = NULL;
 
@@ -90,7 +93,7 @@ void throwException(char * classname, char * message) {
 
 jint getModifiers() {
 	jint modifiers = 0;
-
+/*
 	if (isModifierMask(MOD_LSHIFT) || isModifierMask(MOD_RSHIFT))
 		modifiers |= NativeToJModifier(MOD_SHIFT);
 
@@ -108,7 +111,7 @@ jint getModifiers() {
 	if (isModifierMask(MOD_MBUTTON))	modifiers |= NativeToJModifier(MOD_MBUTTON);
 	if (isModifierMask(MOD_XBUTTON1))	modifiers |= NativeToJModifier(MOD_XBUTTON1);
 	if (isModifierMask(MOD_XBUTTON2))	modifiers |= NativeToJModifier(MOD_XBUTTON2);
-
+*/
 	return modifiers;
 }
 
@@ -116,14 +119,11 @@ jint getModifiers() {
 LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//Attach to the currently running jvm
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
+		printf("Bad Things\n");
+	}
 
-	//Class and getInstance method id for the GlobalScreen Object
-	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
-	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
 
-	//A reference to the GlobalScreen Object
-	jobject objGlobalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 
 
 	//MS Event Struct Data
@@ -137,11 +137,11 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JKeyDatum jkey;
 	jint jbutton;
 	jclass clsKeyEvent, clsMouseEvent;
-	jmethodID idKeyEvent, idMouseEvent;
-	jmethodID idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+
 	jobject objKeyEvent, objMouseEvent;
 
 	switch (wParam) {
+		/*
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			#ifdef DEBUG
@@ -198,7 +198,6 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 		break;
 
-
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
@@ -242,7 +241,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
-
+*/
 
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
@@ -284,10 +283,16 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-		break;
+			objMouseEvent = (*env)->NewGlobalRef(env, (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) 0, 0, (jint) 0, (jint) 0, jbutton));
 
+			printf("Created Obj %x %x %x \n", objGlobalScreen, idDispatchEvent, objMouseEvent);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+
+			printf("\tCRASH\n");
+			(*env)->DeleteGlobalRef(env, objMouseEvent);
+
+		break;
+/*
 		case WM_MOUSEMOVE:
 			#ifdef DEBUG
 				printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
@@ -313,6 +318,7 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				printf ("Native: MsgLoop - Unhandled Event Type\n");
 			#endif
 		break;
+*/
 	}
 
 	#ifdef DEBUG
@@ -327,6 +333,23 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	MSG message;
+
+	JNIEnv * env = NULL;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
+	//Class and getInstance method id for the GlobalScreen Object
+	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
+	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
+
+	//A reference to the GlobalScreen Object
+	jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
+	objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
+
+	printf("TEST %x %x\n", objScreen, objGlobalScreen);
+
+	idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+
+
 
 	//Setup the native hooks and their callbacks.
 	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
@@ -415,6 +438,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//functions that are not called from java. ( I.E. MsgLoop )
 	jvm = vm;
 
+
 	JNIEnv * env = 0;
 	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
 	if (jni_ret == JNI_OK) {
@@ -425,7 +449,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
 		#endif
 	}
-
 
 	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
 	//LPVOID lpParameter = lpStartAddress;
@@ -467,6 +490,20 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 			printf("Native: HeapFree successful.\n");
 		#endif
 	}
+
+	JNIEnv * env = 0;
+	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
+	if (jni_ret == JNI_OK) {
+		jni_ret = JNI_VERSION_1_4;
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
+		#endif
+	}
+
+	(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
 
 	#ifdef DEBUG
 		printf("Native: Thread terminated successful.\n");

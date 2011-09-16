@@ -27,11 +27,11 @@
 unsigned short modifiers = 0x0000;
 
 void setModifierMask(unsigned short mod) {
-	modifiers |= mod;
+	//modifiers |= mod;
 }
 
 void unsetModifierMask(unsigned short mod) {
-	modifiers ^= mod;
+	//modifiers ^= mod;
 }
 
 bool isModifierMask(unsigned short mod) {
