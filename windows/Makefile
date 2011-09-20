@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O0
 
-PROGRAMS = RegisterHotKey.exe SetWindowsHookEx.exe HookExCallback.dll
+PROGRAMS = RegisterHotKey.exe SetWindowsHookEx.exe
 
 all: $(PROGRAMS)
 
@@ -11,9 +11,6 @@ RegisterHotKey.exe: RegisterHotKey.c
 
 SetWindowsHookEx.exe: SetWindowsHookEx.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
-
-HookExCallback.dll: HookExCallback.c
-	$(CC) $(CFLAGS) -shared $(LDFLAGS) $< -o $@
 
 clean:
 	-del /F /Q $(PROGRAMS)
