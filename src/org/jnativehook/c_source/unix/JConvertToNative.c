@@ -307,8 +307,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 jint NativeToJButton(unsigned int button) {
 	switch (button) {
 		case XK_Button1:									return JBUTTON1;
-		case XK_Button2:									return JBUTTON2;
-		case XK_Button3:									return JBUTTON3;
+		case XK_Button2:									return JBUTTON3;
+		case XK_Button3:									return JBUTTON2;
 		case XK_Button4:									return JBUTTON4;
 		case XK_Button5:									return JBUTTON5;
 		default:
@@ -324,8 +324,8 @@ jint NativeToJModifier(unsigned int modifier) {
 		case KeyButMaskMod1:							return JK_ALT_MASK;
 
 		case KeyButMaskButton1:							return JK_BUTTON1_MASK;
-		case KeyButMaskButton2:							return JK_BUTTON2_MASK;
-		case KeyButMaskButton3:							return JK_BUTTON3_MASK;
+		case KeyButMaskButton2:							return JK_BUTTON3_MASK;
+		case KeyButMaskButton3:							return JK_BUTTON2_MASK;
 		case KeyButMaskButton4:							return JK_BUTTON4_MASK;
 		case KeyButMaskButton5:							return JK_BUTTON5_MASK;
 

@@ -52,7 +52,6 @@ HINSTANCE hInst = NULL;
 
 JavaVM * jvm = NULL;
 jobject objGlobalScreen = NULL;
-jmethodID idKeyEvent, idMouseEvent;
 jmethodID idDispatchEvent;
 
 HANDLE hookThreadHandle = NULL;
@@ -116,218 +115,229 @@ jint getModifiers() {
 	return modifiers;
 }
 
-
-LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	//Attach to the currently running jvm
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	//We should already be attached to the JVM at this point.  This should only
+	//be a formality that causes a NOOP.
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == 0) {
-		//MS Event Struct Data
-		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *)lParam;
-		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *)lParam;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
 
-		//Native Event Data
-		unsigned int vk_code = 0;
+	//MS Keyboard Event Struct Data
+	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
-		//Java Event Data
-		JKeyDatum jkey;
-		jint jbutton;
-		jint modifiers;
+	//Java Event Data
+	JKeyDatum jkey;
+	jint modifiers;
 
-		//Java callback classes and objects
-		jclass clsKeyEvent, clsMouseEvent;
-		jobject objKeyEvent, objMouseEvent;
+	//Java callback classes and objects
+	jclass clsKeyEvent;
+	jmethodID idKeyEvent;
+	jobject objKeyEvent;
 
-		switch (wParam) {
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-				#ifdef DEBUG
-					printf("Native: LowLevelProc - Key pressed (%i)\n", (unsigned int) kbhook->vkCode);
-				#endif
+	switch(wParam) {
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+			#ifdef DEBUG
+				printf("Native: LowLevelProc - Key pressed (%i)\n", (unsigned int) kbhook->vkCode);
+			#endif
 
-				//Class and Constructor for the NativeKeyEvent Object
-				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+			//Class and Constructor for the NativeKeyEvent Object
+			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-				//Check and setup modifiers
-				if (kbhook->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
-				else if (kbhook->vkCode == VK_RSHIFT)	setModifierMask(MOD_RSHIFT);
-				else if (kbhook->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
-				else if (kbhook->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
-				else if (kbhook->vkCode == VK_LMENU)	setModifierMask(MOD_LALT);
-				else if (kbhook->vkCode == VK_RMENU)	setModifierMask(MOD_RALT);
-				else if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
-				else if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
+			//Check and setup modifiers
+			if (kbhook->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
+			else if (kbhook->vkCode == VK_RSHIFT)	setModifierMask(MOD_RSHIFT);
+			else if (kbhook->vkCode == VK_LCONTROL)	setModifierMask(MOD_LCONTROL);
+			else if (kbhook->vkCode == VK_RCONTROL)	setModifierMask(MOD_RCONTROL);
+			else if (kbhook->vkCode == VK_LMENU)	setModifierMask(MOD_LALT);
+			else if (kbhook->vkCode == VK_RMENU)	setModifierMask(MOD_RALT);
+			else if (kbhook->vkCode == VK_LWIN)		setModifierMask(MOD_LWIN);
+			else if (kbhook->vkCode == VK_RWIN)		setModifierMask(MOD_RWIN);
 
-				jkey = NativeToJKey(kbhook->vkCode);
-				modifiers = getModifiers();
+			jkey = NativeToJKey(kbhook->vkCode);
+			modifiers = getModifiers();
 
-				//Fire key pressed event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-			break;
+			//Fire key pressed event.
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+		break;
 
-			case WM_KEYUP:
-			case WM_SYSKEYUP:
-				#ifdef DEBUG
-					printf("Native: LowLevelProc - Key released (%i)\n", (unsigned int) kbhook->vkCode);
-				#endif
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			#ifdef DEBUG
+				printf("Native: LowLevelProc - Key released (%i)\n", (unsigned int) kbhook->vkCode);
+			#endif
 
-				//Class and Constructor for the NativeKeyEvent Object
-				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+			//Class and Constructor for the NativeKeyEvent Object
+			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-				//Check and setup modifiers
-				if (kbhook->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
-				else if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
-				else if (kbhook->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
-				else if (kbhook->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
-				else if (kbhook->vkCode == VK_LMENU)	unsetModifierMask(MOD_LALT);
-				else if (kbhook->vkCode == VK_RMENU)	unsetModifierMask(MOD_RALT);
-				else if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
-				else if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
+			//Check and setup modifiers
+			if (kbhook->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
+			else if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
+			else if (kbhook->vkCode == VK_LCONTROL)	unsetModifierMask(MOD_LCONTROL);
+			else if (kbhook->vkCode == VK_RCONTROL)	unsetModifierMask(MOD_RCONTROL);
+			else if (kbhook->vkCode == VK_LMENU)	unsetModifierMask(MOD_LALT);
+			else if (kbhook->vkCode == VK_RMENU)	unsetModifierMask(MOD_RALT);
+			else if (kbhook->vkCode == VK_LWIN)		unsetModifierMask(MOD_LWIN);
+			else if (kbhook->vkCode == VK_RWIN)		unsetModifierMask(MOD_RWIN);
 
-				jkey = NativeToJKey(kbhook->vkCode);
-				modifiers = getModifiers();
+			jkey = NativeToJKey(kbhook->vkCode);
+			modifiers = getModifiers();
 
-				//Fire key released event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-			break;
-
-			case WM_LBUTTONDOWN:
-			case WM_RBUTTONDOWN:
-			case WM_MBUTTONDOWN:
-			case WM_XBUTTONDOWN:
-			case WM_NCXBUTTONDOWN:
-				if (wParam == WM_LBUTTONDOWN) {
-					vk_code = VK_LBUTTON;
-					setModifierMask(MOD_LBUTTON);
-				}
-				else if (wParam == WM_RBUTTONDOWN) {
-					vk_code = VK_RBUTTON;
-					setModifierMask(MOD_RBUTTON);
-				}
-				else if (wParam == WM_MBUTTONDOWN) {
-					vk_code = VK_MBUTTON;
-					setModifierMask(MOD_MBUTTON);
-				}
-				else if (wParam == WM_XBUTTONDOWN || wParam == WM_NCXBUTTONDOWN) {
-					if (HIWORD(mshook->mouseData) == XBUTTON1) {
-						vk_code = VK_XBUTTON1;
-						setModifierMask(MOD_XBUTTON1);
-					}
-					else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-						vk_code = VK_XBUTTON2;
-						setModifierMask(MOD_XBUTTON2);
-					}
-				}
-
-				#ifdef DEBUG
-					printf("Native: MsgLoop - Button pressed (%i)\n", vk_code);
-				#endif
-
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
-
-				jbutton = NativeToJButton(vk_code);
-				modifiers = getModifiers();
-
-				//Fire mouse pressed event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-			break;
-
-			case WM_LBUTTONUP:
-			case WM_RBUTTONUP:
-			case WM_MBUTTONUP:
-			case WM_XBUTTONUP:
-			case WM_NCXBUTTONUP:
-				if (wParam == WM_LBUTTONUP) {
-					vk_code = VK_LBUTTON;
-					unsetModifierMask(MOD_LBUTTON);
-				}
-				else if (wParam == WM_RBUTTONUP) {
-					vk_code = VK_RBUTTON;
-					unsetModifierMask(MOD_RBUTTON);
-				}
-				else if (wParam == WM_MBUTTONUP) {
-					vk_code = VK_MBUTTON;
-					unsetModifierMask(MOD_MBUTTON);
-				}
-				else if (wParam == WM_XBUTTONUP || wParam == WM_NCXBUTTONUP) {
-					if (HIWORD(mshook->mouseData) == XBUTTON1) {
-						vk_code = VK_XBUTTON1;
-						unsetModifierMask(MOD_XBUTTON1);
-					}
-					else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-						vk_code = VK_XBUTTON2;
-						unsetModifierMask(MOD_XBUTTON2);
-					}
-				}
-
-				#ifdef DEBUG
-					printf("Native: MsgLoop - Button released (%i)\n", vk_code);
-				#endif
-
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
-
-				jbutton = NativeToJButton(vk_code);
-				modifiers = getModifiers();
-
-				//Fire mouse released event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-			break;
-
-			case WM_MOUSEMOVE:
-				#ifdef DEBUG
-					printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
-				#endif
-
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
-
-				modifiers = getModifiers();
-
-				//Fire mouse moved event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-			break;
-
-			case WM_MOUSEWHEEL:
-				#ifdef DEBUG
-					printf ("Native: MsgLoop - WM_MOUSEWHEEL (Unimplemented)\n");
-				#endif
-			default:
-				#ifdef DEBUG
-					printf ("Native: MsgLoop - Unhandled Event Type\n");
-				#endif
-			break;
-		}
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: Could not attach to the currently running JVM.");
-		#endif
+			//Fire key released event.
+			objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+		break;
 	}
 
 	#ifdef DEBUG
 		if ((*env)->ExceptionOccurred(env)) {
 			printf("Native: JNI Error Occurred.\n");
-			((*env)->ExceptionDescribe(env));
+			(*env)->ExceptionDescribe(env);
 		}
 	#endif
 
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return CallNextHookEx(handleKeyboardHook, nCode, wParam, lParam);
+}
+
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	//We should already be attached to the JVM at this point.  This should only
+	//be a formality that causes a NOOP.
+	JNIEnv * env = NULL;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
+	//MS Mouse Event Struct Data
+	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
+
+	//Java Event Data
+	jint jbutton;
+	jint modifiers;
+
+	//Java callback classes and objects
+	jclass clsMouseEvent;
+	jmethodID idMouseEvent;
+	jobject objMouseEvent;
+
+	switch(wParam) {
+		case WM_LBUTTONDOWN:
+			jbutton = NativeToJButton(VK_LBUTTON);
+		goto BUTTONDOWN;
+
+		case WM_RBUTTONDOWN:
+			jbutton = NativeToJButton(VK_RBUTTON);
+		goto BUTTONDOWN;
+
+		case WM_MBUTTONDOWN:
+			jbutton = NativeToJButton(VK_MBUTTON);
+		goto BUTTONDOWN;
+
+		case WM_XBUTTONDOWN:
+		case WM_NCXBUTTONDOWN:
+			if (HIWORD(mshook->mouseData) == XBUTTON1) {
+				jbutton = NativeToJButton(VK_XBUTTON1);
+			}
+			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+				jbutton = NativeToJButton(VK_XBUTTON2);
+			}
+
+		BUTTONDOWN:
+			#ifdef DEBUG
+				printf("Native: MsgLoop - Button pressed (%i)\n", vk_code);
+			#endif
+
+			//Class and Constructor for the NativeMouseEvent Object
+			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+
+			modifiers = getModifiers();
+
+			//Fire mouse pressed event.
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+		break;
+
+		case WM_LBUTTONUP:
+			jbutton = NativeToJButton(VK_LBUTTON);
+		goto BUTTONUP;
+
+		case WM_RBUTTONUP:
+			jbutton = NativeToJButton(VK_RBUTTON);
+		goto BUTTONUP;
+
+		case WM_MBUTTONUP:
+			jbutton = NativeToJButton(VK_MBUTTON);
+		goto BUTTONUP;
+
+		case WM_XBUTTONUP:
+		case WM_NCXBUTTONUP:
+			if (HIWORD(mshook->mouseData) == XBUTTON1) {
+				jbutton = NativeToJButton(VK_XBUTTON1);
+			}
+			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+				jbutton = NativeToJButton(VK_XBUTTON2);
+			}
+
+		BUTTONUP:
+			#ifdef DEBUG
+				printf("Native: MsgLoop - Button released (%i)\n", vk_code);
+			#endif
+
+			//Class and Constructor for the NativeMouseEvent Object
+			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+
+			modifiers = getModifiers();
+
+			//Fire mouse released event.
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+		break;
+
+		case WM_MOUSEMOVE:
+			#ifdef DEBUG
+				printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
+			#endif
+
+			//Class and Constructor for the NativeMouseEvent Object
+			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+
+			modifiers = getModifiers();
+
+			//Fire mouse moved event.
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+		break;
+
+		case WM_MOUSEWHEEL:
+			#ifdef DEBUG
+				printf ("Native: MsgLoop - WM_MOUSEWHEEL (Unimplemented)\n");
+			#endif
+		break;
+
+		default:
+			#ifdef DEBUG
+				printf ("Native: MsgLoop - Unhandled Event Type\n");
+			#endif
+		break;
+	}
+
+	#ifdef DEBUG
+		if ((*env)->ExceptionOccurred(env)) {
+			printf("Native: JNI Error Occurred.\n");
+			(*env)->ExceptionDescribe(env);
+		}
+	#endif
+
+	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
 
 DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
+		//FIXME Cause a serious failure.
+	}
 
 	//Class and getInstance method id for the GlobalScreen Object
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
@@ -337,37 +347,36 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 	objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
 
+	//Get the ID of the GlobalScreen Objects dispatch event method.
 	idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
-
 
 
 	//Setup the native hooks and their callbacks.
 	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
-	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
+	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
 	if (handleKeyboardHook != NULL) {
 		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) successful\n");
+			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful\n");
 		#endif
 	}
 	else {
 		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
+			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed\n");
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Failed to hook keyboard using SetWindowsHookEx");
 		return 1; //Naturally exit so JNI exception is thrown.
 	}
 
-
-	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
+	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
 	if (handleMouseHook != NULL) {
 		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) successful\n");
+			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful\n");
 		#endif
 	}
 	else {
 		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
+			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed\n");
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
@@ -376,7 +385,7 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 
 	//Keep running until we get a WM_QUIT request.
 	MSG message;
-	while (GetMessage(&message, NULL, WM_QUIT, WM_QUIT)) {
+	while (GetMessage(&message, NULL, 0, 0)) {
 		//TODO Look into if we need to keep doing this when using LowLevel Mouse/Keyboard Proc
 		TranslateMessage(&message);
 		DispatchMessage(&message);
@@ -495,14 +504,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	#endif
 }
 
-BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
+BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			#ifdef DEBUG
 				printf("Native: DllMain - DLL Process Attach.\n");
 			#endif
 
-			hInst = _hInst; //GetModuleHandle(NULL)
+			hInst = (HINSTANCE) _hInst; //GetModuleHandle(NULL)
 		break;
 
 		case DLL_PROCESS_DETACH:

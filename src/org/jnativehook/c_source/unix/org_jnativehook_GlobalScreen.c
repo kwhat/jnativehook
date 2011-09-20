@@ -109,6 +109,9 @@ void throwException(char * classname, char * message) {
 	}
 }
 
+//This seems to be catching an:
+//	8 - BadMatch (invalid parameter attributes)
+//This comes from an unknown src or problem.
 int xErrorToException(Display * dpy, XErrorEvent * e) {
 	char message[255];
 	XGetErrorText(dpy, e->error_code, message, sizeof message);
@@ -216,6 +219,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 				//FIXME Dirty hack to prevent scroll events.
+				//FIXME Button2 and 3 are reversed from other platforms.
 				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 					jbutton = NativeToJButton(event_code);
 					modifiers = doModifierConvert(event_mask);
@@ -236,6 +240,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 				//FIXME Dirty hack to prevent scroll events.
+				//FIXME Button2 and 3 are reversed from other platforms.
 				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 					jbutton = NativeToJButton(event_code);
 					modifiers = doModifierConvert(event_mask);
@@ -404,8 +409,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Tell X Threads are OK
 	XInitThreads();
 
+	//TODO This appears to be catching some issues that should be recoverable.
 	//Set the native error handler.
-	XSetErrorHandler((XErrorHandler) xErrorToException);
+	//XSetErrorHandler((XErrorHandler) xErrorToException);
 
 	//Grab the default display
 	char * disp_name = XDisplayName(NULL);
