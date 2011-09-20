@@ -21,13 +21,11 @@
 #include <windows.h>
 #include <stdio.h>
 
-LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	//MS Event Struct Data
-	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *) lParam;
-	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
+HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
-	//Event Data
-	unsigned int vk_code = 0;
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	//MS Keyboard Event Struct Data
+	KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
 	switch(wParam) {
 		case WM_KEYDOWN:
@@ -43,56 +41,66 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_SYSKEYUP:
 			printf("Key Release - %i\n", (unsigned int) kbhook->vkCode);
 		break;
+	}
 
+	return CallNextHookEx(handleKeyboardHook, nCode, wParam, lParam);
+}
+
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	//MS Mouse Event Struct Data
+	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
+
+	//Event Data
+	unsigned int vk_code = 0;
+
+	switch(wParam) {
 		case WM_LBUTTONDOWN:
+			vk_code = VK_LBUTTON;
+		goto BUTTONDOWN;
+
 		case WM_RBUTTONDOWN:
+			vk_code = VK_RBUTTON;
+		goto BUTTONDOWN;
+
 		case WM_MBUTTONDOWN:
+			vk_code = VK_MBUTTON;
+		goto BUTTONDOWN;
+
 		case WM_XBUTTONDOWN:
 		case WM_NCXBUTTONDOWN:
-			if (wParam == WM_LBUTTONDOWN) {
-				vk_code = VK_LBUTTON;
+			if (HIWORD(mshook->mouseData) == XBUTTON1) {
+				vk_code = VK_XBUTTON1;
 			}
-			else if (wParam == WM_RBUTTONDOWN) {
-				vk_code = VK_RBUTTON;
-			}
-			else if (wParam == WM_MBUTTONDOWN) {
-				vk_code = VK_MBUTTON;
-			}
-			else if (wParam == WM_XBUTTONDOWN || wParam == WM_NCXBUTTONDOWN) {
-				if (HIWORD(mshook->mouseData) == XBUTTON1) {
-					vk_code = VK_XBUTTON1;
-				}
-				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-					vk_code = VK_XBUTTON2;
-				}
+			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+				vk_code = VK_XBUTTON2;
 			}
 
+		BUTTONDOWN:
 			printf("Button Press - %i\n", vk_code);
 		break;
 
 		case WM_LBUTTONUP:
+			vk_code = VK_LBUTTON;
+		goto BUTTONUP;
+
 		case WM_RBUTTONUP:
+			vk_code = VK_RBUTTON;
+		goto BUTTONUP;
+
 		case WM_MBUTTONUP:
+			vk_code = VK_MBUTTON;
+		goto BUTTONUP;
+
 		case WM_XBUTTONUP:
 		case WM_NCXBUTTONUP:
-			if (wParam == WM_LBUTTONDOWN) {
-				vk_code = VK_LBUTTON;
+			if (HIWORD(mshook->mouseData) == XBUTTON1) {
+				vk_code = VK_XBUTTON1;
 			}
-			else if (wParam == WM_RBUTTONDOWN) {
-				vk_code = VK_RBUTTON;
-			}
-			else if (wParam == WM_MBUTTONDOWN) {
-				vk_code = VK_MBUTTON;
-			}
-			else if (wParam == WM_XBUTTONDOWN || wParam == WM_NCXBUTTONDOWN) {
-				if (HIWORD(mshook->mouseData) == XBUTTON1) {
-					vk_code = VK_XBUTTON1;
-				}
-				else if (HIWORD(mshook->mouseData) == XBUTTON2) {
-					vk_code = VK_XBUTTON2;
-				}
+			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
+				vk_code = VK_XBUTTON2;
 			}
 
+		BUTTONUP:
 			printf("Button Release - %i\n", vk_code);
 		break;
 
@@ -105,25 +113,24 @@ LRESULT CALLBACK LowLevelProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		break;
 	}
 
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
-
 
 int main( int argc, const char* argv[] ) {
 	//Get the handle of this process.
 	HINSTANCE hInst = GetModuleHandle(NULL);
 
 	//Setup the low level keyboard hook.
-	HHOOK handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0);
+	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
 	if (handleKeyboardHook == NULL) {
-		printf("SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelProc, hInst, 0) failed\n");
+		printf("SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed\n");
 		return 1;
 	}
 
 	//Setup the low level mouse hook.
-	HHOOK handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0);
+	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
 	if (handleMouseHook == NULL) {
-		printf("SetWindowsHookEx(WH_MOUSE_LL, LowLevelProc, hInst, 0) failed\n");
+		printf("SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed\n");
 		return 1;
 	}
 
