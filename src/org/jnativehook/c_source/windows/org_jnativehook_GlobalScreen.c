@@ -280,6 +280,9 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
 				jbutton = NativeToJButton(VK_XBUTTON2);
 			}
+			else {
+				jbutton = NativeToJButton(HIWORD(mshook->mouseData));
+			}
 
 		BUTTONUP:
 			#ifdef DEBUG
