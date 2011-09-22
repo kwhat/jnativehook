@@ -52,7 +52,7 @@ jmethodID idDispatchEvent;
 
 //Java callback classes and method id's
 jclass clsKeyEvent, clsMouseEvent;
-jmethodID idKeyEvent, idMouseEvent;
+jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
 
 //Thread information so we can clean up.
 pthread_t hookThreadId = 0;
@@ -224,7 +224,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse pressed event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -241,7 +241,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -263,7 +263,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			modifiers = doModifierConvert(event_mask);
 
 			//Fire mouse moved event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -364,7 +364,8 @@ void MsgLoop() {
 	//Class and Constructor for the NativeMouseEvent Object
 	jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
-	idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+	idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+	idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 
 	CGEventMask event_mask =	CGEventMaskBit(kCGEventKeyDown) |

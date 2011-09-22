@@ -76,7 +76,7 @@ jmethodID idDispatchEvent;
 
 //Java callback classes and method id's
 jclass clsKeyEvent, clsMouseEvent;
-jmethodID idKeyEvent, idMouseEvent;
+jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
 
 //Thread information so we can clean up.
 pthread_t hookThreadId = 0;
@@ -218,7 +218,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 					modifiers = doModifierConvert(event_mask);
 
 					//Fire mouse released event.
-					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				}
 			break;
@@ -235,7 +235,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 					modifiers = doModifierConvert(event_mask);
 
 					//Fire mouse released event.
-					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				}
 			break;
@@ -248,7 +248,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire mouse moved event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -303,11 +303,11 @@ void * MsgLoop() {
 	clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
 	idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
-	//Class and Constructor for the NativeMouseEvent Object
+	//Class and Constructor for the NativeMouseEvent Objects
 	jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
-	idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
-
+	idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+	idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 	//Setup XRecord range
 	XRecordClientSpec clients = XRecordAllClients;

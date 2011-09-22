@@ -57,7 +57,7 @@ jmethodID idDispatchEvent;
 
 //Java callback classes and method id's
 jclass clsKeyEvent, clsMouseEvent;
-jmethodID idKeyEvent, idMouseEvent;
+jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
 
 //Thread information so we can clean up.
 HANDLE hookThreadHandle = NULL;
@@ -247,7 +247,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse pressed event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -283,7 +283,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse released event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -295,7 +295,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			modifiers = getModifiers();
 
 			//Fire mouse moved event.
-			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+			objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
 			(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 		break;
 
@@ -353,7 +353,8 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	//Class and Constructor for the NativeMouseEvent Object
 	jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
-	idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+	idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+	idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 	//Setup the native hooks and their callbacks.
 	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.

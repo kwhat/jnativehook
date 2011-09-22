@@ -56,7 +56,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5076634313730799059L;
 	
-	/** Checkbox's for event delivery options */
+	/** Checkbox's for event delivery options. */
 	private JCheckBox chkKeyboard, chkButton, chkMotion;
 	
 	/** The text area to display event info. */
@@ -202,7 +202,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e The native key event.
 	 */
 	private void displayEventInfo(NativeKeyEvent e) {
-		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
+		txtEventInfo.append("\n" + e.paramString());
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 	}
 	
@@ -212,7 +212,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e The native mouse event.
 	 */
 	private void displayEventInfo(NativeMouseEvent e) {
-		txtEventInfo.setText(txtEventInfo.getText() + "\n" + e.paramString());
+		txtEventInfo.append("\n" + e.paramString());
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
     }
 	
