@@ -217,23 +217,28 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	switch(wParam) {
 		case WM_LBUTTONDOWN:
 			jbutton = NativeToJButton(VK_LBUTTON);
+			setModifierMask(MOD_LBUTTON);
 		goto BUTTONDOWN;
 
 		case WM_RBUTTONDOWN:
 			jbutton = NativeToJButton(VK_RBUTTON);
+			setModifierMask(MOD_RBUTTON);
 		goto BUTTONDOWN;
 
 		case WM_MBUTTONDOWN:
 			jbutton = NativeToJButton(VK_MBUTTON);
+			setModifierMask(MOD_MBUTTON);
 		goto BUTTONDOWN;
 
 		case WM_XBUTTONDOWN:
 		case WM_NCXBUTTONDOWN:
 			if (HIWORD(mshook->mouseData) == XBUTTON1) {
 				jbutton = NativeToJButton(VK_XBUTTON1);
+				setModifierMask(MOD_XBUTTON1);
 			}
 			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
 				jbutton = NativeToJButton(VK_XBUTTON2);
+				setModifierMask(MOD_XBUTTON2);
 			}
 			else {
 				jbutton = NativeToJButton(HIWORD(mshook->mouseData));
@@ -253,23 +258,28 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		case WM_LBUTTONUP:
 			jbutton = NativeToJButton(VK_LBUTTON);
+			unsetModifierMask(MOD_LBUTTON);
 		goto BUTTONUP;
 
 		case WM_RBUTTONUP:
 			jbutton = NativeToJButton(VK_RBUTTON);
+			unsetModifierMask(MOD_RBUTTON);
 		goto BUTTONUP;
 
 		case WM_MBUTTONUP:
 			jbutton = NativeToJButton(VK_MBUTTON);
+			unsetModifierMask(MOD_MBUTTON);
 		goto BUTTONUP;
 
 		case WM_XBUTTONUP:
 		case WM_NCXBUTTONUP:
 			if (HIWORD(mshook->mouseData) == XBUTTON1) {
 				jbutton = NativeToJButton(VK_XBUTTON1);
+				unsetModifierMask(MOD_XBUTTON1);
 			}
 			else if (HIWORD(mshook->mouseData) == XBUTTON2) {
 				jbutton = NativeToJButton(VK_XBUTTON2);
+				unsetModifierMask(MOD_XBUTTON2);
 			}
 			else {
 				jbutton = NativeToJButton(HIWORD(mshook->mouseData));

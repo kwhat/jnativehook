@@ -15,9 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
+
+/* OSX does not track the button masks of its events so we need to do it
+ * manually.
+ */
+
 //These codes do not appear to be defined anywhere by Apple.
-#define kVK_LBUTTON					1
-#define kVK_RBUTTON					2
-#define kVK_MBUTTON					3
-#define kVK_XBUTTON1				4
-#define kVK_XBUTTON2				5
+#define kVK_LBUTTON						kCGMouseButtonLeft
+#define kVK_RBUTTON						kCGMouseButtonRight
+#define kVK_MBUTTON						kCGMouseButtonCenter
+#define kVK_XBUTTON1					3
+#define kVK_XBUTTON2					4
+
+#define kCGEventFlagMaskButtonLeft		1
+#define kCGEventFlagMaskButtonRight		2
+#define kCGEventFlagMaskButtonCenter	4
+#define kCGEventFlagMaskXButton1		8
+#define kCGEventFlagMaskXButton2		16
+
+void setModifierMask(unsigned short mod);
+void unsetModifierMask(unsigned short mod);
+bool isModifierMask(unsigned short mod);

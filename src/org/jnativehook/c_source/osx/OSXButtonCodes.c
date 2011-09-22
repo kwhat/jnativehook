@@ -15,12 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
-#include <windows.h>
 #include <stdbool.h>
-#include "WinKeyCodes.h"
 
 unsigned short _current_modifiers = 0x0000;
 

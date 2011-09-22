@@ -305,6 +305,12 @@ jint NativeToJModifier(unsigned int modifier) {
 		case kCGEventFlagMaskAlternate:					return JK_ALT_MASK;
 		case kCGEventFlagMaskCommand:					return JK_META_MASK;
 
+		case kCGEventFlagMaskButtonLeft:				return JK_BUTTON1_MASK;
+		case kCGEventFlagMaskButtonRight:				return JK_BUTTON2_MASK;
+		case kCGEventFlagMaskButtonCenter:				return JK_BUTTON3_MASK;
+		case kCGEventFlagMaskXButton1:					return JK_BUTTON4_MASK;
+		case kCGEventFlagMaskXButton2:					return JK_BUTTON5_MASK;
+
 		default:										return JK_UNDEFINED;
 	}
 }

@@ -82,22 +82,22 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		//Create keyboard checkbox
 		chkKeyboard = new JCheckBox("Keyboard Events");
 		chkKeyboard.setMnemonic(KeyEvent.VK_K);
-		chkKeyboard.setSelected(true);
 		chkKeyboard.addItemListener(this);
+		chkKeyboard.setSelected(true);
 		grpOptions.add(chkKeyboard);
 		
 		//Create button checkbox
 		chkButton = new JCheckBox("Button Events");
 		chkButton.setMnemonic(KeyEvent.VK_B);
-		chkButton.setSelected(true);
 		chkButton.addItemListener(this);
+		chkButton.setSelected(true);
 		grpOptions.add(chkButton);
 		
 		//Create motion checkbox
 		chkMotion = new JCheckBox("Motion Events");
 		chkMotion.setMnemonic(KeyEvent.VK_M);
-		chkMotion.setSelected(true);
 		chkMotion.addItemListener(this);
+		chkMotion.setSelected(true);
 		grpOptions.add(chkMotion);
 		
 		//Create feedback area
