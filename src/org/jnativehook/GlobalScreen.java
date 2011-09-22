@@ -45,11 +45,8 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
  * @since	1.0
  */
 public class GlobalScreen {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 6504561173380322679L;
-	
 	/** The GlobalScreen singleton. */
-	private static GlobalScreen instance = new GlobalScreen();
+	private static final GlobalScreen instance = new GlobalScreen();
 	
 	/** The list of event listeners to notify. */
 	private EventListenerList eventListeners;
@@ -95,7 +92,7 @@ public class GlobalScreen {
 	 *
 	 * @return single instance of GlobalScreen
 	 */
-	public static synchronized GlobalScreen getInstance() {
+	public static GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
 	

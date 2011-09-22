@@ -54,7 +54,7 @@ bool isRunning = true;
 unsigned int xkb_timeout;
 unsigned int xkb_interval;
 
-/* for this struct, refer to libxnee */
+//For this struct, refer to libxnee
 typedef union {
 	unsigned char		type;
 	xEvent				event;
@@ -64,15 +64,21 @@ typedef union {
 	xConnSetupPrefix	setup;
 } XRecordDatum;
 
+
 Display * disp_hook;
 Display * disp_data;
 XRecordContext context;
 
+//JVM and Screen globals.
 JavaVM * jvm = NULL;
 jobject objGlobalScreen = NULL;
-jmethodID idKeyEvent, idMouseEvent;
 jmethodID idDispatchEvent;
 
+//Java callback classes and method id's
+jclass clsKeyEvent, clsMouseEvent;
+jmethodID idKeyEvent, idMouseEvent;
+
+//Thread information so we can clean up.
 pthread_t hookThreadId = 0;
 
 void jniFatalError(char * message) {
@@ -168,8 +174,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 		jint jbutton;
 		jint modifiers;
 
-		//Java callback classes and objects
-		jclass clsKeyEvent, clsMouseEvent;
+		//Java Event Objects
 		jobject objKeyEvent, objMouseEvent;
 
 		switch (event_type) {
@@ -177,10 +182,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				#ifdef DEBUG
 					printf("Native: MsgLoop - Key pressed (%i)\n", event_code);
 				#endif
-
-				//Class and Constructor for the NativeKeyEvent Object
-				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 				keysym = XKeycodeToKeysym(disp_data, event_code, 0);
 				jkey = NativeToJKey(keysym);
@@ -196,10 +197,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 					printf("Native: MsgLoop - Key released (%i)\n", event_code);
 				#endif
 
-				//Class and Constructor for the NativeKeyEvent Object
-				clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
-
 				keysym = XKeycodeToKeysym(disp_data, event_code, 0);
 				jkey = NativeToJKey(keysym);
 				modifiers = doModifierConvert(event_mask);
@@ -213,10 +210,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				#ifdef DEBUG
 					printf("Native: MsgLoop - Button pressed (%i)\n", event_code);
 				#endif
-
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 				//FIXME Dirty hack to prevent scroll events.
 				//FIXME Button2 and 3 are reversed from other platforms.
@@ -235,10 +228,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 					printf("Native: MsgLoop - Button released (%i)\n", event_code);
 				#endif
 
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
-
 				//FIXME Dirty hack to prevent scroll events.
 				//FIXME Button2 and 3 are reversed from other platforms.
 				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
@@ -255,10 +244,6 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 				#ifdef DEBUG
 					printf ("Native: MsgLoop - Motion Notified (%i,%i)\n", event_root_x, event_root_y);
 				#endif
-
-				//Class and Constructor for the NativeMouseEvent Object
-				clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-				idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 				modifiers = doModifierConvert(event_mask);
 
@@ -283,7 +268,8 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	#ifdef DEBUG
 		if ((*env)->ExceptionOccurred(env)) {
 			printf("Native: JNI Error Occurred.\n");
-			((*env)->ExceptionDescribe(env));
+			(*env)->ExceptionDescribe(env);
+			(*env)->ExceptionClear(env);
 		}
 	#endif
 
@@ -292,7 +278,14 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 void * MsgLoop() {
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
+		#ifdef DEBUG
+			printf("Native: AttachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
+		#endif
+
+		throwException("org/jnativehook/NativeHookException", "Failed to attach to the current Java thread");
+		return NULL; //Naturally exit so JNI exception is thrown.
+	}
 
 	//Class and getInstance method id for the GlobalScreen Object
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
@@ -302,7 +295,18 @@ void * MsgLoop() {
 	jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 	objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
 
+	//Get the ID of the GlobalScreen Objects dispatch event method.
 	idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+
+	//Class and Constructor for the NativeKeyEvent Object
+	jclass clsLocalKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+	clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
+	idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+
+	//Class and Constructor for the NativeMouseEvent Object
+	jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+	clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
+	idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 
 	//Setup XRecord range
@@ -343,7 +347,9 @@ void * MsgLoop() {
 		XRecordProcessReplies(disp_hook);
 	}
 
-	//Make sure we clean up the global screen object.
+	//Make sure we clean up the global objects.
+	(*env)->DeleteGlobalRef(env, clsKeyEvent);
+	(*env)->DeleteGlobalRef(env, clsMouseEvent);
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 
 	#ifdef DEBUG

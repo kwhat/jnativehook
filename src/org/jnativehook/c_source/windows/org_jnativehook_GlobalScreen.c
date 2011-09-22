@@ -50,10 +50,16 @@ HHOOK handleKeyboardHook = NULL;
 HHOOK handleMouseHook = NULL;
 HINSTANCE hInst = NULL;
 
+//JVM and Screen globals.
 JavaVM * jvm = NULL;
 jobject objGlobalScreen = NULL;
 jmethodID idDispatchEvent;
 
+//Java callback classes and method id's
+jclass clsKeyEvent, clsMouseEvent;
+jmethodID idKeyEvent, idMouseEvent;
+
+//Thread information so we can clean up.
 HANDLE hookThreadHandle = NULL;
 LPDWORD hookThreadId = NULL;
 
@@ -128,9 +134,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JKeyDatum jkey;
 	jint modifiers;
 
-	//Java callback classes and objects
-	jclass clsKeyEvent;
-	jmethodID idKeyEvent;
+	//Jave Key Event Object.
 	jobject objKeyEvent;
 
 	switch(wParam) {
@@ -139,10 +143,6 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#ifdef DEBUG
 				printf("Native: LowLevelProc - Key pressed (%i)\n", (unsigned int) kbhook->vkCode);
 			#endif
-
-			//Class and Constructor for the NativeKeyEvent Object
-			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
 
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)		setModifierMask(MOD_LSHIFT);
@@ -168,10 +168,6 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 				printf("Native: LowLevelProc - Key released (%i)\n", (unsigned int) kbhook->vkCode);
 			#endif
 
-			//Class and Constructor for the NativeKeyEvent Object
-			clsKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
-
 			//Check and setup modifiers
 			if (kbhook->vkCode == VK_LSHIFT)		unsetModifierMask(MOD_LSHIFT);
 			else if (kbhook->vkCode == VK_RSHIFT)	unsetModifierMask(MOD_RSHIFT);
@@ -195,6 +191,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		if ((*env)->ExceptionOccurred(env)) {
 			printf("Native: JNI Error Occurred.\n");
 			(*env)->ExceptionDescribe(env);
+			(*env)->ExceptionClear(env);
 		}
 	#endif
 
@@ -214,9 +211,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	jint jbutton;
 	jint modifiers;
 
-	//Java callback classes and objects
-	jclass clsMouseEvent;
-	jmethodID idMouseEvent;
+	//Java Mouse Event Object.
 	jobject objMouseEvent;
 
 	switch(wParam) {
@@ -246,12 +241,8 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		BUTTONDOWN:
 			#ifdef DEBUG
-				printf("Native: MsgLoop - Button pressed (%i)\n", vk_code);
+				printf("Native: MsgLoop - Button pressed (%i)\n", (int) jbutton);
 			#endif
-
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			modifiers = getModifiers();
 
@@ -286,12 +277,8 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		BUTTONUP:
 			#ifdef DEBUG
-				printf("Native: MsgLoop - Button released (%i)\n", vk_code);
+				printf("Native: MsgLoop - Button released (%i)\n", (int) jbutton);
 			#endif
-
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 			modifiers = getModifiers();
 
@@ -304,10 +291,6 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#ifdef DEBUG
 				printf ("Native: MsgLoop - Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 			#endif
-
-			//Class and Constructor for the NativeMouseEvent Object
-			clsMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-			idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
 			modifiers = getModifiers();
 
@@ -333,6 +316,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		if ((*env)->ExceptionOccurred(env)) {
 			printf("Native: JNI Error Occurred.\n");
 			(*env)->ExceptionDescribe(env);
+			(*env)->ExceptionClear(env);
 		}
 	#endif
 
@@ -342,7 +326,12 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	JNIEnv * env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
-		//FIXME Cause a serious failure.
+		#ifdef DEBUG
+			printf("Native: AttachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
+		#endif
+
+		throwException("org/jnativehook/NativeHookException", "Failed to attach to the current Java thread");
+		return 1; //Naturally exit so JNI exception is thrown.
 	}
 
 	//Class and getInstance method id for the GlobalScreen Object
@@ -356,6 +345,15 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	//Get the ID of the GlobalScreen Objects dispatch event method.
 	idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 
+	//Class and Constructor for the NativeKeyEvent Object
+	jclass clsLocalKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+	clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
+	idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+
+	//Class and Constructor for the NativeMouseEvent Object
+	jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+	clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
+	idMouseEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 
 	//Setup the native hooks and their callbacks.
 	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
@@ -397,7 +395,9 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		DispatchMessage(&message);
 	}
 
-	//Make sure we clean up the global screen object.
+	//Make sure we clean up the global objects.
+	(*env)->DeleteGlobalRef(env, clsKeyEvent);
+	(*env)->DeleteGlobalRef(env, clsMouseEvent);
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 
 	#ifdef DEBUG
