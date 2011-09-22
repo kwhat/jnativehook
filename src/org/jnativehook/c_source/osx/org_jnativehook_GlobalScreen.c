@@ -146,7 +146,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventKeyDown:
 			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Key pressed (%i)\n", (unsigned int) keysym);
+				printf("Native: eventHandlerCallback - Key Pressed (%i)\n", (unsigned int) keysym);
 			#endif
 
 			jkey = NativeToJKey(keysym);
@@ -160,7 +160,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventKeyUp:
 			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Key released (%i)\n", (unsigned int) keysym);
+				printf("Native: eventHandlerCallback - Key Released (%i)\n", (unsigned int) keysym);
 			#endif
 
 			jkey = NativeToJKey(keysym);
@@ -174,7 +174,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventFlagsChanged:
 			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			#ifdef DEBUG
-				printf("Native: eventHandlerCallback - Modifiers changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
+				printf("Native: eventHandlerCallback - Modifiers Changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
 			#endif
 
 			jkey = NativeToJKey(keysym);
@@ -243,7 +243,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 
 		BUTTONDOWN:
 			#ifdef DEBUG
-				printf("Native: MsgLoop - Button pressed (%i)\n", (unsigned int) button);
+				printf("Native: eventHandlerCallback - Button Pressed (%i)\n", (unsigned int) button);
 			#endif
 
 			event_point = CGEventGetLocation(event);
@@ -280,7 +280,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 
 		BUTTONUP:
 			#ifdef DEBUG
-				printf("Native: MsgLoop - Button released (%i)\n", (unsigned int) button);
+				printf("Native: eventHandlerCallback - Button Released (%i)\n", (unsigned int) button);
 			#endif
 
 			event_point = CGEventGetLocation(event);
@@ -298,13 +298,13 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventOtherMouseDragged:
 			//Call mouse move events for now.  Adding this functionality to other systems will be difficult.
 			#ifdef DEBUG
-				printf ("Native: EventHandlerCallback - MouseDragged forwarded to Motion Notified\n");
+				printf ("Native: eventHandlerCallback - Mouse Dragged forwarded to Motion Notified\n");
 			#endif
 
 		case kCGEventMouseMoved:
 			event_point = CGEventGetLocation(event);
 			#ifdef DEBUG
-				printf ("Native: MsgLoop - Motion Notified (%f,%f)\n", event_point.x, event_point.y);
+				printf ("Native: eventHandlerCallback - Motion Notified (%f,%f)\n", event_point.x, event_point.y);
 			#endif
 
 			modifiers = doModifierConvert(event_mask);
@@ -316,7 +316,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 
 		case kCGEventScrollWheel:
 			#ifdef DEBUG
-				printf ("Native: EventHandlerCallback - MouseWheelMoved (Unimplemented)\n");
+				printf ("Native: eventHandlerCallback - Mouse Wheel Moved (Unimplemented)\n");
 			#endif
 		break;
 
