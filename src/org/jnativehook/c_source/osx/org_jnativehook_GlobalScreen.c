@@ -44,6 +44,7 @@
 #include "include/org_jnativehook_GlobalScreen.h"
 #include "include/JConvertToNative.h"
 #include "OSXKeyCodes.h"
+#include "OSXButtonCodes.h"
 
 //JVM and Screen globals.
 JavaVM * jvm = NULL;
@@ -218,14 +219,34 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		break;
 
 		case kCGEventLeftMouseDown:
+			button = kVK_LBUTTON;
+			setModifierMask(kCGEventFlagMaskButtonLeft);
+		goto BUTTONDOWN;
+
 		case kCGEventRightMouseDown:
+			button = kVK_RBUTTON;
+			setModifierMask(kCGEventFlagMaskButtonRight);
+		goto BUTTONDOWN;
+
 		case kCGEventOtherMouseDown:
 			button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
-			event_point = CGEventGetLocation(event);
+
+			if (button == kVK_MBUTTON) {
+				setModifierMask(kCGEventFlagMaskButtonCenter);
+			}
+			else if (button == kVK_XBUTTON1) {
+				setModifierMask(kCGEventFlagMaskXButton1);
+			}
+			else if (button == kVK_XBUTTON2) {
+				setModifierMask(kCGEventFlagMaskXButton2);
+			}
+
+		BUTTONDOWN:
 			#ifdef DEBUG
 				printf("Native: MsgLoop - Button pressed (%i)\n", (unsigned int) button);
 			#endif
 
+			event_point = CGEventGetLocation(event);
 			jbutton = NativeToJButton(button);
 			modifiers = doModifierConvert(event_mask);
 
@@ -235,14 +256,34 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		break;
 
 		case kCGEventLeftMouseUp:
+			button = kVK_LBUTTON;
+			unsetModifierMask(kCGEventFlagMaskButtonLeft);
+		goto BUTTONUP;
+
 		case kCGEventRightMouseUp:
+			button = kVK_RBUTTON;
+			unsetModifierMask(kCGEventFlagMaskButtonRight);
+		goto BUTTONUP;
+
 		case kCGEventOtherMouseUp:
 			button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
-			event_point = CGEventGetLocation(event);
+
+			if (button == kVK_MBUTTON) {
+				unsetModifierMask(kCGEventFlagMaskButtonCenter);
+			}
+			else if (button == kVK_XBUTTON1) {
+				unsetModifierMask(kCGEventFlagMaskXButton1);
+			}
+			else if (button == kVK_XBUTTON2) {
+				unsetModifierMask(kCGEventFlagMaskXButton2);
+			}
+
+		BUTTONUP:
 			#ifdef DEBUG
 				printf("Native: MsgLoop - Button released (%i)\n", (unsigned int) button);
 			#endif
 
+			event_point = CGEventGetLocation(event);
 			jbutton = NativeToJButton(button);
 			modifiers = doModifierConvert(event_mask);
 
