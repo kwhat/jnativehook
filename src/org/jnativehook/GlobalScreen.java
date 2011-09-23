@@ -41,7 +41,7 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
  * native library. That includes registering new key and button hooks and the 
  * event dispatchers for each.
  * 
- * @author	Alex Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.0
  * @since	1.0
  */
