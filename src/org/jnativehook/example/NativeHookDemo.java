@@ -140,6 +140,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
         	}
 		}
 		else if (item == chkMotion) {
+			System.out.println("Check check box clicl]k");
 			//Motion checkbox was changed, adjust listeners accordingly
         	if (e.getStateChange() == ItemEvent.SELECTED) {
         		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
@@ -162,35 +163,35 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	}
 	
 	/**
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 * @see org.jnativehook.keyboard.NativeKeyListener#keyPressed(org.jnativehook.keyboard.NativeKeyEvent)
 	 */
 	public void keyPressed(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 * @see org.jnativehook.keyboard.NativeKeyListener#keyReleased(org.jnativehook.keyboard.NativeKeyEvent)
 	 */
 	public void keyReleased(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#mousePressed(org.jnativehook.mouse.NativeMouseEvent)
 	 */
 	public void mousePressed(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#mouseReleased(org.jnativehook.mouse.MouseEvent)
 	 */
 	public void mouseReleased(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseMotionListener#mouseMoved(org.jnativehook.mouse.MouseEvent)
 	 */
 	public void mouseMoved(NativeMouseEvent e) {
 		displayEventInfo(e);
@@ -262,7 +263,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		GlobalScreen.getInstance();
 		
 		try {
-			txtEventInfo.append("Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
+			txtEventInfo.setText("Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
 			txtEventInfo.append("\n" + "Auto Repate Delay: " + GlobalScreen.getInstance().getAutoRepeatDelay());
 		}
 		catch (NativeKeyException ex) {
@@ -270,10 +271,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		}
 		
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
-		
-		GlobalScreen.getInstance().addNativeKeyListener(this);
-		GlobalScreen.getInstance().addNativeMouseListener(this);
-		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
 	}
 	
 	/**
