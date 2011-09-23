@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
+import java.util.EventListener;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.event.EventListenerList;
@@ -131,7 +132,9 @@ public class GlobalScreen {
 	 * @param listener the native mouse listener
 	 */
 	public void addNativeMouseListener(NativeMouseListener listener) {
-		eventListeners.add(NativeMouseListener.class, listener);
+		if (listener != null) {
+			eventListeners.add(NativeMouseListener.class, listener);
+		}
 	}
 	
 	/**
@@ -143,7 +146,9 @@ public class GlobalScreen {
 	 * @param listener the native mouse listener
 	 */
 	public void removeNativeMouseListener(NativeMouseListener listener) {
-		eventListeners.remove(NativeMouseListener.class, listener);
+		if (listener != null) {
+			eventListeners.remove(NativeMouseListener.class, listener);
+		}
 	}
 	
 	/**
@@ -154,7 +159,9 @@ public class GlobalScreen {
 	 * @param listener the native mouse motion listener
 	 */
 	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
-		eventListeners.add(NativeMouseMotionListener.class, listener);
+		if (listener != null) {
+			eventListeners.add(NativeMouseMotionListener.class, listener);
+		}
 	}
 	
 	/**
@@ -167,7 +174,9 @@ public class GlobalScreen {
 	 * @param listener the native mouse motion listener
 	 */
 	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
-		eventListeners.remove(NativeMouseMotionListener.class, listener);
+		if (listener != null) {
+			eventListeners.remove(NativeMouseMotionListener.class, listener);
+		}
 	}
 	
 	/**
@@ -212,20 +221,18 @@ public class GlobalScreen {
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	protected void processKeyEvent(NativeKeyEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
 		int id = e.getID();
+		EventListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 		
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == NativeKeyListener.class ) {
-				switch (id) {
-					case NativeKeyEvent.NATIVE_KEY_PRESSED:
-						((NativeKeyListener) objListeners[i + 1]).keyPressed(e);
-					break;
-					
-					case NativeKeyEvent.NATIVE_KEY_RELEASED:
-						((NativeKeyListener) objListeners[i + 1]).keyReleased(e);
-					break;
-				}
+		for (int i = 0; i < listeners.length; i++) {
+			switch (id) {
+				case NativeKeyEvent.NATIVE_KEY_PRESSED:
+					((NativeKeyListener) listeners[i]).keyPressed(e);
+				break;
+				
+				case NativeKeyEvent.NATIVE_KEY_RELEASED:
+					((NativeKeyListener) listeners[i]).keyReleased(e);
+				break;
 			}
 		}
 	}
@@ -240,27 +247,29 @@ public class GlobalScreen {
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	protected void processMouseEvent(NativeMouseEvent e) {
-		Object[] objListeners = eventListeners.getListenerList();
 		int id = e.getID();
 		
-		for (int i = 0; i < objListeners.length; i += 2) {
-			if ( objListeners[ i ] == NativeMouseListener.class ) {
-				switch (id) {
-					case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-						((NativeMouseListener) objListeners[i + 1]).mousePressed(e);
-					break;
-					
-					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-						((NativeMouseListener) objListeners[i + 1]).mouseReleased(e);
-					break;
-				}
-			}
-			else if ( objListeners[ i ] == NativeMouseMotionListener.class ) {
-				switch (id) {
-					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-						((NativeMouseMotionListener) objListeners[i + 1]).mouseMoved(e);
-					break;
-				}
+		EventListener[] listeners;
+		if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED) {
+			listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+		}
+		else {
+			listeners = eventListeners.getListeners(NativeMouseListener.class);
+		}
+		
+		for (int i = 0; i < listeners.length; i++) {
+			switch (id) {
+				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+					((NativeMouseListener) listeners[i]).mousePressed(e);
+				break;
+				
+				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+					((NativeMouseListener) listeners[i]).mouseReleased(e);
+				break;
+				
+				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+					((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
+				break;
 			}
 		}
 	}
