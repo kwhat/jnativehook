@@ -184,14 +184,14 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	}
 	
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseListener#mouseReleased(org.jnativehook.mouse.MouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#mouseReleased(org.jnativehook.mouse.NativeMouseEvent)
 	 */
 	public void mouseReleased(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseMotionListener#mouseMoved(org.jnativehook.mouse.MouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseMotionListener#mouseMoved(org.jnativehook.mouse.NativeMouseEvent)
 	 */
 	public void mouseMoved(NativeMouseEvent e) {
 		displayEventInfo(e);
