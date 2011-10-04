@@ -140,7 +140,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
         	}
 		}
 		else if (item == chkMotion) {
-			System.out.println("Check check box clicl]k");
 			//Motion checkbox was changed, adjust listeners accordingly
         	if (e.getStateChange() == ItemEvent.SELECTED) {
         		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
