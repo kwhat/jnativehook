@@ -20,6 +20,8 @@
 //Reference: http://www.mactech.com/macintosh-c/chap02-1.html
 
 //#include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants.
+//FIXME We should be using the IOKit constants outlined below.
+//#include <IOKit/hid/IOHIDUsageTables.h> //For IOKit kHIDUsage_KeyboardA keycode constants.
 
 //Used in lieu of the Carbon frameworks HIToolbox.
 //keycodes for ansi keys
