@@ -18,10 +18,13 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include "JKeyCodes.h"
 #include "JKeyLocations.h"
 
+Display * disp;
 typedef struct {
 	int rawcode;		//Raw Code
 	int keycode;		//Key Code
@@ -273,7 +276,12 @@ int compare(const void * x, const void * y) {
 	return ( *(JKeyDatum *) x).rawcode - ( *(JKeyDatum *) y).rawcode;
 }
 
-JKeyDatum lookup(unsigned int keysym) {
+JKeyDatum lookup(unsigned int keycode) {
+	//Translate the generate KeyCode to a KeySym
+	KeySym keysym, lower_keysym, upper_keysym;
+	keysym = XKeycodeToKeysym(disp, keycode, 0);
+	XConvertCase(keysym, &lower_keysym, &upper_keysym);
+
 	JKeyDatum jkey = {keysym, JK_UNDEFINED, JK_LOCATION_STANDARD};
 
 	JKeyDatum * item = (JKeyDatum *) bsearch(&jkey, keycode_table, sizeof(keycode_table) / sizeof(*keycode_table), sizeof(JKeyDatum), compare);
@@ -286,6 +294,7 @@ JKeyDatum lookup(unsigned int keysym) {
 
 int main(int argc, const char * argv[]) {
 	clock_t clock_start, clock_end, clock_diff;
+	disp = XOpenDisplay(NULL);
 
 	clock_start = clock();
 	qsort(keycode_table, sizeof(keycode_table) / sizeof(*keycode_table), sizeof(JKeyDatum), compare);
@@ -300,10 +309,12 @@ int main(int argc, const char * argv[]) {
 	clock_start = clock();
 	long i;
 	for (i = 0; i < 200000000; i++) {
-		int r = rand() % (255 - 20); //i % (255 - 20);
-		r += 20;
+		//Generate a random KeyCode between 8 and 255
+		int r = rand() % (255 - 8); //i % (255 - 20);
+		r += 8;
 
-		lookup(r);
+		//Run the KeySym lookup and translation.
+		lookup(upper_keysym);
 	}
 	clock_end = clock();
 
