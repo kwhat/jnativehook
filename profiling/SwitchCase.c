@@ -15,8 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include "JKeyCodes.h"
 #include "JKeyLocations.h"
@@ -302,20 +305,39 @@ JKeyDatum lookup(unsigned int keysym) {
 	}
 }
 
-
-
 int main(int argc, const char * argv[]) {
+	clock_t clock_start, clock_end, clock_diff;
+	Display * disp = XOpenDisplay(NULL);
+	KeySym keysym, lower_keysym, upper_keysym;
+
+	clock_start = clock();
+	//Do Nothing!
+	clock_end = clock();
+
+	clock_diff = clock_end - clock_start;
+	printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
+
 	//Init random number generator with one.
 	srand(1);
 
+	clock_start = clock();
 	long i;
 	for (i = 0; i < 200000000; i++) {
-		int r = rand() % (255 - 20); //i % (255 - 20);
-		r += 20;
+		//Generate a random KeyCode between 8 and 255
+		int r = rand() % (255 - 8); //i % (255 - 20);
+		r += 8;
 
-		lookup(r);
+		//Translate the generate KeyCode to a KeySym
+		keysym = XKeycodeToKeysym(disp, r, 0);
+		XConvertCase(keysym, &lower_keysym, &upper_keysym);
+
+		//Run the KeySym lookup and translation.
+		lookup(upper_keysym);
 	}
+	clock_end = clock();
 
-	printf("Complete!\n");
+	clock_diff = clock_end - clock_start;
+	printf("Complete!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
+
 	return EXIT_SUCCESS;
 }
