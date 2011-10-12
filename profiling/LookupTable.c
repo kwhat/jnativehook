@@ -303,7 +303,7 @@ int main(int argc, const char * argv[]) {
 	printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
 	//Init random number generator with one.
-	srand(1);
+	//srand(1);
 
 	clock_start = clock();
 	long i;

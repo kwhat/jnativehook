@@ -33,9 +33,10 @@ typedef struct {
 
 JKeyDatum lookup(unsigned int keycode) {
 	//Translate the generate KeyCode to a KeySym
-	KeySym keysym, lower_keysym, upper_keysym;
-	keysym = XKeycodeToKeysym(disp, keycode, 0);
-	XConvertCase(keysym, &lower_keysym, &upper_keysym);
+	//KeySym keysym, lower_keysym, upper_keysym;
+	//keysym = XKeycodeToKeysym(disp, keycode, 0);
+	//XConvertCase(keysym, &lower_keysym, &upper_keysym);
+	KeySym keysym = keycode;
 
 	JKeyDatum jkey;
 	jkey.rawcode = keysym;
@@ -323,7 +324,7 @@ int main(int argc, const char * argv[]) {
 	printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
 	//Init random number generator with one.
-	srand(1);
+	//srand(1);
 
 	clock_start = clock();
 	long i;

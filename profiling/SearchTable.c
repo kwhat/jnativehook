@@ -278,9 +278,10 @@ int compare(const void * x, const void * y) {
 
 JKeyDatum lookup(unsigned int keycode) {
 	//Translate the generate KeyCode to a KeySym
-	KeySym keysym, lower_keysym, upper_keysym;
-	keysym = XKeycodeToKeysym(disp, keycode, 0);
-	XConvertCase(keysym, &lower_keysym, &upper_keysym);
+	//KeySym keysym, lower_keysym, upper_keysym;
+	//keysym = XKeycodeToKeysym(disp, keycode, 0);
+	//XConvertCase(keysym, &lower_keysym, &upper_keysym);
+	KeySym keysym = keycode;
 
 	JKeyDatum jkey = {keysym, JK_UNDEFINED, JK_LOCATION_STANDARD};
 
@@ -291,30 +292,33 @@ JKeyDatum lookup(unsigned int keycode) {
 
 	return jkey;
 }
+void initialize() {
+	qsort(keycode_table, sizeof(keycode_table) / sizeof(*keycode_table), sizeof(JKeyDatum), compare);
+}
 
 int main(int argc, const char * argv[]) {
 	clock_t clock_start, clock_end, clock_diff;
 	disp = XOpenDisplay(NULL);
 
 	clock_start = clock();
-	qsort(keycode_table, sizeof(keycode_table) / sizeof(*keycode_table), sizeof(JKeyDatum), compare);
+	initialize();
 	clock_end = clock();
 
 	clock_diff = clock_end - clock_start;
 	printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
 	//Init random number generator with one.
-	srand(1);
+	//srand(1);
 
 	clock_start = clock();
 	long i;
 	for (i = 0; i < 200000000; i++) {
 		//Generate a random KeyCode between 8 and 255
-		int r = rand() % (255 - 8); //i % (255 - 20);
-		r += 8;
+		int rand_code = rand() % (255 - 8); //i % (255 - 20);
+		rand_code += 8;
 
 		//Run the KeySym lookup and translation.
-		lookup(upper_keysym);
+		lookup(rand_code);
 	}
 	clock_end = clock();
 
