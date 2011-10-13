@@ -22,7 +22,7 @@ OSStatus handler(EventHandlerCallRef nextHandler, EventRef event, void* userData
 	return noErr;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 	EventTypeSpec eventType;
 	eventType.eventClass = kEventClassKeyboard;
 	eventType.eventKind  = kEventHotKeyPressed;

@@ -320,5 +320,6 @@ int main(int argc, const char * argv[]) {
 	clock_diff = clock_end - clock_start;
 	printf("Complete!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
+	XCloseDisplay(disp);
 	return EXIT_SUCCESS;
 }

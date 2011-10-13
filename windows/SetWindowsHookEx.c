@@ -118,7 +118,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
 
-int main( int argc, const char* argv[] ) {
+int main(int argc, const char* argv[]) {
 	//Get the handle of this process.
 	HINSTANCE hHandle = GetModuleHandle(NULL);
 
@@ -136,7 +136,7 @@ int main( int argc, const char* argv[] ) {
 		return 1;
 	}
 
-	hEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+	hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	//Block while we wait for a WM_QUIT message to be delivered.
 	//MSG message;
 	//GetMessage(&message, (HWND) -1, 0, 0);

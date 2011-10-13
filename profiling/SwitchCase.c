@@ -25,24 +25,27 @@
 #include "JKeyLocations.h"
 
 Display * disp;
+
 typedef struct {
 	int keycode;		//Key Code
 	int rawcode;		//Raw Code
 	int location;		//Key Location
 } JKeyDatum;
 
+
 JKeyDatum lookup(unsigned int keycode) {
 	//Translate the generate KeyCode to a KeySym
 	//KeySym keysym, lower_keysym, upper_keysym;
 	//keysym = XKeycodeToKeysym(disp, keycode, 0);
 	//XConvertCase(keysym, &lower_keysym, &upper_keysym);
-	KeySym keysym = keycode;
+	unsigned int keysym = keycode;
 
 	JKeyDatum jkey;
 	jkey.rawcode = keysym;
 	jkey.location = JK_LOCATION_STANDARD;
 
 	switch (keysym) {
+
 		case XK_Return:									jkey.keycode = JK_ENTER;						return jkey;
 		case XK_BackSpace:								jkey.keycode = JK_BACK_SPACE;					return jkey;
 		case XK_Tab:									jkey.keycode = JK_TAB;							return jkey;
@@ -224,7 +227,7 @@ JKeyDatum lookup(unsigned int keycode) {
 		case XK_apostrophe:								jkey.keycode = JK_QUOTE;						return jkey;
 		case XK_grave:									jkey.keycode = JK_BACK_QUOTE;					return jkey;
 
-		/* For European keyboards */
+		//For European keyboards
 		case XK_dead_grave:								jkey.keycode = JK_DEAD_GRAVE;					return jkey;
 		case XK_dead_acute:								jkey.keycode = JK_DEAD_ACUTE;					return jkey;
 		case XK_dead_circumflex:						jkey.keycode = JK_DEAD_CIRCUMFLEX;				return jkey;
@@ -242,7 +245,7 @@ JKeyDatum lookup(unsigned int keycode) {
 		case XK_dead_voiced_sound:						jkey.keycode = JK_DEAD_VOICED_SOUND;			return jkey;
 		case XK_dead_semivoiced_sound:					jkey.keycode = JK_DEAD_SEMIVOICED_SOUND;		return jkey;
 
-		/* Unknown Keyboard Codes */
+		//Unknown Keyboard Codes
 		case XK_ampersand:								jkey.keycode = JK_AMPERSAND;					return jkey;
 		case XK_asterisk:								jkey.keycode = JK_ASTERISK;						return jkey;
 		case XK_quotedbl:								jkey.keycode = JK_QUOTEDBL;						return jkey;
@@ -251,7 +254,7 @@ JKeyDatum lookup(unsigned int keycode) {
 		case XK_braceleft:								jkey.keycode = JK_BRACELEFT;					return jkey;
 		case XK_braceright:								jkey.keycode = JK_BRACERIGHT;					return jkey;
 
-		/* Unknown Extended Keyboard Codes */
+		//Unknown Extended Keyboard Codes
 		case XK_at:										jkey.keycode = JK_AT;							return jkey;
 		case XK_colon:									jkey.keycode = JK_COLON;						return jkey;
 		case XK_asciicircum:							jkey.keycode = JK_CIRCUMFLEX;					return jkey;
@@ -266,7 +269,7 @@ JKeyDatum lookup(unsigned int keycode) {
 		case XK_underscore:								jkey.keycode = JK_UNDERSCORE;					return jkey;
 
 
-		/* For input method support on Asian Keyboards */
+		//For input method support on Asian Keyboards
 		//case XK_Cancel:								jkey.keycode = JK_FINAL;						return jkey;	//Unknown X11 Support
 		//case XK_Henkan:								jkey.keycode = JK_CONVERT;						return jkey;	//Unknown X11 Support
 		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown X11 Support
@@ -291,7 +294,7 @@ JKeyDatum lookup(unsigned int keycode) {
 		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;	//TODO Testing Needed
 		case XK_Eisu_toggle:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	//TODO Testing Needed
 
-		/* For Sun keyboards */
+		//For Sun keyboards
 		#ifdef SUN_KEYBOARD
 		case SunXK_Cut:									jkey.keycode = JK_CUT;							return jkey;
 		case SunXK_Copy:								jkey.keycode = JK_COPY;							return jkey;
@@ -334,12 +337,13 @@ int main(int argc, const char * argv[]) {
 		rand_code += 8;
 
 		//Run the KeySym lookup and translation.
-		lookup(rand_code);
+		//lookup(rand_code);
 	}
 	clock_end = clock();
 
 	clock_diff = clock_end - clock_start;
 	printf("Complete!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
+	XCloseDisplay(disp);
 	return EXIT_SUCCESS;
 }

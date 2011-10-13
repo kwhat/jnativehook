@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 								CGEventMaskBit(kCGEventScrollWheel);
 
 
-    CFMachPortRef event_port = CGEventTapCreate(
+	CFMachPortRef event_port = CGEventTapCreate(
 									kCGSessionEventTap,
 									kCGHeadInsertEventTap,
 									kCGEventTapOptionListenOnly,

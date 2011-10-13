@@ -21,7 +21,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-int main( int argc, const char* argv[] ) {
+int main(int argc, const char* argv[]) {
 	MSG message;
 	HWND hWnd = NULL;
 	int id = 1; //Hot key unique ID.

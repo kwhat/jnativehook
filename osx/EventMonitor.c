@@ -26,7 +26,7 @@ OSStatus eventHandlerCallback(EventHandlerCallRef caller, EventRef event, void *
 
 	// get the event class
 	if (GetEventClass(event) == kEventClassKeyboard) {
-			// get the keyboard event type
+			//Get the keyboard event type
 			switch (GetEventKind(event)) {
 				case kEventRawKeyDown:
 					GetEventParameter(event, kEventParamKeyCode, typeUInt32, NULL, sizeof(UInt32), NULL, &vk_code);
@@ -56,7 +56,7 @@ OSStatus eventHandlerCallback(EventHandlerCallRef caller, EventRef event, void *
 			}
 	}
 	else if (GetEventClass(event) == kEventClassMouse) {
-		// get the type or mouse event
+		//Get the type or mouse event
 		switch (GetEventKind(event)) {
 			case kEventMouseDown:
 				GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	EventTypeSpec kEvents[] = {
-		// use an event that isn't monitored just so we have a valid EventTypeSpec to install
+		//Use an event that isn't monitored just so we have a valid EventTypeSpec to install
 		{ kEventClassCommand, kEventCommandUpdateStatus },
 		{ kEventClassKeyboard, kEventRawKeyDown },
 		{ kEventClassKeyboard, kEventRawKeyUp },
@@ -111,9 +111,7 @@ int main(int argc, char* argv[]) {
 		*/
 	};
 
-	// the magic happens here with the call to GetEventMonitorTarget as described in CarbonEvents.h
-	// The event monitor target is a special event target used to monitor user input events across all processes.
-	// When the monitor target detects a matching event, then MonitorHandler is called.
+	//Install the event handler.
 	InstallEventHandler(GetEventMonitorTarget(), eventHandlerCallback, GetEventTypeCount(kEvents), kEvents, 0, &handler);
 
 	//Call the event loop.
