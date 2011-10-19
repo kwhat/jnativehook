@@ -111,7 +111,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		break;
 
 		default:
-			printf("Unknown Event - %x\n", wParam);
+			printf("Unknown Event - %x\n", (unsigned int) wParam);
 		break;
 	}
 
