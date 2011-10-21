@@ -22,7 +22,6 @@ package org.jnativehook.mouse;
  * Signals that a Native Mouse Exception has occurred.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.0
  * @since	1.0
  * 
  * @see java.lang.Exception

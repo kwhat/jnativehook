@@ -32,7 +32,6 @@ import org.jnativehook.GlobalScreen;
  * method is invoked.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.0
  * @since	1.0
  * 
  * @see NativeMouseEvent
@@ -56,6 +55,7 @@ public interface NativeMouseListener extends EventListener {
 	 * Currently Unimplemented
 	 * 
 	 * @param e the native mouse event
+	 * @since 1.1
 	 */
 	//public void mouseWheel(NativeMouseEvent e);
 	

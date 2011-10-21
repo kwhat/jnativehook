@@ -42,7 +42,7 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
  * event dispatchers for each.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.0
+ * @version	1.1
  * @since	1.0
  */
 public class GlobalScreen {

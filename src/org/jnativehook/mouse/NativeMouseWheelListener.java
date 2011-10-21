@@ -22,35 +22,26 @@ import java.util.EventListener;
 import org.jnativehook.GlobalScreen;
 
 /**
- * The listener interface for receiving native mouse motion events. 
+ * The listener interface for receiving native mouse wheel events. 
  * (For clicks and other mouse events, use the <code>NativeMouseListener</code>.)
  * <p>
- * The class that is interested in processing a <code>NativeMouseMotionEvent</code> 
+ * The class that is interested in processing a <code>NativeMouseWheelEvent</code> 
  * implements this interface, and the object created with that class is 
  * registered with the <code>GlobalScreen</code> using the 
- * {@link GlobalScreen#addNativeMouseMotionListener} method. When the 
- * NativeMouseMotion event occurs, that object's appropriate method is invoked.
+ * {@link GlobalScreen#addNativeMouseWheelListener} method. When the 
+ * NativeMouseWheelEvent occurs, that object's appropriate method is invoked.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @since	1.0
+ * @since	1.1
  * 
- * @see NativeMouseEvent
+ * @see NativeMouseWheelEvent
  */
-public interface NativeMouseMotionListener extends EventListener {
+public interface NativeMouseWheelListener extends EventListener {
 	
 	/**
-	 * Invoked when the mouse has been moved.
+	 * Invoked when the mouse wheel is rotated.
 	 *
 	 * @param e The native mouse event.
 	 */
-	public void mouseMoved(NativeMouseEvent e);
-	
-	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
-	 *
-	 * @param e the native mouse event
-	 * @since 1.1
-	 */
-	//public void mouseDragged(MouseEvent e);
+	public void mouseWheelMoved(NativeMouseEvent e);
 }
