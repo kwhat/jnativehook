@@ -31,6 +31,8 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+import org.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
  * GlobalScreen is used to represent the native screen area that Java does not 
@@ -180,6 +182,38 @@ public class GlobalScreen {
 	}
 	
 	/**
+	 * Adds the specified native mouse wheel listener to receive mouse wheel 
+	 * events from the native system. If listener is null, no exception is 
+	 * thrown and no action is performed.
+	 *
+	 * @param listener the native mouse wheel listener
+	 * 
+	 * @since 1.1
+	 */
+	public void addNativeMouseWheelListener(NativeMouseWheelListener listener) {
+		if (listener != null) {
+			eventListeners.add(NativeMouseWheelListener.class, listener);
+		}
+	}
+	
+	/**
+	 * Removes the specified native mouse wheel listener so that it no longer 
+	 * receives mouse wheel events from the native system. This method performs 
+	 * no function if the listener specified by the argument was not previously 
+	 * added.  If listener is null, no exception is thrown and no action is 
+	 * performed.
+	 *
+	 * @param listener the native mouse wheel listener
+	 * 
+	 * @since 1.1
+	 */
+	public void removeNativeMouseWheelListener(NativeMouseWheelListener listener) {
+		if (listener != null) {
+			eventListeners.remove(NativeMouseWheelListener.class, listener);
+		}
+	}
+	
+	/**
 	 * Gets the native keyboard auto repeat rate.
 	 *
 	 * @return the auto repeat rate in milliseconds
@@ -242,9 +276,9 @@ public class GlobalScreen {
 	 * <code>NativeMouseListener</code> objects.
 	 * 
 	 * @param e The <code>NativeMouseEvent</code> to dispatch.
-	 * @see NativeKeyEvent
-	 * @see NativeKeyListener
-	 * @see #addNativeKeyListener(NativeKeyListener)
+	 * @see NativeMouseEvent
+	 * @see NativeMouseListener
+	 * @see #addNativeMouseListener(NativeMouseListener)
 	 */
 	protected void processMouseEvent(NativeMouseEvent e) {
 		int id = e.getID();
@@ -274,6 +308,24 @@ public class GlobalScreen {
 		}
 	}
 	
+	/**
+	 * Processes native mouse wheel events by dispatching them to all registered 
+	 * <code>NativeMouseWheelListener</code> objects.
+	 * 
+	 * @param e The <code>NativeMouseWheelEvent</code> to dispatch.
+	 * @see NativeMouseWheelEvent
+	 * @see NativeMouseWheelListener
+	 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
+	 * 
+	 * @since 1.1
+	 */
+	protected void processMouseWheelEvent(NativeMouseWheelEvent e) {
+		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
+		
+		for (int i = 0; i < listeners.length; i++) {
+			((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
+		}
+	}
 	
 	/**
 	 * Perform procedures to interface with the native library. These procedures 

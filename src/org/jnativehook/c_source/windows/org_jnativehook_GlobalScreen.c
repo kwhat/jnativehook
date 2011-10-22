@@ -313,6 +313,12 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#ifdef DEBUG
 				printf ("Native: MsgLoop - WM_MOUSEWHEEL (Unimplemented)\n");
 			#endif
+
+			//Delta HIWORD(mshook->mouseData)
+			//A positive value indicates that the wheel was rotated forward, away from the user; a negative
+			//value indicates that the wheel was rotated backward, toward the user. One wheel click is
+			//defined as WHEEL_DELTA, which is 120.
+
 		break;
 
 		default:

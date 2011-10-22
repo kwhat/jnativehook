@@ -32,22 +32,22 @@ import org.jnativehook.NativeInputEvent;
  * 		<ul>
  * 			<li>a mouse button is pressed</li>
  * 			<li>a mouse button is released</li>
- * 			<li><s>the mouse wheel was moved</s></li>
+ * 			<li>the mouse wheel was moved</li>
  * 		</ul>
  * 	</li>
  * 	<li>
  * 		Mouse Motion Events
  * 		<ul>
  * 			<li>the mouse is moved
- * 			<li><s>the mouse is dragged</s></li>
+ * 			<li>the mouse is dragged</li>
  * 		</ul>
  * 	</li>
  * </ul>
  * <p/>
  * 
- * A NativeMouseEvent object is passed to every <code>NativeMouseListener</code> 
- * object which is registered to receive mouse events using the  
- * {@link GlobalScreen#addNativeMouseListener} method. The  
+ * A <code>NativeMouseEvent</code> object is passed to every 
+ * <code>NativeMouseListener</code> object which is registered to receive mouse 
+ * events using the {@link GlobalScreen#addNativeMouseListener} method. The  
  * <code>GlobalScreen</code> object then dispatches a 
  * <code>NativeMouseEvent</code> to each listener.
  * <p/>

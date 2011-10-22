@@ -21,34 +21,15 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
  
 /**
- * An event which indicates that a mouse action occurred on the system.  
+ * An event which indicates that the mouse wheel was rotated on the system.
  * This event is not limited to a particular component's scope or visibility.
  * <p/>
  * 
- * This low-level event is generated natively for:
- * <ul>
- * 	<li>
- * 		Mouse Events
- * 		<ul>
- * 			<li>a mouse button is pressed</li>
- * 			<li>a mouse button is released</li>
- * 			<li><s>the mouse wheel was moved</s></li>
- * 		</ul>
- * 	</li>
- * 	<li>
- * 		Mouse Motion Events
- * 		<ul>
- * 			<li>the mouse is moved
- * 			<li><s>the mouse is dragged</s></li>
- * 		</ul>
- * 	</li>
- * </ul>
- * <p/>
- * 
- * A NativeMouseEvent object is passed to every <code>NativeMouseListener</code> 
- * object which is registered to receive mouse events using the  
- * {@link GlobalScreen#addNativeMouseListener} method. The GlobalScreen 
- * object then dispatches a NativeMouseEvent to each listener.
+ * A <code>NativeMouseWheelEvent</code> object is passed to every 
+ * <code>NativeMouseWheelListener</code> object which is registered to receive 
+ * mouse wheel events using the {@link GlobalScreen#addNativeMouseWheelListener}  
+ * method. The <code>GlobalScreen</code> object then dispatches a 
+ * <code>NativeMouseWheelEvent</code> to each listener.
  * <p/>
  * 
  * A <code>NativeMouseEvent</code> object is also passed to every 
@@ -58,60 +39,70 @@ import org.jnativehook.NativeInputEvent;
  * then dispatches a NativeMouseEvent to each listener. 
  * <p/>
  * 
- * When a mouse button is clicked, events are generated and sent to the 
- * registered <code>NativeMouseListeners</code>. The state of modifiers can be 
- * retrieved using {@link NativeInputEvent#getModifiers}. All modifiers returned 
- * by {@link NativeInputEvent#getModifiers} reflect the current state of all 
- * modifiers and buttons.
+ * FIXME - Next paragraph needs some work.
+ * Platforms offer customization of the amount of scrolling that should take 
+ * place when the mouse wheel is moved. The two most common settings are to 
+ * scroll a certain number of "units" (commonly lines of text in a text-based 
+ * component) or an entire "block" (similar to page-up/page-down). The 
+ * <code>NativeMouseWheelEvent</code> offers methods for conforming to the 
+ * underlying platform settings. These platform settings can be changed at any 
+ * time by the user. <code>NativeMouseWheelEvents</code> reflect the most recent 
+ * settings.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.1
  * 
  * @see GlobalScreen
- * @see NativeMouseListener
- * @see NativeMouseMotionListener
+ * @see NativeMouseWheelListener
  */
 public class NativeMouseWheelEvent extends NativeMouseEvent {
 	/** The Constant serialVersionUID. */
 	
 	
-	/**
-	 * The native mouse event's x pointer position.
-	 * 
-	 * @see #getX()
+	/** 
+	 * Constant representing scrolling by "units" (like scrolling with the 
+	 * arrow keys).
 	 */
-	private int x;
-	
-	/**
-	 * The native mouse event's y pointer position.
-	 * 
-	 * @see #getY()
-	 */
-	private int y;
-	
-	/**
-	 * Indicates which, if any, of the mouse buttons has changed state.
-	 *
-	 * The only legal values are the following constants:
-	 * <code>NOBUTTON</code>,
-	 * <code>BUTTON1</code>,
-	 * <code>BUTTON2</code>,
-	 * <code>BUTTON3</code>,
-	 * <code>BUTTON4</code> or
-	 * <code>BUTTON5</code>
-	 */
-	private int button;
-	
-	
-	/** Indicates no mouse buttons; used by getButton(). */
 	public static final int	WHEEL_UNIT_SCROLL	= 0;
 	
-	/** Indicates mouse button #1; used by getButton(). */
+	/** 
+	 * Constant representing scrolling by a "block" (like scrolling with 
+	 * page-up, page-down keys). 
+	 */
 	public static final int	WHEEL_BLOCK_SCROLL	= 1;
 	
 	
+    /**
+     * Only valid for scrollType WHEEL_UNIT_SCROLL. Indicates number of units 
+     * that should be scrolled per click of mouse wheel rotation, based on 
+     * platform settings.
+     *
+     * @see #getScrollAmount
+     * @see #getScrollType
+     */
+	private int scrollAmount;
+	
+    /**
+     * Indicates what sort of scrolling should take place in response to this
+     * event, based on platform settings.  Legal values are:
+     * <ul>
+     * <li> WHEEL_UNIT_SCROLL
+     * <li> WHEEL_BLOCK_SCROLL
+     * </ul>
+     *
+     * @see #getScrollType
+     */
+	private int scrollType;
+	
+    /**
+     * Indicates how far the mouse wheel was rotated.
+     *
+     * @see #getWheelRotation
+     */
+	private int wheelRotation;
+	
 	/**
-	 * Instantiates a new <code>NativeMouseEvent</code> object.
+	 * Instantiates a new <code>NativeMouseWheelEvent</code> object.
 	 *
 	 * @param id The type of event.
 	 * @param when a long integer that gives the time the event occurred
@@ -122,15 +113,19 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * <code>InputEvent</code> modifiers.
 	 * @param x The x coordinate of the native pointer.
 	 * @param y The y coordinate of the native pointer.
-	 * @param button The mouse buttons that has changed state. NOBUTTON, 
-	 * BUTTON1, BUTTON2, BUTTON3, BUTTON5 or BUTTON5.
+	 * 
+     * @param scrollType The type of scrolling which should take place in 
+     * response to this event;  valid values are <code>WHEEL_UNIT_SCROLL</code> 
+     * and <code>WHEEL_BLOCK_SCROLL</code>.
+     * @param scrollAmount For scrollType <code>WHEEL_UNIT_SCROLL</code>, the 
+     * number of units to be scrolled.
+     * @param wheelRotation The amount that the mouse wheel was rotated (the
+     * number of "clicks")
+     *
+     * @see NativeMouseEvent#NativeMouseEvent()
 	 */
-	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int button) {
+	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int scrollType, int scrollAmount, int wheelRotation) {
 		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, );
-		
-		this.x = x;
-		this.y = y;
-		this.button = button;
 	}
 
 	/**
@@ -141,8 +136,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * @param modifiers a modifier mask describing the modifier keys and mouse 
 	 * buttons active for the event. 
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are 
-	 * not compatible with the extended _DOWN_MASK or the old _MASK 
-	 * <code>InputEvent</code> modifiers.
+	 * not compatible with the extended <code>_DOWN_MASK</code> or the old 
+	 * <code>_MASK NativeInputEvent</code> modifiers.
 	 * @param x The x coordinate of the native pointer.
 	 * @param y The y coordinate of the native pointer.
 	 */
@@ -150,39 +145,58 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 		this(id, when, modifiers, x, y, NOBUTTON);
 	}
 
-	/**
-	 * Returns which, if any, of the mouse buttons has changed state.
-	 *
-	 * @return one of the following constants:
-	 * <code>NOBUTTON</code>,
-	 * <code>BUTTON1</code>,
-	 * <code>BUTTON2</code>,
-	 * <code>BUTTON3</code>,
-	 * <code>BUTTON4</code> or
-	 * <code>BUTTON5</code>
-	 */
-	public int getButton() {
-		return button;
+	
+    /**
+     * Returns the number of units that should be scrolled per
+     * click of mouse wheel rotation.
+     * Only valid if <code>getScrollType</code> returns
+     * <code>NativeMouseWheelEvent.WHEEL_UNIT_SCROLL</code>
+     *
+     * @return number of units to scroll, or an undefined value if
+     *  <code>getScrollType</code> returns
+     *  <code>NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL</code>
+     * @see #getScrollType
+     */
+	public int getScrollAmount() {
+		return scrollAmount;
+	}
+	
+    /**
+     * Returns the type of scrolling that should take place in response to this
+     * event.  This is determined by the native platform.  Legal values are:
+     * <ul>
+     * <li> MouseWheelEvent.WHEEL_UNIT_SCROLL
+     * <li> MouseWheelEvent.WHEEL_BLOCK_SCROLL
+     * </ul>
+     *
+     * @return either NativeMouseWheelEvent.WHEEL_UNIT_SCROLL or
+     *  NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL, depending on the configuration of
+     *  the native platform.
+     * @see java.awt.Adjustable#getUnitIncrement
+     * @see java.awt.Adjustable#getBlockIncrement
+     * @see javax.swing.Scrollable#getScrollableUnitIncrement
+     * @see javax.swing.Scrollable#getScrollableBlockIncrement
+     */
+	public int getScrollType() {
+		return scrollType;
+	}
+	
+	
+    /**
+     * Returns the number of "clicks" the mouse wheel was rotated.
+     *
+     * @return negative values if the mouse wheel was rotated up/away from
+     * the user, and positive values if the mouse wheel was rotated down/
+     * towards the user.
+     */
+	public int getWheelRotation() {
+		return wheelRotation;
 	}
 
-	/**
-	 * Returns the x coordinate of the native pointer.
-	 *
-	 * @return x an integer indicating horizontal position of the native pointer
-	 */
-	public int getX() {
-		return x;
-	}
 	
-	/**
-	 * Returns the y coordinate of the native pointer.
-	 *
-	 * @return y an integer indicating horizontal position of the native pointer
-	 */
-	public int getY() {
-		return y;
-	}
 	
+	
+
 	/**
 	 * Returns a parameter string identifying the native event.
 	 * This method is useful for event-logging and debugging.
@@ -190,51 +204,28 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * @return A string identifying the native event and its attributes.
 	 */
 	public String  paramString() {
-		StringBuilder param = new StringBuilder(255); 
+		StringBuilder param = new StringBuilder(super.paramString());
+		param.append(",scrollType=");
 		
-		switch(getID()) {
-			case NATIVE_MOUSE_PRESSED:
-				 param.append("NATIVE_MOUSE_PRESSED");
+		switch(getScrollType()) {
+			case WHEEL_UNIT_SCROLL:
+				param.append("WHEEL_UNIT_SCROLL");
 			break;
 			
-			case NATIVE_MOUSE_RELEASED:
-				param.append("NATIVE_MOUSE_RELEASED");
-			break;
-			
-			case NATIVE_MOUSE_MOVED:
-				param.append("NATIVE_MOUSE_MOVED");
-			break;
-			
-			case NATIVE_MOUSE_DRAGGED:
-				param.append("NATIVE_MOUSE_DRAGGED");
-			break;
-			
-			case NATIVE_MOUSE_WHEEL:
-				param.append("NATIVE_MOUSE_WHEEL");
+			case WHEEL_BLOCK_SCROLL:
+				param.append("WHEEL_BLOCK_SCROLL");
 			break;
 			
 			default:
-				param.append("unknown type");
+				param.append("unknown scroll type");
 			break;
 		}
-		param.append(',');
 		
-		param.append('(');
-		param.append(x);
-		param.append(',');
-		param.append(y);
-		param.append(')');
-		param.append(',');
+		param.append(",scrollAmount=");
+		param.append(getScrollAmount());
 		
-		
-		param.append("button=");
-		param.append(button);
-		
-		if (getModifiers() != 0) {
-			param.append(',');
-			param.append("modifiers=");
-			param.append(getModifiersText(getModifiers()));
-		}
+		param.append(",wheelRotation=");
+		param.append(getWheelRotation());
 		
 		return param.toString();
 	}
