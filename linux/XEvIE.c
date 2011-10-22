@@ -30,13 +30,13 @@ int main(int argc, const char * argv[]) {
 	display = XOpenDisplay(NULL);
 	if(display == NULL) {
 		printf("Error: Could not open display!\n");
-		return 1;
+		return EXIT_FAILURE;
 	}
 	
 	//Enable XEvIE on the default display.
 	if(!XevieStart(display)) {
 		printf("XevieStart() failure!\n");
-		return 1;
+		return EXIT_FAILURE;
 	}
 	
 	//Select the input masks we would like to listen for.
@@ -87,5 +87,5 @@ int main(int argc, const char * argv[]) {
 	//Close the connection to the selected X11 display.
 	XCloseDisplay(display);
 
-	return 0;
+	return EXIT_SUCCESS;
 }

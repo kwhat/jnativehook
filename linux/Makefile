@@ -7,7 +7,7 @@ PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord
 all: $(PROGRAMS)
 
 XEvIE: XEvIE.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -lX11 -lXevie $< -o $@
+	$(CC) $(CFLAGS) -lX11 -lXevie $(LDFLAGS) $< -o $@
 
 XGrabButton: XGrabButton.c
 	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) $< -o $@

@@ -16,12 +16,11 @@
  */
 
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
 #include <X11/Xlib.h>
 
 int main(int argc, const char * argv[]) {
 	Display * display;
-	XEvent xev;
 
 	//Try to attach to the default X11 display.
 	display = XOpenDisplay(NULL);
@@ -30,28 +29,48 @@ int main(int argc, const char * argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	//Get the default global window to listen on for the selected X11 display.
-	Window grabWin = DefaultRootWindow(display);
-	XAllowEvents(display, AsyncBoth, CurrentTime);
-	
-	//Grab pointer events on the selected X11 display.
-	XGrabPointer(display, grabWin, true, PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
-
-	int i = 0;
-	for(i = 0; i < 10; i++) {
-		//Block waiting for the next event.
-		XNextEvent(display, &xev);
-
-		switch (xev.type) {
-			case MotionNotify:
-				printf("Motion Notify - %i, %i\n", xev.xmotion.x_root, xev.xmotion.y_root);
-			break;
-		}
-
+	int min_keycode, max_keycode, keysyms_per_keycode, i;
+	XDisplayKeycodes(display, &min_keycode, &max_keycode);
+	KeySym * keyboard_map = XGetKeyboardMapping(display, min_keycode, (max_keycode - min_keycode + 1), &keysyms_per_keycode);
+	if (!keyboard_map) {
+		printf("Unable to get keyboard mapping table.\n");
+		return EXIT_FAILURE;
 	}
 
-	//Ungrab pointer events on the selected X11 display.
-	XUngrabPointer(display, CurrentTime);
+	for (i = min_keycode; i <= max_keycode; i++) {
+		int  j, max;
+
+		printf("keycode %3d =", i);
+
+		max = keysyms_per_keycode - 1;
+		while ((max >= 0) && (keyboard_map[max] == NoSymbol)) {
+			max--;
+		}
+
+		for (j = 0; j <= max; j++) {
+			register KeySym ks = keyboard_map[j];
+			char *s;
+
+			if (ks != NoSymbol) {
+				s = XKeysymToString(ks);
+			}
+			else {
+				s = "NoSymbol";
+			}
+
+			if (s) {
+				printf(" %s", s);
+			}
+			else {
+				printf(" 0x%04x", (unsigned int) ks);
+			}
+		}
+		//keyboard_map += keysyms_per_keycode;
+		printf("\n");
+	}
+
+	//
+    XFree(keyboard_map);
 
 	//Close the connection to the selected X11 display.
 	XCloseDisplay(display);

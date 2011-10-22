@@ -89,7 +89,7 @@ int main(int argc, const char * argv[]) {
 	disp_data = XOpenDisplay(NULL);
 	if(disp_hook == NULL || disp_data == NULL) {
 		printf("Error: Could not open display!\n");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	//Setup XRecord range
@@ -97,7 +97,7 @@ int main(int argc, const char * argv[]) {
 	XRecordRange * range = XRecordAllocRange();
 	if (range == NULL) {
 		printf("Error: Could not allocate XRecordRange!");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	//Create XRecord Context
@@ -107,7 +107,7 @@ int main(int argc, const char * argv[]) {
 	XFree(range);
 	if (context == 0) {
 		printf("Error: Could not create XRecordContext!");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	//Start XRecord process
@@ -124,5 +124,5 @@ int main(int argc, const char * argv[]) {
 	XRecordFreeContext(disp_hook, context);
 	XCloseDisplay(disp_hook);
 
-	return 0;
+	return EXIT_SUCCESS;
 }

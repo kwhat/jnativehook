@@ -16,12 +16,11 @@
  */
 
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
 #include <X11/Xlib.h>
 
 int main(int argc, const char * argv[]) {
 	Display * display;
-	XEvent xev;
 
 	//Try to attach to the default X11 display.
 	display = XOpenDisplay(NULL);
@@ -30,28 +29,21 @@ int main(int argc, const char * argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	//Get the default global window to listen on for the selected X11 display.
-	Window grabWin = DefaultRootWindow(display);
-	XAllowEvents(display, AsyncBoth, CurrentTime);
-	
-	//Grab pointer events on the selected X11 display.
-	XGrabPointer(display, grabWin, true, PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+	int count = 256, i;
+    unsigned char * pointer_map = malloc(sizeof(unsigned char) * count);
 
-	int i = 0;
-	for(i = 0; i < 10; i++) {
-		//Block waiting for the next event.
-		XNextEvent(display, &xev);
+    count = XGetPointerMapping(display, pointer_map, count);
+    pointer_map = realloc(pointer_map, sizeof(unsigned char) * count);
 
-		switch (xev.type) {
-			case MotionNotify:
-				printf("Motion Notify - %i, %i\n", xev.xmotion.x_root, xev.xmotion.y_root);
-			break;
-		}
+    printf("There are %d pointer buttons defined.\n\n", count);
+    printf("    Physical        Button\n");
+    printf("     Button          Code\n");
+    for (i = 0; i < count; i++) {
+		printf("      %3u            %3u\n", i + 1, (unsigned int) pointer_map[i]);
+    }
+	printf("\n");
 
-	}
-
-	//Ungrab pointer events on the selected X11 display.
-	XUngrabPointer(display, CurrentTime);
+    free(pointer_map);
 
 	//Close the connection to the selected X11 display.
 	XCloseDisplay(display);
