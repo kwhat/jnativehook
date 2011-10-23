@@ -37,12 +37,12 @@ int main(int argc, const char * argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	for (i = min_keycode; i <= max_keycode; i++) {
-		int  j, max;
+	KeySym * map_ptr = keyboard_map;
 
+	for (i = min_keycode; i <= max_keycode; i++) {
 		printf("keycode %3d =", i);
 
-		max = keysyms_per_keycode - 1;
+		int  j, max = keysyms_per_keycode - 1;
 		while ((max >= 0) && (keyboard_map[max] == NoSymbol)) {
 			max--;
 		}
@@ -65,12 +65,11 @@ int main(int argc, const char * argv[]) {
 				printf(" 0x%04x", (unsigned int) ks);
 			}
 		}
-		//keyboard_map += keysyms_per_keycode;
+		keyboard_map += keysyms_per_keycode;
 		printf("\n");
 	}
 
-	//
-    XFree(keyboard_map);
+    XFree(map_ptr);
 
 	//Close the connection to the selected X11 display.
 	XCloseDisplay(display);
