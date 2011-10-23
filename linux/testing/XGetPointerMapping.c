@@ -30,20 +30,20 @@ int main(int argc, const char * argv[]) {
 	}
 
 	int count = 256, i;
-    unsigned char * pointer_map = malloc(sizeof(unsigned char) * count);
+	unsigned char * pointer_map = malloc(sizeof(unsigned char) * count);
 
-    count = XGetPointerMapping(display, pointer_map, count);
-    pointer_map = realloc(pointer_map, sizeof(unsigned char) * count);
+	count = XGetPointerMapping(display, pointer_map, count);
+	pointer_map = realloc(pointer_map, sizeof(unsigned char) * count);
 
-    printf("There are %d pointer buttons defined.\n\n", count);
-    printf("    Physical        Button\n");
-    printf("     Button          Code\n");
-    for (i = 0; i < count; i++) {
+	printf("There are %d pointer buttons defined.\n\n", count);
+	printf("    Physical        Button\n");
+	printf("     Button          Code\n");
+	for (i = 0; i < count; i++) {
 		printf("      %3u            %3u\n", i + 1, (unsigned int) pointer_map[i]);
-    }
+	}
 	printf("\n");
 
-    free(pointer_map);
+	free(pointer_map);
 
 	//Close the connection to the selected X11 display.
 	XCloseDisplay(display);
