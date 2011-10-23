@@ -306,13 +306,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 jint NativeToJButton(unsigned int button) {
 	switch (button) {
-		case XK_Button1:									return JBUTTON1;
-		case XK_Button2:									return JBUTTON3;
-		case XK_Button3:									return JBUTTON2;
-		case XK_Button4:									return JBUTTON4;
-		case XK_Button5:									return JBUTTON5;
+		case XK_Button1:								return JBUTTON1;
+		case XK_Button2:								return JBUTTON3;
+		case XK_Button3:								return JBUTTON2;
+		case XK_Button4:								return JBUTTON4;
+		case XK_Button5:								return JBUTTON5;
 		default:
-		case XK_NoButton:									return JNOBUTTON;
+		case XK_NoButton:								return JNOBUTTON;
 	}
 }
 

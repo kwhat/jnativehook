@@ -115,22 +115,7 @@ void throwException(char * classname, char * message) {
 	}
 }
 
-//This seems to be catching an:
-//	8 - BadMatch (invalid parameter attributes)
-//This comes from an unknown src or problem.
-int xErrorToException(Display * dpy, XErrorEvent * e) {
-	char message[255];
-	XGetErrorText(dpy, e->error_code, message, sizeof message);
-
-	#ifdef DEBUG
-		printf("Native: XError %i - %s.\n", e->error_code, message);
-	#endif
-
-	throwException("org/jnativehook/NativeHookException", message);
-
-	return 0;
-}
-
+//Convert the XEvent modifier mask to a Java modifier mask.
 jint doModifierConvert(int event_mask) {
 	jint modifiers = 0;
 
@@ -242,7 +227,7 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 			case MotionNotify:
 				#ifdef DEBUG
-					printf ("Native: MsgLoop - Motion Notified (%i,%i)\n", event_root_x, event_root_y);
+					printf ("Native: MsgLoop - Motion Notified (%i, %i)\n", event_root_x, event_root_y);
 				#endif
 
 				modifiers = doModifierConvert(event_mask);

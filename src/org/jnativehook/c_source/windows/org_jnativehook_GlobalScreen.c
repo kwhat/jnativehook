@@ -311,15 +311,82 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		case WM_MOUSEWHEEL:
 			#ifdef DEBUG
-				printf ("Native: MsgLoop - WM_MOUSEWHEEL (Unimplemented)\n");
+				printf ("Native: MsgLoop - WM_MOUSEWHEEL (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
 			#endif
+
+			modifiers = getModifiers();
 
 			//Delta HIWORD(mshook->mouseData)
 			//A positive value indicates that the wheel was rotated forward, away from the user; a negative
 			//value indicates that the wheel was rotated backward, toward the user. One wheel click is
 			//defined as WHEEL_DELTA, which is 120.
 
-		break;
+
+			/*
+UINT GetLinesToScrollUserSetting() {
+    UINT userSetting;
+
+    // Retrieve the lines-to-scroll user setting.
+    BOOL success = SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &userSetting, 0);
+
+    //Use a default value if the API failed.
+    if (success == FALSE) {
+        userSetting = DEFAULT_LINES_TO_SCROLL;
+    }
+
+    return userSetting;
+}
+
+UINT GetCharsToScrollUserSetting() {
+    UINT userSetting;
+
+    // Retrieve the characters-to-scroll user setting.
+    BOOL success = SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &userSetting, 0);
+
+    // If SystemParametersInfo fails assign the correct value to
+    // user setting based on the OS version.
+    if(success == FALSE) {
+        //Get the OS version.
+        OSVERSIONINFO version = { 0 };
+        version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&version);
+
+        if (version.dwPlatformId == VER_PLATFORM_WIN32_NT && version.dwMajorVersion < 6 ) {
+            // On Windows 2000 and Windows XP set the value to 1 in
+            // order to work correctly with IntelliType Pro and
+            // IntelliPoint emulating the WM_MOUSEWHEEL message.
+            userSetting = DEFAULT_CHARS_TO_SCROLL_WITH_EMULATION;
+        }
+        else {
+            // On Longhorn and above use the default value of 3.
+            userSetting = DEFAULT_CHARS_TO_SCROLL;
+        }
+    }
+
+    return userSetting;
+}
+
+
+//
+// Handle the WM_SETTINGCHANGE message and cache changes to
+// SPI_GETWHEELSCROLLLINES and SPI_GETWHEELSCROLLCHARS which indicate
+// the amount to scroll when a scrolling message is handled.
+//
+LRESULT OnSettingChange(UINT setting) {
+    if (setting == SPI_SETWHEELSCROLLLINES) {
+        linesToScrollUserSetting = GetLinesToScrollUserSetting();
+    }
+    else if (setting == SPI_SETWHEELSCROLLCHARS) {
+        charsToScrollUserSetting = GetCharsToScrollUserSetting();
+    }
+
+    return 0;
+}
+		// Settings change message notifies us when change is made
+        // through the SystemParametersInfo() API
+        case WM_SETTINGCHANGE:
+            return OnSettingChange( (UINT)wParam );
+			 */
 
 		default:
 			#ifdef DEBUG
@@ -407,7 +474,8 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	//Keep running until we get a WM_QUIT request.
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0)) {
-		//TODO Look into if we need to keep doing this when using LowLevel Mouse/Keyboard Proc
+		//FIXME This whole loop needs to go away in favor of blocking the thread
+		//using WaitForSingleObject.
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}

@@ -304,7 +304,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 		case kCGEventMouseMoved:
 			event_point = CGEventGetLocation(event);
 			#ifdef DEBUG
-				printf ("Native: eventHandlerCallback - Motion Notified (%f,%f)\n", event_point.x, event_point.y);
+				printf ("Native: eventHandlerCallback - Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 			#endif
 
 			modifiers = doModifierConvert(event_mask);
@@ -318,6 +318,13 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			#ifdef DEBUG
 				printf ("Native: eventHandlerCallback - Mouse Wheel Moved (Unimplemented)\n");
 			#endif
+
+			/*
+			delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis#);
+
+			kCGScrollWheelEventDeltaAxis1 = 11,
+			kCGScrollWheelEventDeltaAxis2 = 12,
+			*/
 		break;
 
 
