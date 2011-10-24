@@ -29,6 +29,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseException;
 import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
@@ -228,6 +229,49 @@ public class GlobalScreen {
 	 * @throws NativeKeyException the native key exception
 	 */
 	public native long getAutoRepeatDelay() throws NativeKeyException;
+	
+	
+	/**
+	 * Gets the native mouse acceleration multiplier.
+	 *
+	 * @return the speed 
+	 * @throws NativeMouseException the native mouse exception
+	 * 
+	 * @since 1.1
+	 */
+	public native long getPointerAccelerationMultiplier() throws NativeMouseException;
+	
+	/**
+	 * Gets the native mouse acceleration threshold.
+	 *
+	 * @return the speed 
+	 * @throws NativeMouseException the native mouse exception
+	 * 
+	 * @since 1.1
+	 */
+	public native long getPointerAccelerationThreshold() throws NativeMouseException;
+	
+	
+	/**
+	 * Gets the native mouse sensitivity.
+	 *
+	 * @return the speed 
+	 * @throws NativeMouseException the native mouse exception
+	 * 
+	 * @since 1.1
+	 */
+	public native long getPointerSensitivity() throws NativeMouseException;
+	
+	/**
+	 * Gets the native mouse double click time in milliseconds.
+	 *
+	 * @return the speed 
+	 * @throws NativeMouseException the native mouse exception
+	 * 
+	 * @since 1.1
+	 */
+	public native long getDoubleClickTime() throws NativeMouseException;
+	
 	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is 

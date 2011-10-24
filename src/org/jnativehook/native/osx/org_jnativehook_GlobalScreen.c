@@ -142,7 +142,7 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 	jobject objKeyEvent, objMouseEvent;
 
 	// get the event class
-	switch (CGEventGetType(event)) {
+	switch (type) {
 		case kCGEventKeyDown:
 			keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			#ifdef DEBUG
@@ -327,6 +327,9 @@ CGEventRef eventHandlerCallback(CGEventTapProxy proxy, CGEventType type, CGEvent
 			*/
 		break;
 
+		case kCGEventTapDisabledByTimeout:
+		case kCGEventTapDisabledByUserInput:
+			//TODO Should manually stop the thread at this point.
 
 		default:
 			#ifdef DEBUG

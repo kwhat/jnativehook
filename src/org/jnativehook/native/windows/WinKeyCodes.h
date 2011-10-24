@@ -42,3 +42,4 @@
 void setModifierMask(unsigned short mod);
 void unsetModifierMask(unsigned short mod);
 bool isModifierMask(unsigned short mod);
+jint getModifiers();

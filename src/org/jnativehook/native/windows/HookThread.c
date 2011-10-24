@@ -15,113 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef UNUSED
-#elif defined(__GNUC__)
-	#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-	#define UNUSED(x) /*@unused@*/ x
-#else
-	#define UNUSED(x) x
-#endif
+//Thread and hook handles.
+static HANDLE hEvent;
+static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
-#include <windows.h>
-//#include <WinDef.h> //??? DWORD for the MSDLLSTRUCT
-
-#ifdef DEBUG
-	#include <stdio.h>
-	#include <unistd.h>
-#endif
-
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-
-#include <jni.h>
-
-#include "include/org_jnativehook_GlobalScreen.h"
-#include "include/JConvertToNative.h"
-#include "WinKeyCodes.h"
-
-//Instance Variables
-HHOOK handleKeyboardHook = NULL;
-HHOOK handleMouseHook = NULL;
-HINSTANCE hInst = NULL;
-
-//JVM and Screen globals.
-JavaVM * jvm = NULL;
+//GlobalScreen object and dispatch id.
 jobject objGlobalScreen = NULL;
 jmethodID idDispatchEvent;
 
 //Java callback classes and method id's
-jclass clsKeyEvent, clsMouseEvent;
-jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
+static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
+static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
 
-//Thread information so we can clean up.
-HANDLE hookThreadHandle = NULL;
-LPDWORD hookThreadId = NULL;
-
-void jniFatalError(char * message) {
-	//Attach to the currently running jvm
-	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
-	#ifdef DEBUG
-		printf("Native: Fatal Error - %s\n", message);
-	#endif
-
-	(*env)->FatalError(env, message);
-	exit(1);
-}
-
-void throwException(char * classname, char * message) {
-	//Attach to the currently running jvm
-	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
-	//Locate our exception class
-	jclass clsException = (*env)->FindClass(env, classname);
-
-	if (clsException != NULL) {
-		#ifdef DEBUG
-			printf("Native: Exception - %s\n", message);
-		#endif
-
-		(*env)->ThrowNew(env, clsException, message);
-	}
-	else {
-		//Unable to find exception class, Terminate with error.
-		jniFatalError("Unable to locate exception class.");
-	}
-}
-
-jint getModifiers() {
-	jint modifiers = 0;
-
-	if (isModifierMask(MOD_LSHIFT) || isModifierMask(MOD_RSHIFT))
-		modifiers |= NativeToJModifier(MOD_SHIFT);
-
-	if (isModifierMask(MOD_LCONTROL) || isModifierMask(MOD_RCONTROL))
-		modifiers |= NativeToJModifier(MOD_CONTROL);
-
-	if (isModifierMask(MOD_LALT) || isModifierMask(MOD_RALT))
-		modifiers |= NativeToJModifier(MOD_ALT);
-
-	if (isModifierMask(MOD_LWIN) || isModifierMask(MOD_RWIN))
-		modifiers |= NativeToJModifier(MOD_WIN);
-
-	if (isModifierMask(MOD_LBUTTON))	modifiers |= NativeToJModifier(MOD_LBUTTON);
-	if (isModifierMask(MOD_RBUTTON))	modifiers |= NativeToJModifier(MOD_RBUTTON);
-	if (isModifierMask(MOD_MBUTTON))	modifiers |= NativeToJModifier(MOD_MBUTTON);
-	if (isModifierMask(MOD_XBUTTON1))	modifiers |= NativeToJModifier(MOD_XBUTTON1);
-	if (isModifierMask(MOD_XBUTTON2))	modifiers |= NativeToJModifier(MOD_XBUTTON2);
-
-	return modifiers;
-}
-
-LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//We should already be attached to the JVM at this point.  This should only
 	//be a formality that causes a NOOP.
 	JNIEnv * env = NULL;
@@ -198,12 +104,13 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	return CallNextHookEx(handleKeyboardHook, nCode, wParam, lParam);
 }
 
-LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//We should already be attached to the JVM at this point.  This should only
 	//be a formality that causes a NOOP.
 	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == 0) {
 
+	}
 	//MS Mouse Event Struct Data
 	MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
 
@@ -323,6 +230,17 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 
 			/*
+
+if (platformLines == WHEEL_PAGESCROLL) {
+	scrollType = java_awt_event_MouseWheelEvent_WHEEL_BLOCK_SCROLL;
+	scrollLines = 1;
+}
+else {
+	scrollType = java_awt_event_MouseWheelEvent_WHEEL_UNIT_SCROLL;
+	scrollLines = platformLines;
+}
+
+
 UINT GetLinesToScrollUserSetting() {
     UINT userSetting;
 
@@ -406,9 +324,10 @@ LRESULT OnSettingChange(UINT setting) {
 	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
 
-DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
+static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
+	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != 0) {
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
 		#ifdef DEBUG
 			printf("Native: AttachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
 		#endif
@@ -439,6 +358,13 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 	idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 	idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
 
+	//Class and Constructor for the NativeMouseWheelEvent Object
+	jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
+	clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
+	//FIXME need to change the constructor signature
+	//idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+
+
 	//Setup the native hooks and their callbacks.
 	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
@@ -468,87 +394,51 @@ DWORD WINAPI MsgLoop(LPVOID UNUSED(lpParameter)) {
 		#endif
 
 		throwException("org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
-		return 1; //Naturally exit so JNI exception is thrown.
+		return EXIT_FAILURE; //Naturally exit so JNI exception is thrown.
 	}
 
+	//Block until the thread needs to exit.
+	WaitForSingleObject(hEvent, INFINITE);
+
 	//Keep running until we get a WM_QUIT request.
+	/*
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0)) {
-		//FIXME This whole loop needs to go away in favor of blocking the thread
+
 		//using WaitForSingleObject.
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
+	 */
 
 	//Make sure we clean up the global objects.
 	(*env)->DeleteGlobalRef(env, clsKeyEvent);
 	(*env)->DeleteGlobalRef(env, clsMouseEvent);
+	(*env)->DeleteGlobalRef(env, clsMouseWheelEvent);
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
+	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
+		#ifdef DEBUG
+			printf("Native: DetachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
+		#endif
+
+		throwException("org/jnativehook/NativeHookException", "Failed to detach to the current Java thread");
+		return EXIT_FAILURE; //Naturally exit so JNI exception is thrown.
+	}
 
 	#ifdef DEBUG
 		printf("Native: MsgLoop() stop successful.\n");
 	#endif
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	long int wkb_rate;
-	if (! SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &wkb_rate, 0) ) {
-		#ifdef DEBUG
-		printf("Native: SPI_GETKEYBOARDSPEED failure\n");
-		#endif
-
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturally exit so JNI exception is thrown.
-	}
-
-	#ifdef DEBUG
-		printf("Native: SPI_GETKEYBOARDSPEED successful (rate: %ldd)\n", wkb_rate);
-	#endif
-	return (jlong) wkb_rate;
-}
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	long int wkb_delay;
-	if (! SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &wkb_delay, 0) ) {
-		#ifdef DEBUG
-			printf("Native: SPI_GETKEYBOARDDELAY failure\n");
-		#endif
-
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturally exit so JNI exception is thrown.
-	}
-
-	#ifdef DEBUG
-		printf("Native: SPI_GETKEYBOARDDELAY successful (delay: %ldd)\n", wkb_delay);
-	#endif
-	return (jlong) wkb_delay;
-}
-
-//This is where java attaches to the native machine.  Its kind of like the java + native constructor.
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
-	//Grab the currently running virtual machine so we can attach to it in
-	//functions that are not called from java. ( I.E. MsgLoop )
-	jvm = vm;
-
-
-	JNIEnv * env = 0;
-	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
-	if (jni_ret == JNI_OK) {
-		jni_ret = JNI_VERSION_1_4;
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
-		#endif
-	}
-
+void StartNativeThread() {
 	LPTHREAD_START_ROUTINE lpStartAddress = &MsgLoop;
 	//LPVOID lpParameter = lpStartAddress;
 	//hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, CREATE_SUSPENDED, &hookThreadId );
 	hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, 0, hookThreadId );
-	if( hookThreadHandle == INVALID_HANDLE_VALUE ) {
+	if (hookThreadHandle == INVALID_HANDLE_VALUE) {
 		#ifdef DEBUG
 			printf("Native: MsgLoop() start failure.\n");
 		#endif
@@ -561,11 +451,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			printf("Native: MsgLoop() start successful.\n");
 		#endif
 	}
-
-	return jni_ret;
 }
 
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
+void StopNativeThread() {
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;
@@ -577,7 +465,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	}
 
 	//Try to exit the thread naturally.
-	PostQuitMessage(0);
+	SetEvent(hEvent);
 	WaitForSingleObject(hookThreadHandle, 250);
 
 	CloseHandle(hookThreadHandle);
@@ -589,28 +477,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 			printf("Native: HeapFree successful.\n");
 		#endif
 	}
-
-	#ifdef DEBUG
-		printf("Native: Thread terminated successful.\n");
-	#endif
 }
 
-BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
-	switch (reason) {
-		case DLL_PROCESS_ATTACH:
-			#ifdef DEBUG
-				printf("Native: DllMain - DLL Process Attach.\n");
-			#endif
+bool IsNativeThreadRunning() {
 
-			hInst = (HINSTANCE) _hInst; //GetModuleHandle(NULL)
-		break;
-
-		case DLL_PROCESS_DETACH:
-			#ifdef DEBUG
-				printf("Native: DllMain - DLL Process Detach.\n");
-			#endif
-		break;
-	}
-
-	return true;
 }

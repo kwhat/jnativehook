@@ -198,6 +198,14 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 				//FIXME Dirty hack to prevent scroll events.
 				//FIXME Button2 and 3 are reversed from other platforms.
+				/* This information is all static for X11, its up to the WM to
+				 * decide how to interpret the wheel events.
+				 *
+				Scroll type: WHEEL_UNIT_SCROLL
+				Scroll amount: 3 unit increments per notch
+				Units to scroll: 3 unit increments
+				Vertical unit increment: 15 pixels
+				 */
 				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 					jbutton = NativeToJButton(event_code);
 					modifiers = doModifierConvert(event_mask);
@@ -375,6 +383,34 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 	#endif
 	return (jlong) xkb_timeout;
 }
+
+
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	long int wkb_sensitivity;
+	if (! SystemParametersInfo(SPI_GETMOUSESPEED, 0, &wkb_sensitivity, 0) ) {
+		#ifdef DEBUG
+			printf("Native: SPI_GETMOUSESPEED failure\n");
+		#endif
+
+		throwException("org/jnativehook/keyboard/NativeMouseException", "Could not determine the mouse pointer sensitivity.");
+		return -1; //Naturally exit so JNI exception is thrown.
+	}
+
+	#ifdef DEBUG
+		printf("Native: SPI_GETMOUSESPEED successful (speed: %ldd)\n", wkb_sensitivity);
+	#endif
+	return (jlong) wkb_sensitivity;
+}
+
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	char * xkb_time = XGetDefault(XToolkit.getDisplay(), "*", "multiClickTime");
+
+	#ifdef DEBUG
+		printf("Native: GetDoubleClickTime() successful (time: %ldd)\n", wkb_time);
+	#endif
+	return (jlong) wkb_time;
+}
+
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
