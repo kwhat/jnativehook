@@ -15,95 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef UNUSED
-#elif defined(__GNUC__)
-	#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-	#define UNUSED(x) /*@unused@*/ x
-#else
-	#define UNUSED(x) x
-#endif
 
 #include <w32api.h>
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
 #include <windows.h>
-//#include <WinDef.h> //??? DWORD for the MSDLLSTRUCT
 
-#ifdef DEBUG
-	#include <stdio.h>
-	#include <unistd.h>
-#endif
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
-#include <jni.h>
-
-#include "include/org_jnativehook_GlobalScreen.h"
-#include "include/JConvertToNative.h"
+#include "JNativeHook.h"
+#include "JConvertToNative.h"
+#include "org_jnativehook_GlobalScreen.h"
 #include "WinKeyCodes.h"
 
-//Instance Variables
+//Global Variables
 HINSTANCE hInst = NULL;
 
-//JVM globals.
-JavaVM * jvm = NULL;
 
-
-
-
-//Thread information so we can clean up.
-HANDLE hookThreadHandle = NULL;
-LPDWORD hookThreadId = NULL;
-
-void jniFatalError(char * message) {
-	//Attach to the currently running jvm
-	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
-	#ifdef DEBUG
-		printf("Native: Fatal Error - %s\n", message);
-	#endif
-
-	(*env)->FatalError(env, message);
-	exit(1);
-}
-
-void throwException(char * classname, char * message) {
-	//Attach to the currently running jvm
-	JNIEnv * env = NULL;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
-	//Locate our exception class
-	jclass clsException = (*env)->FindClass(env, classname);
-
-	if (clsException != NULL) {
-		#ifdef DEBUG
-			printf("Native: Exception - %s\n", message);
-		#endif
-
-		(*env)->ThrowNew(env, clsException, message);
-	}
-	else {
-		//Unable to find exception class, Terminate with error.
-		jniFatalError("Unable to locate exception class.");
-	}
-}
-
-
-
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
 	long int wkb_rate;
 	if (! SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &wkb_rate, 0) ) {
 		#ifdef DEBUG
 		printf("Native: SPI_GETKEYBOARDSPEED failure\n");
 		#endif
 
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturally exit so JNI exception is thrown.
+		throwException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -112,15 +51,15 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 	return (jlong) wkb_rate;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
 	long int wkb_delay;
 	if (! SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &wkb_delay, 0) ) {
 		#ifdef DEBUG
 			printf("Native: SPI_GETKEYBOARDDELAY failure\n");
 		#endif
 
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturally exit so JNI exception is thrown.
+		throwException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -129,15 +68,56 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 	return (jlong) wkb_delay;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+// 0-Threshold X, 1-Threshold Y and 2-Speed
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(JNIEnv * env, jobject UNUSED(obj)) {
+	int wkb_mouse[3];
+	if (! SystemParametersInfo(SPI_GETMOUSE, 0, &wkb_mouse, 0) ) {
+		#ifdef DEBUG
+			printf("Native: SPI_GETMOUSE failure\n");
+		#endif
+
+		throwException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the mouse acceleration multiplier.");
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
+	}
+
+	#ifdef DEBUG
+		fprintf(stdout, "SPI_GETMOUSE successful (%d, %d, %d)\n", wkb_mouse[0], wkb_mouse[1], wkb_mouse[2]);
+	#endif
+
+	return (jlong) wkb_mouse[2];
+}
+
+// 0-Threshold X, 1-Threshold Y and 2-Speed
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(JNIEnv * env, jobject UNUSED(obj)) {
+	int wkb_mouse[3];
+	if (! SystemParametersInfo(SPI_GETMOUSE, 0, &wkb_mouse, 0) ) {
+		#ifdef DEBUG
+			printf("Native: SPI_GETMOUSE failure\n");
+		#endif
+
+		throwException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the mouse acceleration threshold.");
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
+	}
+
+	#ifdef DEBUG
+		fprintf(stdout, "SPI_GETMOUSE successful (%d, %d, %d)\n", wkb_mouse[0], wkb_mouse[1], wkb_mouse[2]);
+	#endif
+
+	//Average the x and y thresholds.
+	return (jlong) (wkb_mouse[0] + wkb_mouse[1]) / 2;
+}
+
+
+
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * env, jobject UNUSED(obj)) {
 	long int wkb_sensitivity;
 	if (! SystemParametersInfo(SPI_GETMOUSESPEED, 0, &wkb_sensitivity, 0) ) {
 		#ifdef DEBUG
 			printf("Native: SPI_GETMOUSESPEED failure\n");
 		#endif
 
-		throwException("org/jnativehook/keyboard/NativeMouseException", "Could not determine the mouse pointer sensitivity.");
-		return -1; //Naturally exit so JNI exception is thrown.
+		throwException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the mouse pointer sensitivity.");
+		return JNI_ERR; //Naturally exit so JNI exception is thrown.
 	}
 
 	#ifdef DEBUG
@@ -145,6 +125,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(
 	#endif
 	return (jlong) wkb_sensitivity;
 }
+
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	long int wkb_time = (long int) GetDoubleClickTime();
@@ -156,36 +137,67 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNI
 }
 
 
+
+
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Grab the currently running virtual machine so we can attach to it in
-	//functions that are not called from java. ( I.E. MsgLoop )
+	//functions that are not called from java. ( I.E. ThreadLoop )
 	jvm = vm;
-
-
 	JNIEnv * env = 0;
-	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), JNI_VERSION_1_4);
-	if (jni_ret == JNI_OK) {
-		jni_ret = JNI_VERSION_1_4;
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: JNI_VERSION_1_4 unavailable for use. (default: %X)\n", (unsigned int) jni_ret);
-		#endif
+
+	jint jni_version = JNI_VERSION_1_4;
+	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), jni_version);
+	switch (jni_ret) {
+		case JNI_EVERSION:
+			#ifdef DEBUG
+				fprintf(stderr, "JNI_VERSION_1_4 unavailable for use.\n");
+			#endif
+
+			jni_version = JNI_ERR;
+		break;
+
+		case JNI_EDETACHED:
+			//Not attached to the current thread.
+			if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
+				#ifdef DEBUG
+					fprintf(stderr, "Could not attach the current thread to the Java virtual machine.\n");
+				#endif
+
+				jni_version = JNI_ERR;
+			}
+		case JNI_OK:
+			#ifdef DEBUG
+				fprintf(stdout, "Successfully acquired a Java environment reference.\n");
+			#endif
+		break;
+
+		default:
+			#ifdef DEBUG
+				fprintf(stderr, "An unknown error occurred while acquiring a Java environment reference.\n");
+			#endif
+
+			jni_version = JNI_ERR;
+		break;
 	}
 
-	//FIXME Start the native thread.
-
-	return jni_ret;
+	return jni_version;
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
 	//FIXME Stop the native thread if its running.
 
+	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
+		#ifdef DEBUG
+			fprintf(stdout, "Could not dettach the current thread from the Java virtual machine.\n");
+		#endif
+	}
+
 	#ifdef DEBUG
 		printf("Native: Thread terminated successful.\n");
 	#endif
 }
+
 
 BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {

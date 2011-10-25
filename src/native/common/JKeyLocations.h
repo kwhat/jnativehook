@@ -15,15 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//TODO These should probably be pulled by JNI from the java class.
-//Reference: ${JAVA_HOME}/src.zip/java/awt/event/InputEvent.java
-#define JK_SHIFT_MASK			1
-#define JK_CTRL_MASK			2
-#define JK_META_MASK			4
-#define JK_ALT_MASK				8
+#ifndef _Included_JKeyLocations_h
+#define _Included_JKeyLocations_h
 
-#define JK_BUTTON1_MASK			16;
-#define JK_BUTTON2_MASK			32;
-#define JK_BUTTON3_MASK			64;
-#define JK_BUTTON4_MASK			128;
-#define JK_BUTTON5_MASK			256;
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
+#define JK_LOCATION_UNKNOWN			0
+#define JK_LOCATION_STANDARD		1
+#define JK_LOCATION_LEFT			2
+#define JK_LOCATION_RIGHT			3
+#define JK_LOCATION_NUMPAD			4
+
+#endif

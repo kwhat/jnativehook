@@ -18,8 +18,7 @@ package org.jnativehook.mouse;
 
 //Imports
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeInputEvent;
- 
+
 /**
  * An event which indicates that the mouse wheel was rotated on the system.
  * This event is not limited to a particular component's scope or visibility.
@@ -125,26 +124,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @see NativeMouseEvent#NativeMouseEvent()
 	 */
 	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int scrollType, int scrollAmount, int wheelRotation) {
-		super(GlobalScreen.getInstance(), id, when, modifiers, x, y, );
+		super(id, when, modifiers, x, y);
 	}
-
-	/**
-	 * Instantiates a new <code>NativeMouseEvent</code> object.
-	 *
-	 * @param id an integer that identifies the event
-	 * @param when a long integer that gives the time the event occurred
-	 * @param modifiers a modifier mask describing the modifier keys and mouse 
-	 * buttons active for the event. 
-	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are 
-	 * not compatible with the extended <code>_DOWN_MASK</code> or the old 
-	 * <code>_MASK NativeInputEvent</code> modifiers.
-	 * @param x The x coordinate of the native pointer.
-	 * @param y The y coordinate of the native pointer.
-	 */
-	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y) {
-		this(id, when, modifiers, x, y, NOBUTTON);
-	}
-
 	
     /**
      * Returns the number of units that should be scrolled per

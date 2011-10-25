@@ -14,13 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef _Included_JConvertToNative_h
+#define _Included_JConvertToNative_h
+
 #include <jni.h>
 
 #include "JInputModifiers.h"
 #include "JKeyCodes.h"
 #include "JKeyLocations.h"
 #include "JMouseButtons.h"
-#include "JNativeEvents.h"
+#include "JNativeEventTypes.h"
 
 typedef struct {
 	jint keycode;		//Key Code
@@ -34,8 +38,8 @@ typedef struct {
 } JButtonDatum;
 
 
-JKeyDatum NativeToJKey(unsigned int keysym);
+extern JKeyDatum NativeToJKey(unsigned int keysym);
+extern jint NativeToJButton(unsigned int button);
+extern jint NativeToJModifier(unsigned int modifier);
 
-jint NativeToJButton(unsigned int button);
-
-jint NativeToJModifier(unsigned int modifier);
+#endif

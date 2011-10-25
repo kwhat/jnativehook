@@ -15,10 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Reference: ${JAVA_HOME}/src.zip/java/awt/event/MouseEvent.java
+#ifndef _Included_JMouseButtons_h
+#define _Included_JMouseButtons_h
+
+//Reference: org/jnativehook/mouse/NativeMouseEvent.java
 #define JNOBUTTON			0	//AnyButton
 #define JBUTTON1			1
 #define JBUTTON2			2
 #define JBUTTON3			3
 #define JBUTTON4			4	//Extra Mouse Button
 #define JBUTTON5			5	//Extra Mouse Button
+
+#endif

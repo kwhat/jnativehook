@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Reference: ${JAVA_HOME}/src.zip/java/awt/event/KeyEvent.java
+#ifndef _Included_JKeyCodes_h
+#define _Included_JKeyCodes_h
+
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
 //http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
@@ -237,3 +240,5 @@
 #define JK_BEGIN						0xFF58
 
 #define JK_UNDEFINED					0x0		// KeyCode Unknown
+
+#endif

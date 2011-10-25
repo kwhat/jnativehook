@@ -15,18 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//TODO These should probably be pulled by JNI from the java class.
-//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
-#define JK_NATIVE_KEY_FIRST			2400
-#define JK_NATIVE_KEY_LAST			2401
-#define JK_NATIVE_KEY_PRESSED		JK_NATIVE_KEY_FIRST
-#define JK_NATIVE_KEY_RELEASED		1 + JK_NATIVE_KEY_FIRST
+#include <jni.h>
+#include <stdlib.h>
 
-//Reference: org/jnativehook/mouse/NativeMouseEvent.java
-#define JK_NATIVE_MOUSE_FIRST		2500
-#define JK_NATIVE_MOUSE_LAST		2504
-#define JK_NATIVE_MOUSE_PRESSED		JK_NATIVE_MOUSE_FIRST
-#define JK_NATIVE_MOUSE_RELEASED	1 + JK_NATIVE_MOUSE_FIRST
-#define JK_NATIVE_MOUSE_MOVED		2 + JK_NATIVE_MOUSE_FIRST
-#define JK_NATIVE_MOUSE_DRAGGED		3 + JK_NATIVE_MOUSE_FIRST
-#define JK_NATIVE_MOUSE_WHEEL		4 + JK_NATIVE_MOUSE_FIRST
+JavaVM * jvm = NULL;
+
+void jniFatalError(JNIEnv * env, char * message) {
+	#ifdef DEBUG
+		fprintf(stderr, "Fatal Error - %s\n", message);
+	#endif
+
+	(*env)->FatalError(env, message);
+	exit(EXIT_FAILURE);
+}
+
+void throwException(JNIEnv * env, char * classname, char * message) {
+	//Locate our exception class
+	jclass clsException = (*env)->FindClass(env, classname);
+
+	if (clsException != NULL) {
+		#ifdef DEBUG
+			fprintf(stderr, "Exception - %s\n", message);
+		#endif
+
+		(*env)->ThrowNew(env, clsException, message);
+	}
+	else {
+		//Unable to find exception class, Terminate with error.
+		jniFatalError(env, "Unable to locate exception class.");
+	}
+}

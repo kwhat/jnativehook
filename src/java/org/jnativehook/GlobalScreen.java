@@ -274,6 +274,36 @@ public class GlobalScreen {
 	
 	
 	/**
+	 * Enable the native hook if it is not currently running. If it is running
+	 * the function has no effect.
+	 *
+	 * @throws NativeHookException the native hook exception
+	 * 
+	 * @since 1.1
+	 */
+	public native void registerNativeHook() throws NativeHookException;
+	
+	/**
+	 * Disable the native hook if it is currently running. If it is not running
+	 * the function has no effect.
+	 *
+	 * @throws NativeHookException the native hook exception
+	 * 
+	 * @since 1.1
+	 */
+	public native void unregisterNativeHook() throws NativeHookException;
+	
+	/**
+	 * Gets the current state of the native hook.
+	 *
+	 * @return the state of the native hook.
+	 * @throws NativeHookException the native hook exception
+	 * 
+	 * @since 1.1
+	 */
+	public native boolean isNativeHookRegistered() throws NativeHookException;
+	
+	/**
 	 * Dispatches an event to the appropriate processor.  This method is 
 	 * generally called by the native library but maybe used to synthesize 
 	 * native events from Java.

@@ -19,8 +19,9 @@
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
 #include <windows.h>
-#include <ime.h>
-#include "include/JConvertToNative.h"
+
+#include "JNativeHook.h"
+#include "JConvertToNative.h"
 #include "WinKeyCodes.h"
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
