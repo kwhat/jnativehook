@@ -441,7 +441,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * env, jobject UNUSED(obj)) {
+void StartNativeThread(JNIEnv * env) {
 	LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
 	//LPVOID lpParameter = lpStartAddress;
 	//hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, CREATE_SUSPENDED, &hookThreadId );
@@ -461,7 +461,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv * env, jobject UNUSED(obj)) {
+void StopNativeThread(JNIEnv * env) {
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;
@@ -486,6 +486,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JN
 	}
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv * env, jobject UNUSED(obj)) {
-
+bool IsNativeThreadRunning(JNIEnv * env, jobject UNUSED(obj)) {
+	return (jboolean) false;
 }

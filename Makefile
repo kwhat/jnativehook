@@ -1,8 +1,6 @@
 SOURCES = $(wildcard $(SRC_DIR)/../common/*.c) $(wildcard $(SRC_DIR)/*.c)
-TMP_OBJECTS = $(subst $(SRC_DIR)/../common,$(OBJ_DIR),$(SOURCES:.c=.o))
-OBJECTS = $(subst $(SRC_DIR),$(OBJ_DIR),$(TMP_OBJECTS:.c=.o))
-
-INCLUDES += -I$(SRC_DIR)/..  -I$(SRC_DIR)/../common
+OBJECTS = $(subst $(SRC_DIR),$(OBJ_DIR),$(SOURCES:.c=.o))
+INCLUDES += -I$(abspath $(SRC_DIR)/../common)
 
 all: $(EXECUTABLE) strip
 ifndef ANT_TASK
@@ -20,5 +18,5 @@ endif
 $(EXECUTABLE): $(OBJECTS)
 	$(LD) $(LDFLAGS) $(OBJECTS) ${LIBS} -o $@
 
-$(OBJECTS): $(SOURCES)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@

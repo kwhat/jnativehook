@@ -523,6 +523,7 @@
 		
 		<echo>Compiling C source...</echo>
 		<mkdir dir="${dir.bin.obj}"/>
+		<mkdir dir="${dir.bin}/common"/>
 		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}"/>
 		
 		<!-- set system specific src -->
@@ -585,14 +586,14 @@
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.jar}"/>
-		<mkdir dir="${dir.bin}/org/jnativehook/lib"/>
-		<copy overwrite="true" todir="${dir.bin}/org/jnativehook/lib">
+		<mkdir dir="${dir.bin.class}/org/jnativehook/lib"/>
+		<copy overwrite="true" todir="${dir.bin.class}/org/jnativehook/lib">
 			<fileset dir="${dir.lib}" includes="**/*"/>
 		</copy>
 		
 		<echo>Creating JNativeHook.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
-		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin}">
+		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin.class}">
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
 			<exclude name="org/jnativehook/c_source/**"/>
