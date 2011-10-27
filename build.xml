@@ -405,7 +405,6 @@
 		</fail>
 		<echo level="info">Java Compatibility: ${java.target}</echo>
 		
-		
 		<!-- set system specific cflags -->
 		<condition property="native.cflags.pic" value="-fPIC" else="">
 			<!-- windows does not need pic support -->
@@ -419,16 +418,23 @@
 		<condition property="native.cflags.optimize" value="-O0 -g2 -ggdb -DDEBUG" else="-O2 -fomit-frame-pointer">
 			<isset property="project.isDebug"/>
 		</condition>
+	
+		<!-- set gcc standard flags (primarily for windows right now) -->
+		<condition property="native.cflags.standard" value="-std=c99 -pedantic" else="-std=gnu99">
+			<not>
+				<isset property="project.isDebug"/>
+			</not>
+		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=gnu99 -pedantic -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic ${native.cflags.standard} -Wall -Wextra -Werror ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall -Wextra -Werror -pthreads ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -arch ${native.arch.osx} -mtune=${native.arch} -Wall ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -arch ${native.arch.osx} -mtune=${native.arch} -Wall -Wextra -Werror ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<isset property="native.os.isMac"/>
 		</condition>

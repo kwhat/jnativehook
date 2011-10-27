@@ -19,8 +19,8 @@
 
 #include <stdbool.h>
 
-extern void StopNativeThread();
-extern void StartNativeThread();
+extern int StopNativeThread();
+extern int StartNativeThread();
 extern bool IsNativeThreadRunning();
 
 #endif

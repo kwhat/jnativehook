@@ -43,7 +43,7 @@
 
 //Common function stubs.
 extern JavaVM * jvm;
-extern void jniFatalError(JNIEnv * env, const char * message);
-extern void throwException(JNIEnv * env, const char * classname, const char * message);
+extern void ThrowFatalError(JNIEnv * env, const char * message);
+extern void ThrowException(JNIEnv * env, const char * classname, const char * message);
 
 #endif

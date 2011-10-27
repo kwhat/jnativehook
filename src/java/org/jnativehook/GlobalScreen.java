@@ -302,7 +302,7 @@ public class GlobalScreen {
 	 * 
 	 * @since 1.1
 	 */
-	public native boolean isNativeHookRegistered() throws NativeHookException;
+	public native boolean isNativeHookRegistered();
 	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is 
@@ -477,10 +477,16 @@ public class GlobalScreen {
 	}
 	
 	/**
-	 * Perform procedures to cleanup the native library. This method should be 
-	 * called on garbage collection to ensure proper native cleanup.
+	 * Perform procedures to cleanup the native library. This method is called 
+	 * on garbage collection to ensure proper native cleanup.
 	 */
 	protected static void unloadNativeLibrary() {
-		//Do Nothing
+		try {
+			//Make sure the native thread has stopped.
+			instance.unregisterNativeHook();
+		}
+		catch (NativeHookException e) {
+			e.printStackTrace();
+		}
 	}
 }

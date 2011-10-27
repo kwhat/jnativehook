@@ -18,33 +18,40 @@
 #include "JNativeHook.h"
 
 JavaVM * jvm = NULL;
-JNIEnv * env_dll;
-void jniFatalError(JNIEnv * env, const char * message) {
+
+void ThrowFatalError(JNIEnv * env, const char * message) {
 	#ifdef DEBUG
-		fprintf(stderr, "Fatal Error - %s\n", message);
+		fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
 	(*env)->FatalError(env, message);
 	exit(EXIT_FAILURE);
 }
 
-void throwException(JNIEnv * _env, const char * classname, const char * message) {
-	JNIEnv * env;
-	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
-
+void ThrowException(JNIEnv * env, const char * classname, const char * message) {
 	//Locate our exception class
 	jclass clsException = (*env)->FindClass(env, classname);
 
 	if (clsException != NULL) {
-		#ifdef DEBUG
-			fprintf(stderr, "Exception - %s\n", message);
-		#endif
-
 		(*env)->ThrowNew(env, clsException, message);
+		#ifdef DEBUG
+			(*env)->ExceptionDescribe(env);
+		#endif
 		(*env)->DeleteLocalRef(env, clsException);
 	}
 	else {
-		//Unable to find exception class, Terminate with error.
-		jniFatalError(env, "Unable to locate exception class.");
+		clsException = (*env)->FindClass(env, "java/lang/NoClassDefFoundError");
+
+		if (clsException != NULL) {
+			(*env)->ThrowNew(env, clsException, classname);
+			#ifdef DEBUG
+				(*env)->ExceptionDescribe(env);
+			#endif
+			(*env)->DeleteLocalRef(env, clsException);
+		}
+		else {
+			//Unable to find exception class, Terminate with error.
+			ThrowFatalError(env, "Unable to locate exception class.");
+		}
 	}
 }
