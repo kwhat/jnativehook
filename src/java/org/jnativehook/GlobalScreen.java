@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.util.EventListener;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -68,7 +69,7 @@ public class GlobalScreen {
 		eventListeners = new EventListenerList();
 		
 		//Unpack and Load the native library.
-		GlobalScreen.registerHook();
+		GlobalScreen.loadNativeLibrary();
 	}
 	
 	/**
@@ -81,7 +82,7 @@ public class GlobalScreen {
 	 */
 	protected void finalize() throws Throwable {
 		try {
-			GlobalScreen.unregisterHook();
+			GlobalScreen.unloadNativeLibrary();
 		}
 		catch(Exception e) {
 			//Do Nothing
@@ -405,8 +406,7 @@ public class GlobalScreen {
 	 * Perform procedures to interface with the native library. These procedures 
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
-	//TODO Replace with a custom class loader
-	protected static void registerHook() {
+	protected static void loadNativeLibrary() {
 		try {
 			//Try to load the native library assuming the java.library.path was
 			//set correctly at launch.
@@ -424,6 +424,7 @@ public class GlobalScreen {
 					ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(classFile));
 					ZipEntry zipEntry;
 					
+					//FIXME Instead of looping over the entires, use the ClassLoader map to get the native file name. 
 					while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
 						//Check all the entries for the lib path
 						if (!zipEntry.isDirectory() && zipEntry.getName().toLowerCase().startsWith( libPath.toLowerCase() )) {
@@ -464,8 +465,13 @@ public class GlobalScreen {
 					}
 				}
 			}
+			catch (URISyntaxException e) {
+				//Tried and Failed to unpak the JAR container.
+				throw new RuntimeException(e.getMessage());
+			}
 			catch (Exception e) {
-				throw new NativeHookException(e.getMessage(), e.getCause());
+				//Tried and Failed to manually setup the java.library.path
+				throw new RuntimeException(e.getMessage());
 			}
 		}
 	}
@@ -474,8 +480,7 @@ public class GlobalScreen {
 	 * Perform procedures to cleanup the native library. This method should be 
 	 * called on garbage collection to ensure proper native cleanup.
 	 */
-	//TODO Replace with a custom class loader
-	protected static void unregisterHook() {
+	protected static void unloadNativeLibrary() {
 		//Do Nothing
 	}
 }

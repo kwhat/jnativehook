@@ -14,33 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef _Included_NativeThread_h
+#define _Included_NativeThread_h
 
-#include "JNativeHook.h"
+#include <stdbool.h>
 
-JavaVM * jvm = NULL;
+extern void StopNativeThread();
+extern void StartNativeThread();
+extern bool IsNativeThreadRunning();
 
-void jniFatalError(JNIEnv * env, const char * message) {
-	#ifdef DEBUG
-		fprintf(stderr, "Fatal Error - %s\n", message);
-	#endif
-
-	(*env)->FatalError(env, message);
-	exit(EXIT_FAILURE);
-}
-
-void throwException(JNIEnv * env, const char * classname, const char * message) {
-	//Locate our exception class
-	jclass clsException = (*env)->FindClass(env, classname);
-
-	if (clsException != NULL) {
-		#ifdef DEBUG
-			fprintf(stderr, "Exception - %s\n", message);
-		#endif
-
-		(*env)->ThrowNew(env, clsException, message);
-	}
-	else {
-		//Unable to find exception class, Terminate with error.
-		jniFatalError(env, "Unable to locate exception class.");
-	}
-}
+#endif

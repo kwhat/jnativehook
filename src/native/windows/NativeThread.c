@@ -22,15 +22,15 @@
 
 #include "JNativeHook.h"
 #include "JConvertToNative.h"
-#include "org_jnativehook_GlobalScreen.h"
+#include "NativeThread.h"
 #include "WinKeyCodes.h"
 
+//The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH
 extern HINSTANCE hInst;
 
 //Thread and hook handles.
-//static HANDLE hEvent; this was the sentinal... probably not needed.
 static HANDLE hookThreadHandle = NULL;
-static LPDWORD hookThreadId = NULL;
+static DWORD hookThreadId = 0;
 static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
 //GlobalScreen object and dispatch id.
@@ -342,18 +342,7 @@ static LRESULT CALLBACK SettingChangeProc(UINT setting) {
 }
 */
 
-static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
-	//Attach the current thread to the JVM.
-	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
-		#ifdef DEBUG
-			printf("Native: AttachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
-		#endif
-
-		throwException(env, "org/jnativehook/NativeHookException", "Failed to attach to the current Java thread");
-		return 1; //Naturally exit so JNI exception is thrown.
-	}
-
+static void CreateJNIGlobals(JNIEnv * env) {
 	//Class and getInstance method id for the GlobalScreen Object
 	jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 	jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
@@ -381,87 +370,44 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
 	//FIXME need to change the constructor signature
 	//idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+}
 
-
-	//Setup the native hooks and their callbacks.
-	//TODO Need to check to see if hInst is thread safe... May need to use GetModuleHandle(NULL) here.
-	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
-	if (handleKeyboardHook != NULL) {
-		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful\n");
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed\n");
-		#endif
-
-		throwException(env, "org/jnativehook/NativeHookException", "Failed to hook keyboard using SetWindowsHookEx");
-		return 1; //Naturally exit so JNI exception is thrown.
-	}
-
-	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
-	if (handleMouseHook != NULL) {
-		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful\n");
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed\n");
-		#endif
-
-		throwException(env, "org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
-		return EXIT_FAILURE; //Naturally exit so JNI exception is thrown.
-	}
-
-	//Block until the thread needs to exit.
-	WaitForSingleObject(hookThreadHandle, INFINITE);
-
-	//Make sure we clean up the global objects.
+static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, clsKeyEvent);
 	(*env)->DeleteGlobalRef(env, clsMouseEvent);
 	(*env)->DeleteGlobalRef(env, clsMouseWheelEvent);
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
-
-	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
-		#ifdef DEBUG
-			printf("Native: DetachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
-		#endif
-
-		throwException(env, "org/jnativehook/NativeHookException", "Failed to detach to the current Java thread");
-		return EXIT_FAILURE; //Naturally exit so JNI exception is thrown.
-	}
-
-	#ifdef DEBUG
-		printf("Native: ThreadProc() stop successful.\n");
-	#endif
-
-	return EXIT_SUCCESS;
 }
 
-
-void StartNativeThread(JNIEnv * env) {
-	LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
-	//LPVOID lpParameter = lpStartAddress;
-	//hookThreadHandle = CreateThread( NULL, 0, lpStartAddress, NULL, CREATE_SUSPENDED, &hookThreadId );
-	hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, hookThreadId);
-	if (hookThreadHandle == INVALID_HANDLE_VALUE) {
+static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
+	//Attach the current thread to the JVM.
+	JNIEnv * env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
 		#ifdef DEBUG
-			printf("Native: ThreadProc() start failure.\n");
+			fprintf(stderr, "AttachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
 		#endif
 
-		throwException(env, "org/jnativehook/NativeHookException", "Could not create native thread.");
-		return; //Naturally exit so JNI exception is thrown.
+		throwException(env, "org/jnativehook/NativeHookException", "Failed to attach to the current Java thread");
+		ExitThread(EXIT_FAILURE); //Naturally exit so JNI exception is thrown.
 	}
-	else {
-		#ifdef DEBUG
-			printf("Native: ThreadProc() start successful.\n");
-		#endif
-	}
-}
 
-void StopNativeThread(JNIEnv * env) {
+	//Create all the global references up front to save time in the callbacks.
+	CreateJNIGlobals(env);
+
+	//Create the native hooks.
+	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
+	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
+
+
+	//Block until the thread needs to exit
+	//Blocking will occur even if SetWindowsHookEx fails.
+	MSG message;
+	while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+	}
+
+	//Destroy the native hooks.
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;
@@ -472,8 +418,88 @@ void StopNativeThread(JNIEnv * env) {
 		handleMouseHook = NULL;
 	}
 
+	//Make sure we clean up the global objects.
+	DestroyJNIGlobals(env);
+
+
+	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
+		#ifdef DEBUG
+			fprintf(stderr, "DetachCurrentThread(jvm, (void **)(&env), NULL) failed\n");
+		#endif
+
+		throwException(env, "org/jnativehook/NativeHookException", "Failed to detach to the current Java thread");
+		ExitThread(EXIT_FAILURE); //Naturally exit so JNI exception is thrown.
+	}
+
+	#ifdef DEBUG
+		fprintf(stdout, "ThreadProc() stop successful.\n");
+	#endif
+
+	ExitThread(EXIT_SUCCESS);
+}
+
+
+void StartNativeThread() {
+	LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
+	hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
+	if (hookThreadHandle == INVALID_HANDLE_VALUE) {
+		#ifdef DEBUG
+			printf("Native: ThreadProc() start failure.\n");
+		#endif
+
+		//throwException(env, "org/jnativehook/NativeHookException", "Could not create native thread.");
+		//return; //Naturally exit so JNI exception is thrown.
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: ThreadProc() start successful.\n");
+		#endif
+	}
+
+	Sleep(3000);
+
+	if (handleKeyboardHook != NULL) {
+		#ifdef DEBUG
+			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed\n");
+		#endif
+
+		//Make sure we clean up the global objects.
+		//DestroyJNIGlobals(env);
+
+		//throwException(env, "org/jnativehook/NativeHookException", "Failed to hook keyboard using SetWindowsHookEx");
+		//ExitThread(EXIT_FAILURE); //Naturally exit so JNI exception is thrown.
+	}
+
+	if (handleMouseHook != NULL) {
+		#ifdef DEBUG
+			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+			printf("Native: SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed\n");
+		#endif
+
+		//Make sure we clean up the global objects.
+		//DestroyJNIGlobals(env);
+
+		//throwException(env, "org/jnativehook/NativeHookException", "Failed to hook mouse using SetWindowsHookEx");
+		//TerminateThread(EXIT_FAILURE); //Naturally exit so JNI exception is thrown.
+	}
+
+}
+
+void StopNativeThread() {
 	//Try to exit the thread naturally.
-	SetEvent(hookThreadHandle);
+	PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
+	WaitForSingleObject(hookThreadHandle, 1000);
+
+
 
 	CloseHandle(hookThreadHandle);
 	if(hookThreadHandle != NULL) {
@@ -486,6 +512,9 @@ void StopNativeThread(JNIEnv * env) {
 	}
 }
 
-bool IsNativeThreadRunning(JNIEnv * env, jobject UNUSED(obj)) {
-	return (jboolean) false;
+bool IsNativeThreadRunning() {
+	DWORD status;
+	BOOL WINAPI GetExitCodeThread(hookThreadHandle, status);
+
+	return status == STILL_ACTIVE;
 }

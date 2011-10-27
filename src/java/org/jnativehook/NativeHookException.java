@@ -25,7 +25,7 @@ package org.jnativehook;
  * 
  * @see RuntimeException
  */
-public class NativeHookException extends RuntimeException {
+public class NativeHookException extends Exception {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 6199753732102764333L;
 

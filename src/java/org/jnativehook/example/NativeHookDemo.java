@@ -34,8 +34,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -66,10 +68,18 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * Instantiates a new native hook demo.
 	 */
 	public NativeHookDemo() {
+		try {
+			//Initialze native hook.
+			GlobalScreen.getInstance().registerNativeHook();
+		}
+		catch (NativeHookException ex) {
+			ex.printStackTrace();
+		}
+		
 		//Setup the main window.
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setSize(600, 300);
 		addWindowListener(this);
 		
@@ -229,7 +239,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 *
 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 	 */
-	public void windowClosing(WindowEvent e) { /* Do Nothing */ }
+	public void windowClosing(WindowEvent e) {
+		
+	}
 	
 	/**
 	 * Unimplemented
@@ -278,6 +290,14 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
 	 */
 	public void windowClosed(WindowEvent e) {
+		try {
+			//Clean up the native hook.
+			GlobalScreen.getInstance().unregisterNativeHook();
+		}
+		catch (NativeHookException ex) {
+			ex.printStackTrace();
+		}
+		
 		System.runFinalization();
 		System.exit(0);
 	}

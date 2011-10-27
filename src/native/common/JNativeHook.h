@@ -34,6 +34,7 @@
 
 #include <jni.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 //Exception class definitions.
 #define NATIVE_HOOK_EXCEPTION	"org/jnativehook/NativeHookException"
@@ -42,7 +43,7 @@
 
 //Common function stubs.
 extern JavaVM * jvm;
-extern void jniFatalError(JNIEnv * env, char * message);
-extern void throwException(JNIEnv * env, char * classname, char * message);
+extern void jniFatalError(JNIEnv * env, const char * message);
+extern void throwException(JNIEnv * env, const char * classname, const char * message);
 
 #endif
