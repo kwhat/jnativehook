@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
-HANDLE hEvent ;
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//MS Keyboard Event Struct Data
@@ -33,7 +32,6 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_SYSKEYDOWN:
 			if (kbhook->vkCode == VK_ESCAPE) {
 				PostQuitMessage(0);
-				SetEvent(hEvent);
 			}
 
 			printf("Key Press - %i\n", (unsigned int) kbhook->vkCode);
@@ -136,19 +134,12 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	//Block while we wait for a WM_QUIT message to be delivered.
-	//MSG message;
-	//GetMessage(&message, (HWND) -1, 0, 0);
-	WaitForSingleObject(hEvent, INFINITE);
-
-	/*
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0)) {
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
-	*/
 
 	//Unhook the low level keyboard.
 	UnhookWindowsHookEx(handleKeyboardHook);
