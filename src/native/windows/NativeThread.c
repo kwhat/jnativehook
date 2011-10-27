@@ -110,10 +110,11 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 			if ((*env)->ExceptionOccurred(env)) {
 				printf("Native: JNI Error Occurred.\n");
 				(*env)->ExceptionDescribe(env);
-				(*env)->ExceptionClear(env);
+				//(*env)->ExceptionClear(env);
 			}
 		#endif
 	}
+	throwException(env, "org/jnativehook/NativeHookException", "Test");
 
 	return CallNextHookEx(handleKeyboardHook, nCode, wParam, lParam);
 }
@@ -306,7 +307,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			default:
 				#ifdef DEBUG
-					fprintf(stdout, "Unhandled mouse event (%X).\n", wParam);
+					fprintf(stdout, "Unhandled mouse event (%X).\n", (unsigned int) wParam);
 				#endif
 			break;
 		}
@@ -317,7 +318,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stderr, "JNI error occurred.\n");
 				(*env)->ExceptionDescribe(env);
 			#endif
-			(*env)->ExceptionClear(env);
+			//(*env)->ExceptionClear(env);
 		}
 	}
 
@@ -379,6 +380,7 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 }
 
+HANDLE hEventDll, hEventThread;
 static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
@@ -391,6 +393,8 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		ExitThread(EXIT_FAILURE); //Naturally exit so JNI exception is thrown.
 	}
 
+
+
 	//Create all the global references up front to save time in the callbacks.
 	CreateJNIGlobals(env);
 
@@ -398,8 +402,9 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
 	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
 
+	SignalObjectAndWait(hEventDll, hEventThread, INFINITE, FALSE);
 
-	//Block until the thread needs to exit
+	//Block until the thread receives an WM_QUIT request.
 	//Blocking will occur even if SetWindowsHookEx fails.
 	MSG message;
 	while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
@@ -440,6 +445,9 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 
 void StartNativeThread() {
+	hEventDll = CreateEvent(NULL, TRUE, FALSE, NULL);
+	hEventThread = CreateEvent(NULL, TRUE, FALSE, NULL);
+
 	LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
 	hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
 	if (hookThreadHandle == INVALID_HANDLE_VALUE) {
@@ -456,7 +464,7 @@ void StartNativeThread() {
 		#endif
 	}
 
-	Sleep(3000);
+	SignalObjectAndWait(hEventThread, hEventDll, INFINITE, FALSE);
 
 	if (handleKeyboardHook != NULL) {
 		#ifdef DEBUG
@@ -498,8 +506,9 @@ void StopNativeThread() {
 	//Try to exit the thread naturally.
 	PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
 	WaitForSingleObject(hookThreadHandle, 1000);
-
-
+	#ifdef DEBUG
+		printf("Native: Done Waiting.\n");
+	#endif
 
 	CloseHandle(hookThreadHandle);
 	if(hookThreadHandle != NULL) {
@@ -514,7 +523,7 @@ void StopNativeThread() {
 
 bool IsNativeThreadRunning() {
 	DWORD status;
-	BOOL WINAPI GetExitCodeThread(hookThreadHandle, status);
+	GetExitCodeThread(hookThreadHandle, &status);
 
 	return status == STILL_ACTIVE;
 }

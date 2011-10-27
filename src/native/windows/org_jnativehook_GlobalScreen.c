@@ -148,7 +148,7 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 	return (jboolean) IsNativeThreadRunning();
 }
 
-
+extern JNIEnv * env_dll;
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Grab the currently running virtual machine so we can attach to it in
@@ -196,7 +196,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			jni_version = JNI_ERR;
 		break;
 	}
-
+	env_dll = env;
 	return jni_version;
 }
 

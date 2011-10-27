@@ -18,7 +18,7 @@
 #include "JNativeHook.h"
 
 JavaVM * jvm = NULL;
-
+JNIEnv * env_dll;
 void jniFatalError(JNIEnv * env, const char * message) {
 	#ifdef DEBUG
 		fprintf(stderr, "Fatal Error - %s\n", message);
@@ -28,7 +28,10 @@ void jniFatalError(JNIEnv * env, const char * message) {
 	exit(EXIT_FAILURE);
 }
 
-void throwException(JNIEnv * env, const char * classname, const char * message) {
+void throwException(JNIEnv * _env, const char * classname, const char * message) {
+	JNIEnv * env;
+	(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+
 	//Locate our exception class
 	jclass clsException = (*env)->FindClass(env, classname);
 
@@ -38,6 +41,7 @@ void throwException(JNIEnv * env, const char * classname, const char * message) 
 		#endif
 
 		(*env)->ThrowNew(env, clsException, message);
+		(*env)->DeleteLocalRef(env, clsException);
 	}
 	else {
 		//Unable to find exception class, Terminate with error.
