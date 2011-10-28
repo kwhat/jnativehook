@@ -420,6 +420,7 @@
 		</condition>
 	
 		<!-- set gcc standard flags (primarily for windows right now) -->
+		<!-- FIXME try this instead: http://www.aquaphoenix.com/ref/gnu_c_library/libc_12.html -->
 		<condition property="native.cflags.standard" value="-std=c99 -pedantic" else="-std=gnu99">
 			<not>
 				<isset property="project.isDebug"/>
@@ -430,7 +431,8 @@
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall -Wextra -Werror -pthread ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic ${native.cflags.standard} -Wall -Wextra -Werror -pthread -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		

@@ -541,6 +541,8 @@ int StopNativeThread() {
 
 			status = EXIT_FAILURE;
 		}
+
+		CloseHandle(hookEventHandle);
 	}
 
 	return status;

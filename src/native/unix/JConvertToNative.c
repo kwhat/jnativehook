@@ -22,9 +22,9 @@
 #ifdef SUN_KEYBOARD
 	#include <X11/Sunkeysym.h>
 #endif
-#include "include/JConvertToNative.h"
-#include "xEventModifers.h"
-#include "xButtonCodes.h"
+#include "JConvertToNative.h"
+#include "XButtonCodes.h"
+#include "XEventModifiers.h"
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;

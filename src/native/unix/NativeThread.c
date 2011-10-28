@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <pthread.h>
 #include <signal.h>
+#include <pthread.h>
+
 
 #include <X11/Xlibint.h>
 #include <X11/Xlib.h>
@@ -48,6 +49,7 @@ static Display * disp_hook;
 
 //Thread and hook handles.
 static bool isRunning = true;
+static pthread_mutex_t hookMutexHandle = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
 static XRecordContext context = 0;
 
@@ -77,7 +79,7 @@ jint doModifierConvert(int event_mask) {
 	return modifiers;
 }
 
-static void LowLevelProc(XPointer pointer, XRecordInterceptData * hook) {
+static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		//We should already be attached to the JVM at this point.  This should only
 		//be a formality that causes a NOOP.
@@ -244,8 +246,8 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 }
 
-static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
-	DWORD status = EXIT_FAILURE;
+static void * ThreadProc() {
+	int UNUSED(status) = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
@@ -254,11 +256,9 @@ static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 		CreateJNIGlobals(env);
 
 		//Grab the default display
-		char * disp_name = XDisplayName(NULL);
-		disp_hook = XOpenDisplay(disp_name);
-		disp_data = XOpenDisplay(disp_name);
+		disp_hook = XOpenDisplay(XDisplayName(NULL));
 		#ifdef DEBUG
-		if (disp_hook != NULL && disp_data != NULL) {
+		if (disp_hook != NULL) {
 			printf("Native: XOpenDisplay successful.\n");
 		}
 		else {
@@ -281,18 +281,6 @@ static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 			disp_hook = NULL;
 			disp_data = NULL;
 		}
-
-		//enable detectable autorepeat.
-		Bool isAutoRepeat;
-		XkbSetDetectableAutoRepeat(disp_data, true, &isAutoRepeat);
-		#ifdef DEBUG
-		if (isAutoRepeat) {
-			printf("Native: XkbSetDetectableAutoRepeat successful.\n");
-		}
-		else {
-			printf("Native: Could not enable detectable autorepeat!\n");
-		}
-		#endif
 
 
 		//Setup XRecord range
@@ -321,8 +309,10 @@ static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 				printf("Native: XRecordCreateContext successful.\n");
 			#endif
 
+			pthread_mutex_unlock(&hookMutexHandle);
+
 			//Async works with the loop and outside of threads.
-			XRecordEnableContextAsync(disp_hook, context, callback, NULL);
+			XRecordEnableContextAsync(disp_hook, context, LowLevelProc, NULL);
 			//XRecordEnableContext(disp_hook, context, callback, NULL);
 
 			while (isRunning) {
@@ -338,13 +328,11 @@ static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 
 		//Destroy the native displays.
-		if (disp_data != NULL) {
-			XRecordDisableContext(disp_data, context);
-			XCloseDisplay(disp_data);
-			disp_data = NULL;
-		}
-
 		if (disp_hook != NULL) {
+			if (disp_data != NULL) {
+				XRecordDisableContext(disp_data, context);
+			}
+
 			XRecordFreeContext(disp_hook, context);
 			XCloseDisplay(disp_hook);
 			disp_hook = NULL;
@@ -374,14 +362,14 @@ static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 	//Make sure we signal that we have passed any exception throwing code.
 	//This should only make a difference if we had an initialization exception.
-	SetEvent(hookEventHandle);
+	pthread_mutex_unlock(&hookMutexHandle);
 
-	ExitThread(status);
+	pthread_exit(NULL);
 }
 
-DWORD GetThreadStatus() {
-	DWORD status;
-	GetExitCodeThread(hookThreadHandle, &status);
+int GetThreadStatus() {
+	int status = EXIT_FAILURE;
+	//GetExitCodeThread(hookThreadHandle, &status);
 
 	return status;
 }
@@ -391,29 +379,36 @@ int StartNativeThread() {
 
 	//Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
+		//Lock the mutex handle for the thread hook.
+		pthread_mutex_init(&hookMutexHandle, NULL);
+		pthread_mutex_lock(&hookMutexHandle);
+
 		//Call listener
 		isRunning = true;
 
 		/*
 		 * We shall use the default pthread attributes: thread is joinable
 		 * (not detached) and has default (non real-time) scheduling policy.
-		pthread_attr_t attr = NULL;
-		pthread_attr_init(&attr);
-		pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); //sets system contention scope for thread
-		//pthread_attr_setstacksize(&attr, 512*1024);
-		if( pthread_create( &hookThreadId, &attr, MsgLoop, NULL) ) {
-		*/
-		if( pthread_create( &hookThreadId, NULL, MsgLoop, NULL) ) {
+		 */
+		if( pthread_create( &hookThreadId, NULL, ThreadProc, NULL) ) {
 			#ifdef DEBUG
-				printf("Native: MsgLoop() start failure.\n");
+				printf("Native: MsgLoop() start failure!\n");
 			#endif
 
-			throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
+			//throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
 			return JNI_ERR; //Naturally exit so jni exception is thrown.
 		}
 		else {
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start successful.\n");
+			#endif
+
+			while (pthread_mutex_trylock(&hookMutexHandle) == EBUSY) {
+				sched_yield();
+			}
+
+			#ifdef DEBUG
+				printf("Native: MsgLoop() start done.\n");
 			#endif
 		}
 	}
@@ -427,7 +422,7 @@ int StopNativeThread() {
 	if (IsNativeThreadRunning() == true) {
 		//Try to exit the thread naturally.
 		isRunning = false;
-		pthread_join(hookThreadId, NULL);
+		pthread_join(hookThreadId, (void **) &status);
 
 		//Make sure the thread has stopped.
 		if (pthread_kill(hookThreadId, SIGKILL) == 0) {
@@ -435,11 +430,16 @@ int StopNativeThread() {
 				printf("Native: pthread_kill successful.\n");
 			#endif
 		}
+
+		pthread_mutex_destroy(&hookMutexHandle);
 	}
 
 	return status;
 }
 
 bool IsNativeThreadRunning() {
-	return GetThreadStatus() == STILL_ACTIVE;
+	//FIXME
+	//Could use XRecordGetContext to query
+	//Could use http://www.ic.unicamp.br/~islene/1s2008-mc514/pthread/pthread_tryjoin.c
+	return GetThreadStatus() == 0;
 }

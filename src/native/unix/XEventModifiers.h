@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//xEvent Modifiers that are not defined by xorg.
+#ifndef _Included_XEventModifiers_h
+#define _Included_XEventModifiers_h
+
+//XEvent Modifiers that are not defined by xorg.
 #define KeyButMaskAny			0
 #define KeyButMaskShift			1
 #define KeyButMaskLock			2
@@ -30,3 +33,5 @@
 #define KeyButMaskButton3		1024
 #define KeyButMaskButton4		2048
 #define KeyButMaskButton5		4096
+
+#endif
