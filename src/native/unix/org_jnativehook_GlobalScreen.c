@@ -82,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	char * UNUSED(xkb_time) = XGetDefault(disp_data, "*", "multiClickTime");
+	char * xkb_time = XGetDefault(disp_data, "*", "multiClickTime");
 
 	#ifdef DEBUG
 		printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);

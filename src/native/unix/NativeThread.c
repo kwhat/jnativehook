@@ -45,10 +45,7 @@ typedef union {
 extern Display * disp_data;
 static Display * disp_hook;
 
-
-
 //Thread and hook handles.
-static bool isRunning = true;
 static pthread_mutex_t hookMutexHandle = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
 static XRecordContext context = 0;
@@ -247,7 +244,8 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 }
 
 static void * ThreadProc() {
-	int UNUSED(status) = EXIT_FAILURE;
+	pthread_mutex_lock(&hookMutexHandle);
+	int status = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
@@ -305,6 +303,9 @@ static void * ThreadProc() {
 
 
 		if (context != 0) {
+			//Set the exit status.
+			status = EXIT_SUCCESS;
+
 			#ifdef DEBUG
 				printf("Native: XRecordCreateContext successful.\n");
 			#endif
@@ -312,13 +313,18 @@ static void * ThreadProc() {
 			pthread_mutex_unlock(&hookMutexHandle);
 
 			//Async works with the loop and outside of threads.
+			/*
 			XRecordEnableContextAsync(disp_hook, context, LowLevelProc, NULL);
-			//XRecordEnableContext(disp_hook, context, callback, NULL);
-
 			while (isRunning) {
 				XRecordProcessReplies(disp_hook);
 			}
+			*/
 
+			//Sync call blocks until we turn off XRecord on the context.
+			XRecordEnableContext(disp_hook, context, LowLevelProc, NULL);
+
+			//Lock back up until we are done processing the exit.
+			pthread_mutex_lock(&hookMutexHandle);
 		}
 		else {
 			#ifdef DEBUG
@@ -329,10 +335,6 @@ static void * ThreadProc() {
 
 		//Destroy the native displays.
 		if (disp_hook != NULL) {
-			if (disp_data != NULL) {
-				XRecordDisableContext(disp_data, context);
-			}
-
 			XRecordFreeContext(disp_hook, context);
 			XCloseDisplay(disp_hook);
 			disp_hook = NULL;
@@ -361,7 +363,6 @@ static void * ThreadProc() {
 	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
-	//This should only make a difference if we had an initialization exception.
 	pthread_mutex_unlock(&hookMutexHandle);
 
 	pthread_exit(NULL);
@@ -369,7 +370,12 @@ static void * ThreadProc() {
 
 int GetThreadStatus() {
 	int status = EXIT_FAILURE;
-	//GetExitCodeThread(hookThreadHandle, &status);
+
+
+	//TODO to get the exit status of the thread it needs to be stopped and we
+	//need to check using pthread_join(thread, (void *) &retval);
+
+
 
 	return status;
 }
@@ -381,21 +387,18 @@ int StartNativeThread() {
 	if (IsNativeThreadRunning() != true) {
 		//Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookMutexHandle, NULL);
-		pthread_mutex_lock(&hookMutexHandle);
 
-		//Call listener
-		isRunning = true;
 
 		/*
 		 * We shall use the default pthread attributes: thread is joinable
 		 * (not detached) and has default (non real-time) scheduling policy.
 		 */
-		if( pthread_create( &hookThreadId, NULL, ThreadProc, NULL) ) {
+		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL)) {
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start failure!\n");
 			#endif
 
-			//throwException("org/jnativehook/NativeHookException", "Could not create message loop thread.");
+
 			return JNI_ERR; //Naturally exit so jni exception is thrown.
 		}
 		else {
@@ -403,6 +406,7 @@ int StartNativeThread() {
 				printf("Native: MsgLoop() start successful.\n");
 			#endif
 
+			//Wait for the thread to release the lock.
 			while (pthread_mutex_trylock(&hookMutexHandle) == EBUSY) {
 				sched_yield();
 			}
@@ -420,17 +424,16 @@ int StopNativeThread() {
 	int status = EXIT_SUCCESS;
 
 	if (IsNativeThreadRunning() == true) {
+		pthread_mutex_lock(&hookMutexHandle);
+
 		//Try to exit the thread naturally.
-		isRunning = false;
+		XRecordDisableContext(disp_data, context);
+
+		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
+		printf("Test: %i", status);
 
-		//Make sure the thread has stopped.
-		if (pthread_kill(hookThreadId, SIGKILL) == 0) {
-			#ifdef DEBUG
-				printf("Native: pthread_kill successful.\n");
-			#endif
-		}
-
+		//Clean up the mutex.
 		pthread_mutex_destroy(&hookMutexHandle);
 	}
 
@@ -438,8 +441,31 @@ int StopNativeThread() {
 }
 
 bool IsNativeThreadRunning() {
-	//FIXME
-	//Could use XRecordGetContext to query
-	//Could use http://www.ic.unicamp.br/~islene/1s2008-mc514/pthread/pthread_tryjoin.c
-	return GetThreadStatus() == 0;
+	bool running = false;
+
+	//Wait for a lock on the thread.
+	if (pthread_mutex_lock(&hookMutexHandle) == 0) {
+		//Lock Successful.
+
+		if (disp_data != NULL && context != 0) {
+			XRecordState * state_return;
+			if (XRecordGetContext(disp_data, context, &state_return) != 0) {
+				running = state_return->enabled;
+				XRecordFreeState(state_return);
+			}
+			else {
+				printf("XRecordGetContext: Failure!!!\n");
+			}
+		}
+
+		pthread_mutex_unlock(&hookMutexHandle);
+	}
+	else {
+		//Lock Failure. This should always be caused by an invalid pointer
+		//and/or an uninitialized mutex.
+
+		printf("pthread_mutex_lock: Failure!!!\n");
+	}
+
+	return running;
 }

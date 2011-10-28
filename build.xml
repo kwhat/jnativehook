@@ -432,7 +432,7 @@
 		</condition>
 		
 		<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic ${native.cflags.standard} -Wall -Wextra -Werror -pthread -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -Wall -Wextra -Werror ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		
