@@ -21,10 +21,8 @@
 #include <windows.h>
 
 #include "JNativeHook.h"
-#include "JConvertToNative.h"
-#include "org_jnativehook_GlobalScreen.h"
 #include "NativeThread.h"
-#include "WinKeyCodes.h"
+#include "org_jnativehook_GlobalScreen.h"
 
 //Global Variables
 HINSTANCE hInst = NULL;

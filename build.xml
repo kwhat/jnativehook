@@ -430,7 +430,7 @@
 			<isset property="native.os.isWindows"/>
 		</condition>
 		
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall -Wextra -Werror -pthreads ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -Wall -Wextra -Werror -pthread ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		

@@ -15,16 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
+#include <signal.h>
+
+#include <X11/Xlibint.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+#include <X11/extensions/record.h>
+
 #include "JNativeHook.h"
 #include "JConvertToNative.h"
 #include "NativeThread.h"
-#include "WinKeyCodes.h"
+#include "XButtonCodes.h"
+#include "XEventModifiers.h"
+
+//For this struct, refer to libxnee
+typedef union {
+	unsigned char		type;
+	xEvent				event;
+	xResourceReq		req;
+	xGenericReply		reply;
+	xError				error;
+	xConnSetupPrefix	setup;
+} XRecordDatum;
 
 //The pointer to the X11 display for the hook and data.
-//extern
-static Display * disp_hook, disp_data;
+extern Display * disp_data;
+static Display * disp_hook;
+
+
 
 //Thread and hook handles.
+static bool isRunning = true;
 static pthread_t hookThreadId = 0;
 static XRecordContext context = 0;
 
@@ -35,6 +58,24 @@ static jmethodID idDispatchEvent;
 //Java callback classes and constructor id's
 static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
+
+//Convert the XEvent modifier mask to a Java modifier mask.
+jint doModifierConvert(int event_mask) {
+	jint modifiers = 0;
+
+	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
+	if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
+	if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
+	if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+
+	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
+	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
+	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
+	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
+	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
+
+	return modifiers;
+}
 
 static void LowLevelProc(XPointer pointer, XRecordInterceptData * hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
@@ -203,7 +244,7 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 }
 
-static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
+static void * ThreadProc(LPVOID UNUSED(lpParameter)) {
 	DWORD status = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.

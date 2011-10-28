@@ -15,118 +15,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <pthread.h>
-#include <signal.h>
-
-#include <X11/Xlibint.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/XKBlib.h>
-#include <X11/extensions/record.h>
 
-
+#include "JNativeHook.h"
+#include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
-#include "JConvertToNative.h"
-#include "xEventModifers.h"
 
-//Instance Variables
-bool isRunning = true;
-unsigned int xkb_timeout;
-unsigned int xkb_interval;
-
-//For this struct, refer to libxnee
-typedef union {
-	unsigned char		type;
-	xEvent				event;
-	xResourceReq		req;
-	xGenericReply		reply;
-	xError				error;
-	xConnSetupPrefix	setup;
-} XRecordDatum;
+//Global Variables
+Display * disp_data;
 
 
 
-//Display * disp_hook;
-//Display * disp_data;
-
-
-//Convert the XEvent modifier mask to a Java modifier mask.
-jint doModifierConvert(int event_mask) {
-	jint modifiers = 0;
-
-	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-	if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-	if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-	if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
-
-	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
-
-	return modifiers;
-}
-
-
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
+	unsigned int xkb_interval;
+	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, NULL, &xkb_interval)) {
 		#ifdef DEBUG
-			printf("Native: XkbGetAutoRepeatRate failure\n");
+			printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
 
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat rate.");
-		return -1; //Naturally exit so jni exception is thrown.
+		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 
 	#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
+		printf("Native: XkbGetAutoRepeatRate successful. (rate: %i)\n", xkb_interval);
 	#endif
 	return (jlong) xkb_interval;
 }
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) ) {
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
+	unsigned int xkb_timeout;
+	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, NULL)) {
 		#ifdef DEBUG
-			printf("Native: XkbGetAutoRepeatRate failure\n");
+			printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
 
-		throwException("org/jnativehook/keyboard/NativeKeyException", "Could not determine the keyboard auto repeat delay.");
-		return -1; //Naturally exit so jni exception is thrown.
+		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat delay.");
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 
 	#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate successful (rate: %i) (delay: %i)\n", xkb_interval, xkb_timeout);
+		printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
 	#endif
 	return (jlong) xkb_timeout;
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	long int wkb_sensitivity;
-	if (! SystemParametersInfo(SPI_GETMOUSESPEED, 0, &wkb_sensitivity, 0) ) {
-		#ifdef DEBUG
-			printf("Native: SPI_GETMOUSESPEED failure\n");
-		#endif
-
-		throwException("org/jnativehook/keyboard/NativeMouseException", "Could not determine the mouse pointer sensitivity.");
-		return -1; //Naturally exit so JNI exception is thrown.
-	}
-
-	#ifdef DEBUG
-		printf("Native: SPI_GETMOUSESPEED successful (speed: %ldd)\n", wkb_sensitivity);
-	#endif
-	return (jlong) wkb_sensitivity;
+	return (jlong) JNI_ERR;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	char * xkb_time = XGetDefault(XToolkit.getDisplay(), "*", "multiClickTime");
+	char * xkb_time = XGetDefault(disp_data, "*", "multiClickTime");
 
 	#ifdef DEBUG
 		printf("Native: GetDoubleClickTime() successful (time: %ldd)\n", wkb_time);
 	#endif
-	return (jlong) wkb_time;
+	return (jlong) xkb_time;
 }
 
 
