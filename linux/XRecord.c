@@ -23,10 +23,12 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/record.h>
 
-Display * disp_hook;
-Display * disp_data;
-XRecordContext context;
+static Display * disp_hook;
+static Display * disp_data;
+static XRecordContext context;
+#ifdef ASYNC
 bool running = true;
+#endif
 
 //struct taken from libxnee
 typedef union {
@@ -52,7 +54,15 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 		case KeyPress:
 			//Stop looping if the escape key is pressed.
 			if (XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0) == XK_Escape) {
-				running = false;
+				#ifdef ASYNC
+					running = false;
+				#else
+					//This has NO effect.
+					//XRecordDisableContext(disp_data, context);
+
+					//This stops the recording but fails to cause a return.
+					XRecordDisableContext(disp_hook, context);
+				#endif
 			}
 
 			printf("Key Press - %i\n", (int) XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0));
@@ -111,13 +121,18 @@ int main(int argc, const char * argv[]) {
 	}
 
 	//Start XRecord process
-	XRecordEnableContextAsync(disp_hook, context, callback, NULL);
-	while(running) {
-		XRecordProcessReplies(disp_hook);
-	}
+	#ifdef ASYNC
+		XRecordEnableContextAsync(disp_hook, context, callback, NULL);
+		while(running) {
+			XRecordProcessReplies(disp_hook);
+		}
+		//This causes a segmentation fault
+		//XRecordDisableContext(disp_hook, context);
+	#else
+		XRecordEnableContext(disp_hook, context, callback, NULL);
+	#endif
 
 	//Disable the XRecord context on the data display and close the connection.
-	XRecordDisableContext(disp_data, context);
 	XCloseDisplay(disp_data);
 
 	//Free the XRecord context on the hook display and close the connection.

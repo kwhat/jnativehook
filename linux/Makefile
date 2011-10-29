@@ -19,7 +19,7 @@ XGrabPointer: XGrabPointer.c
 	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) $< -o $@
 	
 XRecord: XRecord.c
-	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) -DASYNC $< -o $@
 
 clean:
 	-rm -f $(PROGRAMS)
