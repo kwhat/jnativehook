@@ -368,18 +368,6 @@ static void * ThreadProc() {
 	pthread_exit(NULL);
 }
 
-int GetThreadStatus() {
-	int status = EXIT_FAILURE;
-
-
-	//TODO to get the exit status of the thread it needs to be stopped and we
-	//need to check using pthread_join(thread, (void *) &retval);
-
-
-
-	return status;
-}
-
 int StartNativeThread() {
 	int status = EXIT_SUCCESS;
 
@@ -398,7 +386,6 @@ int StartNativeThread() {
 				printf("Native: MsgLoop() start failure!\n");
 			#endif
 
-
 			return JNI_ERR; //Naturally exit so jni exception is thrown.
 		}
 		else {
@@ -406,10 +393,8 @@ int StartNativeThread() {
 				printf("Native: MsgLoop() start successful.\n");
 			#endif
 
-			//Wait for the thread to release the lock.
-			while (pthread_mutex_trylock(&hookMutexHandle) == EBUSY) {
-				sched_yield();
-			}
+			//Wait for the thread to start up.
+			pthread_mutex_lock(&hookMutexHandle);
 
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start done.\n");
@@ -424,10 +409,15 @@ int StopNativeThread() {
 	int status = EXIT_SUCCESS;
 
 	if (IsNativeThreadRunning() == true) {
+		//Lock the thread.
 		pthread_mutex_lock(&hookMutexHandle);
 
 		//Try to exit the thread naturally.
 		XRecordDisableContext(disp_data, context);
+
+		//Must unlock to allow the thread to finish cleaning up.
+		pthread_mutex_unlock(&hookMutexHandle);
+
 
 		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
