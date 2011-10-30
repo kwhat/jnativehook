@@ -42,10 +42,13 @@ typedef union {
 } XRecordDatum;
 
 //The pointer to the X11 display for the hook and data.
-extern Display * disp_data;
+static Display * disp_data;
 static Display * disp_hook;
 
 //Thread and hook handles.
+#ifndef XRECORD_SYNC
+static bool running;
+#endif
 static pthread_mutex_t hookMutexHandle = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
 static XRecordContext context = 0;
@@ -254,6 +257,16 @@ static void * ThreadProc() {
 		CreateJNIGlobals(env);
 
 		//Grab the default display
+		disp_data = XOpenDisplay(XDisplayName(NULL));
+		#ifdef DEBUG
+		if (disp_data != NULL) {
+			printf("Native: XOpenDisplay successful.\n");
+		}
+		else {
+			printf("Native: XOpenDisplay failure!\n");
+		}
+		#endif
+
 		disp_hook = XOpenDisplay(XDisplayName(NULL));
 		#ifdef DEBUG
 		if (disp_hook != NULL) {
@@ -302,6 +315,7 @@ static void * ThreadProc() {
 		}
 
 
+
 		if (context != 0) {
 			//Set the exit status.
 			status = EXIT_SUCCESS;
@@ -312,19 +326,20 @@ static void * ThreadProc() {
 
 			pthread_mutex_unlock(&hookMutexHandle);
 
-			//Async works with the loop and outside of threads.
-			/*
-			XRecordEnableContextAsync(disp_hook, context, LowLevelProc, NULL);
-			while (isRunning) {
-				XRecordProcessReplies(disp_hook);
-			}
-			*/
-
-			//Sync call blocks until we turn off XRecord on the context.
-			XRecordEnableContext(disp_hook, context, LowLevelProc, NULL);
+			#ifndef XRECORD_SYNC
+				//Async requires that we loop so that our thread does not return.
+				XRecordEnableContextAsync(disp_hook, context, LowLevelProc, NULL);
+				while (running) {
+					XRecordProcessReplies(disp_hook);
+				}
+			#else
+				//We should be using this but its broken upstream.
+				XRecordEnableContext(disp_hook, context, LowLevelProc, NULL);
+			#endif
 
 			//Lock back up until we are done processing the exit.
 			pthread_mutex_lock(&hookMutexHandle);
+			XRecordFreeContext(disp_hook, context);
 		}
 		else {
 			#ifdef DEBUG
@@ -335,16 +350,14 @@ static void * ThreadProc() {
 
 		//Destroy the native displays.
 		if (disp_hook != NULL) {
-			XRecordFreeContext(disp_hook, context);
 			XCloseDisplay(disp_hook);
 			disp_hook = NULL;
 		}
 
-
 		//Make sure we clean up the global objects.
 		DestroyJNIGlobals(env);
 
-		//Dettach the current thread to the JVM.
+		//Detach the current thread to the JVM.
 		if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 			#ifdef DEBUG
 				fprintf(stderr, "DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
@@ -352,7 +365,7 @@ static void * ThreadProc() {
 		}
 	}
 	else {
-		//We cant do a whole lot of anythign if we cant attach to the current thread.
+		//We cant do a whole lot of anything if we cant attach to the current thread.
 		#ifdef DEBUG
 			fprintf(stderr, "AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 		#endif
@@ -376,29 +389,37 @@ int StartNativeThread() {
 		//Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookMutexHandle, NULL);
 
+		#ifndef XRECORD_SYNC
+			//Try to exit the thread naturally.
+			running = true;
+		#endif
 
 		/*
 		 * We shall use the default pthread attributes: thread is joinable
 		 * (not detached) and has default (non real-time) scheduling policy.
 		 */
-		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL)) {
-			#ifdef DEBUG
-				printf("Native: MsgLoop() start failure!\n");
-			#endif
-
-			return JNI_ERR; //Naturally exit so jni exception is thrown.
-		}
-		else {
+		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL) == 0) {
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start successful.\n");
 			#endif
 
 			//Wait for the thread to start up.
-			pthread_mutex_lock(&hookMutexHandle);
+			if (pthread_mutex_lock(&hookMutexHandle) == 0) {
+				pthread_mutex_unlock(&hookMutexHandle);
+			}
 
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start done.\n");
 			#endif
+		}
+		else {
+			running = false;
+
+			#ifdef DEBUG
+				printf("Native: MsgLoop() start failure!\n");
+			#endif
+
+			return JNI_ERR; //Naturally exit so jni exception is thrown.
 		}
 	}
 
@@ -412,16 +433,23 @@ int StopNativeThread() {
 		//Lock the thread.
 		pthread_mutex_lock(&hookMutexHandle);
 
-		//Try to exit the thread naturally.
-		XRecordDisableContext(disp_data, context);
+		#ifndef XRECORD_SYNC
+			//Try to exit the thread naturally.
+			XRecordDisableContext(disp_hook, context);
+
+			running = false;
+		#else
+			//This stops the recording but fails to cause the return of XRecordEnableContext
+			XRecordDisableContext(disp_hook, context);
+		#endif
 
 		//Must unlock to allow the thread to finish cleaning up.
 		pthread_mutex_unlock(&hookMutexHandle);
-
+		printf("Unlocked\n");
 
 		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
-		printf("Test: %i", status);
+		printf("Test: %i\n", status);
 
 		//Clean up the mutex.
 		pthread_mutex_destroy(&hookMutexHandle);
@@ -434,20 +462,24 @@ bool IsNativeThreadRunning() {
 	bool running = false;
 
 	//Wait for a lock on the thread.
+	printf("IsNativeThreadRunning: Wait For lock\n");
 	if (pthread_mutex_lock(&hookMutexHandle) == 0) {
 		//Lock Successful.
 
 		if (disp_data != NULL && context != 0) {
+			printf("IsNativeThreadRunning: Is Running\n");
+
 			XRecordState * state_return;
 			if (XRecordGetContext(disp_data, context, &state_return) != 0) {
 				running = state_return->enabled;
 				XRecordFreeState(state_return);
+				printf("IsNativeThreadRunning: Got State (%i)\n", running);
 			}
 			else {
 				printf("XRecordGetContext: Failure!!!\n");
 			}
 		}
-
+		printf("IsNativeThreadRunning: Unlock\n");
 		pthread_mutex_unlock(&hookMutexHandle);
 	}
 	else {
@@ -456,6 +488,7 @@ bool IsNativeThreadRunning() {
 
 		printf("pthread_mutex_lock: Failure!!!\n");
 	}
+	printf("IsNativeThreadRunning: Done\n");
 
 	return running;
 }

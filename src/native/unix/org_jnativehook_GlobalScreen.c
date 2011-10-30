@@ -22,12 +22,11 @@
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-//Global Variables
-Display * disp_data;
-
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
+	Display * disp = XOpenDisplay(XDisplayName(NULL));
+
 	unsigned int xkb_timeout, xkb_interval;
-	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval)) {
+	if (disp == NULL && XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
 		#ifdef DEBUG
 			printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
@@ -36,6 +35,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	(void) xkb_timeout;
+	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: XkbGetAutoRepeatRate successful. (rate: %i)\n", xkb_interval);
@@ -44,6 +44,8 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
+	Display * disp = XOpenDisplay(XDisplayName(NULL));
+
 	unsigned int xkb_timeout, xkb_interval;
 	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval)) {
 		#ifdef DEBUG
@@ -54,6 +56,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	(void) xkb_interval;
+	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
@@ -82,7 +85,9 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	char * xkb_time = XGetDefault(disp_data, "*", "multiClickTime");
+	Display * disp = XOpenDisplay(XDisplayName(NULL));
+	char * xkb_time = XGetDefault(disp, "*", "multiClickTime");
+	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);
