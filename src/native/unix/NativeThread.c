@@ -42,7 +42,7 @@ typedef union {
 } XRecordDatum;
 
 //The pointer to the X11 display for the hook and data.
-static Display * disp_data;
+extern Display * disp_data;
 static Display * disp_hook;
 
 //Thread and hook handles.
@@ -256,44 +256,6 @@ static void * ThreadProc() {
 		//Create all the global references up front to save time in the callbacks.
 		CreateJNIGlobals(env);
 
-		//Grab the default display
-		disp_data = XOpenDisplay(XDisplayName(NULL));
-		#ifdef DEBUG
-		if (disp_data != NULL) {
-			printf("Native: XOpenDisplay successful.\n");
-		}
-		else {
-			printf("Native: XOpenDisplay failure!\n");
-		}
-		#endif
-
-		disp_hook = XOpenDisplay(XDisplayName(NULL));
-		#ifdef DEBUG
-		if (disp_hook != NULL) {
-			printf("Native: XOpenDisplay successful.\n");
-		}
-		else {
-			printf("Native: XOpenDisplay failure!\n");
-		}
-		#endif
-
-		//Check to make sure XRecord is installed and enabled.
-		int major, minor;
-		if (XRecordQueryVersion(disp_hook, &major, &minor) != false) {
-			#ifdef DEBUG
-				printf ("Native: XRecord version: %d.%d.\n", major, minor);
-			#endif
-		}
-		else {
-			#ifdef DEBUG
-				printf ("Native: XRecord is not currently available!\n");
-			#endif
-
-			disp_hook = NULL;
-			disp_data = NULL;
-		}
-
-
 		//Setup XRecord range
 		XRecordClientSpec clients = XRecordAllClients;
 		XRecordRange * range = XRecordAllocRange();
@@ -332,6 +294,7 @@ static void * ThreadProc() {
 				while (running) {
 					XRecordProcessReplies(disp_hook);
 				}
+				XRecordDisableContext(disp_data, context);
 			#else
 				//We should be using this but its broken upstream.
 				XRecordEnableContext(disp_hook, context, LowLevelProc, NULL);
@@ -339,7 +302,6 @@ static void * ThreadProc() {
 
 			//Lock back up until we are done processing the exit.
 			pthread_mutex_lock(&hookMutexHandle);
-			XRecordFreeContext(disp_hook, context);
 		}
 		else {
 			#ifdef DEBUG
@@ -347,12 +309,6 @@ static void * ThreadProc() {
 			#endif
 		}
 
-
-		//Destroy the native displays.
-		if (disp_hook != NULL) {
-			XCloseDisplay(disp_hook);
-			disp_hook = NULL;
-		}
 
 		//Make sure we clean up the global objects.
 		DestroyJNIGlobals(env);
@@ -388,6 +344,39 @@ int StartNativeThread() {
 	if (IsNativeThreadRunning() != true) {
 		//Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookMutexHandle, NULL);
+
+		//Tell X Threads are OK
+		XInitThreads();
+
+		//Grab the default display
+		disp_hook = XOpenDisplay(XDisplayName(NULL));
+		#ifdef DEBUG
+		if (disp_hook != NULL) {
+			printf("Native: XOpenDisplay successful.\n");
+		}
+		else {
+			printf("Native: XOpenDisplay failure!\n");
+		}
+		#endif
+
+
+		//Check to make sure XRecord is installed and enabled.
+		int major, minor;
+		if (XRecordQueryVersion(disp_hook, &major, &minor) != false) {
+			#ifdef DEBUG
+				printf ("Native: XRecord version: %d.%d.\n", major, minor);
+			#endif
+		}
+		else {
+			#ifdef DEBUG
+				printf ("Native: XRecord is not currently available!\n");
+			#endif
+
+			//disp_hook = NULL;
+		}
+
+
+
 
 		#ifndef XRECORD_SYNC
 			//Try to exit the thread naturally.
@@ -435,8 +424,6 @@ int StopNativeThread() {
 
 		#ifndef XRECORD_SYNC
 			//Try to exit the thread naturally.
-			XRecordDisableContext(disp_hook, context);
-
 			running = false;
 		#else
 			//This stops the recording but fails to cause the return of XRecordEnableContext
@@ -450,6 +437,26 @@ int StopNativeThread() {
 		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
 		printf("Test: %i\n", status);
+
+        if (pthread_kill(hookThreadId, SIGKILL) == 0) {
+                #ifdef DEBUG
+                   printf("Native: pthread_kill successful.\n");
+               #endif
+        }
+
+        if (disp_data != NULL) {
+                XRecordDisableContext(disp_data, context);
+                XCloseDisplay(disp_data);
+                disp_data = NULL;
+        }
+
+        if (disp_hook != NULL) {
+                XRecordFreeContext(disp_hook, context);
+                XCloseDisplay(disp_hook);
+                disp_hook = NULL;
+        }
+
+
 
 		//Clean up the mutex.
 		pthread_mutex_destroy(&hookMutexHandle);
