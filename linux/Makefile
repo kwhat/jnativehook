@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O1
 
-PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord
+PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord XRecordThreads
 
 all: $(PROGRAMS)
 
@@ -20,6 +20,9 @@ XGrabPointer: XGrabPointer.c
 	
 XRecord: XRecord.c
 	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) -DASYNC $< -o $@
+	
+XRecordThreads: XRecordThreads.c
+	$(CC) $(CFLAGS) -pthread -lXtst $(LDFLAGS) -DASYNC $< -o $@
 
 clean:
 	-rm -f $(PROGRAMS)
