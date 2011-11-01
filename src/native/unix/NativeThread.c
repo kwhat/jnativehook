@@ -345,9 +345,6 @@ int StartNativeThread() {
 		//Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookMutexHandle, NULL);
 
-		//Tell X Threads are OK
-		XInitThreads();
-
 		//Grab the default display
 		disp_hook = XOpenDisplay(XDisplayName(NULL));
 		#ifdef DEBUG

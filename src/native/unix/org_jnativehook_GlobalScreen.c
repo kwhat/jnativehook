@@ -167,7 +167,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 
 
 	//Tell X Threads are OK
-	//TODO We need to check and see if this is even needed.
 	XInitThreads();
 
 	disp_data = XOpenDisplay(XDisplayName(NULL));
