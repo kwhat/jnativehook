@@ -153,46 +153,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	jvm = vm;
 	JNIEnv * env = 0;
 
-	//FIXME use better var names, should not reutrn jni_version
 	jint jni_version = JNI_VERSION_1_4;
-	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), jni_version);
-	switch (jni_ret) {
-		case JNI_EVERSION:
-			#ifdef DEBUG
-				fprintf(stderr, "JNI_VERSION_1_4 unavailable for use.\n");
-			#endif
-
-			jni_version = JNI_ERR;
-		break;
-
-		case JNI_EDETACHED:
-			//TODO Eval if this is needed.
-			//Not attached to the current thread.
-			if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
-				#ifdef DEBUG
-					fprintf(stderr, "Could not attach the current thread to the Java virtual machine.\n");
-				#endif
-
-				jni_version = JNI_ERR;
-			}
-			else {
-				#ifdef DEBUG
-					fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
-				#endif
-			}
-		case JNI_OK:
-			#ifdef DEBUG
-				fprintf(stdout, "Successfully acquired a Java environment reference.\n");
-			#endif
-		break;
-
-		default:
-			#ifdef DEBUG
-				fprintf(stderr, "An unknown error occurred while acquiring a Java environment reference.\n");
-			#endif
-
-			jni_version = JNI_ERR;
-		break;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		#ifdef DEBUG
+			fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
+		#endif
 	}
 
 	return jni_version;

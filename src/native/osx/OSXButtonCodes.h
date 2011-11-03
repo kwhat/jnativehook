@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_OSXButtonCodes_h
+#define _Included_OSXButtonCodes_h
+
 #include <stdbool.h>
 
 /* OSX does not track the button masks of its events so we need to do it
@@ -37,3 +40,5 @@
 void setModifierMask(unsigned short mod);
 void unsetModifierMask(unsigned short mod);
 bool isModifierMask(unsigned short mod);
+
+#endif

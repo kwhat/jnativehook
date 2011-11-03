@@ -34,7 +34,6 @@
 
 #include <jni.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 //Exception class definitions.
 #define NATIVE_HOOK_EXCEPTION	"org/jnativehook/NativeHookException"

@@ -15,6 +15,9 @@
  * along with this program.  If not see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_OSXKeyCodes_h
+#define _Included_OSXKeyCodes_h
+
 //Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
 //Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
 //Reference: http://www.mactech.com/macintosh-c/chap02-1.html
@@ -153,3 +156,5 @@
 //Suplemental virtual key information
 #define kVK_RightCommand				0x36
 #define kVK_ContextMenu					0x6E	//AKA kMenuPowerGlyph
+
+#endif

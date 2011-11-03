@@ -22,7 +22,6 @@
 #include <X11/Xlibint.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-
 #include <X11/extensions/record.h>
 
 #include "JNativeHook.h"
@@ -42,7 +41,7 @@ typedef union {
 } XRecordDatum;
 
 //The pointer to the X11 display for the hook and data.
-extern Display * disp_data;
+static Display * disp_data;
 static Display * disp_hook;
 
 //Thread and hook handles.
@@ -261,7 +260,7 @@ static void * ThreadProc() {
 		XRecordRange * range = XRecordAllocRange();
 		if (range != NULL) {
 			#ifdef DEBUG
-				printf("Native: XRecordAllocRange successful.\n");
+				fprintf(stdout, "XRecordAllocRange successful.\n");
 			#endif
 
 			//Create XRecord Context
@@ -272,10 +271,9 @@ static void * ThreadProc() {
 		}
 		else {
 			#ifdef DEBUG
-				printf("Native: XRecordAllocRange failure!\n");
+				fprintf(stderr, "XRecordAllocRange failure!\n");
 			#endif
 		}
-
 
 
 		if (context != 0) {
@@ -334,7 +332,7 @@ static void * ThreadProc() {
 	//Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookMutexHandle);
 
-	pthread_exit(NULL);
+	pthread_exit((void **) status);
 }
 
 int StartNativeThread() {
@@ -346,16 +344,17 @@ int StartNativeThread() {
 		pthread_mutex_init(&hookMutexHandle, NULL);
 
 		//Grab the default display
-		disp_hook = XOpenDisplay(XDisplayName(NULL));
+		char * disp_name = XDisplayName(NULL);
+		disp_data = XOpenDisplay(disp_name);
+		disp_hook = XOpenDisplay(disp_name);
 		#ifdef DEBUG
-		if (disp_hook != NULL) {
+		if (disp_data != NULL && disp_hook != NULL) {
 			printf("Native: XOpenDisplay successful.\n");
 		}
 		else {
 			printf("Native: XOpenDisplay failure!\n");
 		}
 		#endif
-
 
 		//Check to make sure XRecord is installed and enabled.
 		int major, minor;
@@ -373,17 +372,13 @@ int StartNativeThread() {
 		}
 
 
-
-
 		#ifndef XRECORD_SYNC
 			//Try to exit the thread naturally.
 			running = true;
 		#endif
 
-		/*
-		 * We shall use the default pthread attributes: thread is joinable
-		 * (not detached) and has default (non real-time) scheduling policy.
-		 */
+		//We shall use the default pthread attributes: thread is joinable
+		//(not detached) and has default (non real-time) scheduling policy.
 		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL) == 0) {
 			#ifdef DEBUG
 				printf("Native: MsgLoop() start successful.\n");
@@ -429,17 +424,10 @@ int StopNativeThread() {
 
 		//Must unlock to allow the thread to finish cleaning up.
 		pthread_mutex_unlock(&hookMutexHandle);
-		printf("Unlocked\n");
 
 		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
-		printf("Test: %i\n", status);
-
-        if (pthread_kill(hookThreadId, SIGKILL) == 0) {
-                #ifdef DEBUG
-                   printf("Native: pthread_kill successful.\n");
-               #endif
-        }
+		printf("Thread Result: %i\n", status);
 
         if (disp_data != NULL) {
                 XRecordDisableContext(disp_data, context);
@@ -453,8 +441,6 @@ int StopNativeThread() {
                 disp_hook = NULL;
         }
 
-
-
 		//Clean up the mutex.
 		pthread_mutex_destroy(&hookMutexHandle);
 	}
@@ -463,36 +449,37 @@ int StopNativeThread() {
 }
 
 bool IsNativeThreadRunning() {
-	bool running = false;
+	bool isRunning = false;
 
 	//Wait for a lock on the thread.
-	printf("IsNativeThreadRunning: Wait For lock\n");
 	if (pthread_mutex_lock(&hookMutexHandle) == 0) {
 		//Lock Successful.
 
 		if (disp_data != NULL && context != 0) {
-			printf("IsNativeThreadRunning: Is Running\n");
-
 			XRecordState * state_return;
 			if (XRecordGetContext(disp_data, context, &state_return) != 0) {
-				running = state_return->enabled;
+				isRunning = state_return->enabled;
 				XRecordFreeState(state_return);
-				printf("IsNativeThreadRunning: Got State (%i)\n", running);
+
+				#ifdef DEBUG
+					printf("IsNativeThreadRunning: Got State (%i)\n", isRunning);
+				#endif
 			}
 			else {
-				printf("XRecordGetContext: Failure!!!\n");
+				printf("XRecordGetContext: Failure!\n");
 			}
 		}
-		printf("IsNativeThreadRunning: Unlock\n");
+
 		pthread_mutex_unlock(&hookMutexHandle);
 	}
 	else {
 		//Lock Failure. This should always be caused by an invalid pointer
 		//and/or an uninitialized mutex.
 
-		printf("pthread_mutex_lock: Failure!!!\n");
+		#ifdef DEBUG
+			printf("pthread_mutex_lock: Failure!!!\n");
+		#endif
 	}
-	printf("IsNativeThreadRunning: Done\n");
 
-	return running;
+	return isRunning;
 }

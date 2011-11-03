@@ -22,11 +22,12 @@
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
-	Display * disp = XOpenDisplay(XDisplayName(NULL));
+static Display * disp;
 
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
 	unsigned int xkb_timeout, xkb_interval;
-	if (disp == NULL && XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
+
+	if (XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
 		#ifdef DEBUG
 			printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
@@ -35,7 +36,6 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	(void) xkb_timeout;
-	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: XkbGetAutoRepeatRate successful. (rate: %i)\n", xkb_interval);
@@ -44,10 +44,9 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
-	Display * disp = XOpenDisplay(XDisplayName(NULL));
-
 	unsigned int xkb_timeout, xkb_interval;
-	if (!XkbGetAutoRepeatRate(disp_data, XkbUseCoreKbd, &xkb_timeout, &xkb_interval)) {
+
+	if (XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
 		#ifdef DEBUG
 			printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
@@ -56,7 +55,6 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 	(void) xkb_interval;
-	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
@@ -85,9 +83,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	Display * disp = XOpenDisplay(XDisplayName(NULL));
 	char * xkb_time = XGetDefault(disp, "*", "multiClickTime");
-	XCloseDisplay(disp);
 
 	#ifdef DEBUG
 		printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);
@@ -123,82 +119,48 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	jvm = vm;
 	JNIEnv * env = 0;
 
-	//FIXME use better var names, should not reutrn jni_version
 	jint jni_version = JNI_VERSION_1_4;
-	jint jni_ret = (*jvm)->GetEnv(jvm, (void **)(&env), jni_version);
-	switch (jni_ret) {
-		case JNI_EVERSION:
-			#ifdef DEBUG
-				fprintf(stderr, "JNI_VERSION_1_4 unavailable for use.\n");
-			#endif
-
-			jni_version = JNI_ERR;
-		break;
-
-		case JNI_EDETACHED:
-			//TODO Eval if this is needed.
-			//Not attached to the current thread.
-			if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
-				#ifdef DEBUG
-					fprintf(stderr, "Could not attach the current thread to the Java virtual machine.\n");
-				#endif
-
-				jni_version = JNI_ERR;
-			}
-			else {
-				#ifdef DEBUG
-					fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
-				#endif
-			}
-		case JNI_OK:
-			#ifdef DEBUG
-				fprintf(stdout, "Successfully acquired a Java environment reference.\n");
-			#endif
-		break;
-
-		default:
-			#ifdef DEBUG
-				fprintf(stderr, "An unknown error occurred while acquiring a Java environment reference.\n");
-			#endif
-
-			jni_version = JNI_ERR;
-		break;
-	}
-
-
-	//Tell X Threads are OK
-	XInitThreads();
-
-	disp_data = XOpenDisplay(XDisplayName(NULL));
-	if (disp_data != NULL) {
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		#ifdef DEBUG
-			printf("Native: XOpenDisplay successful.\n");
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-			printf("Native: XOpenDisplay failure!\n");
+			fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
 		#endif
 
-		//TODO ThrowException
+		//Tell X Threads are OK
+		XInitThreads();
+
+		//Open local display.
+		disp = XOpenDisplay(XDisplayName(NULL));
+		if (disp != NULL) {
+			#ifdef DEBUG
+				fprintf(stdout, "XOpenDisplay successful.\n");
+			#endif
+		}
+		else {
+			#ifdef DEBUG
+				fprintf(stderr, "XOpenDisplay failure!\n");
+			#endif
+
+			ThrowFatalError(env, "Could not attach to the default X11 display");
+		}
+
+		//enable detectable autorepeat.
+		Bool isAutoRepeat;
+		XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
+		if (isAutoRepeat == True) {
+			#ifdef DEBUG
+				fprintf(stdout, "Successfully enabled detectable autorepeat.\n");
+			#endif
+		}
+		else {
+			#ifdef DEBUG
+				fprintf(stderr, "Could not enable detectable auto-repeat!\n");
+			#endif
+
+			ThrowException(env, NATIVE_HOOK_EXCEPTION, "Could not enable detectable auto-repeat");
+		}
 	}
 
-    //enable detectable autorepeat.
-    Bool isAutoRepeat;
-    XkbSetDetectableAutoRepeat(disp_data, true, &isAutoRepeat);
-    if (!isAutoRepeat) {
-            #ifdef DEBUG
-                    printf("Native: Could not enable detectable autorepeat.\n");
-            #endif
-    }
-    else {
-            #ifdef DEBUG
-                    printf("Native: XkbSetDetectableAutoRepeat successful\n");
-            #endif
-    }
-
-
-	return jni_version;
+    return jni_version;
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
@@ -208,9 +170,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	}
 
 	//Destroy the native displays.
-	if (disp_data != NULL) {
-		XCloseDisplay(disp_data);
-		disp_data = NULL;
+	if (disp != NULL) {
+		XCloseDisplay(disp);
+		disp = NULL;
 	}
 
 	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
