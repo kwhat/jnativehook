@@ -31,7 +31,8 @@
 //Thread and hook handles.
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
-static pthread_mutex_t hookMutexHandle = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId = 0;
 
 //GlobalScreen object and dispatch id.
@@ -337,7 +338,8 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 }
 
 static void * ThreadProc() {
-	pthread_mutex_lock(&hookMutexHandle);
+	pthread_mutex_lock(&hookControlMutex);
+	pthread_mutex_lock(&hookRunningMutex);
 	int status = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.
@@ -398,12 +400,12 @@ static void * ThreadProc() {
 					#endif
 
 					CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
-					pthread_mutex_unlock(&hookMutexHandle);
+					pthread_mutex_unlock(&hookControlMutex);
 
 					CFRunLoopRun();
 
 					//Lock back up until we are done processing the exit.
-					pthread_mutex_lock(&hookMutexHandle);
+					pthread_mutex_lock(&hookControlMutex);
 					CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
 				}
 			}
@@ -437,7 +439,8 @@ static void * ThreadProc() {
 	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
-	pthread_mutex_unlock(&hookMutexHandle);
+	pthread_mutex_unlock(&hookRunningMutex);
+	pthread_mutex_unlock(&hookControlMutex);
 
 	pthread_exit((void **) status);
 }
@@ -448,7 +451,7 @@ int StartNativeThread() {
 	//Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
 		//Lock the mutex handle for the thread hook.
-		pthread_mutex_init(&hookMutexHandle, NULL);
+		pthread_mutex_init(&hookControlMutex, NULL);
 
 		//Check and make sure assistive devices is enabled.
 		if (AXAPIEnabled() == true) {
@@ -473,8 +476,8 @@ int StartNativeThread() {
 			#endif
 
 			//Wait for the thread to start up.
-			if (pthread_mutex_lock(&hookMutexHandle) == 0) {
-				pthread_mutex_unlock(&hookMutexHandle);
+			if (pthread_mutex_lock(&hookControlMutex) == 0) {
+				pthread_mutex_unlock(&hookControlMutex);
 			}
 
 			#ifdef DEBUG
@@ -498,19 +501,19 @@ int StopNativeThread() {
 
 	if (IsNativeThreadRunning() == true) {
 		//Lock the thread.
-		pthread_mutex_lock(&hookMutexHandle);
+		pthread_mutex_lock(&hookControlMutex);
 
 		CFRunLoopStop(event_loop);
 
 		//Must unlock to allow the thread to finish cleaning up.
-		pthread_mutex_unlock(&hookMutexHandle);
+		pthread_mutex_unlock(&hookControlMutex);
 
 		//Wait for the thread to die.
 		pthread_join(hookThreadId, (void **) &status);
 		printf("Thread Result: %i\n", status);
 
 		//Clean up the mutex.
-		pthread_mutex_destroy(&hookMutexHandle);
+		pthread_mutex_destroy(&hookControlMutex);
 	}
 
 	return status;
@@ -520,24 +523,29 @@ bool IsNativeThreadRunning() {
 	bool isRunning = false;
 
 	//Wait for a lock on the thread.
-	if (pthread_mutex_lock(&hookMutexHandle) == 0) {
+	if (pthread_mutex_lock(&hookControlMutex) == 0) {
 		//Lock Successful.
 
-		//FIXME Causing memory access issues probably because we arent in the correct thread.
-		CFStringRef mode = CFRunLoopCopyCurrentMode(event_loop);
-		isRunning = (mode != NULL);
+		if (pthread_mutex_trylock(&hookRunningMutex) == 0) {
+			//Lock Successful, we are not running.
+			pthread_mutex_unlock(&hookRunningMutex);
+		}
+		else {
+			isRunning = true;
+		}
+
 		#ifdef DEBUG
-			printf("IsNativeThreadRunning: Got State (%s)\n", mode);
+			fprintf(stdout, "IsNativeThreadRunning: Running State (%i)\n", isRunning);
 		#endif
 
-		pthread_mutex_unlock(&hookMutexHandle);
+		pthread_mutex_unlock(&hookControlMutex);
 	}
 	else {
 		//Lock Failure. This should always be caused by an invalid pointer
 		//and/or an uninitialized mutex.
 
 		#ifdef DEBUG
-			printf("pthread_mutex_lock: Failure!!!\n");
+			fprintf(stderr, "IsNativeThreadRunning: Failed to acquire control mutex lock!\n");
 		#endif
 	}
 

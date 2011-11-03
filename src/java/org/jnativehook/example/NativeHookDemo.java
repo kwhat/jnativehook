@@ -271,8 +271,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
-		GlobalScreen.getInstance();
-		
 		try {
 			txtEventInfo.setText("Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
 			txtEventInfo.append("\n" + "Auto Repate Delay: " + GlobalScreen.getInstance().getAutoRepeatDelay());
