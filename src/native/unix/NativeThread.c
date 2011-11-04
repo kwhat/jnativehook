@@ -107,7 +107,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			switch (event_type) {
 				case KeyPress:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc: Key pressed. (%i)\n", event_code);
+						fprintf(stdout, "LowLevelProc(): Key pressed. (%i)\n", event_code);
 					#endif
 
 					keysym = XKeycodeToKeysym(disp_data, event_code, 0);
@@ -121,7 +121,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 				case KeyRelease:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc: Key released. (%i)\n", event_code);
+						fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
 					#endif
 
 					keysym = XKeycodeToKeysym(disp_data, event_code, 0);
@@ -135,7 +135,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 				case ButtonPress:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc: Button pressed. (%i)\n", event_code);
+						fprintf(stdout, "LowLevelProc(): Button pressed. (%i)\n", event_code);
 					#endif
 
 					//FIXME Dirty hack to prevent scroll events.
@@ -160,7 +160,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 				case ButtonRelease:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc: Button released. (%i)\n", event_code);
+						fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
 					#endif
 
 					//FIXME Dirty hack to prevent scroll events.
@@ -177,7 +177,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 				case MotionNotify:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc: Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
+						fprintf(stdout, "LowLevelProc(): Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
 					#endif
 
 					modifiers = doModifierConvert(event_mask);
@@ -189,7 +189,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 				default:
 					#ifdef DEBUG
-						fprintf(stderr, "LowLevelProc: Unhandled Event Type!\n");
+						fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
 					#endif
 				break;
 			}
@@ -197,7 +197,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			//Handle any possible JNI issue that may have occured.
 			if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 				#ifdef DEBUG
-					fprintf(stderr, "LowLevelProc: JNI error occurred!\n");
+					fprintf(stderr, "LowLevelProc(): JNI error occurred!\n");
 					(*env)->ExceptionDescribe(env);
 				#endif
 				(*env)->ExceptionClear(env);
@@ -265,14 +265,14 @@ static void * ThreadProc() {
 		Display * disp_hook = XOpenDisplay(disp_name);
 		if (disp_data != NULL && disp_hook != NULL) {
 			#ifdef DEBUG
-				printf("Native: XOpenDisplay successful.\n");
+				fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
 			#endif
 
 			//Check to make sure XRecord is installed and enabled.
 			int major, minor;
 			if (XRecordQueryVersion(disp_hook, &major, &minor) != false) {
 				#ifdef DEBUG
-					printf ("Native: XRecord version: %d.%d.\n", major, minor);
+					fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
 				#endif
 
 				//Setup XRecord range
@@ -280,7 +280,7 @@ static void * ThreadProc() {
 				XRecordRange * range = XRecordAllocRange();
 				if (range != NULL) {
 					#ifdef DEBUG
-						fprintf(stdout, "XRecordAllocRange successful.\n");
+						fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
 					#endif
 
 					//Create XRecord Context
@@ -291,19 +291,19 @@ static void * ThreadProc() {
 				}
 				else {
 					#ifdef DEBUG
-						fprintf(stderr, "XRecordAllocRange failure!\n");
+						fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
 					#endif
 				}
 			}
 			else {
 				#ifdef DEBUG
-					printf ("Native: XRecord is not currently available!\n");
+					fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
 				#endif
 			}
 		}
 		else {
 			#ifdef DEBUG
-				printf("Native: XOpenDisplay failure!\n");
+				fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
 			#endif
 		}
 
@@ -313,7 +313,7 @@ static void * ThreadProc() {
 			status = EXIT_SUCCESS;
 
 			#ifdef DEBUG
-				printf("Native: XRecordCreateContext successful.\n");
+				fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
 			#endif
 
 			pthread_mutex_unlock(&hookControlMutex);
@@ -335,7 +335,7 @@ static void * ThreadProc() {
 		}
 		else {
 			#ifdef DEBUG
-				printf("Native: XRecordCreateContext failure!\n");
+				fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
 			#endif
 		}
 
@@ -356,19 +356,19 @@ static void * ThreadProc() {
 		//Detach the current thread to the JVM.
 		if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 			#ifdef DEBUG
-				fprintf(stderr, "DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+				fprintf(stderr, "ThreadProc(): DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 			#endif
 		}
 	}
 	else {
 		//We cant do a whole lot of anything if we cant attach to the current thread.
 		#ifdef DEBUG
-			fprintf(stderr, "AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+			fprintf(stderr, "ThreadProc(): AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 		#endif
 	}
 
 	#ifdef DEBUG
-		fprintf(stdout, "ThreadProc() has completed.\n");
+		fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
@@ -386,18 +386,16 @@ int StartNativeThread() {
 		//Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookControlMutex, NULL);
 
-
 		#ifndef XRECORD_SYNC
 			//Allow the thread loop to block.
 			running = true;
 		#endif
 
-
 		//We shall use the default pthread attributes: thread is joinable
 		//(not detached) and has default (non real-time) scheduling policy.
 		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL) == 0) {
 			#ifdef DEBUG
-				printf("Native: MsgLoop() start successful.\n");
+				fprintf(stdout, "StartNativeThread(): start successful.\n");
 			#endif
 
 			//Wait for the thread to start up.
@@ -406,17 +404,17 @@ int StartNativeThread() {
 			}
 
 			#ifdef DEBUG
-				printf("Native: MsgLoop() start done.\n");
+				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 			#endif
 		}
 		else {
 			running = false;
 
 			#ifdef DEBUG
-				printf("Native: MsgLoop() start failure!\n");
+				fprintf(stderr, "StartNativeThread(): start failure!\n");
 			#endif
 
-			return JNI_ERR; //Naturally exit so jni exception is thrown.
+			status = EXIT_FAILURE;
 		}
 	}
 

@@ -60,7 +60,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 			case WM_KEYDOWN:
 			case WM_SYSKEYDOWN:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelKeyboardProc: Key pressed (%i)\n", (unsigned int) kbhook->vkCode);
+					fprintf(stdout, "LowLevelKeyboardProc(): Key pressed. (%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
 				//Check and setup modifiers
@@ -84,7 +84,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelKeyboardProc: Key released (%i)\n", (unsigned int) kbhook->vkCode);
+					fprintf(stdout, "LowLevelKeyboardProc(): Key released. (%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
 				//Check and setup modifiers
@@ -109,7 +109,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		//Handle any possible JNI issue that may have occured.
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
-				fprintf(stderr, "LowLevelKeyboardProc: JNI error occurred!\n");
+				fprintf(stderr, "LowLevelKeyboardProc(): JNI error occurred!\n");
 				(*env)->ExceptionDescribe(env);
 			#endif
 			(*env)->ExceptionClear(env);
@@ -166,7 +166,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			BUTTONDOWN:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelMouseProc: Button pressed (%i)\n", (int) jbutton);
+					fprintf(stdout, "LowLevelMouseProc(): Button pressed. (%i)\n", (int) jbutton);
 				#endif
 
 				modifiers = getModifiers();
@@ -207,7 +207,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			BUTTONUP:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelMouseProc: Button released (%i)\n", (int) jbutton);
+					fprintf(stdout, "LowLevelMouseProc(): Button released. (%i)\n", (int) jbutton);
 				#endif
 
 				modifiers = getModifiers();
@@ -219,7 +219,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			case WM_MOUSEMOVE:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelMouseProc: Motion Notified (%li, %li)\n", mshook->pt.x, mshook->pt.y);
+					fprintf(stdout, "LowLevelMouseProc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 				#endif
 
 				modifiers = getModifiers();
@@ -231,7 +231,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			case WM_MOUSEWHEEL:
 				#ifdef DEBUG
-					fprintf(stdout, "LowLevelMouseProc: WM_MOUSEWHEEL (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
+					fprintf(stdout, "LowLevelMouseProc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
 				#endif
 
 				modifiers = getModifiers();
@@ -307,7 +307,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 			default:
 				#ifdef DEBUG
-					fprintf(stdout, "Unhandled mouse event (%X).\n", (unsigned int) wParam);
+					fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
 				#endif
 			break;
 		}
@@ -315,7 +315,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 		//Handle any possible JNI issue that may have occured.
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
-				fprintf(stderr, "LowLevelMouseProc: JNI error occurred!\n");
+				fprintf(stderr, "LowLevelMouseProc(): JNI error occurred!\n");
 				(*env)->ExceptionDescribe(env);
 			#endif
 			(*env)->ExceptionClear(env);
@@ -393,20 +393,20 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
 		#ifdef DEBUG
 		if (handleKeyboardHook != NULL) {
-			fprintf(stdout, "SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful.\n");
+			fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful.\n");
 		}
 		else {
-			fprintf(stderr, "SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed!\n");
+			fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed!\n");
 		}
 		#endif
 
 		handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
 		#ifdef DEBUG
 		if (handleMouseHook != NULL) {
-			fprintf(stdout, "SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful.\n");
+			fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful.\n");
 		}
 		else {
-			fprintf(stderr, "SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed!\n");
+			fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed!\n");
 		}
 		#endif
 
@@ -446,19 +446,19 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		//Dettach the current thread to the JVM.
 		if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 			#ifdef DEBUG
-				fprintf(stderr, "DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+				fprintf(stderr, "ThreadProc(): DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 			#endif
 		}
 	}
 	else {
-		//We cant do a whole lot of anythign if we cant attach to the current thread.
+		//We cant do a whole lot of anything if we cant attach to the current thread.
 		#ifdef DEBUG
-			fprintf(stderr, "AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+			fprintf(stderr, "ThreadProc(): AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 		#endif
 	}
 
 	#ifdef DEBUG
-		fprintf(stdout, "ThreadProc() has completed.\n");
+		fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
@@ -476,7 +476,7 @@ DWORD GetThreadStatus() {
 }
 
 int StartNativeThread() {
-	int status = EXIT_SUCCESS;
+	int status = EXIT_FAILURE;
 
 	//Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
@@ -487,32 +487,30 @@ int StartNativeThread() {
 		hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
 		if (hookThreadHandle != INVALID_HANDLE_VALUE) {
 			#ifdef DEBUG
-				fprintf(stdout, "ThreadProc() has started.\n");
+				fprintf(stdout, "StartNativeThread(): start successful.\n");
 			#endif
 
 			//Wait for any possible thread exceptions to get thrown into the queue.
 			WaitForSingleObject(hookEventHandle, INFINITE);
 
-			//TODO Set the reutrn status to the thread exit code.
+			//TODO Set the return status to the thread exit code.
 			if (IsNativeThreadRunning()) {
 				#ifdef DEBUG
-					fprintf(stdout, "ThreadProc() initialization successful.\n");
+					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 				#endif
+
+				status = EXIT_SUCCESS;
 			}
 			else {
 				#ifdef DEBUG
-					fprintf(stderr, "ThreadProc() initialization failure!\n");
+					fprintf(stderr, "StartNativeThread(): initialization failure!\n");
 				#endif
-
-				status = EXIT_FAILURE;
 			}
 		}
 		else {
 			#ifdef DEBUG
-				fprintf(stderr, "ThreadProc() start failure!\n");
+				fprintf(stderr, "StartNativeThread(): start failure!\n");
 			#endif
-
-			status = EXIT_FAILURE;
 		}
 	}
 
@@ -529,14 +527,14 @@ int StopNativeThread() {
 
 		if (CloseHandle(hookThreadHandle)) {
 			#ifdef DEBUG
-				fprintf(stdout, "CloseHandle successful.\n");
+				fprintf(stdout, "StopNativeThread(): CloseHandle successful.\n");
 			#endif
 
 			hookThreadHandle = NULL;
 		}
 		else {
 			#ifdef DEBUG
-				fprintf(stderr, "CloseHandle failure!\n");
+				fprintf(stderr, "StopNativeThread(): CloseHandle failure!\n");
 			#endif
 
 			status = EXIT_FAILURE;
