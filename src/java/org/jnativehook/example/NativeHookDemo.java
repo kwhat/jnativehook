@@ -274,8 +274,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		try {
 			txtEventInfo.setText("Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
 			txtEventInfo.append("\n" + "Auto Repate Delay: " + GlobalScreen.getInstance().getAutoRepeatDelay());
+			txtEventInfo.append("\n" + "Double Click Time: " + GlobalScreen.getInstance().getDoubleClickTime());
+			txtEventInfo.append("\n" + "Pointer Sensitivity: " + GlobalScreen.getInstance().getPointerSensitivity());
+			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + GlobalScreen.getInstance().getPointerAccelerationMultiplier());
+			txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + GlobalScreen.getInstance().getPointerAccelerationThreshold());
 		}
-		catch (NativeKeyException ex) {
+		catch (Exception ex) {
 			txtEventInfo.setText("Error: " + ex.toString() + "\n");
 		}
 		

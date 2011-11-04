@@ -16,31 +16,70 @@
  */
 
 #include <X11/Xlib.h>
+
+#ifdef XKB
 #include <X11/XKBlib.h>
+#endif
+
+#ifdef XF86MISC
+#include <X11/extensions/xf86misc.h>
+#include <X11/extensions/xf86mscstr.h>
+#endif
 
 #include "JNativeHook.h"
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
+#ifdef XKB
+#define KB_DELAY_DEFAULT	660
+#define KB_RATE_DEFAULT		40
+#endif
+
+#ifdef XF86MISC
+#define KB_DELAY_DEFAULT	500
+#define KB_RATE_DEFAULT		30
+#endif
+
 static Display * disp;
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
-	unsigned int xkb_timeout, xkb_interval;
+	int kb_delay, kb_rate;
+	bool success = false;
 
-	if (XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
+	#ifdef XKB
+	if (success != true) {
+		success = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_timeout, &kb_interval);
+	}
+	#endif
+
+	#ifdef XF86MISC
+	if (success != true) {
+		XF86MiscKbdSettings kb_info;
+		success = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
+
+		if (success == true) {
+			kb_delay = kbdinfo.delay;
+			kb_rate = kbdinfo.rate;
+		}
+	}
+	#endif
+
+	if (success == true) {
 		#ifdef DEBUG
-			printf("Native: XkbGetAutoRepeatRate failure!\n");
+		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %i)\n", kb_rate);
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): failure!\n");
 		#endif
 
 		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
-		return JNI_ERR; //Naturally exit so jni exception is thrown.
+		kb_rate = JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
-	(void) xkb_timeout;
 
-	#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate successful. (rate: %i)\n", xkb_interval);
-	#endif
-	return (jlong) xkb_interval;
+	(void) kb_delay;
+	return (jlong) kb_rate;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
@@ -48,7 +87,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 
 	if (XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
 		#ifdef DEBUG
-			printf("Native: XkbGetAutoRepeatRate failure!\n");
+		printf("Native: XkbGetAutoRepeatRate failure!\n");
 		#endif
 
 		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat delay.");
@@ -57,37 +96,61 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 	(void) xkb_interval;
 
 	#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
+	printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
 	#endif
 	return (jlong) xkb_timeout;
 }
 
 // 0-Threshold X, 1-Threshold Y and 2-Speed
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(JNIEnv * env, jobject UNUSED(obj)) {
-	ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the pointer acceleration multiplier.");
+	int accel_numerator, accel_denominator, threshold;
+	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
+	if (accel_denominator < 0) {
+		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer acceleration multiplier.");
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
+	}
+	(void) accel_numerator;
+	(void) threshold;
 
-	return (jlong) JNI_ERR;
+	return (jlong) accel_denominator;
 }
 
 // 0-Threshold X, 1-Threshold Y and 2-Speed
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(JNIEnv * env, jobject UNUSED(obj)) {
-	ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the pointer acceleration threshold.");
+	int accel_numerator, accel_denominator, threshold;
+	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
+	if (threshold < 0) {
+		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer acceleration threshold.");
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
+	}
+	(void) accel_numerator;
+	(void) accel_denominator;
 
-	//Average the x and y thresholds.
-	return (jlong) JNI_ERR;
+	return (jlong) threshold;
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	return (jlong) JNI_ERR;
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * env, jobject UNUSED(obj)) {
+	int accel_numerator, accel_denominator, threshold;
+	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
+	if (accel_numerator < 0) {
+		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer sensitivity.");
+		return JNI_ERR; //Naturally exit so jni exception is thrown.
+	}
+	(void) accel_denominator;
+	(void) threshold;
+
+	return (jlong) accel_numerator;
 }
+
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	char * xkb_time = XGetDefault(disp, "*", "multiClickTime");
 
 	#ifdef DEBUG
-		printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);
+	printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);
 	#endif
+
 	return (jlong) JNI_ERR;
 }
 
@@ -122,7 +185,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	jint jni_version = JNI_VERSION_1_4;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		#ifdef DEBUG
-			fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
+		fprintf(stdout, "Successfully attached the current thread to the Java virtual machine.\n");
 		#endif
 
 		//Tell X Threads are OK
@@ -132,12 +195,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		disp = XOpenDisplay(XDisplayName(NULL));
 		if (disp != NULL) {
 			#ifdef DEBUG
-				fprintf(stdout, "XOpenDisplay successful.\n");
+			fprintf(stdout, "XOpenDisplay successful.\n");
 			#endif
 		}
 		else {
 			#ifdef DEBUG
-				fprintf(stderr, "XOpenDisplay failure!\n");
+			fprintf(stderr, "XOpenDisplay failure!\n");
 			#endif
 
 			ThrowFatalError(env, "Could not attach to the default X11 display");
@@ -148,12 +211,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
 		if (isAutoRepeat == True) {
 			#ifdef DEBUG
-				fprintf(stdout, "Successfully enabled detectable autorepeat.\n");
+			fprintf(stdout, "Successfully enabled detectable autorepeat.\n");
 			#endif
 		}
 		else {
 			#ifdef DEBUG
-				fprintf(stderr, "Could not enable detectable auto-repeat!\n");
+			fprintf(stderr, "Could not enable detectable auto-repeat!\n");
 			#endif
 
 			ThrowException(env, NATIVE_HOOK_EXCEPTION, "Could not enable detectable auto-repeat");
@@ -177,11 +240,11 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 
 	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 		#ifdef DEBUG
-			fprintf(stderr, "Could not dettach the current thread from the Java virtual machine!\n");
+		fprintf(stderr, "Could not dettach the current thread from the Java virtual machine!\n");
 		#endif
 	}
 
 	#ifdef DEBUG
-		fprintf(stdout, "JNI Unloaded.\n");
+	fprintf(stdout, "JNI Unloaded.\n");
 	#endif
 }
