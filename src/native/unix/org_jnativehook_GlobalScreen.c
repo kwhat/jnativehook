@@ -44,27 +44,27 @@ static Display * disp;
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
 	int kb_delay, kb_rate;
-	bool success = false;
+	bool successful = false;
 
 	#ifdef XKB
-	if (success != true) {
-		success = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_timeout, &kb_interval);
+	if (!successful) {
+		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_timeout, &kb_interval);
 	}
 	#endif
 
 	#ifdef XF86MISC
-	if (success != true) {
+	if (!successful) {
 		XF86MiscKbdSettings kb_info;
-		success = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
+		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 
-		if (success == true) {
+		if (successful) {
 			kb_delay = kbdinfo.delay;
 			kb_rate = kbdinfo.rate;
 		}
 	}
 	#endif
 
-	if (success == true) {
+	if (successful) {
 		#ifdef DEBUG
 		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %i)\n", kb_rate);
 		#endif
@@ -206,10 +206,20 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			ThrowFatalError(env, "Could not attach to the default X11 display");
 		}
 
+		bool isAutoRepeat = false;
+		#ifdef XKB
 		//enable detectable autorepeat.
-		Bool isAutoRepeat;
 		XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
-		if (isAutoRepeat == True) {
+		#else
+		XAutoRepeatOn(disp);
+
+		XKeyboardState kb_state;
+		XGetKeyboardControl(disp, &kb_state);
+
+		isAutoRepeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
+		#endif
+
+		if (isAutoRepeat) {
 			#ifdef DEBUG
 			fprintf(stdout, "Successfully enabled detectable autorepeat.\n");
 			#endif
