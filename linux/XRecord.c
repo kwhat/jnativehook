@@ -23,8 +23,8 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/record.h>
 
-static Display * disp_hook;
 static Display * disp_data;
+static Display * disp_ctrl;
 static XRecordContext context;
 #ifdef ASYNC
 bool running = true;
@@ -53,23 +53,20 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 	switch(data->type) {
 		case KeyPress:
 			//Stop looping if the escape key is pressed.
-			if (XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0) == XK_Escape) {
+			if (XKeycodeToKeysym(disp_ctrl, data->event.u.u.detail, 0) == XK_Escape) {
 				#ifdef ASYNC
 					running = false;
 				#else
-					//This has NO effect.
-					//XRecordDisableContext(disp_data, context);
-
-					//This stops the recording but fails to cause a return.
-					XRecordDisableContext(disp_hook, context);
+					XRecordDisableContext(disp_ctrl, context);
+					XSync(disp_ctrl, True);
 				#endif
 			}
 
-			printf("Key Press - %i\n", (int) XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0));
+			printf("Key Press - %i\n", (int) XKeycodeToKeysym(disp_ctrl, data->event.u.u.detail, 0));
 		break;
 
 		case KeyRelease:
-			printf("Key Release - %i\n", (int) XKeycodeToKeysym(disp_data, data->event.u.u.detail, 0));
+			printf("Key Release - %i\n", (int) XKeycodeToKeysym(disp_ctrl, data->event.u.u.detail, 0));
 		break;
 
 		case ButtonPress:
@@ -95,9 +92,9 @@ void callback(XPointer pointer, XRecordInterceptData * hook) {
 
 int main(int argc, const char * argv[]) {
 	//Try to attach to the default X11 display.
-	disp_hook = XOpenDisplay(NULL);
 	disp_data = XOpenDisplay(NULL);
-	if(disp_hook == NULL || disp_data == NULL) {
+	disp_ctrl = XOpenDisplay(NULL);
+	if(disp_data == NULL || disp_ctrl == NULL) {
 		printf("Error: Could not open display!\n");
 		return EXIT_FAILURE;
 	}
@@ -113,7 +110,7 @@ int main(int argc, const char * argv[]) {
 	//Create XRecord Context
 	range->device_events.first = KeyPress;
 	range->device_events.last = MotionNotify;
-	context = XRecordCreateContext(disp_hook, 0, &clients, 1, &range, 1);
+	context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 	XFree(range);
 	if (context == 0) {
 		printf("Error: Could not create XRecordContext!");
@@ -122,22 +119,23 @@ int main(int argc, const char * argv[]) {
 
 	//Start XRecord process
 	#ifdef ASYNC
-		XRecordEnableContextAsync(disp_hook, context, callback, NULL);
+		XRecordEnableContextAsync(disp_data, context, callback, NULL);
 		while(running) {
-			XRecordProcessReplies(disp_hook);
+			XRecordProcessReplies(disp_data);
 		}
-		//This causes a segmentation fault
-		//XRecordDisableContext(disp_hook, context);
+		XRecordDisableContext(disp_ctrl, context);
+		XSync(disp_ctrl, True);
 	#else
-		XRecordEnableContext(disp_hook, context, callback, NULL);
+		XRecordEnableContext(disp_data, context, callback, NULL);
 	#endif
 
+	XRecordFreeContext(disp_ctrl, context);
+
 	//Disable the XRecord context on the data display and close the connection.
-	XCloseDisplay(disp_data);
+	XCloseDisplay(disp_ctrl);
 
 	//Free the XRecord context on the hook display and close the connection.
-	XRecordFreeContext(disp_hook, context);
-	XCloseDisplay(disp_hook);
+	XCloseDisplay(disp_data);
 
 	return EXIT_SUCCESS;
 }
