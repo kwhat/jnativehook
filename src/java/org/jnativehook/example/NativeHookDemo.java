@@ -28,18 +28,20 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyException;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
@@ -151,12 +153,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		}
 		else if (item == chkMotion) {
 			//Motion checkbox was changed, adjust listeners accordingly
-        	if (e.getStateChange() == ItemEvent.SELECTED) {
-        		GlobalScreen.getInstance().addNativeMouseMotionListener(this);
-        	}
-        	else {
-        		GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
-        	}
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				GlobalScreen.getInstance().addNativeMouseMotionListener(this);
+			}
+			else {
+				GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
+			}
 		}
 	}
 	
@@ -292,13 +294,17 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
 	 */
 	public void windowClosed(WindowEvent e) {
-		try {
-			//Clean up the native hook.
-			GlobalScreen.getInstance().unregisterNativeHook();
-		}
-		catch (NativeHookException ex) {
-			ex.printStackTrace();
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		    	try {
+			    	//Clean up the native hook.
+		    		GlobalScreen.getInstance().unregisterNativeHook();
+			    }
+				catch (NativeHookException ex) {
+					ex.printStackTrace();
+				}
+		    }
+		});
 		
 		System.runFinalization();
 		System.exit(0);

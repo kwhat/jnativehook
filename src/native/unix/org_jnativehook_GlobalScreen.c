@@ -26,40 +26,36 @@
 #include <X11/extensions/xf86mscstr.h>
 #endif
 
+#ifdef XT
+#include <X11/Intrinsic.h>
+#endif
+
 #include "JNativeHook.h"
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-#ifdef XKB
-#define KB_DELAY_DEFAULT	660
-#define KB_RATE_DEFAULT		40
-#endif
-
-#ifdef XF86MISC
-#define KB_DELAY_DEFAULT	500
-#define KB_RATE_DEFAULT		30
-#endif
-
 static Display * disp;
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
-	int kb_delay, kb_rate;
 	bool successful = false;
+	long value = JNI_ERR;
+	unsigned int kb_delay, kb_rate;
 
 	#ifdef XKB
+	//Attempt to acquire the keyboard auto repeat rate using the XKB extension if available.
 	if (!successful) {
-		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_timeout, &kb_interval);
+		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
 	}
 	#endif
 
 	#ifdef XF86MISC
+	//Fallback to the XF86 Misc extension if available and other efforts failed.
 	if (!successful) {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
-
 		if (successful) {
-			kb_delay = kbdinfo.delay;
-			kb_rate = kbdinfo.rate;
+			kb_delay = (unsigned int) kbdinfo.delay;
+			kb_rate = (unsigned int) kbdinfo.rate;
 		}
 	}
 	#endif
@@ -68,6 +64,8 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		#ifdef DEBUG
 		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %i)\n", kb_rate);
 		#endif
+
+		value = (long) kb_rate;
 	}
 	else {
 		#ifdef DEBUG
@@ -75,30 +73,52 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 		#endif
 
 		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
-		kb_rate = JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
 
 	(void) kb_delay;
-	return (jlong) kb_rate;
+	return (jlong) value;
 }
 
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
-	unsigned int xkb_timeout, xkb_interval;
+	bool successful = false;
+	long value = JNI_ERR;
+	unsigned int kb_delay, kb_rate;
 
-	if (XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &xkb_timeout, &xkb_interval) != true) {
+	#ifdef XKB
+	if (!successful) {
+		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
+	}
+	#endif
+
+	#ifdef XF86MISC
+	if (!successful) {
+		XF86MiscKbdSettings kb_info;
+		Status ret = XF86MiscGetKbdSettings(disp, &kb_info);
+		successful = (bool) ret->status;
+		if (successful) {
+			kb_delay = (unsigned int) kbdinfo.delay;
+			kb_rate = (unsigned int) kbdinfo.rate;
+		}
+	}
+	#endif
+
+	if (successful) {
 		#ifdef DEBUG
-		printf("Native: XkbGetAutoRepeatRate failure!\n");
+		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): successful. (delay: %i)\n", kb_delay);
+		#endif
+
+		value = (long) kb_delay;
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): failure!\n");
 		#endif
 
 		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat delay.");
-		return JNI_ERR; //Naturally exit so jni exception is thrown.
 	}
-	(void) xkb_interval;
 
-	#ifdef DEBUG
-	printf("Native: XkbGetAutoRepeatRate successful (delay: %i)\n", xkb_timeout);
-	#endif
-	return (jlong) xkb_timeout;
+	(void) kb_rate;
+	return (jlong) value;
 }
 
 // 0-Threshold X, 1-Threshold Y and 2-Speed
@@ -144,14 +164,38 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	char * xkb_time = XGetDefault(disp, "*", "multiClickTime");
+JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * env, jobject UNUSED(obj)) {
+	int xm_clicktime;
+	bool successful = false;
 
-	#ifdef DEBUG
-	printf("Native: GetDoubleClickTime() successful (time: %s)\n", xkb_time);
+	//Try and acquire the multi-click time from the user defined Xdefaults
+	char * xprop = XGetDefault(disp, "*", "multiClickTime");
+	if (xprop != NULL && sscanf(xprop, "%i", &xm_clicktime) != EOF) {
+		successful = true;
+	}
+
+	#ifdef XT
+	//Fall back to the X Toolkit extension if available and other efforts failed.
+	if (!successful) {
+		xm_clicktime = XtGetMultiClickTime(disp);
+	}
 	#endif
 
-	return (jlong) JNI_ERR;
+	if (successful) {
+		#ifdef DEBUG
+		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getDoubleClickTime(): successful. (time: %i)\n", xm_clicktime);
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getDoubleClickTime(): failure!\n");
+		#endif
+
+		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the mouse double click time.");
+		xm_clicktime = JNI_ERR; //Naturally exit so jni exception is thrown.
+	}
+
+	return (jlong) xm_clicktime;
 }
 
 
@@ -206,7 +250,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 			ThrowFatalError(env, "Could not attach to the default X11 display");
 		}
 
-		bool isAutoRepeat = false;
+		Bool isAutoRepeat = false;
 		#ifdef XKB
 		//enable detectable autorepeat.
 		XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
@@ -248,9 +292,15 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 		disp = NULL;
 	}
 
-	if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
+	//Detach the current thread to the JVM.
+	if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
 		#ifdef DEBUG
-		fprintf(stderr, "Could not dettach the current thread from the Java virtual machine!\n");
+		fprintf(stdout, "JNI_OnUnload(): DetachCurrentThread(jvm, (void **)(&env), NULL) successful.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "JNI_OnUnload(): DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
 		#endif
 	}
 

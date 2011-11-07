@@ -415,7 +415,7 @@
 		</condition>
 		
 		<!-- set optimization level flag -->
-		<condition property="native.cflags.optimize" value="-O0 -g2 -ggdb -DDEBUG" else="-O2 -fomit-frame-pointer">
+		<condition property="native.cflags.optimize" value="-O0 -ggdb -DDEBUG" else="-O2 -fomit-frame-pointer">
 			<isset property="project.isDebug"/>
 		</condition>
 	
