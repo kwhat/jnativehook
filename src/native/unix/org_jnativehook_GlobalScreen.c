@@ -39,7 +39,7 @@ static Display * disp;
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
 	bool successful = false;
 	long value = JNI_ERR;
-	unsigned int kb_delay, kb_rate;
+	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
 	//Attempt to acquire the keyboard auto repeat rate using the XKB extension if available.
@@ -61,11 +61,11 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 	#endif
 
 	if (successful) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %i)\n", kb_rate);
-		#endif
-
 		value = (long) kb_rate;
+
+		#ifdef DEBUG
+		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %li)\n", value);
+		#endif
 	}
 	else {
 		#ifdef DEBUG
@@ -82,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIE
 JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
 	bool successful = false;
 	long value = JNI_ERR;
-	unsigned int kb_delay, kb_rate;
+	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
 	if (!successful) {
@@ -103,11 +103,11 @@ JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNI
 	#endif
 
 	if (successful) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): successful. (delay: %i)\n", kb_delay);
-		#endif
-
 		value = (long) kb_delay;
+
+		#ifdef DEBUG
+		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): successful. (delay: %li)\n", value);
+		#endif
 	}
 	else {
 		#ifdef DEBUG
