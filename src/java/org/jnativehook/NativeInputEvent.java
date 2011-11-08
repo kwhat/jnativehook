@@ -29,7 +29,6 @@ import java.util.EventObject;
  * <p/>
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.0
  * @since	1.0
  * 
  * @see org.jnativehook.keyboard.NativeKeyListener
@@ -85,8 +84,8 @@ public class NativeInputEvent extends EventObject {
 	 * @param when The timestamp for the event.
 	 * @param modifiers the modifier keys down during event. 
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are 
-	 * not compatible with the extended _DOWN_MASK or the old _MASK InputEvent 
-	 * modifiers.
+	 * not compatible with the extended _DOWN_MASK or the old _MASK 
+	 * <code>InputEvent</code> modifiers.
 	 */
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);

@@ -20,6 +20,9 @@ package org.jnativehook;
  * A small class to determine the native system's operating system family and 
  * architecture. The class is only used to determine which library to unpack 
  * and load at runtime. 
+ * 
+ * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @since	1.0
  */
 public class NativeSystem {
 	
@@ -27,7 +30,6 @@ public class NativeSystem {
 	 * The operating system family enum.
 	 */
 	public enum Family {
-		
 		/** The Windows operating system family. */
 		WINDOWS,
 		
@@ -51,7 +53,6 @@ public class NativeSystem {
 	 * The system architecture enum.
 	 */
 	public enum Arch {
-		
 		/** The x86 architecture. */
 		x86,
 		

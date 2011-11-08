@@ -43,5 +43,5 @@ public interface NativeMouseWheelListener extends EventListener {
 	 *
 	 * @param e The native mouse event.
 	 */
-	public void mouseWheelMoved(NativeMouseEvent e);
+	public void mouseWheelMoved(NativeMouseWheelEvent e);
 }

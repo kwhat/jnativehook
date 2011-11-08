@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.util.EventListener;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyException;
@@ -282,6 +283,7 @@ public class GlobalScreen {
 	 * 
 	 * @since 1.1
 	 */
+	//FIXME this needs to be AWT thread safe.
 	public native void registerNativeHook() throws NativeHookException;
 	
 	/**
@@ -292,6 +294,7 @@ public class GlobalScreen {
 	 * 
 	 * @since 1.1
 	 */
+	//FIXME this needs to be AWT thread safe.
 	public native void unregisterNativeHook() throws NativeHookException;
 	
 	/**
@@ -304,6 +307,7 @@ public class GlobalScreen {
 	 */
 	public native boolean isNativeHookRegistered();
 	
+	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is 
 	 * generally called by the native library but maybe used to synthesize 
@@ -314,6 +318,9 @@ public class GlobalScreen {
 	public final void dispatchEvent(NativeInputEvent e) {
 		if (e instanceof NativeKeyEvent) {
 			processKeyEvent((NativeKeyEvent) e);
+		}
+		else if (e instanceof NativeMouseWheelEvent) {
+			processMouseWheelEvent((NativeMouseWheelEvent) e);
 		}
 		else if (e instanceof NativeMouseEvent) {
 			processMouseEvent((NativeMouseEvent) e);
@@ -336,11 +343,29 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					((NativeKeyListener) listeners[i]).keyPressed(e);
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeKeyListener) this.getListener()).keyPressed((NativeKeyEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeKeyListener) listeners[i]).keyPressed(e);
+					}
 				break;
 				
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					((NativeKeyListener) listeners[i]).keyReleased(e);
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeKeyListener) this.getListener()).keyReleased((NativeKeyEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeKeyListener) listeners[i]).keyReleased(e);
+					}
 				break;
 			}
 		}
@@ -369,15 +394,42 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					((NativeMouseListener) listeners[i]).mousePressed(e);
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeMouseListener) this.getListener()).mousePressed((NativeMouseEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeMouseListener) listeners[i]).mousePressed(e);
+					}
 				break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					((NativeMouseListener) listeners[i]).mouseReleased(e);
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeMouseListener) this.getListener()).mouseReleased((NativeMouseEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeMouseListener) listeners[i]).mouseReleased(e);
+					}
 				break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeMouseMotionListener) this.getListener()).mouseMoved((NativeMouseEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
+					}
 				break;
 			}
 		}
@@ -398,7 +450,16 @@ public class GlobalScreen {
 		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 		
 		for (int i = 0; i < listeners.length; i++) {
-			((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
+			if (SwingUtilities.isEventDispatchThread()) {
+				SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+					public void run() {
+						((NativeMouseWheelListener) this.getListener()).mouseWheelMoved((NativeMouseWheelEvent) this.getEvent());
+					}
+				});
+			}
+			else {
+				((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
+			}
 		}
 	}
 	
@@ -487,6 +548,56 @@ public class GlobalScreen {
 		}
 		catch (NativeHookException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * AWTDispatchRunnable is a small abstract inner class used for dispatching  
+	 * events that may conflict with the AWT Event dispatching thread.  This 
+	 * custom runnable allows <code>SwingUtilities.invokeLater(java.lang.Runnable)</code> 
+	 * to be called without requring that event objects be declared final. 
+	 * 
+	 * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+	 * @since	1.1
+	 * 
+	 * @see javax.swing.SwingUtilities#invokeLater(java.lang.Runnable)
+	 */
+	private abstract class AWTDispatchRunnable implements Runnable {
+		/** The EventListener to send events to. */
+		private EventListener listener;
+		
+		/** The NativeInputEvent to send out. */
+		private NativeInputEvent event;
+		
+		/**
+		 * Instantiates a new <code>AWTDispatchRunnable</code> for use with 
+		 * <code>SwingUtilities.invokeLater()</code>.
+		 * 
+		 * @param listener The listener to dispatch events to.
+		 * @param e The event to dispatch.
+		 */
+		public AWTDispatchRunnable(EventListener listener, NativeInputEvent e) {
+			this.listener = listener;
+			this.event = e;
+		}
+		
+		/**
+		 * Gets the event listener.
+		 *
+		 * @return the event listener
+		 */
+		public EventListener getListener() {
+			return listener;
+		}
+		
+		/**
+		 * Gets the event.
+		 *
+		 * @return the event
+		 */
+		public NativeInputEvent getEvent() {
+			return event;
 		}
 	}
 }
