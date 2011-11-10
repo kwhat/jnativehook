@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JNativeHook_h
-#define _Included_JNativeHook_h
+#ifndef _Included_NativeErrors_h
+#define _Included_NativeErrors_h
 
 #ifdef UNUSED
 #elif defined(__GNUC__)
-	#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
 #elif defined(__LCLINT__)
-	#define UNUSED(x) /*@unused@*/ x
+#define UNUSED(x) /*@unused@*/ x
 #else
-	#define UNUSED(x) x
+#define UNUSED(x) x
 #endif
 
 #ifdef DEBUG
-	#include <stdio.h>
-	#include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 #endif
 
 #include <jni.h>

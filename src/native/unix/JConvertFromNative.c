@@ -22,7 +22,7 @@
 #ifdef SUN_KEYBOARD
 	#include <X11/Sunkeysym.h>
 #endif
-#include "JConvertToNative.h"
+#include "JConvertFromNative.h"
 #include "XButtonCodes.h"
 #include "XEventModifiers.h"
 

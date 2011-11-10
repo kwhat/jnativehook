@@ -20,8 +20,8 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
-#include "JNativeHook.h"
-#include "JConvertToNative.h"
+#include "NativeErrors.h"
+#include "JConvertFromNative.h"
 #include "WinKeyCodes.h"
 
 //FIXME We should store the modifiers as Java modifiers not Native Modifiers to speed up the getModifiers function.

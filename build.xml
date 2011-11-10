@@ -432,7 +432,7 @@
 		</condition>
 		
 		<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
-		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -Wall -Wextra -Werror ${native.cflags.optimize} -fno-strict-aliasing ${native.cflags.pic}">
+		<condition property="native.cflags" value="-c -m${native.arch.model} -march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -Wall -Wextra -Werror ${native.cflags.optimize} -DXT -DXKB -fno-strict-aliasing ${native.cflags.pic}">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		
@@ -464,7 +464,7 @@
 		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
 			<isset property="native.os.isWindows"/>
 		</condition>
-		<condition property="native.libs" value="-lX11 -lXtst">
+		<condition property="native.libs" value="-lX11 -lXt -lXtst">
 			<isset property="native.os.isUnix"/>
 		</condition>
 		<condition property="native.libs" value="-framework ApplicationServices">

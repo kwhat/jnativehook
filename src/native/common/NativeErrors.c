@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "JNativeHook.h"
+#include "NativeErrors.h"
 
 JavaVM * jvm = NULL;
 
 void ThrowFatalError(JNIEnv * env, const char * message) {
 	#ifdef DEBUG
-		fprintf(stderr, "Fatal Error: %s\n", message);
+	fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
 	(*env)->FatalError(env, message);
@@ -35,7 +35,7 @@ void ThrowException(JNIEnv * env, const char * classname, const char * message) 
 	if (clsException != NULL) {
 		(*env)->ThrowNew(env, clsException, message);
 		#ifdef DEBUG
-			(*env)->ExceptionDescribe(env);
+		(*env)->ExceptionDescribe(env);
 		#endif
 		(*env)->DeleteLocalRef(env, clsException);
 	}
@@ -45,7 +45,7 @@ void ThrowException(JNIEnv * env, const char * classname, const char * message) 
 		if (clsException != NULL) {
 			(*env)->ThrowNew(env, clsException, classname);
 			#ifdef DEBUG
-				(*env)->ExceptionDescribe(env);
+			(*env)->ExceptionDescribe(env);
 			#endif
 			(*env)->DeleteLocalRef(env, clsException);
 		}
