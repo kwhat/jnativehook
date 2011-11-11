@@ -15,100 +15,149 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef COREFOUNDATION
 //#include <ApplicationServices/ApplicationServices.h>
-#include <CoreFoundation/CoreFoundation.h>
-#endif
 
 #ifdef IOKIT
 #include <IOKit/hidsystem/IOHIDLib.h>
 #include <IOKit/hidsystem/IOHIDParameter.h>
 #endif
 
+#ifdef COREFOUNDATION
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
+#ifdef CARBON
+#include <Carbon/Carbon.h>
+#endif
+
 #include "NativeErrors.h"
 
 /*
- * Apple doesn't document anything.  Value is the slider value in the system
- * prefernces. That value * 15 is the rate in MS.  66 / that value is the chars
- * per second rate.
-
-Value	MS		Char/Sec
-
-1		15		66
-
-2		30		33
-6		90		11
-12		180		5.5
-30		450		2.2
-60		900		1.1
-90		1350	0.73
-120		1800	0.55
-
-
-V = MS / 15
-V = 66 / Char
-
-MS = V * 15
-MS = (66 / Char) * 15
-
-Char = 66 / V
-Char = 66 / (MS / 15)
-*/
+ * Apple's documentation is not very good.  I was finally able to find this
+ * information after many hours of googling.  Value is the slider value in the
+ * system preferences. That value * 15 is the rate in MS.  66 / the value is the
+ * chars per second rate.
+ *
+ * Value	MS		Char/Sec
+ *
+ * 1		15		66		//Out of standard range.
+ *
+ * 2		30		33
+ * 6		90		11
+ * 12		180		5.5
+ * 30		450		2.2
+ * 60		900		1.1
+ * 90		1350	0.73
+ * 120		1800	0.55
+ *
+ * V = MS / 15
+ * V = 66 / CharSec
+ *
+ * MS = V * 15
+ * MS = (66 / CharSec) * 15
+ *
+ * CharSec = 66 / V
+ * CharSec = 66 / (MS / 15)
+ */
 
 long GetAutoRepeatRate() {
+	bool successful = false;
 	long value = -1;
 	UInt64 rate;
 
-	#ifdef COREFOUNDATION
-	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &rate)) {
-			value = (long) rate * 15;
+	#ifdef IOKIT
+	if (!successful) {
+		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+		if (service) {
+			kern_return_t kren_ret = kIOReturnError;
+			io_connect_t connection;
+
+			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
+			if (kren_ret == kIOReturnSuccess) {
+				IOByteCount size = sizeof(rate);
+
+				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDKeyRepeatKey), (IOByteCount) sizeof(rate), &rate, &size);
+				if (kren_ret == kIOReturnSuccess) {
+					//This is the chars per second value. (66 / CharSec) * 15
+					value = (66.0 / (((double) rate) / 1000.0 / 1000.0 / 1000.0) * 15;
+					successful = true;
+				}
+			}
 		}
 	}
 	#endif
 
-
-	#ifdef IOKIT
-	//io_iterator_t iter;
-	//kern_return_t kr = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass), &iter);
-	kern_return_t kr = kIOReturnSuccess;
-	io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
-
-	if (kr == kIOReturnSuccess) {
-		//io_service_t service = IOIteratorNext(iter);
-		io_connect_t sSystemService;
-		kr = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &sSystemService);
-
-		if (kr == kIOReturnSuccess) {
-			IOByteCount size = sizeof(rate);
-
-			kr = IOHIDGetParameter(sSystemService, CFSTR(kIOHIDKeyRepeatKey), (IOByteCount) sizeof(rate), &rate, &size);
-			if (kr == kIOReturnSuccess) {
-				printf("TEST %lf", ((double) rate) / 1000.0 / 1000.0 / 1000.0);
-
-				//FIXME I have no idea what this is return, no apple docs.
-				//size is 8 i get something like 0x00BBC2 out for the rate.  Maybe floor(rate / 1000 /1000)??
-				printf("*** Success %lX %i\n", (long) rate, (int) size);
+	#ifdef COREFOUNDATION
+	if (!successful) {
+		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+			if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &rate)) {
+				//This is the slider value, we must multiply by 15 to convert to milliseconds.
+				value = (long) rate * 15;
+				successful = true;
 			}
 		}
 	}
+	#endif
 
+	#ifdef CARBON
+	if (!successful) {
+		//This value is in clock ticks, you know, because that is useful.
+		//osfmk/kern/clock.h - absolutetime_to_nanoseconds(uint64_t abstime, uint64_t *result);
+
+		value = (long) LMGetKeyThresh() * 60;
+		successful = true;
+	}
 	#endif
 
 	return value;
 }
 
 long GetAutoRepeatDelay() {
+	bool successful = false;
 	long value = -1;
-	SInt32 delay = -1;
+	UInt64 delay;
+
+	#ifdef IOKIT
+	if (!successful) {
+		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+		if (service) {
+			kern_return_t kren_ret = kIOReturnError;
+			io_connect_t connection;
+
+			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
+			if (kren_ret == kIOReturnSuccess) {
+				IOByteCount size = sizeof(delay);
+
+				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDInitialKeyRepeatKey), (IOByteCount) sizeof(delay), &delay, &size);
+				if (kren_ret == kIOReturnSuccess) {
+					//This is the chars per second value. (66 / CharSec) * 15
+					value = (66.0 / (((double) delay) / 1000.0 / 1000.0 / 1000.0) * 15;
+					successful = true;
+				}
+			}
+		}
+	}
+	#endif
 
 	#ifdef COREFOUNDATION
 	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &delay)) {
-			value = (long) delay;
+			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			value = (long) delay * 15;
+			successful = true;
 		}
+	}
+	#endif
+
+	#ifdef CARBON
+	if (!successful) {
+		//This value is in clock ticks, you know, because that is useful.
+		//osfmk/kern/clock.h - absolutetime_to_nanoseconds(uint64_t abstime, uint64_t *result);
+
+		value = (long) LMGetKeyThresh() * 60;
+		successful = true;
 	}
 	#endif
 
