@@ -15,22 +15,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <ApplicationServices/ApplicationServices.h>
+#ifdef COREFOUNDATION
+//#include <ApplicationServices/ApplicationServices.h>
+#include <CoreFoundation/CoreFoundation.h>
+#endif
 
-#include "JNativeHook.h"
-#include "NativeThread.h"
-#include "org_jnativehook_GlobalScreen.h"
+#ifdef IOKIT
+#include <IOKit/hidsystem/IOHIDLib.h>
+#include <IOKit/hidsystem/IOHIDParameter.h>
+#endif
+
+#include "NativeErrors.h"
+
+/*
+ * Apple doesn't document anything.  Value is the slider value in the system
+ * prefernces. That value * 15 is the rate in MS.  66 / that value is the chars
+ * per second rate.
+
+Value	MS		Char/Sec
+
+1		15		66
+
+2		30		33
+6		90		11
+12		180		5.5
+30		450		2.2
+60		900		1.1
+90		1350	0.73
+120		1800	0.55
+
+
+V = MS / 15
+V = 66 / Char
+
+MS = V * 15
+MS = (66 / Char) * 15
+
+Char = 66 / V
+Char = 66 / (MS / 15)
+*/
 
 long GetAutoRepeatRate() {
 	long value = -1;
-	SInt32 rate;
+	UInt64 rate;
 
-	CFTypeRef pref_val = CFPreferencesCopyAppValue(CFSTR("KeyRepeat"), kCFPreferencesCurrentApplication);
+	#ifdef COREFOUNDATION
+	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &rate)) {
-			value = (long) rate;
+			value = (long) rate * 15;
 		}
 	}
+	#endif
+
+
+	#ifdef IOKIT
+	//io_iterator_t iter;
+	//kern_return_t kr = IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass), &iter);
+	kern_return_t kr = kIOReturnSuccess;
+	io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+
+	if (kr == kIOReturnSuccess) {
+		//io_service_t service = IOIteratorNext(iter);
+		io_connect_t sSystemService;
+		kr = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &sSystemService);
+
+		if (kr == kIOReturnSuccess) {
+			IOByteCount size = sizeof(rate);
+
+			kr = IOHIDGetParameter(sSystemService, CFSTR(kIOHIDKeyRepeatKey), (IOByteCount) sizeof(rate), &rate, &size);
+			if (kr == kIOReturnSuccess) {
+				printf("TEST %lf", ((double) rate) / 1000.0 / 1000.0 / 1000.0);
+
+				//FIXME I have no idea what this is return, no apple docs.
+				//size is 8 i get something like 0x00BBC2 out for the rate.  Maybe floor(rate / 1000 /1000)??
+				printf("*** Success %lX %i\n", (long) rate, (int) size);
+			}
+		}
+	}
+
+	#endif
 
 	return value;
 }
@@ -39,12 +103,14 @@ long GetAutoRepeatDelay() {
 	long value = -1;
 	SInt32 delay = -1;
 
-	CFTypeRef pref_val = CFPreferencesCopyAppValue(CFSTR("InitialKeyRepeat"), kCFPreferencesCurrentApplication);
+	#ifdef COREFOUNDATION
+	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &delay)) {
 			value = (long) delay;
 		}
 	}
+	#endif
 
 	return value;
 }
@@ -67,8 +133,19 @@ long GetPointerSensitivity() {
 }
 
 long GetDoubleClickTime() {
-	//FIXME Implement.
-	return -1;
+	long value = -1;
+
+	#ifdef COREFOUNDATION
+	Float32 clicktime = -1;
+	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.doubleClickThreshold"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberFloat32Type, &clicktime)) {
+			value = (long) (clicktime * 1000);
+		}
+	}
+	#endif
+
+	return value;
 }
 
 

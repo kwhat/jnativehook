@@ -16,7 +16,7 @@
  */
 
 //Reference: http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html
-#include "JConvertToNative.h"
+#include "JConvertFromNative.h"
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
 #include <ApplicationServices/ApplicationServices.h> //For CoreGraphics kCGEventFlagMask constants

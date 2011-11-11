@@ -22,8 +22,8 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
-#include "JNativeHook.h"
-#include "JConvertToNative.h"
+#include "NativeErrors.h"
+#include "JConvertFromNative.h"
 #include "NativeThread.h"
 #include "OSXButtonCodes.h"
 #include "OSXKeyCodes.h"
