@@ -81,7 +81,7 @@ long GetAutoRepeatRate() {
 					/* This is in some undefined unit of time that if we happen
 					 * to multiply by 900 gives us the time in milliseconds. We
 					 * add 0.5 to the result so that when we cast to long we
-					 * acctually get a rounded result.  Saves the math.h depend.
+					 * actually get a rounded result.  Saves the math.h depend.
 					 *
 					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
 					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
@@ -114,8 +114,8 @@ long GetAutoRepeatRate() {
 
 	#ifdef CARBON
 	if (!successful) {
-		//This value is in ticks? I am not sure what that means, but it looks a
-		//lot like the arbitrary sider value.
+		//Apple documentation states that value is in 'ticks'. I am not sure
+		//what that means, but it looks a lot like the arbitrary slider value.
 		rate = LMGetKeyRepThresh();
 		if (rate > -1) {
 			//This is the slider value, we must multiply by 15 to convert to milliseconds.
@@ -146,8 +146,21 @@ long GetAutoRepeatDelay() {
 
 				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDInitialKeyRepeatKey), (IOByteCount) sizeof(delay), &delay, &size);
 				if (kren_ret == kIOReturnSuccess) {
-					//FIXME, I have no idea what values this will return.
-					value = (long) (66.0 / ((double) delay) / 1000.0 / 1000.0 / 1000.0) * 15;
+					/* This is in some undefined unit of time that if we happen
+					 * to multiply by 900 gives us the time in milliseconds. We
+					 * add 0.5 to the result so that when we cast to long we
+					 * actually get a rounded result.  Saves the math.h depend.
+					 *
+					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
+					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
+  					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
+  					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
+					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
+					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
+					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
+					 */
+					//FIXME This needs to be checked to see if it works.
+					value = (long) (900.0 * ((double) delay) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
 				}
 			}
@@ -160,6 +173,7 @@ long GetAutoRepeatDelay() {
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &delay)) {
 			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			//FIXME This needs to be checked to see if it works.
 			value = (long) delay * 15;
 			successful = true;
 		}
@@ -168,12 +182,13 @@ long GetAutoRepeatDelay() {
 
 	#ifdef CARBON
 	if (!successful) {
-		//This value is in clock ticks, you know, because that is useful.
-		//osfmk/kern/clock.h - absolutetime_to_nanoseconds(uint64_t abstime, uint64_t *result);
-
-		long ticks_per_second = sysconf(_SC_CLK_TCK);
-		if (ticks_per_second > -1) {
-			value = (long) LMGetKeyThresh() * ticks_per_second * 1000;
+		//Apple documentation states that value is in 'ticks'. I am not sure
+		//what that means, but it looks a lot like the arbitrary slider value.
+		delay = LMGetKeyThresh();
+		if (delay > -1) {
+			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			//FIXME This needs to be checked to see if it works.
+			value = (long) delay * 15;
 			successful = true;
 		}
 	}
@@ -200,14 +215,68 @@ long GetPointerSensitivity() {
 }
 
 long GetDoubleClickTime() {
+	bool successful = false;
 	long value = -1;
+
+	//TODO this may need to be a Float32/64 type.
+	UInt64 time;
+
+	#ifdef IOKIT
+	if (!successful) {
+		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+		if (service) {
+			kern_return_t kren_ret = kIOReturnError;
+			io_connect_t connection;
+
+			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
+			if (kren_ret == kIOReturnSuccess) {
+				IOByteCount size = sizeof(time);
+
+				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDClickTimeKey), (IOByteCount) sizeof(time), &time, &size);
+				if (kren_ret == kIOReturnSuccess) {
+					/* This is in some undefined unit of time that if we happen
+					 * to multiply by 900 gives us the time in milliseconds. We
+					 * add 0.5 to the result so that when we cast to long we
+					 * actually get a rounded result.  Saves the math.h depend.
+					 *
+					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
+					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
+  					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
+  					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
+					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
+					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
+					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
+					 */
+					//FIXME This needs to be checked to see if it works.
+					value = (long) (900.0 * ((double) time) / 1000.0 / 1000.0 / 1000.0 + 0.5);
+					successful = true;
+				}
+			}
+		}
+	}
+	#endif
 
 	#ifdef COREFOUNDATION
 	Float32 clicktime = -1;
 	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.doubleClickThreshold"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberFloat32Type, &clicktime)) {
+			//FIXME this probably only needs to be multiplied by 15, not 1000.
 			value = (long) (clicktime * 1000);
+		}
+	}
+	#endif
+
+	#ifdef CARBON
+	if (!successful) {
+		//Apple documentation states that value is in 'ticks'. I am not sure
+		//what that means, but it looks a lot like the arbitrary slider value.
+		click = GetDblTime();
+		if (click > -1) {
+			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			//FIXME This needs to be checked to see if it works.
+			value = (long) click * 15;
+			successful = true;
 		}
 	}
 	#endif

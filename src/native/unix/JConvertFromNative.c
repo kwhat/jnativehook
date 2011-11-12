@@ -20,7 +20,7 @@
 #include <X11/keysym.h> //Reduced symbol set
 //#include <X11/keysymdef.h>  //Full symbol set
 #ifdef SUN_KEYBOARD
-	#include <X11/Sunkeysym.h>
+#include <X11/Sunkeysym.h>
 #endif
 #include "JConvertFromNative.h"
 #include "XButtonCodes.h"

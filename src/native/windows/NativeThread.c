@@ -134,6 +134,15 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 		//Java Mouse Event Object.
 		jobject objMouseEvent;
 
+		/* Code to track the click count, It maybe easier to track our own click
+		 * counts to allow for triple click detection.
+		int clickCount=0;
+		if (button!=MouseButtons.None)
+			if (wParam == WM_LBUTTONDBLCLK || wParam = WM_MBUTTONDBLCLK || wParam == WM_RBUTTONDBLCLK || wParam == WM_XBUTTONDBLCLK)
+				clickCount=2;
+			else
+				clickCount=1;
+		*/
 		switch(wParam) {
 			case WM_LBUTTONDOWN:
 				jbutton = NativeToJButton(VK_LBUTTON);
