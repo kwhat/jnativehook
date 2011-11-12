@@ -78,8 +78,20 @@ long GetAutoRepeatRate() {
 
 				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDKeyRepeatKey), (IOByteCount) sizeof(rate), &rate, &size);
 				if (kren_ret == kIOReturnSuccess) {
-					//This is the chars per second value. (66 / CharSec) * 15
-					value = (66.0 / (((double) rate) / 1000.0 / 1000.0 / 1000.0) * 15;
+					/* This is in some undefined unit of time that if we happen
+					 * to multiply by 900 gives us the time in milliseconds. We
+					 * add 0.5 to the result so that when we cast to long we
+					 * acctually get a rounded result.  Saves the math.h depend.
+					 *
+					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
+					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
+  					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
+  					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
+					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
+					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
+					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
+					 */
+					value = (long) (900.0 * ((double) rate) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
 				}
 			}
@@ -102,11 +114,14 @@ long GetAutoRepeatRate() {
 
 	#ifdef CARBON
 	if (!successful) {
-		//This value is in clock ticks, you know, because that is useful.
-		//osfmk/kern/clock.h - absolutetime_to_nanoseconds(uint64_t abstime, uint64_t *result);
-
-		value = (long) LMGetKeyThresh() * 60;
-		successful = true;
+		//This value is in ticks? I am not sure what that means, but it looks a
+		//lot like the arbitrary sider value.
+		rate = LMGetKeyRepThresh();
+		if (rate > -1) {
+			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			value = (long) rate * 15;
+			successful = true;
+		}
 	}
 	#endif
 
@@ -131,8 +146,8 @@ long GetAutoRepeatDelay() {
 
 				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDInitialKeyRepeatKey), (IOByteCount) sizeof(delay), &delay, &size);
 				if (kren_ret == kIOReturnSuccess) {
-					//This is the chars per second value. (66 / CharSec) * 15
-					value = (66.0 / (((double) delay) / 1000.0 / 1000.0 / 1000.0) * 15;
+					//FIXME, I have no idea what values this will return.
+					value = (long) (66.0 / ((double) delay) / 1000.0 / 1000.0 / 1000.0) * 15;
 					successful = true;
 				}
 			}
@@ -156,8 +171,11 @@ long GetAutoRepeatDelay() {
 		//This value is in clock ticks, you know, because that is useful.
 		//osfmk/kern/clock.h - absolutetime_to_nanoseconds(uint64_t abstime, uint64_t *result);
 
-		value = (long) LMGetKeyThresh() * 60;
-		successful = true;
+		long ticks_per_second = sysconf(_SC_CLK_TCK);
+		if (ticks_per_second > -1) {
+			value = (long) LMGetKeyThresh() * ticks_per_second * 1000;
+			successful = true;
+		}
 	}
 	#endif
 
