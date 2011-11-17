@@ -61,9 +61,12 @@
  */
 
 long GetAutoRepeatRate() {
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
 	bool successful = false;
+	SInt64 rate;
+	#endif
+
 	long value = -1;
-	UInt64 rate;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -103,7 +106,7 @@ long GetAutoRepeatRate() {
 	if (!successful) {
 		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-			if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &rate)) {
+			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &rate)) {
 				//This is the slider value, we must multiply by 15 to convert to milliseconds.
 				value = (long) rate * 15;
 				successful = true;
@@ -129,9 +132,12 @@ long GetAutoRepeatRate() {
 }
 
 long GetAutoRepeatDelay() {
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
 	bool successful = false;
+	SInt64 delay;
+	#endif
+
 	long value = -1;
-	UInt64 delay;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -159,7 +165,6 @@ long GetAutoRepeatDelay() {
 					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
 					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
 					 */
-					//FIXME This needs to be checked to see if it works.
 					value = (long) (900.0 * ((double) delay) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
 				}
@@ -171,9 +176,8 @@ long GetAutoRepeatDelay() {
 	#ifdef COREFOUNDATION
 	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberSInt32Type, &delay)) {
+		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
 			//This is the slider value, we must multiply by 15 to convert to milliseconds.
-			//FIXME This needs to be checked to see if it works.
 			value = (long) delay * 15;
 			successful = true;
 		}
@@ -187,7 +191,6 @@ long GetAutoRepeatDelay() {
 		delay = LMGetKeyThresh();
 		if (delay > -1) {
 			//This is the slider value, we must multiply by 15 to convert to milliseconds.
-			//FIXME This needs to be checked to see if it works.
 			value = (long) delay * 15;
 			successful = true;
 		}
@@ -211,15 +214,20 @@ long GetPointerAccelerationThreshold() {
 
 long GetPointerSensitivity() {
 	//FIXME Implement.
+	//"com.apple.mouse.scaling" ?
 	return -1;
 }
 
 long GetDoubleClickTime() {
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
 	bool successful = false;
-	long value = -1;
+	#if defined IOKIT || defined CARBON
+	//This needs to be defiend only if we have IOKIT or Carbon
+	SInt64 time;
+	#endif
+	#endif
 
-	//TODO this may need to be a Float32/64 type.
-	UInt64 time;
+	long value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -238,16 +246,7 @@ long GetDoubleClickTime() {
 					 * to multiply by 900 gives us the time in milliseconds. We
 					 * add 0.5 to the result so that when we cast to long we
 					 * actually get a rounded result.  Saves the math.h depend.
-					 *
-					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
-					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
-  					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
-  					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
-					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
-					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
-					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
 					 */
-					//FIXME This needs to be checked to see if it works.
 					value = (long) (900.0 * ((double) time) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
 				}
@@ -257,12 +256,18 @@ long GetDoubleClickTime() {
 	#endif
 
 	#ifdef COREFOUNDATION
-	Float32 clicktime = -1;
+	Float32 clicktime;
 	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.doubleClickThreshold"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef)pref_val, kCFNumberFloat32Type, &clicktime)) {
-			//FIXME this probably only needs to be multiplied by 15, not 1000.
-			value = (long) (clicktime * 1000);
+		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberFloat32Type, &clicktime)) {
+			/* This is in some undefined unit of time that if we happen
+			 * to multiply by 900 gives us the time in milliseconds.  It is
+			 * completely possible that this value is in seconds and should be
+			 * multiplied by 1000 but because IOKit values are undocumented and
+			 * I have no idea what a Carbon 'tick' is so there really is no way
+			 * to confirm this.
+			 */
+			value = (long) (clicktime * 900);
 		}
 	}
 	#endif
@@ -271,11 +276,10 @@ long GetDoubleClickTime() {
 	if (!successful) {
 		//Apple documentation states that value is in 'ticks'. I am not sure
 		//what that means, but it looks a lot like the arbitrary slider value.
-		click = GetDblTime();
-		if (click > -1) {
+		time = GetDblTime();
+		if (time > -1) {
 			//This is the slider value, we must multiply by 15 to convert to milliseconds.
-			//FIXME This needs to be checked to see if it works.
-			value = (long) click * 15;
+			value = (long) time * 15;
 			successful = true;
 		}
 	}
