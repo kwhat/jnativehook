@@ -131,10 +131,10 @@ int main(int argc, const char * argv[]) {
 
 	XRecordFreeContext(disp_ctrl, context);
 
-	//Disable the XRecord context on the data display and close the connection.
+	//Disable the XRecord context on the ctrl display and close the connection.
 	XCloseDisplay(disp_ctrl);
 
-	//Free the XRecord context on the hook display and close the connection.
+	//Close the data display.
 	XCloseDisplay(disp_data);
 
 	return EXIT_SUCCESS;
