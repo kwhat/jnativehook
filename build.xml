@@ -498,100 +498,12 @@
 		</propertyfile>
 	</target>
 	
-	<target name="compile" depends="configure" description="Compiles all Java and C source files.">
-		<echo>Compiling java source...</echo>
-		<mkdir dir="${dir.bin.class}"/>
-		
-		<path id="classpath">
-			<pathelement location="${dir.bin.class}"/>
-			<!-- Use this to include addtional dependencies
-			<fileset dir="${project.lib}">
-				<include name="*.jar"/>
-			</fileset>
-			-->
-		</path>
-		<javac srcdir="${dir.src.java}"
-			destdir="${dir.bin.class}"
-			classpathref="classpath"
-			debug="${project.debug}"
-			optimize="${project.debug}"
-			deprecation="false"
-			includeantruntime="false"
-			source="${java.target}"
-			target="${java.target}"
-		/>
-		
-		<echo>Creating JNI Headers...</echo>
-		<javah 
-			class="org.jnativehook.GlobalScreen" 
-			outputFile="${dir.src.native}/common/org_jnativehook_GlobalScreen.h"
-			classpathref="classpath"
-			verbose="yes" 
-		/>
-		
-		<echo>Compiling C source...</echo>
-		<mkdir dir="${dir.bin.obj}"/>
-		<mkdir dir="${dir.bin}/common"/>
-		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}"/>
-		
-		<!-- set system specific src -->
-		<condition property="native.src" value="windows">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		<condition property="native.src" value="unix">
-			<isset property="native.os.isUnix"/>
-		</condition>
-		<condition property="native.src" value="osx">
-			<isset property="native.os.isMac"/>
-		</condition>
-		
-		<!-- set system specific ldflags -->
-		<condition property="native.executable" value="${project.name}.dll">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		<condition property="native.executable" value="lib${project.name}.so">
-			<isset property="native.os.isUnix"/>
-		</condition>
-		<condition property="native.executable" value="lib${project.name}.dylib">
-			<isset property="native.os.isMac"/>
-		</condition>
-		
-		<!-- set system shell -->
-		<condition property="native.shell" value="${env.SystemRoot}\system32\cmd.exe" else="/bin/sh">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		
-		<!-- set system specific strip arguments -->
-		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
-			<or>
-				<isset property="native.os.isWindows"/>
-				<isset property="native.os.isUnix"/>
-			</or>
-		</condition>
-		<condition property="native.strip.args" value="-x -S">
-			<isset property="native.os.isMac"/>
-		</condition>
-		
-		<!-- execute make for native building -->
-		<exec executable="${native.make}" dir="." failonerror="true">
-			<env key="ANT_TASK" value="true"/>
-			<env key="DEBUG" value="${project.debug}"/>
-			<env key="SHELL" value="${native.shell}"/>
-			<env key="CC" value="${native.cc}"/>
-			<env key="LD" value="${native.ld}"/>
-			<env key="STRIP" value="${native.strip}"/>
-			<env key="CFLAGS" value="${native.cflags}"/>
-			<env key="LDFLAGS" value="${native.ldflags}"/>
-			<env key="STRIPARGS" value="${native.strip.args}"/>
-			<env key="INCLUDES" value="${native.includes}"/>
-			<env key="LIBS" value="${native.libs}"/>
-			<env key="SRC_DIR" value="${dir.src.native}/${native.src}"/>
-			<env key="OBJ_DIR" value="${dir.bin.obj}"/>
-			<env key="EXECUTABLE" value="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
-		</exec>
+	<target name="compile" depends="configure" description="Compiles both Java and C source files.">
+		<antcall target="compile-java"/>
+		<antcall target="compile-native"/>
 	</target>
 	
-	<target name="compile-java" depends="configure" description="Compiles all Java and C source files.">
+	<target name="compile-java" depends="configure" description="Compiles Java source files.">
 		<echo>Compiling java source...</echo>
 		<mkdir dir="${dir.bin.class}" />
 		
@@ -619,9 +531,6 @@
 		
 		
 		<echo>Compiling C source...</echo>
-		<mkdir dir="${dir.bin.obj}"/>
-		<mkdir dir="${dir.bin.obj}/common"/>
-		<mkdir dir="${dir.bin.obj}/${native.os.type}"/>
 		
 		<!-- set system specific src directory -->
 		<condition property="native.os.type" value="windows">
@@ -633,6 +542,11 @@
 		<condition property="native.os.type" value="osx">
 			<isset property="native.os.isMac"/>
 		</condition>
+		
+		<!-- Create required directories for compiling -->
+		<mkdir dir="${dir.bin.obj}"/>
+		<mkdir dir="${dir.bin.obj}/common"/>
+		<mkdir dir="${dir.bin.obj}/${native.os.type}"/>
 		
 		<!-- Execute the native compiler on the soruce files -->
 		<apply executable="${native.cc}" failonerror="true" verbose="true" ignoremissing="false">
@@ -652,7 +566,6 @@
 		
 		
 		<echo>Linking C objects...</echo>
-		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}" />
 		
 		<!-- set system specific library path -->
 		<condition property="native.executable" value="${project.name}.dll">
@@ -664,6 +577,9 @@
 		<condition property="native.executable" value="lib${project.name}.dylib">
 			<isset property="native.os.isMac"/>
 		</condition>
+		
+		<!-- Create required directory for linking -->
+		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}" />
 		
 		<!-- Execute the native compiler on the soruce files -->
 		<apply executable="${native.ld}" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
