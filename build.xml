@@ -591,6 +591,95 @@
 		</exec>
 	</target>
 	
+	<target name="compile-java" depends="configure" description="Compiles all Java and C source files.">
+		<echo>Compiling java source...</echo>
+		<mkdir dir="${dir.bin.class}" />
+		
+		<javac srcdir="${dir.src.java}"
+			destdir="${dir.bin.class}"
+			classpath="${dir.bin.class}"
+			debug="${project.debug}"
+			optimize="${project.debug}"
+			deprecation="false"
+			includeantruntime="false"
+			source="${java.target}"
+			target="${java.target}"
+			verbose="true"
+		/>
+	</target>
+	
+	<target name="compile-native" depends="configure" description="Compiles C source files.">
+		<echo>Creating JNI Headers...</echo>
+		<javah 
+			class="org.jnativehook.GlobalScreen" 
+			outputFile="${dir.src.native}/common/org_jnativehook_GlobalScreen.h"
+			classpath="${dir.bin.class}"
+			verbose="true"
+		/>
+		
+		
+		<echo>Compiling C source...</echo>
+		<mkdir dir="${dir.bin.obj}"/>
+		<mkdir dir="${dir.bin.obj}/common"/>
+		<mkdir dir="${dir.bin.obj}/${native.os.type}"/>
+		
+		<!-- set system specific src directory -->
+		<condition property="native.os.type" value="windows">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.os.type" value="unix">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.os.type" value="osx">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
+		<!-- Execute the native compiler on the soruce files -->
+		<apply executable="${native.cc}" failonerror="true" verbose="true" ignoremissing="false">
+			<fileset dir="${dir.src.native}">
+				<include name="common/*.c" />
+				<include name="${native.os.type}/*.c" />
+			</fileset>
+			
+			<arg line="${native.cflags}" />
+			<arg line="${native.includes} -I${dir.src.native}/common" />
+			<srcfile />
+			<arg value="-o" />
+			<targetfile />
+			
+			<mapper type="glob" from="*.c" to="${dir.bin.obj}/*.o" />
+		</apply>
+		
+		
+		<echo>Linking C objects...</echo>
+		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}" />
+		
+		<!-- set system specific library path -->
+		<condition property="native.executable" value="${project.name}.dll">
+			<isset property="native.os.isWindows"/>
+		</condition>
+		<condition property="native.executable" value="lib${project.name}.so">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<condition property="native.executable" value="lib${project.name}.dylib">
+			<isset property="native.os.isMac"/>
+		</condition>
+		
+		<!-- Execute the native compiler on the soruce files -->
+		<apply executable="${native.ld}" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
+			<fileset dir="${dir.bin.obj}">
+				<include name="**/*.o" />
+			</fileset>
+			
+			<arg line="${native.ldflags}" />
+			<srcfile />
+			<arg line="${native.libs}" />
+			<arg value="-o" />
+			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}" />
+		</apply>
+	</target>
+	
+	
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.jar}"/>
