@@ -375,14 +375,14 @@ static void * ThreadProc() {
 	}
 
 	#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): complete.\n");
+	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
-	pthread_exit((void *) status);
+	pthread_exit((void *) &status);
 }
 
 int StartNativeThread() {
