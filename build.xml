@@ -614,7 +614,7 @@
 		<mkdir dir="${dir.bin.obj}/${native.os.type}" />
 		
 		<!-- Execute the native compiler on the soruce files -->
-		<apply executable="${native.cc}" failonerror="true" verbose="true" ignoremissing="false">
+		<apply executable="${native.cc}" resultproperty="native.cc.result" failonerror="true" verbose="true" ignoremissing="false">
 			<fileset dir="${dir.src.native}">
 				<include name="common/*.c" />
 				<include name="${native.os.type}/*.c" />
@@ -629,7 +629,7 @@
 			
 			<mapper type="glob" from="*.c" to="${dir.bin.obj}/*.o" />
 		</apply>
-		
+		<echo>${native.cc.result}</echo>
 		
 		<echo>Linking C objects...</echo>
 		<!-- Create required directory for linking -->
@@ -670,9 +670,9 @@
 			<fileset dir="${dir.lib}" includes="**/*"/>
 		</copy>
 		
-		<echo>Creating JNativeHook.jar...</echo>
+		<echo>Creating ${project.name}.jar...</echo>
 		<mkdir dir="${dir.jar}"/>
-		<jar jarfile="${dir.jar}/JNativeHook.jar" basedir="${dir.bin.class}">
+		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin.class}">
 			<include name="org/jnativehook/keyboard/**"/>
 			<include name="org/jnativehook/**"/>
 			<exclude name="org/jnativehook/c_source/**"/>
