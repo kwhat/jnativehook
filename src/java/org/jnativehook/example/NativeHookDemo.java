@@ -28,15 +28,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import org.jnativehook.GlobalScreen;
@@ -274,12 +271,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowOpened(WindowEvent e) {
 		try {
-			txtEventInfo.setText("Auto Repate Rate: " + GlobalScreen.getInstance().getAutoRepeatRate());
-			txtEventInfo.append("\n" + "Auto Repate Delay: " + GlobalScreen.getInstance().getAutoRepeatDelay());
-			txtEventInfo.append("\n" + "Double Click Time: " + GlobalScreen.getInstance().getDoubleClickTime());
-			txtEventInfo.append("\n" + "Pointer Sensitivity: " + GlobalScreen.getInstance().getPointerSensitivity());
-			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + GlobalScreen.getInstance().getPointerAccelerationMultiplier());
-			txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + GlobalScreen.getInstance().getPointerAccelerationThreshold());
+			txtEventInfo.setText("Auto Repate Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
+			txtEventInfo.append("\n" + "Auto Repate Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
+			txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.multiClickInterval"));
+			txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointerSensitivity"));
+			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointerAccelerationMultiplier"));
+			txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + System.getProperty("jnativehook.pointerAccelerationThreshold"));
 		}
 		catch (Exception ex) {
 			txtEventInfo.setText("Error: " + ex.toString() + "\n");

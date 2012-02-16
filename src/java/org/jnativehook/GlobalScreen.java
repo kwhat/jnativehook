@@ -77,10 +77,11 @@ public class GlobalScreen {
 	 * A deconstructor that will perform native cleanup by calling the
 	 * {@link #unregisterHook} method.  This method will not run until the
 	 * class is garbage collected.
-	 * 
+	 *
 	 * @throws Throwable The <code>Exception</code> raised by this method.
 	 * @see Object#finalize
 	 */
+	@Override
 	protected void finalize() throws Throwable {
 		try {
 			GlobalScreen.unloadNativeLibrary();
@@ -215,65 +216,6 @@ public class GlobalScreen {
 			eventListeners.remove(NativeMouseWheelListener.class, listener);
 		}
 	}
-	
-	/**
-	 * Gets the native keyboard auto repeat rate.
-	 *
-	 * @return the auto repeat rate in milliseconds
-	 * @throws NativeKeyException the native key exception
-	 */
-	public native long getAutoRepeatRate() throws NativeKeyException;
-	
-	/**
-	 * Gets the native keyboard auto repeat delay.
-	 *
-	 * @return the auto repeat delay in milliseconds
-	 * @throws NativeKeyException the native key exception
-	 */
-	public native long getAutoRepeatDelay() throws NativeKeyException;
-	
-	
-	/**
-	 * Gets the native mouse acceleration multiplier.
-	 *
-	 * @return the speed 
-	 * @throws NativeMouseException the native mouse exception
-	 * 
-	 * @since 1.1
-	 */
-	public native long getPointerAccelerationMultiplier() throws NativeMouseException;
-	
-	/**
-	 * Gets the native mouse acceleration threshold.
-	 *
-	 * @return the speed 
-	 * @throws NativeMouseException the native mouse exception
-	 * 
-	 * @since 1.1
-	 */
-	public native long getPointerAccelerationThreshold() throws NativeMouseException;
-	
-	
-	/**
-	 * Gets the native mouse sensitivity.
-	 *
-	 * @return the speed 
-	 * @throws NativeMouseException the native mouse exception
-	 * 
-	 * @since 1.1
-	 */
-	public native long getPointerSensitivity() throws NativeMouseException;
-	
-	/**
-	 * Gets the native mouse double click time in milliseconds.
-	 *
-	 * @return the speed 
-	 * @throws NativeMouseException the native mouse exception
-	 * 
-	 * @since 1.1
-	 */
-	public native long getDoubleClickTime() throws NativeMouseException;
-	
 	
 	/**
 	 * Enable the native hook if it is not currently running. If it is running

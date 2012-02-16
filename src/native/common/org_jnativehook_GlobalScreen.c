@@ -21,130 +21,104 @@
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv * env, jobject UNUSED(obj)) {
-	long rate = GetAutoRepeatRate();
+static void SetNativeProperties(JNIEnv * env) {
+	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
+	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
-	if (rate >= 0) {
+	if (clsSystem != NULL && setProperty_ID != NULL) {
+		//Set the native keyboard auto repeat rate.
+		long rate = GetAutoRepeatRate();
+		if (rate >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetAutoRepeatRate(): successful. (rate: %li)\n", rate);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.autoRepeatRate", (jstring) rate);
+		}
 		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): successful. (rate: %li)\n", rate);
+		else {
+			fprintf(stderr, "GetAutoRepeatRate(): failure!\n");
+		}
+		#endif
+
+
+		long delay = GetAutoRepeatDelay();
+		if (delay >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetAutoRepeatDelay(): successful. (delay: %li)\n", delay);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.autoRepeatDelay", (jstring) delay);
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "GetAutoRepeatDelay(): failure!\n");
+		}
+		#endif
+
+		
+		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		long multiplier = GetPointerAccelerationMultiplier();
+		if (multiplier >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetPointerAccelerationMultiplier(): successful. (multiplier: %li)\n", multiplier);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerAccelerationMultiplier", (jstring) multiplier);
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stdout, "GetPointerAccelerationMultiplier(): failure!\n");
+		}
+		#endif
+
+
+		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		long threshold = GetPointerAccelerationThreshold();
+		if (threshold >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetPointerAccelerationThreshold(): successful. (threshold: %li)\n", threshold);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerAccelerationThreshold", (jstring) threshold);
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stdout, "GetPointerAccelerationThreshold(): failure!\n");
+		}
+		#endif
+
+
+		long sensitivity = GetPointerSensitivity();
+		if (sensitivity >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetPointerSensitivity(): successful. (sensitivity: %li)\n", sensitivity);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerSensitivity", (jstring) sensitivity);
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stdout, "GetPointerSensitivity(): failure!\n");
+		}
+		#endif
+
+
+		long clicktime = GetDoubleClickTime();
+		if (clicktime >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetDoubleClickTime(): successful. (time: %li)\n", clicktime);
+			#endif
+
+			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.multiClickInterval", (jstring) clicktime);
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "GetDoubleClickTime(): failure!\n");
+		}
 		#endif
 	}
-	else {
-		#ifdef DEBUG
-		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat rate.");
-		rate = JNI_ERR;
-	}
-
-	return (jlong) rate;
 }
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv * env, jobject UNUSED(obj)) {
-	long delay = GetAutoRepeatDelay();
-
-	if (delay >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): successful. (delay: %li)\n", delay);
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the keyboard auto repeat delay.");
-		delay = JNI_ERR;
-	}
-
-	return (jlong) delay;
-}
-
-// 0-Threshold X, 1-Threshold Y and 2-Speed
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(JNIEnv * env, jobject UNUSED(obj)) {
-	long multiplier = GetPointerAccelerationMultiplier();
-
-	if (multiplier >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(): successful. (multiplier: %li)\n", multiplier);
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer acceleration multiplier.");
-		multiplier = JNI_ERR;
-	}
-
-	return (jlong) multiplier;
-}
-
-// 0-Threshold X, 1-Threshold Y and 2-Speed
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(JNIEnv * env, jobject UNUSED(obj)) {
-	long threshold = GetPointerAccelerationThreshold();
-
-	if (threshold >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(): successful. (threshold: %li)\n", threshold);
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer acceleration threshold.");
-		threshold = JNI_ERR;
-	}
-
-	return (jlong) threshold;
-}
-
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv * env, jobject UNUSED(obj)) {
-	long sensitivity = GetPointerSensitivity();
-
-	if (sensitivity >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerSensitivity(): successful. (sensitivity: %li)\n", sensitivity);
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getPointerSensitivity(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_MOUSE_EXCEPTION, "Could not determine the pointer sensitivity.");
-		sensitivity = JNI_ERR;
-	}
-
-	return (jlong) sensitivity;
-}
-
-
-JNIEXPORT jlong JNICALL Java_org_jnativehook_GlobalScreen_getDoubleClickTime(JNIEnv * env, jobject UNUSED(obj)) {
-	long clicktime = GetDoubleClickTime();
-
-	if (clicktime >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "Java_org_jnativehook_GlobalScreen_getDoubleClickTime(): successful. (time: %li)\n", clicktime);
-		#endif
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stderr, "Java_org_jnativehook_GlobalScreen_getDoubleClickTime(): failure!\n");
-		#endif
-
-		ThrowException(env, NATIVE_KEY_EXCEPTION, "Could not determine the mouse double click time.");
-		clicktime = JNI_ERR; //Naturally exit so jni exception is thrown.
-	}
-
-	return (jlong) clicktime;
-}
-
 
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * env, jobject UNUSED(obj)) {
@@ -180,7 +154,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#endif
 
 		//Run platform specific load items.
-		OnLibraryLoad(env);
+		OnLibraryLoad();
+
+		//Set java properties from native sources.
+		SetNativeProperties(env);
 	}
 	else {
 		#ifdef DEBUG

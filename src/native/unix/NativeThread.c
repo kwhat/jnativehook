@@ -61,7 +61,7 @@ static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
 
 //Convert the XEvent modifier mask to a Java modifier mask.
-jint doModifierConvert(int event_mask) {
+static jint DoModifierConvert(int event_mask) {
 	jint modifiers = 0;
 
 	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
@@ -112,7 +112,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 					keysym = XKeycodeToKeysym(disp_ctrl, event_code, 0);
 					jkey = NativeToJKey(keysym);
-					modifiers = doModifierConvert(event_mask);
+					modifiers = DoModifierConvert(event_mask);
 
 					//Fire key pressed event.
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
@@ -126,7 +126,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 					keysym = XKeycodeToKeysym(disp_ctrl, event_code, 0);
 					jkey = NativeToJKey(keysym);
-					modifiers = doModifierConvert(event_mask);
+					modifiers = DoModifierConvert(event_mask);
 
 					//Fire key released event.
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
@@ -150,7 +150,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					 */
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
-						modifiers = doModifierConvert(event_mask);
+						modifiers = DoModifierConvert(event_mask);
 
 						//Fire mouse released event.
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
@@ -167,7 +167,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					//FIXME Button2 and 3 are reversed from other platforms.
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
-						modifiers = doModifierConvert(event_mask);
+						modifiers = DoModifierConvert(event_mask);
 
 						//Fire mouse released event.
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
@@ -180,7 +180,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
 					#endif
 
-					modifiers = doModifierConvert(event_mask);
+					modifiers = DoModifierConvert(event_mask);
 
 					//Fire mouse moved event.
 					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
@@ -476,7 +476,7 @@ bool IsNativeThreadRunning() {
 		}
 
 		#ifdef DEBUG
-			fprintf(stdout, "IsNativeThreadRunning: Running State (%i)\n", isRunning);
+		fprintf(stdout, "IsNativeThreadRunning: Running State (%i)\n", isRunning);
 		#endif
 
 		pthread_mutex_unlock(&hookControlMutex);
@@ -486,7 +486,7 @@ bool IsNativeThreadRunning() {
 		//and/or an uninitialized mutex.
 
 		#ifdef DEBUG
-			fprintf(stderr, "IsNativeThreadRunning: Failed to acquire control mutex lock!\n");
+		fprintf(stderr, "IsNativeThreadRunning: Failed to acquire control mutex lock!\n");
 		#endif
 	}
 
