@@ -307,6 +307,24 @@
 		<echo level="info">Operating system: ${os.name} ${os.version} (${native.os.type} compatible)</echo>
 		
 		
+		
+		<!-- Set linux configuration options to their default values -->
+		<condition property="project.option.xkb" value="true">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<echo level="info">Build optimized: ${project.optimize}</echo>
+		
+		<condition property="project.option.xf86misc" value="false">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<echo level="info">Build optimized: ${project.optimize}</echo>
+		
+		<condition property="project.option.xt" value="false">
+			<isset property="native.os.isUnix"/>
+		</condition>
+		<echo level="info">Build debug: ${project.debug}</echo>
+		
+		
 		<!-- Try to locate a compiler -->
 		<condition property="native.cc" value="${env.CC}">
 			<available filepath="${native.path}" file="${env.CC}" type="file" />
