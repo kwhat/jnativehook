@@ -83,7 +83,11 @@
 		<property name="project.debug" value="false" />
 		<echo level="info">Build debug: ${project.debug}</echo>
 		
-		<property name="project.optimize" value="true" />
+		<condition property="project.optimize" value="true">
+			<not>
+				<istrue value="${project.debug}" />
+			</not>
+		</condition>
 		<echo level="info">Build optimized: ${project.optimize}</echo>
 		
 		<property name="project.strip" value="true" />
@@ -114,8 +118,8 @@
 			<condition>
 				<not>
 					<or>
-						<isset property="java.include"/>
-						<available file="${java.include}" type="dir"/>
+						<isset property="java.include" />
+						<available file="${java.include}" type="dir" />
 					</or>
 				</not>
 			</condition>
@@ -125,19 +129,19 @@
 		
 		<!-- Try to locate the env path varaible -->
 		<condition property="native.path" value="${env.PATH}">
-			<isset property="env.PATH"/>
+			<isset property="env.PATH" />
 		</condition>
 		<condition property="native.path" value="${env.Path}">
-			<isset property="env.Path"/>
+			<isset property="env.Path" />
 		</condition>
 		<condition property="native.path" value="${env.path}">
-			<isset property="env.path"/>
+			<isset property="env.path" />
 		</condition>
 		
 		<fail message="Could not determine environment path.  Please set your PATH environment variable or manually set native.path to a '${path.separator}' seperated list of folders to search for native applications.">
 			<condition>
 				<not>
-					<isset property="native.path"/>
+					<isset property="native.path" />
 				</not>
 			</condition>
 		</fail>
@@ -147,54 +151,54 @@
 		<!-- Figure out of the system arch to pass to the compiler -->
 		<condition property="native.arch" value="i586">
 			<or>
-				<os arch="x86"/>
-				<os arch="i386"/>
-				<os arch="i486"/>
-				<os arch="i586"/>
-				<os arch="i686"/>
+				<os arch="x86" />
+				<os arch="i386" />
+				<os arch="i486" />
+				<os arch="i586" />
+				<os arch="i686" />
 			</or>
 		</condition>
 		<condition property="native.arch" value="x86-64">
 			<!-- FIXME This should be set to k8 instead of x86-64 for better gcc compatiblity -->
 			<or>
-				<os arch="x86-64"/>
-				<os arch="x86_64"/>
-				<os arch="amd64"/>
-				<os arch="k8"/>
+				<os arch="x86-64" />
+				<os arch="x86_64" />
+				<os arch="amd64" />
+				<os arch="k8" />
 			</or>
 		</condition>
 		<condition property="native.arch" value="powerpc">
 			<or>
-				<os arch="ppc"/>
-				<os arch="PowerPC"/>
+				<os arch="ppc" />
+				<os arch="PowerPC" />
 			</or>
 		</condition>
 		<condition property="native.arch" value="powerpc64">
 			<or>
-				<os arch="ppc64"/>
-				<os arch="PowerPC64"/>
+				<os arch="ppc64" />
+				<os arch="PowerPC64" />
 			</or>
 		</condition>
 		
 		
 		<!-- Set the system arch name used for orginizing native libraries -->
 		<condition property="native.arch.name" value="x86">
-			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.name" value="x86_64">
-			<equals arg1="${native.arch}" arg2="x86-64" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="x86-64" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.name" value="ppc">
-			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.name" value="ppc64">
-			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true"/>
+			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true" />
 		</condition>
 		
 		<fail message="The ${os.arch} architecture is not currently supported.">
 			<condition>
 				<not>
-					<isset property="native.arch.name"/>
+					<isset property="native.arch.name" />
 				</not>
 			</condition>
 		</fail>
@@ -204,37 +208,32 @@
 		<!-- Special arch for osx -->
 		<condition property="native.arch.osx" value="i386">
 			<and>
-				<os family="mac"/>
-				<os family="unix"/>
-				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true"/>
+				<os family="mac" />
+				<os family="unix" />
+				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
 			</and>
 		</condition>
 		<condition property="native.arch.osx" value="${native.arch.name}">
 			<and>
-				<os family="mac"/>
-				<os family="unix"/>
+				<os family="mac" />
+				<os family="unix" />
 			</and>
 		</condition>
 		
 		
 		<!-- Set 32 or 64 bit flag -->
-		<property name="native.arch.model" value="${sun.arch.data.model}"/>
+		<property name="native.arch.model" value="${sun.arch.data.model}" />
 		<fail message="The ${native.arch.model}-bit data model is not currently supported.">
 			<condition>
 				<not>
 					<or>
-						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true"/>
-						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true"/>
+						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true" />
+						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true" />
 					</or>
 				</not>
 			</condition>
 		</fail>
 		<echo level="info">System architecture data model: ${native.arch.model} bit</echo>
-		
-		
-		<!-- Set little or big endian -->
-		<property name="native.arch.endian" value="${sun.cpu.endian}"/>
-		<echo level="info">System architecture endian: ${native.arch.endian} endian</echo>
 		
 		
 		<!-- Determin the operating system -->
@@ -266,64 +265,78 @@
 				<os family="unix" name="SunOS" />
 			</or>
 		</condition>
-		
+
+
 		<!-- Figure out the os family -->
 		<condition property="native.os.isApple" value="true">
-			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
 		</condition>
 		<condition property="native.os.isUnix" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
-			</or>
+			<and>
+				<os family="unix" />
+				<not>
+					<istrue value="${native.os.isApple}" />
+				</not>
+			</and>
 		</condition>
 		<condition property="native.os.isWindows" value="true">
-			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
+			<os family="winnt" />
 		</condition>
-		
+
+
 		<!-- set system specific src directory -->
-		<condition property="native.os.type" value="osx">
-			<isset property="native.os.isApple" />
+		<condition property="dir.os.platform" value="osx">
+			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.os.type" value="unix">
-			<isset property="native.os.isUnix" />
+		<condition property="dir.os.platform" value="unix">
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.os.type" value="windows">
-			<isset property="native.os.isWindows" />
+		<condition property="dir.os.platform" value="windows">
+			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
+
 		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
 			<condition>
 				<not>
 					<or>
-						<isset property="native.os.isApple" />
-						<isset property="native.os.isUnix" />
-						<isset property="native.os.isWindows" />
+						<istrue value="${native.os.isApple}" />
+						<istrue value="${native.os.isUnix}" />
+						<istrue value="${native.os.isWindows}" />
 					</or>
 				</not>
 			</condition>
 		</fail>
-		<echo level="info">Operating system: ${os.name} ${os.version} (${native.os.type} compatible)</echo>
+		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.os.platform} compatible)</echo>
 		
 		
-		
-		<!-- Set linux configuration options to their default values -->
+		<!-- Set Apple configuration options to their default values -->
+		<!-- FIXME:  These need to be added when we are ready to test the OS X platform -->
+
+		<!-- Set Linux configuration options to their default values -->
 		<condition property="project.option.xkb" value="true">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<echo level="info">Build optimized: ${project.optimize}</echo>
-		
 		<condition property="project.option.xf86misc" value="false">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<echo level="info">Build optimized: ${project.optimize}</echo>
-		
 		<condition property="project.option.xt" value="false">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<echo level="info">Build debug: ${project.debug}</echo>
-		
+
+		<!-- Set Windows configuration options to their default values -->
+		<!-- TODO: At this time Windows does not have any platform specific configuration options -->
+
+		<!-- Set Common configuration options to their default values -->
+		<!-- TODO: This is for HIDAPI library which has not been integrated yet. -->
+		<!-- condition property="project.option.hid" value="false">
+			<istrue value="${native.os.isApple}" />
+			<istrue value="${native.os.isUnix}" />
+			<istrue value="${native.os.isWindows}" />
+		</condition -->
+
 		
 		<!-- Try to locate a compiler -->
 		<condition property="native.cc" value="${env.CC}">
@@ -339,23 +352,23 @@
 			<available filepath="${native.path}" file="gcc.exe" type="file" />
 		</condition>
 		<condition property="native.cc" value="mingw32-gcc.exe">
-			<available filepath="${native.path}" file="mingw32-gcc.exe"/>
+			<available filepath="${native.path}" file="mingw32-gcc.exe" />
 		</condition>
 		<condition property="native.cc" value="mingw64-gcc.exe">
-			<available filepath="${native.path}" file="mingw64-gcc.exe"/>
+			<available filepath="${native.path}" file="mingw64-gcc.exe" />
 		</condition>
 		<condition property="native.cc" value="cc.exe">
-			<available filepath="${native.path}" file="cc.exe" type="file"/>
+			<available filepath="${native.path}" file="cc.exe" type="file" />
 		</condition>
 		
 		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
 			<condition>
 				<not>
 					<and>
-						<isset property="native.cc"/>
+						<isset property="native.cc" />
 						<or>
-							<available filepath="${native.path}" file="${native.cc}"/>
-							<available file="${native.cc}"/>
+							<available filepath="${native.path}" file="${native.cc}" />
+							<available file="${native.cc}" />
 						</or>
 					</and>
 				</not>
@@ -366,21 +379,21 @@
 		
 		<!-- Try to locate the linker -->
 		<condition property="native.ld" value="${env.LD}">
-			<available filepath="${native.path}" file="${env.LD}" type="file"/>
+			<available filepath="${native.path}" file="${env.LD}" type="file" />
 		</condition>
-		<property name="native.ld" value="${native.cc}"/>
+		<property name="native.ld" value="${native.cc}" />
 		<!-- Using gcc for linking does a much better job at passing all the correct libraries to the linker
 		<condition property="native.ld" value="ld">
-			<available filepath="${native.path}" file="ld" type="file"/>
+			<available filepath="${native.path}" file="ld" type="file" />
 		</condition>
 		<condition property="native.ld" value="ld.exe">
-			<available filepath="${native.path}" file="ld.exe" type="file"/>
+			<available filepath="${native.path}" file="ld.exe" type="file" />
 		</condition>
 		<condition property="native.ld" value="gcc">
-			<available filepath="${native.path}" file="gcc" type="file"/>
+			<available filepath="${native.path}" file="gcc" type="file" />
 		</condition>
 		<condition property="native.ld" value="gcc.exe">
-			<available filepath="${native.path}" file="gcc.exe" type="file"/>
+			<available filepath="${native.path}" file="gcc.exe" type="file" />
 		</condition>
 		-->
 		
@@ -388,10 +401,10 @@
 			<condition>
 				<not>
 					<and>
-						<isset property="native.ld"/>
+						<isset property="native.ld" />
 						<or>
-							<available filepath="${native.path}" file="${native.ld}"/>
-							<available file="${native.ld}"/>
+							<available filepath="${native.path}" file="${native.ld}" />
+							<available file="${native.ld}" />
 						</or>
 					</and>
 				</not>
@@ -402,26 +415,26 @@
 		
 		<!-- Try to locate strip -->
 		<condition property="native.strip" value="strip">
-			<available filepath="${native.path}" file="strip" type="file"/>
+			<available filepath="${native.path}" file="strip" type="file" />
 		</condition>
 		<condition property="native.strip" value="strip.exe">
-			<available filepath="${native.path}" file="strip.exe" type="file"/>
+			<available filepath="${native.path}" file="strip.exe" type="file" />
 		</condition>
 		<condition property="native.strip" value="mingw32-strip.exe">
-			<available filepath="${native.path}" file="mingw32-strip.exe"/>
+			<available filepath="${native.path}" file="mingw32-strip.exe" />
 		</condition>
 		<condition property="native.strip" value="mingw64-strip.exe">
-			<available filepath="${native.path}" file="mingw64-strip.exe"/>
+			<available filepath="${native.path}" file="mingw64-strip.exe" />
 		</condition>
 	
 		<fail message="Could not locate strip command.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
 			<condition>
 				<not>
 					<and>
-						<isset property="native.strip"/>
+						<isset property="native.strip" />
 						<or>
-							<available filepath="${native.path}" file="${native.strip}"/>
-							<available file="${native.strip}"/>
+							<available filepath="${native.path}" file="${native.strip}" />
+							<available file="${native.strip}" />
 						</or>
 					</and>
 				</not>
@@ -432,170 +445,155 @@
 		
 		<!-- set system specific strip arguments -->
 		<condition property="native.strip.args" value="-x -S">
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
 			<or>
-				<isset property="native.os.isUnix"/>
-				<isset property="native.os.isWindows"/>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${native.os.isWindows}" />
 			</or>
 		</condition>
 		
-		
+
+		<!-- Set the java compiler -->
+		<property name="java.cc" value="modern" />
+		<echo level="info">Java compiler: ${java.cc}</echo>
+
 		<!-- Set the java compatible version -->
-		<property name="java.target" value="${ant.java.version}"/>
-		<fail message="Invalid java target version.  Only java versions 1.5, 1.6 and 1.7 have been tested.">
-			<condition>
-				<not>
-					<and>
-						<isset property="java.target"/>
-						<or>
-							<equals arg1="${java.target}" arg2="1.5" casesensitive="false" trim="false"/>
-							<equals arg1="${java.target}" arg2="1.6" casesensitive="false" trim="false"/>
-							<equals arg1="${java.target}" arg2="1.7" casesensitive="false" trim="false"/>
-						</or>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Java Compatibility: ${java.target}</echo>
-		
-		
-		<!-- Set system specific cflags -->
-		<property name="native.cc.args.obj" value="-o" />
-		
-		<condition property="native.cc.flags.pic" value="-fPIC" else="">
-			<not>
-				<!-- Windows does not need pic support -->
-				<isset property="native.os.isWindows"/>
-			</not>
-		</condition>
-		
+		<property name="java.target" value="${ant.java.version}" />
+		<echo level="info">Java compatibility: ${java.target}</echo>
+
+
 		<!-- Set optimization level flag -->
-		<condition property="native.cc.flags.optimize" value="-O2 -fomit-frame-pointer" else="-O0 -ggdb -DDEBUG">
-			<istrue value="${project.optimize}"/>
+		<condition property="native.cc.flags.optimize" value="-O2 -fomit-frame-pointer" else="-O0 -ggdb">
+			<istrue value="${project.optimize}" />
 		</condition>
 		
 		<!-- set gcc standard flags (primarily for windows right now) -->
 		<!-- FIXME try this instead: http://www.aquaphoenix.com/ref/gnu_c_library/libc_12.html -->
 		<condition property="native.cc.flags.standard" value="-std=c99 -pedantic" else="-std=gnu99">
 			<not>
-				<istrue value="${project.debug}"/>
+				<istrue value="${project.debug}" />
 			</not>
 		</condition>
-		
-		<condition property="native.cc.args" value="-c -m${native.arch.model}">
-			<isset property="native.os.isApple"/>
-		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model}">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model}">
-			<isset property="native.os.isUnix"/>
-		</condition>
-		
 
-		<condition property="native.cc.flags" value="-arch ${native.arch.osx} -mtune=${native.arch} -Wall -Wextra -Werror ${native.cc.flags.optimize} -fno-strict-aliasing ${native.cc.flags.pic}">
+		<!-- Set the compiler flags. -->
+		<condition property="native.cc.flags" value="-arch ${native.arch.osx} -mtune=${native.arch} ${native.cc.flags.optimize}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -Wall -Wextra -Werror ${native.cc.flags.optimize} -DXT -DXKB -fno-strict-aliasing ${native.cc.flags.pic}">
-			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
-			<isset property="native.os.isUnix"/>
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic -std=c99 ${native.cc.flags.optimize}">
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic ${native.cc.flags.standard} -Wall -Wextra -Werror ${native.cc.flags.optimize} -fno-strict-aliasing ${native.cc.flags.pic}">
-			<isset property="native.os.isWindows"/>
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic ${native.cc.flags.optimize}">
+			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
-		
+
+		<!-- Set system specific cflags -->
+		<condition property="native.cc.flags.pic" value="-fPIC" else="">
+			<not>
+				<!-- Windows does not need pic support -->
+				<istrue value="${native.os.isWindows}" />
+			</not>
+		</condition>
+
 		<!-- Set system specific includes locations -->
 		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${file.separator}usr${file.separator}lib -I${java.include}">
 			<!-- -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -->
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${java.include} -I${java.include}${file.separator}${native.os} -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${java.include} -I${java.include}${file.separator}win32">
-			<isset property="native.os.isWindows"/>
-		</condition>
-		
-		
-		<!-- Set optimization level flag -->
-		<condition property="native.ld.flags.optimize" value="-O0" else="-O1">
-			<istrue value="${project.optimize}"/>
+			<istrue value="${native.os.isWindows}" />
 		</condition>
 
 		
-		<!-- set system specific linker arguments -->
-		<property name="native.ld.args.obj" value="-o" />
-				
-		<condition property="native.ld.args" value="-dynamiclib -m${native.arch.model}">
-			<isset property="native.os.isApple"/>
+		<!-- Set the compiler arguments for compiling. -->
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
+			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.args" value="-shared -m${native.arch.model}">
-			<isset property="native.os.isUnix"/>
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -DXT -DXKB -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
+			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.ld.args" value="-shared -m${native.arch.model}">
-			<isset property="native.os.isWindows"/>
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.standard} -Wall -Wextra -Werror -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
+		<property name="native.cc.args2" value="-o" />
+
+
+
+		<!-- Set optimization level flag -->
+		<condition property="native.ld.flags.optimize" value="-O0" else="-O1">
+			<istrue value="${project.optimize}" />
+		</condition>
+
 		<!-- set system specific ldflags -->
 		<condition property="native.ld.flags" value="-arch ${native.arch.osx}">
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.flags" value="-W1,--as-needed,${native.ld.flags.optimize}">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}">
-			<isset property="native.os.isWindows"/>
+			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
 		
 		<!-- Guess what system specific libraries to link against -->
 		<condition property="native.ld.libs" value="-framework ApplicationServices">
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.libs" value="-lcrtdll -luser32 -lkernel32">
-			<isset property="native.os.isWindows"/>
+			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
-		
+
+		<!-- set system specific linker arguments -->
+		<condition property="native.ld.args" value="-dynamiclib -m${native.arch.model} ${native.ld.flags}">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
+			<istrue value="${native.os.isWindows}" />
+		</condition>
+		<property name="native.ld.args2" value="${native.ld.libs} -o" />
+
 		<!-- set system specific library name -->
 		<condition property="native.executable" value="lib${project.name}.dylib">
-			<isset property="native.os.isApple"/>
+			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.executable" value="lib${project.name}.so">
-			<isset property="native.os.isUnix"/>
+			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.executable" value="${project.name}.dll">
-			<isset property="native.os.isWindows"/>
+			<istrue value="${native.os.isWindows}" />
 		</condition>
 		
 		
 		<!-- Create property file for the descovered values -->
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
+			<entry key="java.cc"				value="${java.cc}" />
 			<entry key="java.target"			value="${java.target}" />
-			<entry key="native.os"				value="${native.os}" />
-			<entry key="native.arch"			value="${native.arch}" />
 			<entry key="native.cc"				value="${native.cc}" />
 			<entry key="native.cc.args"			value="${native.cc.args}" />
-			<entry key="native.cc.flags"		value="${native.cc.flags}" />
-			<entry key="native.cc.includes"		value="${native.cc.includes}" />
+			<entry key="native.cc.args2"		value="${native.cc.args2}" />
 			<entry key="native.ld"				value="${native.ld}" />
 			<entry key="native.ld.args"			value="${native.ld.args}" />
-			<entry key="native.ld.flags"		value="${native.ld.flags}" />
-			<entry key="native.ld.libs"			value="${native.ld.libs}" />
+			<entry key="native.ld.args2"		value="${native.ld.args2}" />
 			<entry key="native.strip"			value="${native.strip}" />
-			<entry key="native.strip.args"		value="${native.strip.args}"/>
+			<entry key="native.strip.args"		value="${native.strip.args}" />
 		</propertyfile>
 		
 		
 		<!-- Set a flag to let our tasks know we have configured successfully -->
-		<property name="project.isConfigured" value="true"/>
+		<property name="project.isConfigured" value="true" />
 	</target>
 
 	
@@ -614,6 +612,8 @@
 			optimize="${project.optimize}"
 			deprecation="false"
 			includeantruntime="false"
+			listfiles="true"
+			compiler="${java.cc}"
 			source="${java.target}"
 			target="${java.target}"
 			verbose="false"
@@ -634,20 +634,23 @@
 		<!-- Create required directories for compiling -->
 		<mkdir dir="${dir.bin.obj}" />
 		<mkdir dir="${dir.bin.obj}/common" />
-		<mkdir dir="${dir.bin.obj}/${native.os.type}" />
-		
+		<mkdir dir="${dir.bin.obj}/${dir.os.platform}" />
+
+		<fileset dir="${dir.src.native}" id="file.src">
+			<include name="common/*.c" />
+			<include name="${dir.os.platform}/*.c" />
+		</fileset>
+
+		<property name="file.src.txt" refid='file.src'/>
+		<echo>Applying ${native.cc} on the following files: ${file.src.txt}</echo>
+
 		<!-- Execute the native compiler on the soruce files -->
 		<apply executable="${native.cc}" failonerror="true" verbose="true" ignoremissing="false">
-			<fileset dir="${dir.src.native}">
-				<include name="common/*.c" />
-				<include name="${native.os.type}/*.c" />
-			</fileset>
+			<fileset refid="file.src" />
 			
 			<arg line="${native.cc.args}" />
-			<arg line="${native.cc.flags}" />
-			<arg line="${native.cc.includes}" />
 			<srcfile />
-			<arg value="${native.cc.args.obj}" />
+			<arg value="${native.cc.args2}" />
 			<targetfile />
 			
 			<mapper type="glob" from="*.c" to="${dir.bin.obj}/*.o" />
@@ -657,56 +660,59 @@
 		<echo>Linking C objects...</echo>
 		<!-- Create required directory for linking -->
 		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}" />
-		
+
+		<fileset dir="${dir.bin.obj}" id="file.obj">
+			<include name="**/*.o" />
+		</fileset>
+
+		<property name="file.obj.txt" refid='file.obj'/>
+		<echo>Applying ${native.ld} on the following files: ${file.obj.txt}</echo>
+
 		<!-- Execute the native linker on the object files -->
 		<apply executable="${native.ld}" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
-			<fileset dir="${dir.bin.obj}">
-				<include name="**/*.o" />
-			</fileset>
+			<fileset refid="file.obj" />
 			
 			<arg line="${native.ld.args}" />
-			<arg line="${native.ld.flags}" />
 			<srcfile />
-			<arg line="${native.ld.libs}" />
-			<arg value="${native.ld.args.obj}" />
+			<arg line="${native.ld.args2}" />
 			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}" />
 		</apply>
 	</target>
 	
 	
-	<target name="strip-native" if="project.strip.enabled" description="Discard debug symbols from native binaries.">
+	<target name="strip-native" if="project.strip" description="Discard debug symbols from native binaries.">
 		<echo>Stripping native binaries...</echo>
 		
 		<!-- Execute strip on native binaries -->
 		<exec executable="${native.strip}" failonerror="true">
-			<arg line="${native.strip.args}"/>
-			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}"/>
+			<arg line="${native.strip.args}" />
+			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}" />
 		</exec>
 	</target>
 	
 	
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
-		<mkdir dir="${dir.jar}"/>
-		<mkdir dir="${dir.bin.class}/org/jnativehook/lib"/>
+		<mkdir dir="${dir.jar}" />
+		<mkdir dir="${dir.bin.class}/org/jnativehook/lib" />
 		<copy overwrite="true" todir="${dir.bin.class}/org/jnativehook/lib">
-			<fileset dir="${dir.lib}" includes="**/*"/>
+			<fileset dir="${dir.lib}" includes="**/*" />
 		</copy>
 		
 		<echo>Creating ${project.name}.jar...</echo>
-		<mkdir dir="${dir.jar}"/>
+		<mkdir dir="${dir.jar}" />
 		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin.class}">
-			<include name="org/jnativehook/keyboard/**"/>
-			<include name="org/jnativehook/**"/>
-			<exclude name="org/jnativehook/c_source/**"/>
-			<exclude name="org/jnativehook/lib/**/history.xml"/>
-			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class"/> -->
+			<include name="org/jnativehook/keyboard/**" />
+			<include name="org/jnativehook/**" />
+			<exclude name="org/jnativehook/c_source/**" />
+			<exclude name="org/jnativehook/lib/**/history.xml" />
+			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
 			<manifest>
-				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo"/>
+				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
 				<section name="org/jnativehook">
-					<attribute name="Implementation-Title" value="${project.name} Library"/>
-					<attribute name="Implementation-Version" value="${project.version}"/> 
-					<attribute name="Implementation-Vendor" value="${project.vendor}"/>
+					<attribute name="Implementation-Title" value="${project.name} Library" />
+					<attribute name="Implementation-Version" value="${project.version}" />
+					<attribute name="Implementation-Vendor" value="${project.vendor}" />
 				</section>
 			</manifest>
 		</jar>
@@ -717,27 +723,27 @@
 		<echo level="info">Generating API Documenation...</echo>
 	
 		<!-- Delete any previous javadocs -->
-		<mkdir dir="${dir.doc}"/>
+		<mkdir dir="${dir.doc}" />
 		<delete includeemptydirs="true">
-			<fileset dir="${dir.doc}" includes="**/*"/>
+			<fileset dir="${dir.doc}" includes="**/*" />
 		</delete>
 		
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="src" defaultexcludes="yes">
-				<include name="org/jnativehook/**"/>
-				<exclude name="org/jnativehook/c_source/**"/>
-				<exclude name="org/jnativehook/lib/**"/>
+				<include name="org/jnativehook/**" />
+				<exclude name="org/jnativehook/c_source/**" />
+				<exclude name="org/jnativehook/lib/**" />
 			</packageset>
 			
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
 			<bottom><![CDATA[<i>Copyright &#169; 2006-2012 ${project.vendor}. All Rights Reserved.</i>]]></bottom>
 			
 			<!--
-			<tag name="to.do" scope="all" description="To Do:"/>
-			<tag name="fix.me" scope="all" description="Fix Needed:"/>
+			<tag name="to.do" scope="all" description="To Do:" />
+			<tag name="fix.me" scope="all" description="Fix Needed:" />
 			-->
 			
-			<link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
 		</javadoc>
 	</target>
 	
@@ -745,35 +751,35 @@
 	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
-		<mkdir dir="${dir.dist}"/>
+		<mkdir dir="${dir.dist}" />
 		
 		<zip destfile="${dir.dist}/${project.name}-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${dir.jar}" prefix="${project.name}/jar">
-				<include name="*.jar"/>
+				<include name="*.jar" />
 			</zipfileset>
 			
 			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<include name="license*.txt"/>
-				<include name="readme.txt"/>
+				<include name="license*.txt" />
+				<include name="readme.txt" />
 			</zipfileset>
 		</zip>
 		
 		<zip destfile="${dir.dist}/${project.name}-doc-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
-				<exclude name="**/.*"/>
+				<exclude name="**/.*" />
 			</zipfileset>
 		</zip>
 		
 		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<include name="*.txt"/>
-				<include name="build.*"/>
-				<exclude name="build.properties*"/>
+				<include name="*.txt" />
+				<include name="build.*" />
+				<exclude name="build.properties*" />
 			</zipfileset>
 			
 			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
-				<exclude name="**/.*"/>
-				<exclude name="org/jnativehook/lib/**"/>
+				<exclude name="**/.*" />
+				<exclude name="org/jnativehook/lib/**" />
 			</zipfileset>
 		</zip>
 		
@@ -781,7 +787,7 @@
 		<propertyfile file="build.num" comment="Build Number for ANT. Do not edit!">
 			<entry key="build.major" type="int" value="${build.major}" />
 			<entry key="build.minor" type="int" value="${build.minor}" />
-			<entry key="build.revision" type="int" value="1" operation="+"/>
+			<entry key="build.revision" type="int" value="1" operation="+" />
 		</propertyfile>
 	</target>
 	
