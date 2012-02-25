@@ -384,9 +384,7 @@ static void * ThreadProc(void * arg) {
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
-	*status = 42;
-	//pthread_exit((void *) status);
-	return status;
+	pthread_exit(status);
 }
 
 int StartNativeThread() {
@@ -454,12 +452,13 @@ int StopNativeThread() {
 		pthread_mutex_unlock(&hookControlMutex);
 
 		//Wait for the thread to die.
-		void * t;
-		pthread_join(hookThreadId, (void *) &t);
+		void * thread_status;
+		pthread_join(hookThreadId, (void *) &thread_status);
+		status = *(int *) thread_status;
 		#ifdef DEBUG
-		printf("Thread Result: %i\n", *(int *) t);
+		printf("Thread Result: %i\n", *(int *) thread_status);
 		#endif
-		free(t);
+		free(thread_status);
 		
 		//Clean up the mutex.
 		pthread_mutex_destroy(&hookControlMutex);
