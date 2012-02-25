@@ -245,10 +245,12 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 }
 
-static void * ThreadProc() {
+static void * ThreadProc(void * arg) {
 	pthread_mutex_lock(&hookControlMutex);
 	pthread_mutex_lock(&hookRunningMutex);
-	int status = EXIT_FAILURE;
+	//int status = EXIT_FAILURE;
+	int * status = (int *) arg;
+	*status = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
@@ -265,7 +267,7 @@ static void * ThreadProc() {
 		Display * disp_data = XOpenDisplay(disp_name);
 		if (disp_ctrl != NULL && disp_data != NULL) {
 			#ifdef DEBUG
-				fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
+			fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
 			#endif
 
 			//Check to make sure XRecord is installed and enabled.
@@ -310,7 +312,7 @@ static void * ThreadProc() {
 
 		if (context != 0) {
 			//Set the exit status.
-			status = EXIT_SUCCESS;
+			*status = EXIT_SUCCESS;;
 
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
@@ -382,7 +384,9 @@ static void * ThreadProc() {
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
-	pthread_exit((void *) &status);
+	*status = 42;
+	//pthread_exit((void *) status);
+	return status;
 }
 
 int StartNativeThread() {
@@ -400,7 +404,7 @@ int StartNativeThread() {
 
 		//We shall use the default pthread attributes: thread is joinable
 		//(not detached) and has default (non real-time) scheduling policy.
-		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL) == 0) {
+		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "StartNativeThread(): start successful.\n");
 			#endif
@@ -450,9 +454,13 @@ int StopNativeThread() {
 		pthread_mutex_unlock(&hookControlMutex);
 
 		//Wait for the thread to die.
-		pthread_join(hookThreadId, (void **) &status);
-		printf("Thread Result: %i\n", status);
-
+		void * t;
+		pthread_join(hookThreadId, (void *) &t);
+		#ifdef DEBUG
+		printf("Thread Result: %i\n", *(int *) t);
+		#endif
+		free(t);
+		
 		//Clean up the mutex.
 		pthread_mutex_destroy(&hookControlMutex);
 	}

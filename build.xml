@@ -83,20 +83,29 @@
 		<property name="project.debug" value="false" />
 		<echo level="info">Build debug: ${project.debug}</echo>
 		
-		<condition property="project.optimize" value="true">
+		<condition property="project.optimize" value="true" else="false">
 			<not>
 				<istrue value="${project.debug}" />
 			</not>
 		</condition>
 		<echo level="info">Build optimized: ${project.optimize}</echo>
 		
-		<property name="project.strip" value="true" />
+		<condition property="project.strip" value="true" else="false">
+			<not>
+				<istrue value="${project.debug}" />
+			</not>
+		</condition>
 		<condition property="project.strip.enabled" value="true">
 			<istrue value="${project.strip}" />
 		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
+
+		<!-- Set the project config options to their default values -->
+		<property name="project.option.xkb" value="true" />
+		<property name="project.option.xf86misc" value="false" />
+		<property name="project.option.xt" value="true" />
 		
-		
+
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="java.include" value="${java.home}${file.separator}include">
 			<available file="${java.home}${file.separator}include" type="dir" />
@@ -316,25 +325,36 @@
 		<!-- FIXME:  These need to be added when we are ready to test the OS X platform -->
 
 		<!-- Set Linux configuration options to their default values -->
-		<condition property="project.option.xkb" value="true">
-			<istrue value="${native.os.isUnix}" />
+		<condition property="native.cc.macros.xkb" value="-DXKB" else="">
+			<and>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${project.option.xkb}" />
+			</and>
 		</condition>
-		<condition property="project.option.xf86misc" value="false">
-			<istrue value="${native.os.isUnix}" />
+		<condition property="native.cc.macros.xf86misc" value="-DXF86MISC" else="">
+			<and>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${project.option.xf86misc}" />
+			</and>
 		</condition>
-		<condition property="project.option.xt" value="false">
-			<istrue value="${native.os.isUnix}" />
+		<condition property="native.cc.macros.xt" value="-DXT" else="">
+			<and>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${project.option.xt}" />
+			</and>
 		</condition>
 
 		<!-- Set Windows configuration options to their default values -->
 		<!-- TODO: At this time Windows does not have any platform specific configuration options -->
 
 		<!-- Set Common configuration options to their default values -->
+		<condition property="native.cc.macros.debug" value="-DDEBUG">
+			<istrue value="${project.debug}" />
+		</condition>
+
 		<!-- TODO: This is for HIDAPI library which has not been integrated yet. -->
-		<!-- condition property="project.option.hid" value="false">
-			<istrue value="${native.os.isApple}" />
-			<istrue value="${native.os.isUnix}" />
-			<istrue value="${native.os.isWindows}" />
+		<!-- condition property="native.cc.macros.hidapi" value="-DHIDAPI">
+			<istrue value="${project.option.hid}" />
 		</condition -->
 
 		
@@ -515,7 +535,7 @@
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread -DXT -DXKB -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread ${native.cc.macros.debug} ${native.cc.macros.xkb} ${native.cc.macros.xf86misc} ${native.cc.macros.xt} -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
 			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
 			<istrue value="${native.os.isUnix}" />
 		</condition>
@@ -680,7 +700,7 @@
 	</target>
 	
 	
-	<target name="strip-native" if="project.strip" description="Discard debug symbols from native binaries.">
+	<target name="strip-native" if="project.strip.enabled" description="Discard debug symbols from native binaries.">
 		<echo>Stripping native binaries...</echo>
 		
 		<!-- Execute strip on native binaries -->

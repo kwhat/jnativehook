@@ -26,6 +26,9 @@ static void SetNativeProperties(JNIEnv * env) {
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 	if (clsSystem != NULL && setProperty_ID != NULL) {
+		//Create a buffer for converting numbers to strings.
+		char buffer[16];
+
 		//Set the native keyboard auto repeat rate.
 		long rate = GetAutoRepeatRate();
 		if (rate >= 0) {
@@ -33,7 +36,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetAutoRepeatRate(): successful. (rate: %li)\n", rate);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.autoRepeatRate", (jstring) rate);
+			if (snprintf(buffer, sizeof(buffer), "%li", rate) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetAutoRepeatRate(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -48,7 +58,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetAutoRepeatDelay(): successful. (delay: %li)\n", delay);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.autoRepeatDelay", (jstring) delay);
+			if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetAutoRepeatDelay(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -64,7 +81,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetPointerAccelerationMultiplier(): successful. (multiplier: %li)\n", multiplier);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerAccelerationMultiplier", (jstring) multiplier);
+			if (snprintf(buffer, sizeof(buffer), "%li", multiplier) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetPointerAccelerationMultiplier(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -80,7 +104,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetPointerAccelerationThreshold(): successful. (threshold: %li)\n", threshold);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerAccelerationThreshold", (jstring) threshold);
+			if (snprintf(buffer, sizeof(buffer), "%li", threshold) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetPointerAccelerationThreshold(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -95,7 +126,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetPointerSensitivity(): successful. (sensitivity: %li)\n", sensitivity);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.pointerSensitivity", (jstring) sensitivity);
+			if (snprintf(buffer, sizeof(buffer), "%li", sensitivity) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetPointerSensitivity(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -110,7 +148,14 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stdout, "GetDoubleClickTime(): successful. (time: %li)\n", clicktime);
 			#endif
 
-			(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, "jnativehook.multiClickInterval", (jstring) clicktime);
+			if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.multiClickInterval"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetDoubleClickTime(): failure converting value to string!\n");
+			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -137,7 +182,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JN
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	return (jboolean) IsNativeThreadRunning();
 }
-
 
 
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
