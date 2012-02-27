@@ -79,7 +79,7 @@ long GetPointerSensitivity() {
 	return value;
 }
 
-long GetDoubleClickTime() {
+long GetMultiClickTime() {
 	long value = -1;
 	UINT WINAPI clicktime;
 
@@ -89,6 +89,18 @@ long GetDoubleClickTime() {
 	}
 
 	return value;
+}
+
+long GetScrollWheelType() {
+	//FIXME Implement.
+
+	return (long) WHEEL_UNIT_SCROLL;
+}
+
+long GetScrollWheelAmount() {
+	//FIXME Implement.
+
+	return 3;
 }
 
 void OnLibraryLoad() {

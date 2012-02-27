@@ -218,7 +218,7 @@ long GetPointerSensitivity() {
 	return -1;
 }
 
-long GetDoubleClickTime() {
+long GetMultiClickTime() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
 	bool successful = false;
 	#if defined IOKIT || defined CARBON
@@ -288,6 +288,17 @@ long GetDoubleClickTime() {
 	return value;
 }
 
+long GetScrollWheelType() {
+	//FIXME Implement.
+
+	return (long) WHEEL_UNIT_SCROLL;
+}
+
+long GetScrollWheelAmount() {
+	//FIXME Implement.
+
+	return 3;
+}
 
 void OnLibraryLoad() {
 	//Do Nothing.

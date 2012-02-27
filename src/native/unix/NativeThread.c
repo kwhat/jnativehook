@@ -138,15 +138,9 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Button pressed. (%i)\n", event_code);
 					#endif
 
-					//FIXME Dirty hack to prevent scroll events.
 					//FIXME Button2 and 3 are reversed from other platforms.
 					/* This information is all static for X11, its up to the WM to
 					 * decide how to interpret the wheel events.
-					 *
-					Scroll type: WHEEL_UNIT_SCROLL
-					Scroll amount: 3 unit increments per notch
-					Units to scroll: 3 unit increments
-					Vertical unit increment: 15 pixels
 					 */
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
@@ -156,22 +150,38 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
+					else if (event_code == 4 || event_code == 5) {
+						//Scroll wheel release events.
+						//TODO Implement
+						//wheelRotation is the direction of the wheel determined by the previous wheel event.
+						//lastButton == 4 ? -1 : 1,
+						/*
+							Scroll type: WHEEL_UNIT_SCROLL
+							Scroll amount: 3 unit increments per notch
+							Units to scroll: 3 unit increments
+							Vertical unit increment: 15 pixels
+						*/
+					}
 				break;
 
 				case ButtonRelease:
 					#ifdef DEBUG
-						fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
+					fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
 					#endif
 
-					//FIXME Dirty hack to prevent scroll events.
 					//FIXME Button2 and 3 are reversed from other platforms.
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+						//Handle button release events
 						jbutton = NativeToJButton(event_code);
 						modifiers = DoModifierConvert(event_mask);
 
 						//Fire mouse released event.
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					}
+					else if (event_code == 4 || event_code == 5) {
+						//Scroll wheel release events.
+						//TODO Implement
 					}
 				break;
 
@@ -321,16 +331,16 @@ static void * ThreadProc(void * arg) {
 			pthread_mutex_unlock(&hookControlMutex);
 
 			#ifdef XRECORD_ASYNC
-				//Async requires that we loop so that our thread does not return.
-				XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL);
-				while (running) {
-					XRecordProcessReplies(disp_data);
-				}
-				XRecordDisableContext(disp_ctrl, context);
-				XSync(disp_ctrl, True);
+			//Async requires that we loop so that our thread does not return.
+			XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL);
+			while (running) {
+				XRecordProcessReplies(disp_data);
+			}
+			XRecordDisableContext(disp_ctrl, context);
+			XSync(disp_ctrl, True);
 			#else
-				//We should be using this but its broken upstream.
-				XRecordEnableContext(disp_data, context, LowLevelProc, NULL);
+			//We should be using this but its broken upstream.
+			XRecordEnableContext(disp_data, context, LowLevelProc, NULL);
 			#endif
 
 			//Lock back up until we are done processing the exit.
@@ -440,12 +450,12 @@ int StopNativeThread() {
 		pthread_mutex_lock(&hookControlMutex);
 
 		#ifdef XRECORD_ASYNC
-			//Try to exit the thread naturally.
-			running = false;
+		//Try to exit the thread naturally.
+		running = false;
 		#else
-			//Try to exit the thread naturally.
-			XRecordDisableContext(disp_ctrl, context);
-			XSync(disp_ctrl, True);
+		//Try to exit the thread naturally.
+		XRecordDisableContext(disp_ctrl, context);
+		XSync(disp_ctrl, True);
 		#endif
 
 		//Must unlock to allow the thread to finish cleaning up.
@@ -456,7 +466,7 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, (void *) &thread_status);
 		status = *(int *) thread_status;
 		#ifdef DEBUG
-		printf("Thread Result: %i\n", *(int *) thread_status);
+		printf("StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
 		#endif
 		free(thread_status);
 		
@@ -483,7 +493,7 @@ bool IsNativeThreadRunning() {
 		}
 
 		#ifdef DEBUG
-		fprintf(stdout, "IsNativeThreadRunning: Running State (%i)\n", isRunning);
+		fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
 		#endif
 
 		pthread_mutex_unlock(&hookControlMutex);
@@ -493,7 +503,7 @@ bool IsNativeThreadRunning() {
 		//and/or an uninitialized mutex.
 
 		#ifdef DEBUG
-		fprintf(stderr, "IsNativeThreadRunning: Failed to acquire control mutex lock!\n");
+		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 		#endif
 	}
 

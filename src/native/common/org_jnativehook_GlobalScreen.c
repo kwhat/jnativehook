@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "NativeErrors.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
@@ -142,10 +141,10 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 
-		long clicktime = GetDoubleClickTime();
+		long clicktime = GetMultiClickTime();
 		if (clicktime >= 0) {
 			#ifdef DEBUG
-			fprintf(stdout, "GetDoubleClickTime(): successful. (time: %li)\n", clicktime);
+			fprintf(stdout, "GetMultiClickTime(): successful. (time: %li)\n", clicktime);
 			#endif
 
 			if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
@@ -153,13 +152,57 @@ static void SetNativeProperties(JNIEnv * env) {
 			}
 			#ifdef DEBUG
 			else {
-				fprintf(stderr, "GetDoubleClickTime(): failure converting value to string!\n");
+				fprintf(stderr, "GetMultiClickTime(): failure converting value to string!\n");
 			}
 			#endif
 		}
 		#ifdef DEBUG
 		else {
-			fprintf(stderr, "GetDoubleClickTime(): failure!\n");
+			fprintf(stderr, "GetMultiClickTime(): failure!\n");
+		}
+		#endif
+
+
+		long scrolltype = GetScrollWheelType();
+		if (scrolltype >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetScrollWheelType(): successful. (type: %li)\n", scrolltype);
+			#endif
+
+			if (snprintf(buffer, sizeof(buffer), "%li", scrolltype) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.wheelScrollType"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetScrollWheelType(): failure converting value to string!\n");
+			}
+			#endif
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "GetScrollWheelType(): failure!\n");
+		}
+		#endif
+
+
+		long scrollamount = GetScrollWheelAmount();
+		if (scrollamount >= 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "GetScrollWheelAmount(): successful. (type: %li)\n", scrollamount);
+			#endif
+
+			if (snprintf(buffer, sizeof(buffer), "%li", scrollamount) >= 0) {
+				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.wheelScrollAmount"), (*env)->NewStringUTF(env, buffer));
+			}
+			#ifdef DEBUG
+			else {
+				fprintf(stderr, "GetScrollWheelAmount(): failure converting value to string!\n");
+			}
+			#endif
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "GetScrollWheelAmount(): failure!\n");
 		}
 		#endif
 	}

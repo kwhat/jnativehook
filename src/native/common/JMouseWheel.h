@@ -15,18 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_NativeHelpers_h
-#define _Included_NativeHelpers_h
+#ifndef _Included_JMouseWheel_h
+#define _Included_JMouseWheel_h
 
-extern long GetAutoRepeatRate();
-extern long GetAutoRepeatDelay();
-extern long GetPointerAccelerationMultiplier();
-extern long GetPointerAccelerationThreshold();
-extern long GetPointerSensitivity();
-extern long GetMultiClickTime();
-extern long GetScrollWheelType();
-extern long GetScrollWheelAmount();
-extern void OnLibraryLoad();
-extern void OnLibraryUnload();
+//Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
+#define WHEEL_UNIT_SCROLL	0	//AnyButton
+#define WHEEL_BLOCK_SCROLL	1
 
 #endif

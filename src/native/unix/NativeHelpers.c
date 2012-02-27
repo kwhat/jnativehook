@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
+#include "JMouseWheel.h"
 
 #ifdef XKB
 #include <X11/XKBlib.h>
@@ -143,7 +144,7 @@ long GetPointerSensitivity() {
 	return value;
 }
 
-long GetDoubleClickTime() {
+long GetMultiClickTime() {
 	long value = -1;
 	int clicktime;
 	bool successful = false;
@@ -180,6 +181,25 @@ long GetDoubleClickTime() {
 	return value;
 }
 
+long GetScrollWheelType() {
+	/* X11 does not have an API call for aquiring the mouse scroll type.  This
+	 * maybe part of the XInput2 (XI2) extention but I will wont know until it
+	 * is available on my platform.  For the time being we will just use the
+	 * unit scroll value.
+	 */
+
+	return (long) WHEEL_UNIT_SCROLL;
+}
+
+long GetScrollWheelAmount() {
+	/* Some scroll wheel properties are avaiable via the new XInput2 (XI2)
+	 * extention.  Unfortunately the extention is not available on my
+	 * development platform at this time.  For the time being we will just
+	 * use the Windows default value of 3.
+	 */
+
+	return 3;
+}
 
 void OnLibraryLoad() {
 	//Tell X Threads are OK
@@ -192,19 +212,15 @@ void OnLibraryLoad() {
 
 	//Open local display.
 	disp = XOpenDisplay(XDisplayName(NULL));
+	#ifdef DEBUG
 	if (disp != NULL) {
-		#ifdef DEBUG
-		fprintf(stdout, "XOpenDisplay successful.\n");
-		#endif
+		fprintf(stdout, "OnLibraryLoad(): XOpenDisplay successful.\n");
 	}
 	else {
-		#ifdef DEBUG
-		fprintf(stderr, "XOpenDisplay failure!\n");
-		#endif
-
-		//ThrowFatalError(env, "Could not attach to the default X11 display");
+		fprintf(stderr, "OnLibraryLoad(): XOpenDisplay failure!\n");
 	}
-
+	#endif
+	
 	Bool isAutoRepeat = false;
 	#ifdef XKB
 	//enable detectable autorepeat.
@@ -218,18 +234,14 @@ void OnLibraryLoad() {
 	isAutoRepeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
 	#endif
 
+	#ifdef DEBUG
 	if (isAutoRepeat) {
-		#ifdef DEBUG
-		fprintf(stdout, "Successfully enabled detectable autorepeat.\n");
-		#endif
+		fprintf(stdout, "OnLibraryLoad(): Successfully enabled detectable autorepeat.\n");
 	}
 	else {
-		#ifdef DEBUG
-		fprintf(stderr, "Could not enable detectable auto-repeat!\n");
-		#endif
-
-		//ThrowException(env, NATIVE_HOOK_EXCEPTION, "Could not enable detectable auto-repeat");
+		fprintf(stderr, "OnLibraryLoad(): Could not enable detectable auto-repeat!\n");
 	}
+	#endif
 }
 
 void OnLibraryUnload() {
