@@ -23,8 +23,9 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/record.h>
 
-#include "NativeErrors.h"
 #include "JConvertFromNative.h"
+#include "NativeErrors.h"
+#include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "XButtonCodes.h"
 #include "XEventModifiers.h"
@@ -58,7 +59,7 @@ static jmethodID idDispatchEvent;
 
 //Java callback classes and constructor id's
 static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
-static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
+static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 //Convert the XEvent modifier mask to a Java modifier mask.
 static jint DoModifierConvert(int event_mask) {
@@ -99,10 +100,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			//Java Event Data
 			JKeyDatum jkey;
 			jint jbutton;
+			jint scrollType, scrollAmount, wheelRotation;
 			jint modifiers;
 
 			//Java Event Objects
-			jobject objKeyEvent, objMouseEvent;
+			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
 			switch (event_type) {
 				case KeyPress:
@@ -142,9 +144,9 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					/* This information is all static for X11, its up to the WM to
 					 * decide how to interpret the wheel events.
 					 */
+					modifiers = DoModifierConvert(event_mask);
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
-						modifiers = DoModifierConvert(event_mask);
 
 						//Fire mouse released event.
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
@@ -152,15 +154,21 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					}
 					else if (event_code == 4 || event_code == 5) {
 						//Scroll wheel release events.
-						//TODO Implement
-						//wheelRotation is the direction of the wheel determined by the previous wheel event.
-						//lastButton == 4 ? -1 : 1,
 						/*
 							Scroll type: WHEEL_UNIT_SCROLL
 							Scroll amount: 3 unit increments per notch
 							Units to scroll: 3 unit increments
 							Vertical unit increment: 15 pixels
 						*/
+
+						scrollType = GetScrollWheelType();
+						scrollAmount = GetScrollWheelAmount();
+						//wheelRotation is the direction of the wheel determined by the previous wheel event.
+						wheelRotation = 1; //FIXME lastButton == 4 ? -1 : 1,
+
+						//Fire mouse wheel event.
+						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) scrollType, (jint) scrollAmount, (jint) wheelRotation);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					}
 				break;
 
@@ -244,8 +252,7 @@ static void CreateJNIGlobals(JNIEnv * env) {
 	//Class and Constructor for the NativeMouseWheelEvent Object
 	jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 	clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
-	//FIXME need to change the constructor signature
-	//idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+	idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIIIII)V");
 }
 
 static void DestroyJNIGlobals(JNIEnv * env) {
