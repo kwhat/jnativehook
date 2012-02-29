@@ -348,12 +348,12 @@
 		<!-- TODO: At this time Windows does not have any platform specific configuration options -->
 
 		<!-- Set Common configuration options to their default values -->
-		<condition property="native.cc.macros.debug" value="-DDEBUG">
+		<condition property="native.cc.macros.debug" value="-DDEBUG" else="">
 			<istrue value="${project.debug}" />
 		</condition>
 
 		<!-- TODO: This is for HIDAPI library which has not been integrated yet. -->
-		<!-- condition property="native.cc.macros.hidapi" value="-DHIDAPI">
+		<!-- condition property="native.cc.macros.hidapi" value="-DHIDAPI" else="">
 			<istrue value="${project.option.hid}" />
 		</condition -->
 
