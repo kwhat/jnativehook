@@ -52,7 +52,6 @@ static bool running;
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId = 0;
-static unsigned short lastWheelButton = 0;
 
 //GlobalScreen object and dispatch id.
 static jobject objGlobalScreen = NULL;
@@ -162,16 +161,17 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 							Vertical unit increment: 15 pixels
 						*/
 
-
 						scrollType = (jint) GetScrollWheelType();
 						scrollAmount = (jint) GetScrollWheelAmount();
 						if (event_code == 4) {
+							//Wheel Rotated Up and Away
 							wheelRotation = -1;
 						}
 						else { //event_code == 5
-							wheelRotation = -1;
+							//Wheel Rotated Down and Towards
+							wheelRotation = 1;
 						}
-
+						
 						//Fire mouse wheel event.
 						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, scrollType, scrollAmount, wheelRotation);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
@@ -193,10 +193,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
+					/*
 					else if (event_code == 4 || event_code == 5) {
-						//Scroll wheel release events.
-						//TODO Figure out if we need to implmenet this or if the button down is sufficient.
+						//Scroll wheel release events, not needed for this platform.
 					}
+					*/
 				break;
 
 				case MotionNotify:

@@ -38,10 +38,13 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+import org.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
  * A demonstration of how to use the JNativeHook library.
@@ -53,12 +56,12 @@ import org.jnativehook.mouse.NativeMouseInputListener;
  * @see GlobalScreen
  * @see NativeKeyListener
  */
-public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, ActionListener, WindowListener, ItemListener {
+public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, ActionListener, WindowListener, ItemListener {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5076634313730799059L;
 	
 	/** Checkbox's for event delivery options. */
-	private JCheckBox chkKeyboard, chkButton, chkMotion;
+	private JCheckBox chkKeyboard, chkButton, chkMotion, chkWheel;
 	
 	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
@@ -69,6 +72,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public NativeHookDemo() {
 		try {
 			//Initialze native hook.
+			//FIXME This function is not AWT Thread Safe!
 			GlobalScreen.getInstance().registerNativeHook();
 		}
 		catch (NativeHookException ex) {
@@ -108,6 +112,13 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		chkMotion.addItemListener(this);
 		chkMotion.setSelected(true);
 		grpOptions.add(chkMotion);
+
+		//Create wheel checkbox
+		chkWheel = new JCheckBox("Wheel Events");
+		chkWheel.setMnemonic(KeyEvent.VK_W);
+		chkWheel.addItemListener(this);
+		chkWheel.setSelected(true);
+		grpOptions.add(chkWheel);
 		
 		//Create feedback area
 		txtEventInfo = new JTextArea();
@@ -157,6 +168,15 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
 			}
 		}
+		else if (item == chkWheel) {
+			//Motion checkbox was changed, adjust listeners accordingly
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				GlobalScreen.getInstance().addNativeMouseWheelListener(this);
+			}
+			else {
+				GlobalScreen.getInstance().removeNativeMouseWheelListener(this);
+			}
+		}
 	}
 	
 	/**
@@ -204,27 +224,23 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void mouseMoved(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
-	
+
 	/**
-	 * Write the <code>NativeKeyEvent</code> to the text window.
-	 *
-	 * @param e The native key event.
+	 * @see org.jnativehook.mouse.NativeMouseWheelListener#mouseWheelMoved(org.jnativehook.mouse.NativeMouseWheelEvent)
 	 */
-	private void displayEventInfo(NativeKeyEvent e) {
-		txtEventInfo.append("\n" + e.paramString());
-		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+	public void mouseWheelMoved(NativeMouseWheelEvent e) {
+		displayEventInfo(e);
 	}
 	
 	/**
-	 * Write the <code>NativeMouseEvent</code> to the text window.
+	 * Write the <code>NativeInputEvent</code> to the text window.
 	 *
-	 * @param e The native mouse event.
+	 * @param e The native key event.
 	 */
-	private void displayEventInfo(NativeMouseEvent e) {
+	private void displayEventInfo(NativeInputEvent e) {
 		txtEventInfo.append("\n" + e.paramString());
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
-    }
-	
+	}
 
 	/**
 	 * Unimplemented
@@ -238,9 +254,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 *
 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 	 */
-	public void windowClosing(WindowEvent e) {
-		
-	}
+	public void windowClosing(WindowEvent e) { /* Do Nothing */ }
 	
 	/**
 	 * Unimplemented
@@ -303,7 +317,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		System.runFinalization();
 		System.exit(0);
 	}
-	
     
 	/**
 	 * The demo project entry point.
