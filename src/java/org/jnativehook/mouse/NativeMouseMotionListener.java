@@ -46,11 +46,11 @@ public interface NativeMouseMotionListener extends EventListener {
 	public void mouseMoved(NativeMouseEvent e);
 	
 	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
+	/**
+	 * Invoked when the mouse has been moved while a button mask is present.
 	 *
 	 * @param e the native mouse event
 	 * @since 1.1
 	 */
-	//public void mouseDragged(MouseEvent e);
+	public void mouseDragged(NativeMouseEvent e);
 }

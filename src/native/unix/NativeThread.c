@@ -207,8 +207,17 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 
 					modifiers = DoModifierConvert(event_mask);
 
+					//Check the upper half of java modifiers for non zero value.
+					if (modifiers >> 4 > 0) {
+						//Create Mouse Dragged event.
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+					}
+					else {
+						//Create a Mouse Moved event
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+					}
+					
 					//Fire mouse moved event.
-					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				break;
 
