@@ -72,7 +72,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public NativeHookDemo() {
 		try {
 			//Initialze native hook.
-			//FIXME This function is not AWT Thread Safe!
+			//Note: This function is not AWT Thread Safe!
 			GlobalScreen.getInstance().registerNativeHook();
 		}
 		catch (NativeHookException ex) {
@@ -314,7 +314,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void windowClosed(WindowEvent e) {
     	//Clean up the native hook.
    		try {
-   			//FIXME This function is not AWT Thread Safe!
+   			//Note: This function is not AWT Thread Safe!
 			GlobalScreen.getInstance().unregisterNativeHook();
 		}
 		catch (NativeHookException ex) {

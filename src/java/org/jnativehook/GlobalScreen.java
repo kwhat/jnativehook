@@ -373,6 +373,19 @@ public class GlobalScreen {
 						((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
 					}
 				break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeMouseMotionListener) this.getListener()).mouseDragged((NativeMouseEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeMouseMotionListener) listeners[i]).mouseDragged(e);
+					}
+				break;
 			}
 		}
 	}
@@ -390,7 +403,7 @@ public class GlobalScreen {
 	 */
 	protected void processMouseWheelEvent(NativeMouseWheelEvent e) {
 		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
-		
+
 		for (int i = 0; i < listeners.length; i++) {
 			if (SwingUtilities.isEventDispatchThread()) {
 				SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {

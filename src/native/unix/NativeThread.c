@@ -171,7 +171,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 							//Wheel Rotated Down and Towards
 							wheelRotation = 1;
 						}
-						
+
 						//Fire mouse wheel event.
 						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, scrollType, scrollAmount, wheelRotation);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
