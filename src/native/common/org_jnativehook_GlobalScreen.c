@@ -246,11 +246,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		//Set java properties from native sources.
 		SetNativeProperties(env);
 	}
+	#ifdef DEBUG
 	else {
-		#ifdef DEBUG
 		fprintf(stderr, "JNI_OnUnload(): AttachCurrentThread() failed!\n");
-		#endif
 	}
+	#endif
 
     return jni_version;
 }
@@ -265,16 +265,16 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	OnLibraryUnload();
 
 	//Detach the current thread to the JVM.
+	#ifdef DEBUG
 	if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
-		#ifdef DEBUG
 		fprintf(stdout, "JNI_OnUnload(): DetachCurrentThread() successful.\n");
-		#endif
 	}
 	else {
-		#ifdef DEBUG
 		fprintf(stderr, "JNI_OnUnload(): DetachCurrentThread() failed!\n");
-		#endif
 	}
+	#else
+	(*jvm)->DetachCurrentThread(jvm);
+	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI Unloaded.\n");

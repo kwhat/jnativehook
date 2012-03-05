@@ -249,68 +249,14 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				//A positive value indicates that the wheel was rotated forward, away from the user; a negative
 				//value indicates that the wheel was rotated backward, toward the user. One wheel click is
 				//defined as WHEEL_DELTA, which is 120.
-
-
+				
 				/*
-
-	if (platformLines == WHEEL_PAGESCROLL) {
-		scrollType = java_awt_event_MouseWheelEvent_WHEEL_BLOCK_SCROLL;
-		scrollLines = 1;
-	}
-	else {
-		scrollType = java_awt_event_MouseWheelEvent_WHEEL_UNIT_SCROLL;
-		scrollLines = platformLines;
-	}
-
-
-	UINT GetLinesToScrollUserSetting() {
-		UINT userSetting;
-
-		// Retrieve the lines-to-scroll user setting.
-		BOOL success = SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &userSetting, 0);
-
-		//Use a default value if the API failed.
-		if (success == FALSE) {
-			userSetting = DEFAULT_LINES_TO_SCROLL;
-		}
-
-		return userSetting;
-	}
-
-	UINT GetCharsToScrollUserSetting() {
-		UINT userSetting;
-
-		// Retrieve the characters-to-scroll user setting.
-		BOOL success = SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &userSetting, 0);
-
-		// If SystemParametersInfo fails assign the correct value to
-		// user setting based on the OS version.
-		if(success == FALSE) {
-			//Get the OS version.
-			OSVERSIONINFO version = { 0 };
-			version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-			GetVersionEx(&version);
-
-			if (version.dwPlatformId == VER_PLATFORM_WIN32_NT && version.dwMajorVersion < 6 ) {
-				// On Windows 2000 and Windows XP set the value to 1 in
-				// order to work correctly with IntelliType Pro and
-				// IntelliPoint emulating the WM_MOUSEWHEEL message.
-				userSetting = DEFAULT_CHARS_TO_SCROLL_WITH_EMULATION;
-			}
-			else {
-				// On Longhorn and above use the default value of 3.
-				userSetting = DEFAULT_CHARS_TO_SCROLL;
-			}
-		}
-
-		return userSetting;
-	}
-
 
 
 			// Settings change message notifies us when change is made
 			// through the SystemParametersInfo() API
 			case WM_SETTINGCHANGE:
+				//TODO Reset all the system props.
 				return OnSettingChange( (UINT)wParam );
 				 */
 

@@ -92,15 +92,35 @@ long GetMultiClickTime() {
 }
 
 long GetScrollWheelType() {
-	//FIXME Implement.
+	long value = -1;
+	UINT WINAPI wheeltype;
 
-	return (long) WHEEL_UNIT_SCROLL;
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
+	if (wheeltype == WHEEL_PAGESCROLL) {
+		value = WHEEL_BLOCK_SCROLL;
+		scrollLines = 1;
+	}
+	else {
+		value = WHEEL_UNIT_SCROLL;
+		scrollLines = platformLines;
+	}
+
+	return value;
 }
 
 long GetScrollWheelAmount() {
-	//FIXME Implement.
+	long value = -1;
+	UINT WINAPI wheelamount;
 
-	return 3;
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheelamount, 0);
+	if (wheelamount == WHEEL_PAGESCROLL) {
+		value = 1;
+	}
+	else {
+		value = (long) wheelamount;
+	}
+
+	return value;
 }
 
 void OnLibraryLoad() {
