@@ -489,7 +489,7 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, (void *) &thread_status);
 		status = *(int *) thread_status;
 		#ifdef DEBUG
-		printf("StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
+		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
 		#endif
 		free(thread_status);
 		
