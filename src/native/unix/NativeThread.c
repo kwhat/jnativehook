@@ -221,11 +221,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				break;
 
+				#ifdef DEBUG
 				default:
-					#ifdef DEBUG
 					fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
-					#endif
 				break;
+				#endif
 			}
 
 			//Handle any possible JNI issue that may have occured.
@@ -324,23 +324,23 @@ static void * ThreadProc(void * arg) {
 					context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 					XFree(range);
 				}
-				else {
-					#ifdef DEBUG
-					fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
-					#endif
-				}
-			}
-			else {
 				#ifdef DEBUG
-				fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
+				else {
+					fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
+				}
 				#endif
 			}
-		}
-		else {
 			#ifdef DEBUG
-			fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
+			else {
+				fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
+			}
 			#endif
 		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
+		}
+		#endif
 
 
 		if (context != 0) {
@@ -370,11 +370,11 @@ static void * ThreadProc(void * arg) {
 			pthread_mutex_lock(&hookControlMutex);
 			XRecordFreeContext(disp_ctrl, context);
 		}
+		#ifdef DEBUG
 		else {
-			#ifdef DEBUG
 			fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
-			#endif
 		}
+		#endif
 
 		//Close down any open displays.
 		if (disp_ctrl != NULL) {
@@ -391,23 +391,23 @@ static void * ThreadProc(void * arg) {
 		DestroyJNIGlobals(env);
 
 		//Detach the current thread to the JVM.
+		#ifdef DEBUG
 		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
-			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): DetachCurrentThread() successful.\n");
-			#endif
 		}
 		else {
-			#ifdef DEBUG
 			fprintf(stderr, "ThreadProc(): DetachCurrentThread() failed!\n");
-			#endif
 		}
-	}
-	else {
-		//We cant do a whole lot of anything if we cant attach to the current thread.
-		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
+		#else
+		(*jvm)->DetachCurrentThread(jvm);
 		#endif
 	}
+	#ifdef DEBUG
+	else {
+		//We cant do a whole lot of anything if we cant attach to the current thread.
+		fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
+	}
+	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "ThreadProc(): complete.\n");
@@ -521,14 +521,13 @@ bool IsNativeThreadRunning() {
 
 		pthread_mutex_unlock(&hookControlMutex);
 	}
+	#ifdef DEBUG
 	else {
 		//Lock Failure. This should always be caused by an invalid pointer
 		//and/or an uninitialized mutex.
-
-		#ifdef DEBUG
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
-		#endif
 	}
+	#endif
 
 	return isRunning;
 }

@@ -21,6 +21,7 @@
 #include <windows.h>
 
 #include "NativeErrors.h"
+#include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "JConvertFromNative.h"
 #include "WinKeyCodes.h"
@@ -39,7 +40,7 @@ static jmethodID idDispatchEvent;
 
 //Java callback classes and constructor id's
 static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
-static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
+static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//We should already be attached to the JVM at this point.  This should only
@@ -129,10 +130,11 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 		//Java Event Data
 		jint jbutton;
+		jint scrollType, scrollAmount, wheelRotation;
 		jint modifiers;
 
 		//Java Mouse Event Object.
-		jobject objMouseEvent;
+		jobject objMouseEvent, objMouseWheelEvent;
 
 		/* Code to track the click count, It maybe easier to track our own click
 		 * counts to allow for triple click detection.
@@ -233,8 +235,17 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 				modifiers = getModifiers();
 
+				//Check the upper half of java modifiers for non zero value.
+				if (modifiers >> 4 > 0) {
+					//Create Mouse Dragged event.
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+				}
+				else {
+					//Create a Mouse Moved event
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+				}
+
 				//Fire mouse moved event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -250,21 +261,28 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				//value indicates that the wheel was rotated backward, toward the user. One wheel click is
 				//defined as WHEEL_DELTA, which is 120.
 				
-				/*
+				scrollType = (jint) GetScrollWheelType();
+				scrollAmount = (jint) GetScrollWheelAmount();
+				wheelRotation = (jint) ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
+				
+				//Fire mouse wheel event.
+				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, scrollType, scrollAmount, wheelRotation);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+			break;
 
-
+			/*
 			// Settings change message notifies us when change is made
 			// through the SystemParametersInfo() API
 			case WM_SETTINGCHANGE:
 				//TODO Reset all the system props.
 				return OnSettingChange( (UINT)wParam );
-				 */
+			*/
 
+			#ifdef DEBUG
 			default:
-				#ifdef DEBUG
 				fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
-				#endif
 			break;
+			#endif
 		}
 
 		//Handle any possible JNI issue that may have occured.
@@ -324,8 +342,7 @@ static void CreateJNIGlobals(JNIEnv * env) {
 	//Class and Constructor for the NativeMouseWheelEvent Object
 	jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 	clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
-	//FIXME need to change the constructor signature
-	//idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+	idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIII)V");
 }
 
 static void DestroyJNIGlobals(JNIEnv * env) {
@@ -399,18 +416,23 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		DestroyJNIGlobals(env);
 
 		//Dettach the current thread to the JVM.
-		if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
-			#ifdef DEBUG
-			fprintf(stderr, "ThreadProc(): DetachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
-			#endif
-		}
-	}
-	else {
-		//We cant do a whole lot of anything if we cant attach to the current thread.
 		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+			fprintf(stderr, "ThreadProc(): DetachCurrentThread() successful.\n");
+		}
+		else {
+			fprintf(stderr, "ThreadProc(): DetachCurrentThread() failed!\n");
+		}
+		#else
+		(*jvm)->DetachCurrentThread(jvm);
 		#endif
 	}
+	#ifdef DEBUG
+	else {
+		//We cant do a whole lot of anything if we cant attach to the current thread.
+		fprintf(stderr, "ThreadProc(): AttachCurrentThread(jvm, (void **)(&env), NULL) failed!\n");
+	}
+	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "ThreadProc(): complete.\n");
@@ -456,17 +478,17 @@ int StartNativeThread() {
 
 				status = EXIT_SUCCESS;
 			}
-			else {
-				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
-				#endif
-			}
-		}
-		else {
 			#ifdef DEBUG
-			fprintf(stderr, "StartNativeThread(): start failure!\n");
+			else {
+				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+			}
 			#endif
 		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "StartNativeThread(): start failure!\n");
+		}
+		#endif
 	}
 
 	return status;

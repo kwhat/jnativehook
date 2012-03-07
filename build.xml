@@ -63,6 +63,8 @@
 	
 
 	<target name="configure" unless="project.isConfigured" description="Automatically generates a properties file for your environment.">
+		<property file="build.properties" />
+		
 		<echo>Checking environment sanity...</echo>
 
 		<fail message="Could not determine ${project.name} version.  Please check the build.num file.">
@@ -547,7 +549,7 @@
 
 
 		<!-- Set optimization level flag -->
-		<condition property="native.ld.flags.optimize" value="-O0" else="-O1">
+		<condition property="native.ld.flags.optimize" value="-O1" else="-O0">
 			<istrue value="${project.optimize}" />
 		</condition>
 
@@ -555,7 +557,7 @@
 		<condition property="native.ld.flags" value="-arch ${native.arch.osx}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.flags" value="-W1,--as-needed,${native.ld.flags.optimize}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed,${native.ld.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}">
@@ -569,7 +571,7 @@
 		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.ld.libs" value="-lcrtdll -luser32 -lkernel32">
+		<condition property="native.ld.libs" value="-lmsvcrt -luser32 -lkernel32">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -580,7 +582,7 @@
 		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
+		<condition property="native.ld.args" value="-shared -m${native.arch.model} -mno-cygwin ${native.ld.flags}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.ld.args2" value="${native.ld.libs} -o" />

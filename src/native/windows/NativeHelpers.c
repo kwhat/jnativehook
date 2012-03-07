@@ -20,6 +20,9 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
+#include "JMouseWheel.h"
+#include "NativeErrors.h"
+
 //Global Variables
 HINSTANCE hInst = NULL;
 
@@ -62,7 +65,7 @@ long GetPointerAccelerationThreshold() {
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
 		//Average the x and y thresholds.
-		value = (wkb_mouse[0] + wkb_mouse[1]) / 2;
+		value = (mouse[0] + mouse[1]) / 2;
 	}
 
 	return value;
@@ -70,10 +73,10 @@ long GetPointerAccelerationThreshold() {
 
 long GetPointerSensitivity() {
 	long value = -1;
-	PVOID sensitivity;
+	int sensitivity;
 
-	if (SystemParametersInfo(SPI_GETMOUSESPEED, 0, sensitivity, 0)) {
-		value = *sensitivity;
+	if (SystemParametersInfo(SPI_GETMOUSESPEED, 0, &sensitivity, 0)) {
+		value = sensitivity;
 	}
 
 	return value;
@@ -84,9 +87,7 @@ long GetMultiClickTime() {
 	UINT WINAPI clicktime;
 
 	clicktime = GetDoubleClickTime();
-	if (clicktime >= 0) {
-		value = (long) clicktime;
-	}
+	value = (long) clicktime;
 
 	return value;
 }
@@ -98,11 +99,9 @@ long GetScrollWheelType() {
 	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
 	if (wheeltype == WHEEL_PAGESCROLL) {
 		value = WHEEL_BLOCK_SCROLL;
-		scrollLines = 1;
 	}
 	else {
 		value = WHEEL_UNIT_SCROLL;
-		scrollLines = platformLines;
 	}
 
 	return value;

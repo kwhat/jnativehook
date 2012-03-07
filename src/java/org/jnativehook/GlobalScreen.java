@@ -20,9 +20,12 @@ package org.jnativehook;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.EventListener;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.SwingUtilities;
@@ -423,48 +426,49 @@ public class GlobalScreen {
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
 	protected static void loadNativeLibrary() {
+		String libName = "JNativeHook";
+
 		try {
 			//Try to load the native library assuming the java.library.path was
 			//set correctly at launch.
-			System.loadLibrary("JNativeHook");
+			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
 			//The library is not in the java.library.path so try to extract it.
 			try {
 				//Try to locate the jar file
-				String libPath = "org/jnativehook/lib/" + NativeSystem.getFamily().toString().toLowerCase() + "/" +	NativeSystem.getArchitecture().toString().toLowerCase() + "/";
+				String jarLibPath =
+						"org/jnativehook/lib/" +
+						NativeSystem.getFamily().toString().toLowerCase() + "/" +
+						NativeSystem.getArchitecture().toString().toLowerCase() + "/";
+				
 				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 				
 				if (classFile.isFile()) {
-					//Found the jar file to load.
-					ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(classFile));
-					ZipEntry zipEntry;
+					//Load the jar file and get the lib entry.
+					JarFile jarFile = new JarFile(classFile);
+					JarEntry jarLibEntry = jarFile.getJarEntry(jarLibPath + System.mapLibraryName(libName));
+
+					//Create a temp lib file in the systems tmp folder.
+					File tmpLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + System.mapLibraryName(libName));
 					
-					//FIXME Instead of looping over the entires, use the ClassLoader map to get the native file name. 
-					while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
-						//Check all the entries for the lib path
-						if (!zipEntry.isDirectory() && zipEntry.getName().toLowerCase().startsWith( libPath.toLowerCase() )) {
-							String libName = zipEntry.getName().substring(zipEntry.getName().lastIndexOf('/'));
-							File libFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + libName);
-							
-							FileOutputStream tempLibOutputStream = new FileOutputStream(libFile);
-							byte[] array = new byte[8192];
-						    int read = 0;
-						    while ( (read = zipInputStream.read(array)) > 0) {
-						    	tempLibOutputStream.write(array, 0, read);
-						    }
-						    tempLibOutputStream.close();
-						    
-						    libFile.deleteOnExit();
-						    System.load(libFile.getPath());
-						}
+					//Extract the lib from inside of the jar file.
+					InputStream jarInputStream = jarFile.getInputStream(jarLibEntry);
+					FileOutputStream tempLibOutputStream = new FileOutputStream(tmpLibFile);
+					byte[] array = new byte[8192];
+					int read = 0;
+					while ( (read = jarInputStream.read(array)) > 0) {
+						tempLibOutputStream.write(array, 0, read);
 					}
-					zipInputStream.close();
+					tempLibOutputStream.close();
+					
+					tmpLibFile.deleteOnExit();
+					System.load(tmpLibFile.getPath());
 				}
 				else if (classFile.isDirectory()) {
 					//Probably IDE environment, possible manual unpack.
 					//Setup the java.library.path to the load path and attempt a lib load.
-					File libFolder = new File(classFile.getAbsoluteFile() + "/" + libPath);
+					File libFolder = new File(classFile.getAbsoluteFile() + "/" + jarLibPath);
 
 					if (libFolder.isDirectory()) {
 						System.setProperty("java.library.path", System.getProperty("java.library.path", ".") + System.getProperty("path.separator", ":") + libFolder.getPath());
@@ -477,7 +481,7 @@ public class GlobalScreen {
 						}
 						
 						//Try to load the native library
-						System.loadLibrary("JNativeHook");
+						System.loadLibrary(libName);
 					}
 				}
 			}
