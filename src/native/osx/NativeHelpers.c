@@ -30,6 +30,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
+#include "JMouseWheel.h"
 #include "NativeErrors.h"
 
 /*
@@ -203,11 +204,15 @@ long GetAutoRepeatDelay() {
 
 long GetPointerAccelerationMultiplier() {
 	//FIXME Implement.
+	//kIOHIDPointerResolutionKey
+
 	return -1;
 }
 
 long GetPointerAccelerationThreshold() {
 	//FIXME Implement.
+	//kIOHIDPointerAccelerationKey
+
 	return -1;
 }
 
@@ -290,12 +295,29 @@ long GetMultiClickTime() {
 
 long GetScrollWheelType() {
 	//FIXME Implement.
+	// "com.apple.trackpad.scrollBehavior" = 2;  ??
 
 	return (long) WHEEL_UNIT_SCROLL;
 }
 
 long GetScrollWheelAmount() {
 	//FIXME Implement.
+
+	/*
+    "com.apple.driver.AppleHIDMouse" =     {
+        Button1 = 1;
+        Button2 = 1;
+        Button3 = 3;
+        Button4 = 4;
+        Button4Click = 0;
+        Button4Force = 0;
+        ButtonDominance = 1;
+        ScrollH = 1;
+        ScrollS = 4;
+        ScrollSSize = 30;
+        ScrollV = 1;
+    };
+	*/
 
 	return 3;
 }

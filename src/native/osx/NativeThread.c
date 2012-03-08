@@ -41,7 +41,7 @@ static jmethodID idDispatchEvent;
 
 //Java callback classes and constructor id's
 static jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
-static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent;
+static jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 static CGEventFlags prev_event_mask = 0;
 static unsigned int event_modifiers[] = {
@@ -276,8 +276,8 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				*/
 			break;
 
-			case kCGEventTapDisabledByTimeout:
-			case kCGEventTapDisabledByUserInput:
+			//case kCGEventTapDisabledByTimeout:
+			//case kCGEventTapDisabledByUserInput:
 				//TODO Should manually stop the thread at this point.
 
 			#ifdef DEBUG
@@ -458,14 +458,15 @@ int StartNativeThread() {
 		pthread_mutex_init(&hookControlMutex, NULL);
 
 		//Check and make sure assistive devices is enabled.
+		//FIXME This needs to set an error msg for Exception in Java_org_jnativehook_GlobalScreen_registerNativeHook
 		if (AXAPIEnabled() == true) {
 			#ifdef DEBUG
-				printf ("Native: Accessibility API is enabled.\n");
+			printf ("Native: Accessibility API is enabled.\n");
 			#endif
 		}
 		else {
 			#ifdef DEBUG
-				printf("Native: Accessibility API is not enabled.\n");
+			printf("Native: Accessibility API is not enabled.\n");
 			#endif
 
 			//FIXME this needs to throw an exception!  Move out the
