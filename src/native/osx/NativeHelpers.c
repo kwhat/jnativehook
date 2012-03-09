@@ -206,6 +206,8 @@ long GetPointerAccelerationMultiplier() {
 	//FIXME Implement.
 	//kIOHIDPointerResolutionKey
 
+	//com.apple.mouse.scaling
+	//com.apple.trackpad.scaling
 	return -1;
 }
 
