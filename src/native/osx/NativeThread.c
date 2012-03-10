@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 #include <signal.h>
 #include <pthread.h>
 
@@ -336,10 +334,12 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 	(*env)->DeleteGlobalRef(env, objGlobalScreen);
 }
 
-static void * ThreadProc() {
+static void * ThreadProc(void * arg) {
 	pthread_mutex_lock(&hookControlMutex);
 	pthread_mutex_lock(&hookRunningMutex);
-	int status = EXIT_FAILURE;
+
+	int * status = (int *) arg;
+	*status = EXIT_FAILURE;
 
 	//Attach the current thread to the JVM.
 	JNIEnv * env = NULL;
@@ -392,7 +392,7 @@ static void * ThreadProc() {
 				event_loop = CFRunLoopGetCurrent();
 				if (event_loop != NULL) {
 					//Set the exit status.
-					status = EXIT_SUCCESS;
+					*status = EXIT_SUCCESS;
 
 					#ifdef DEBUG
 					fprintf(stderr, "ThreadProc(): CFRunLoopGetCurrent() failure.\n");
@@ -414,7 +414,6 @@ static void * ThreadProc() {
 			fprintf(stderr, "ThreadProc(): Failed to create event port!\n");
 		}
 		#endif
-
 
 		//Make sure we clean up the global objects.
 		DestroyJNIGlobals(env);
@@ -446,7 +445,7 @@ static void * ThreadProc() {
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
-	pthread_exit((void **) status);
+	pthread_exit(status);
 }
 
 int StartNativeThread() {
@@ -476,7 +475,7 @@ int StartNativeThread() {
 
 		//We shall use the default pthread attributes: thread is joinable
 		//(not detached) and has default (non real-time) scheduling policy.
-		if (pthread_create(&hookThreadId, NULL, ThreadProc, NULL) == 0) {
+		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "StartNativeThread(): start successful.\n");
 			#endif

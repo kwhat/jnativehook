@@ -102,11 +102,6 @@
 		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
 
-		<!-- Set the project config options to their default values -->
-		<property name="project.option.xkb" value="true" />
-		<property name="project.option.xf86misc" value="false" />
-		<property name="project.option.xt" value="true" />
-		
 
 		<!-- Try to locate the include folder for java headers -->
 		<condition property="java.include" value="${java.home}${file.separator}include">
@@ -321,22 +316,48 @@
 			</condition>
 		</fail>
 		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.os.platform} compatible)</echo>
-		
+
+		<!-- Set the project config options to their default values -->
+		<property name="project.option.carbon" value="false" />
+		<property name="project.option.corefoundation" value="true" />
+		<property name="project.option.iokit" value="true" />
+
+		<property name="project.option.xf86misc" value="false" />
+		<property name="project.option.xkb" value="true" />
+		<property name="project.option.xt" value="true" />
+
 		
 		<!-- Set Apple configuration options to their default values -->
-		<!-- FIXME:  These need to be added when we are ready to test the OS X platform -->
-
-		<!-- Set Linux configuration options to their default values -->
-		<condition property="native.cc.macros.xkb" value="-DXKB" else="">
+		<condition property="native.cc.macros.carbon" value="-DCARBON" else="">
 			<and>
-				<istrue value="${native.os.isUnix}" />
-				<istrue value="${project.option.xkb}" />
+				<istrue value="${native.os.isApple}" />
+				<istrue value="${project.option.carbon}" />
 			</and>
 		</condition>
+		<condition property="native.cc.macros.corefoundation" value="-DCOREFOUNDATION" else="">
+			<and>
+				<istrue value="${native.os.isApple}" />
+				<istrue value="${project.option.corefoundation}" />
+			</and>
+		</condition>
+		<condition property="native.cc.macros.iokit" value="-DIOKIT" else="">
+			<and>
+				<istrue value="${native.os.isApple}" />
+				<istrue value="${project.option.iokit}" />
+			</and>
+		</condition>
+
+		<!-- Set Linux configuration options to their default values -->
 		<condition property="native.cc.macros.xf86misc" value="-DXF86MISC" else="">
 			<and>
 				<istrue value="${native.os.isUnix}" />
 				<istrue value="${project.option.xf86misc}" />
+			</and>
+		</condition>
+		<condition property="native.cc.macros.xkb" value="-DXKB" else="">
+			<and>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${project.option.xkb}" />
 			</and>
 		</condition>
 		<condition property="native.cc.macros.xt" value="-DXT" else="">
@@ -533,11 +554,11 @@
 
 		
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread ${native.cc.macros.debug} ${native.cc.macros.xkb} ${native.cc.macros.xf86misc} ${native.cc.macros.xt} -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=199506L -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
 			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
 			<istrue value="${native.os.isUnix}" />
 		</condition>
@@ -565,7 +586,8 @@
 		</condition>
 		
 		<!-- Guess what system specific libraries to link against -->
-		<condition property="native.ld.libs" value="-framework ApplicationServices">
+		<!-- FIXME These need to be dynamically created based on the options for the macros -->
+		<condition property="native.ld.libs" value="-framework ApplicationServices -framework IOKit -framework Carbon">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst">
@@ -588,7 +610,7 @@
 		<property name="native.ld.args2" value="${native.ld.libs} -o" />
 
 		<!-- set system specific library name -->
-		<condition property="native.executable" value="lib${project.name}.dylib">
+		<condition property="native.executable" value="lib${project.name}.jnilib">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.executable" value="lib${project.name}.so">
@@ -724,10 +746,7 @@
 		<echo>Creating ${project.name}.jar...</echo>
 		<mkdir dir="${dir.jar}" />
 		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin.class}">
-			<include name="org/jnativehook/keyboard/**" />
 			<include name="org/jnativehook/**" />
-			<exclude name="org/jnativehook/c_source/**" />
-			<exclude name="org/jnativehook/lib/**/history.xml" />
 			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />

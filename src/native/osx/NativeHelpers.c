@@ -175,12 +175,14 @@ long GetAutoRepeatDelay() {
 	#endif
 
 	#ifdef COREFOUNDATION
-	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
-			//This is the slider value, we must multiply by 15 to convert to milliseconds.
-			value = (long) delay * 15;
-			successful = true;
+	if (!successful) {
+		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
+				//This is the slider value, we must multiply by 15 to convert to milliseconds.
+				value = (long) delay * 15;
+				successful = true;
+			}
 		}
 	}
 	#endif
@@ -203,12 +205,49 @@ long GetAutoRepeatDelay() {
 
 
 long GetPointerAccelerationMultiplier() {
-	//FIXME Implement.
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
+	bool successful = false;
+	SInt64 multiplier;
+	#endif
+
+	long value = -1;
+
+	#ifdef IOKIT
+	if (!successful) {
+		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+		if (service) {
+			kern_return_t kren_ret = kIOReturnError;
+			io_connect_t connection;
+
+			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
+			if (kren_ret == kIOReturnSuccess) {
+				IOByteCount size = sizeof(multiplier);
+
+				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDMouseAccelerationType), (IOByteCount) sizeof(multiplier), &multiplier, &size);
+				if (kren_ret == kIOReturnSuccess) {
+					value = (long) multiplier;
+					successful = true;
+				}
+			}
+		}
+	}
+	#endif
+
+	#ifdef COREFOUNDATION
+	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.scaling"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &multiplier)) {
+			value = (long) multiplier;
+		}
+	}
+	#endif
+
+	
 	//kIOHIDPointerResolutionKey
 
-	//com.apple.mouse.scaling
+	//
 	//com.apple.trackpad.scaling
-	return -1;
+	return value;
 }
 
 long GetPointerAccelerationThreshold() {
@@ -222,6 +261,8 @@ long GetPointerAccelerationThreshold() {
 long GetPointerSensitivity() {
 	//FIXME Implement.
 	//"com.apple.mouse.scaling" ?
+
+
 	return -1;
 }
 

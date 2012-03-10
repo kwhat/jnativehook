@@ -281,7 +281,7 @@ static void DestroyJNIGlobals(JNIEnv * env) {
 static void * ThreadProc(void * arg) {
 	pthread_mutex_lock(&hookControlMutex);
 	pthread_mutex_lock(&hookRunningMutex);
-	//int status = EXIT_FAILURE;
+	
 	int * status = (int *) arg;
 	*status = EXIT_FAILURE;
 
@@ -345,7 +345,7 @@ static void * ThreadProc(void * arg) {
 
 		if (context != 0) {
 			//Set the exit status.
-			*status = EXIT_SUCCESS;;
+			*status = EXIT_SUCCESS;
 
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");

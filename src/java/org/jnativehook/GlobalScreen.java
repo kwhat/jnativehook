@@ -443,7 +443,7 @@ public class GlobalScreen {
 						NativeSystem.getArchitecture().toString().toLowerCase() + "/";
 				
 				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
-				
+
 				if (classFile.isFile()) {
 					//Load the jar file and get the lib entry.
 					JarFile jarFile = new JarFile(classFile);
@@ -451,10 +451,11 @@ public class GlobalScreen {
 
 					//Create a temp lib file in the systems tmp folder.
 					File tmpLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + System.mapLibraryName(libName));
-					
+
 					//Extract the lib from inside of the jar file.
 					InputStream jarInputStream = jarFile.getInputStream(jarLibEntry);
 					FileOutputStream tempLibOutputStream = new FileOutputStream(tmpLibFile);
+					
 					byte[] array = new byte[8192];
 					int read = 0;
 					while ( (read = jarInputStream.read(array)) > 0) {
