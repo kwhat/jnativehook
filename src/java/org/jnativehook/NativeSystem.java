@@ -30,21 +30,24 @@ public class NativeSystem {
 	 * The operating system family enum.
 	 */
 	public enum Family {
-		/** The Windows operating system family. */
-		WINDOWS,
-		
-		/** The Linux operating system family. */
-		LINUX,
-		
 		/** The FreeBSD operating system family. */
 		FREEBSD,
-		
+
 		/** The OpenBSD operating system family. */
 		OPENBSD,
-		
+
 		/** The Apple OS X operating system family. */
 		OSX,
-		
+
+		/** The Solaris operating system family. */
+		SOLARIS,
+
+		/** The Linux operating system family. */
+		LINUX,
+
+		/** The Windows operating system family. */
+		WINDOWS,
+
 		/** Any unsupported operating system family. */
 		UNSUPPORTED
 	}
@@ -53,29 +56,38 @@ public class NativeSystem {
 	 * The system architecture enum.
 	 */
 	public enum Arch {
-		/** The x86 architecture. */
-		x86,
-		
-		/** The amd64 architecture. */
-		x86_64,
-		
-		/** The ppc architecture. */
-		PPC,
-		
-		/** The ppc64 architecture. */
-		PPC64,
-		
+		/** The alpha architecture. */
+		ALPHA,
+
 		/** The arm architecture. */
 		ARM,
+
+		/** The itanium64 32-bit architecture. */
+		IA64_32,
+
+		/** The itanium64 architecture. */
+		IA64,
 		
 		/** The mips architecture. */
 		MIPS,
 		
 		/** The sparc architecture. */
 		SPARC,
+
+		/** The sparc64 architecture. */
+		SPARC64,
 		
-		/** The alpha architecture. */
-		ALPHA,
+		/** The ppc architecture. */
+		PPC,
+		
+		/** The ppc64 architecture. */
+		PPC64,
+
+		/** The x86 architecture. */
+		x86,
+		
+		/** The amd64 architecture. */
+		x86_64,
 		
 		/** Any unsupported system architecture. */
 		UNSUPPORTED
@@ -89,18 +101,26 @@ public class NativeSystem {
 	public static Family getFamily() {
 		String osName = System.getProperty("os.name");
 		Family family;
-		
-		if (osName.toLowerCase().startsWith("windows")) {
-			family = Family.WINDOWS;
-		}
-		else if (osName.toLowerCase().equals("linux")) {
-			family = Family.LINUX;
-		}
-		else if (osName.toLowerCase().equals("freebsd")) {
+
+		if (osName.equalsIgnoreCase("freebsd")) {
 			family = Family.FREEBSD;
 		}
-		else if (osName.toLowerCase().equals("mac os x")) {
+		else if (osName.equalsIgnoreCase("openbsd")) {
+			family = Family.OPENBSD;
+		}
+		else if (osName.equalsIgnoreCase("mac os x")) {
 			family = Family.OSX;
+		}
+		else if (osName.equalsIgnoreCase("solaris") || 
+				osName.equalsIgnoreCase("sunos")
+		) {
+			family = Family.OSX;
+		}
+		else if (osName.equalsIgnoreCase("linux")) {
+			family = Family.LINUX;
+		}
+		else if (osName.toLowerCase().startsWith("windows")) {
+			family = Family.WINDOWS;
 		}
 		else {
 			family = Family.UNSUPPORTED;
@@ -118,7 +138,38 @@ public class NativeSystem {
 		String osArch = System.getProperty("os.arch");
 		Arch arch;
 		
-		if (osArch.equalsIgnoreCase("x86") || 
+		if (osArch.equalsIgnoreCase("alpha")) {
+			arch = Arch.ALPHA;
+		}
+		else if (osArch.toLowerCase().startsWith("arm")) {
+			arch = Arch.ARM;
+		}
+		else if (osArch.equalsIgnoreCase("ia64_32")) {
+			arch = Arch.IA64_32;
+		}
+		else if (osArch.equalsIgnoreCase("ia64")) {
+			arch = Arch.IA64;
+		}
+		else if (osArch.equalsIgnoreCase("mips")) {
+			arch = Arch.MIPS;
+		}
+		else if (osArch.equalsIgnoreCase("sparc")) {
+			arch = Arch.SPARC;
+		}
+		else if (osArch.equalsIgnoreCase("sparc64")) {
+			arch = Arch.SPARC64;
+		}
+		else if (osArch.equalsIgnoreCase("ppc") ||
+				osArch.equalsIgnoreCase("powerpc")
+		) {
+			arch = Arch.PPC;
+		}
+		else if (osArch.equalsIgnoreCase("ppc64") ||
+				osArch.equalsIgnoreCase("powerpc64")
+		) {
+			arch = Arch.PPC64;
+		}
+		else if (osArch.equalsIgnoreCase("x86") ||
 			osArch.equalsIgnoreCase("i386") || 
 			osArch.equalsIgnoreCase("i486") ||
 			osArch.equalsIgnoreCase("i586") ||
@@ -132,14 +183,7 @@ public class NativeSystem {
 		) {
 			arch = Arch.x86_64;
 		}
-		else if (osArch.equalsIgnoreCase("ppc") ||
-				osArch.equalsIgnoreCase("PowerPC")
-		) {
-			arch = Arch.PPC;
-		}
-		else if (osArch.equalsIgnoreCase("ppc64")) {
-			arch = Arch.PPC64;
-		}
+
 		else {
 			arch = Arch.UNSUPPORTED;
 		}
