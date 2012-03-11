@@ -80,7 +80,8 @@
 		</fail>
 		<echo level="info">${project.name} version ${project.version}</echo>
 
-		
+
+
 		<!-- Set the project flags to their default values -->
 		<property name="project.debug" value="false" />
 		<echo level="info">Build debug: ${project.debug}</echo>
@@ -101,6 +102,85 @@
 			<istrue value="${project.strip}" />
 		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
+
+
+
+		<!-- Determin the operating system -->
+		<condition property="native.os" value="freebsd">
+			<os family="unix" name="FreeBSD" />
+		</condition>
+		<condition property="native.os" value="openbsd">
+			<os family="unix" name="OpenBSD" />
+		</condition>
+		<condition property="native.os" value="osx">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
+		</condition>
+		<condition property="native.os" value="solaris">
+			<or>
+				<os family="unix" name="Solaris" />
+				<os family="unix" name="SunOS" />
+			</or>
+		</condition>
+		<condition property="native.os" value="linux">
+			<os family="unix" name="Linux" />
+		</condition>
+		<condition property="native.os" value="windows">
+			<or>
+				<os family="winnt" name="Windows 2000" />
+				<os family="winnt" name="Windows XP" />
+				<os family="winnt" name="Windows 2003" />
+				<os family="winnt" name="Windows Vista" />
+				<os family="winnt" name="Windows 2007" />
+				<os family="winnt" name="Windows 7" />
+			</or>
+		</condition>
+		
+		<!-- Figure out the os family -->
+		<condition property="native.os.isApple" value="true">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
+		</condition>
+		<condition property="native.os.isUnix" value="true">
+			<and>
+				<os family="unix" />
+				<not>
+					<istrue value="${native.os.isApple}" />
+				</not>
+			</and>
+		</condition>
+		<condition property="native.os.isWindows" value="true">
+			<os family="winnt" />
+		</condition>
+
+		<!-- set system specific lib directory -->
+		<condition property="dir.src.platform" value="osx">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="dir.src.platform" value="unix">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="dir.src.platform" value="windows">
+			<istrue value="${native.os.isWindows}" />
+		</condition>
+
+		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
+			<condition>
+				<not>
+					<or>
+						<istrue value="${native.os.isApple}" />
+						<istrue value="${native.os.isUnix}" />
+						<istrue value="${native.os.isWindows}" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.src.platform} compatible)</echo>
+
 
 
 		<!-- Try to locate the include folder for java headers -->
@@ -200,7 +280,27 @@
 		<condition property="native.arch.name" value="ppc64">
 			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true" />
 		</condition>
-		
+
+		<!-- Set the arch tune value -->
+		<condition property="native.arch.tune" value="i386">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
+			</and>
+		</condition>
+		<condition property="native.arch.tune" value="${native.arch.name}">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
+		</condition>
+		<condition property="native.arch.tune" value="generic">
+			<not>
+				<isset property="native.arch.tune" />
+			</not>
+		</condition>
+
 		<fail message="The ${os.arch} architecture is not currently supported.">
 			<condition>
 				<not>
@@ -210,113 +310,19 @@
 		</fail>
 		<echo level="info">Compatible system architecture: ${native.arch.name}</echo>
 		
-		
-		<!-- Special arch for osx -->
-		<condition property="native.arch.osx" value="i386">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
-			</and>
-		</condition>
-		<condition property="native.arch.osx" value="${native.arch.name}">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-			</and>
-		</condition>
-		
-		
 		<!-- Set 32 or 64 bit flag -->
 		<property name="native.arch.model" value="${sun.arch.data.model}" />
-		<fail message="The ${native.arch.model}-bit data model is not currently supported.">
+		<fail message="Could not determin the native architecture data model.">
 			<condition>
 				<not>
-					<or>
-						<equals arg1="${native.arch.model}" arg2="32" casesensitive="false" trim="true" />
-						<equals arg1="${native.arch.model}" arg2="64" casesensitive="false" trim="true" />
-					</or>
+					<isset property="native.arch.model" />
 				</not>
 			</condition>
 		</fail>
 		<echo level="info">System architecture data model: ${native.arch.model} bit</echo>
 		
 		
-		<!-- Determin the operating system -->
-		<condition property="native.os" value="windows">
-			<or>
-				<os family="winnt" name="Windows 2000" />
-				<os family="winnt" name="Windows XP" />
-				<os family="winnt" name="Windows 2003" />
-				<os family="winnt" name="Windows Vista" />
-				<os family="winnt" name="Windows 2007" />
-				<os family="winnt" name="Windows 7" />
-			</or>
-		</condition>
-		<condition property="native.os" value="osx">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-			</and>
-		</condition>
-		<condition property="native.os" value="linux">
-			<os family="unix" name="Linux" />
-		</condition>
-		<condition property="native.os" value="freebsd">
-			<os family="unix" name="FreeBSD" />
-		</condition>
-		<condition property="native.os" value="solaris">
-			<or>
-				<os family="unix" name="Solaris" />
-				<os family="unix" name="SunOS" />
-			</or>
-		</condition>
-
-
-		<!-- Figure out the os family -->
-		<condition property="native.os.isApple" value="true">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-			</and>
-		</condition>
-		<condition property="native.os.isUnix" value="true">
-			<and>
-				<os family="unix" />
-				<not>
-					<istrue value="${native.os.isApple}" />
-				</not>
-			</and>
-		</condition>
-		<condition property="native.os.isWindows" value="true">
-			<os family="winnt" />
-		</condition>
-
-
-		<!-- set system specific src directory -->
-		<condition property="dir.os.platform" value="osx">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="dir.os.platform" value="unix">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="dir.os.platform" value="windows">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-
-		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
-			<condition>
-				<not>
-					<or>
-						<istrue value="${native.os.isApple}" />
-						<istrue value="${native.os.isUnix}" />
-						<istrue value="${native.os.isWindows}" />
-					</or>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.os.platform} compatible)</echo>
-
+		
 		<!-- Set the project config options to their default values -->
 		<property name="project.option.carbon" value="false" />
 		<property name="project.option.corefoundation" value="true" />
@@ -326,7 +332,7 @@
 		<property name="project.option.xkb" value="true" />
 		<property name="project.option.xt" value="true" />
 
-		
+
 		<!-- Set Apple configuration options to their default values -->
 		<condition property="native.cc.macros.carbon" value="-DCARBON" else="">
 			<and>
@@ -425,20 +431,7 @@
 			<available filepath="${native.path}" file="${env.LD}" type="file" />
 		</condition>
 		<property name="native.ld" value="${native.cc}" />
-		<!-- Using gcc for linking does a much better job at passing all the correct libraries to the linker
-		<condition property="native.ld" value="ld">
-			<available filepath="${native.path}" file="ld" type="file" />
-		</condition>
-		<condition property="native.ld" value="ld.exe">
-			<available filepath="${native.path}" file="ld.exe" type="file" />
-		</condition>
-		<condition property="native.ld" value="gcc">
-			<available filepath="${native.path}" file="gcc" type="file" />
-		</condition>
-		<condition property="native.ld" value="gcc.exe">
-			<available filepath="${native.path}" file="gcc.exe" type="file" />
-		</condition>
-		-->
+		<!-- Using gcc for linking does a much better job at passing all the correct libraries to the linker -->
 		
 		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
 			<condition>
@@ -464,12 +457,12 @@
 			<available filepath="${native.path}" file="strip.exe" type="file" />
 		</condition>
 		<condition property="native.strip" value="mingw32-strip.exe">
-			<available filepath="${native.path}" file="mingw32-strip.exe" />
+			<available filepath="${native.path}" file="mingw32-strip.exe" type="file" />
 		</condition>
 		<condition property="native.strip" value="mingw64-strip.exe">
-			<available filepath="${native.path}" file="mingw64-strip.exe" />
+			<available filepath="${native.path}" file="mingw64-strip.exe" type="file" />
 		</condition>
-	
+		
 		<fail message="Could not locate strip command.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
 			<condition>
 				<not>
@@ -486,18 +479,7 @@
 		<echo level="info">Native strip: ${native.strip}</echo>
 		
 		
-		<!-- set system specific strip arguments -->
-		<condition property="native.strip.args" value="-x -S">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
-			<or>
-				<istrue value="${native.os.isUnix}" />
-				<istrue value="${native.os.isWindows}" />
-			</or>
-		</condition>
 		
-
 		<!-- Set the java compiler -->
 		<property name="java.cc" value="modern" />
 		<echo level="info">Java compiler: ${java.cc}</echo>
@@ -521,14 +503,14 @@
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="-arch ${native.arch.osx} -mtune=${native.arch} ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-arch ${native.arch.tune} -mtune=${native.arch} ${native.cc.flags.optimize}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic -std=c99 ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} -std=c99 ${native.cc.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=generic ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -552,7 +534,6 @@
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
-		
 		<!-- Set the compiler arguments for compiling. -->
 		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra -Werror ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} -fno-strict-aliasing ${native.cc.flags.pic} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
@@ -620,7 +601,21 @@
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		
-		
+
+
+		<!-- set system specific strip arguments -->
+		<condition property="native.strip.args" value="-x -S">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
+			<or>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${native.os.isWindows}" />
+			</or>
+		</condition>
+
+
+
 		<!-- Create property file for the descovered values -->
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
 			<entry key="java.cc"				value="${java.cc}" />
@@ -678,11 +673,11 @@
 		<!-- Create required directories for compiling -->
 		<mkdir dir="${dir.bin.obj}" />
 		<mkdir dir="${dir.bin.obj}/common" />
-		<mkdir dir="${dir.bin.obj}/${dir.os.platform}" />
+		<mkdir dir="${dir.bin.obj}/${dir.src.platform}" />
 
 		<fileset dir="${dir.src.native}" id="file.src">
 			<include name="common/*.c" />
-			<include name="${dir.os.platform}/*.c" />
+			<include name="${dir.src.platform}/*.c" />
 		</fileset>
 
 		<property name="file.src.txt" refid='file.src'/>

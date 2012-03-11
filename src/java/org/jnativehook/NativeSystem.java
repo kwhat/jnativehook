@@ -114,7 +114,7 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("solaris") || 
 				osName.equalsIgnoreCase("sunos")
 		) {
-			family = Family.OSX;
+			family = Family.SOLARIS;
 		}
 		else if (osName.equalsIgnoreCase("linux")) {
 			family = Family.LINUX;
