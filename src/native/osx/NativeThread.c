@@ -21,6 +21,7 @@
 
 #include "NativeErrors.h"
 #include "NativeGlobals.h"
+#include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "JConvertFromNative.h"
 #include "OSXButtonCodes.h"
@@ -75,10 +76,11 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 		//Java Event Data
 		JKeyDatum jkey;
 		jint jbutton;
+		jint scrollType, scrollAmount, wheelRotation;
 		jint modifiers;
 
 		//Java Event Objects
-		jobject objKeyEvent, objMouseEvent;
+		jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
 		// get the event class
 		switch (type) {
@@ -235,10 +237,18 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			case kCGEventLeftMouseDragged:
 			case kCGEventRightMouseDragged:
 			case kCGEventOtherMouseDragged:
+				event_point = CGEventGetLocation(event);
 				//Call mouse move events for now.  Adding this functionality to other systems will be difficult.
 				#ifdef DEBUG
-				fprintf(stdout, "LowLevelProc(): Mouse Dragged forwarded to Motion Notified\n");
+				fprintf(stdout, "LowLevelProc(): Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 				#endif
+
+				modifiers = doModifierConvert(event_mask);
+
+				//Fire mouse moved event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+			break;
 
 			case kCGEventMouseMoved:
 				event_point = CGEventGetLocation(event);
@@ -254,8 +264,12 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			break;
 
 			case kCGEventScrollWheel:
+				scrollType = (jint) GetScrollWheelType();
+				scrollAmount = (jint) GetScrollWheelAmount();
+				wheelRotation = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) / -10;
+
 				#ifdef DEBUG
-				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (Unimplemented)\n");
+				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (%i) (Unimplemented)\n", (int) wheelRotation);
 				#endif
 
 				/*
@@ -264,6 +278,12 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				kCGScrollWheelEventDeltaAxis1 = 11,
 				kCGScrollWheelEventDeltaAxis2 = 12,
 				*/
+
+				//TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
+				
+				//Fire mouse wheel event.
+				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, scrollType, scrollAmount, wheelRotation);
+				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 			break;
 
 			//case kCGEventTapDisabledByTimeout:

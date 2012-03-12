@@ -556,7 +556,7 @@
 		</condition>
 
 		<!-- set system specific ldflags -->
-		<condition property="native.ld.flags" value="-arch ${native.arch.osx}">
+		<condition property="native.ld.flags" value="-arch ${native.arch.tune}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,${native.ld.flags.optimize}">
