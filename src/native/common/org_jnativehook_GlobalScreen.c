@@ -16,6 +16,7 @@
  */
 
 #include "NativeErrors.h"
+#include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
@@ -237,7 +238,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	jint jni_version = JNI_VERSION_1_4;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		#ifdef DEBUG
-		fprintf(stdout, "JNI_OnUnload(): AttachCurrentThread() successful.\n");
+		fprintf(stdout, "JNI_OnLoad(): AttachCurrentThread() successful.\n");
 		#endif
 
 		//Run platform specific load items.
@@ -248,7 +249,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 	#ifdef DEBUG
 	else {
-		fprintf(stderr, "JNI_OnUnload(): AttachCurrentThread() failed!\n");
+		fprintf(stderr, "JNI_OnLoad(): AttachCurrentThread() failed!\n");
+		//TODO Throw a runtime exception
 	}
 	#endif
 

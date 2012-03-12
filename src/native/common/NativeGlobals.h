@@ -15,17 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_NativeErrors_h
-#define _Included_NativeErrors_h
-
-#ifdef UNUSED
-#elif defined(__GNUC__)
-#define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-#define UNUSED(x) /*@unused@*/ x
-#else
-#define UNUSED(x) x
-#endif
+#ifndef _Included_NativeGlobals_h
+#define _Included_NativeGlobals_h
 
 #ifdef DEBUG
 #include <stdio.h>
@@ -33,15 +24,24 @@
 #endif
 
 #include <jni.h>
-#include <stdlib.h>
 
-//Exception class definitions.
-#define NATIVE_HOOK_EXCEPTION	"org/jnativehook/NativeHookException"
-#define NATIVE_KEY_EXCEPTION	"org/jnativehook/keyboard/NativeKeyException"
-#define NATIVE_MOUSE_EXCEPTION	"org/jnativehook/mouse/NativeMouseException"
+//Define some simple function return codes.
+#define RETURN_SUCCESS 0
+#define RETURN_FAILURE 1
+
+//Global Ref to the JVM
+extern JavaVM * jvm;
+
+//GlobalScreen object and dispatch id.
+extern jobject objGlobalScreen;
+extern jmethodID idDispatchEvent;
+
+//Java callback classes and constructor id's
+extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
+extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 //Common function stubs.
-extern void ThrowFatalError(JNIEnv * env, const char * message);
-extern void ThrowException(JNIEnv * env, const char * classname, const char * message);
+extern int CreateJNIGlobals();
+extern int DestroyJNIGlobals();
 
 #endif

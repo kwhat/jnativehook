@@ -16,8 +16,7 @@
  */
 
 #include "NativeErrors.h"
-
-JavaVM * jvm = NULL;
+#include "NativeGlobals.h"
 
 void ThrowFatalError(JNIEnv * env, const char * message) {
 	#ifdef DEBUG
