@@ -264,7 +264,13 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			break;
 
 			case kCGEventScrollWheel:
-				scrollType = (jint) GetScrollWheelType();
+				if (CGEventGetIntegerValueField(event, kCGScrollWheelEventIsContinuous) == 0) {
+					scrollType = (jint)  WHEEL_BLOCK_SCROLL;
+				}
+				else {
+					scrollType = (jint)  WHEEL_UNIT_SCROLL;
+				}
+
 				scrollAmount = (jint) GetScrollWheelAmount();
 				wheelRotation = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) / -10;
 
