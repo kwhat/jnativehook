@@ -772,7 +772,7 @@
 			</packageset>
 			
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2012 ${project.vendor}. All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2012 ${project.vendor}. All Rights Received.</i>]]></bottom>
 			
 			<!--
 			<tag name="to.do" scope="all" description="To Do:" />
