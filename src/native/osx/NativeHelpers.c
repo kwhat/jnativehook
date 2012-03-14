@@ -179,6 +179,7 @@ long GetAutoRepeatDelay() {
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
 				//This is the slider value, we must multiply by 15 to convert to milliseconds.
+				printf("Test: %i\n\n", (int) delay);
 				value = (long) delay * 15;
 				successful = true;
 			}
@@ -204,9 +205,9 @@ long GetAutoRepeatDelay() {
 
 
 long GetPointerAccelerationMultiplier() {
-	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
+	#if defined IOKIT || defined COREFOUNDATION
 	bool successful = false;
-	SInt64 multiplier;
+	double multiplier;
 	#endif
 
 	long value = -1;
@@ -214,17 +215,29 @@ long GetPointerAccelerationMultiplier() {
 	#ifdef IOKIT
 	if (!successful) {
 		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+
 		if (service) {
 			kern_return_t kren_ret = kIOReturnError;
 			io_connect_t connection;
 
 			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
 			if (kren_ret == kIOReturnSuccess) {
-				IOByteCount size = sizeof(multiplier);
+				//IOByteCount size = sizeof(multiplier);
 
-				kren_ret = IOHIDGetParameter(connection, CFSTR(kIOHIDMouseAccelerationType), (IOByteCount) sizeof(multiplier), &multiplier, &size);
+				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &multiplier);
 				if (kren_ret == kIOReturnSuccess) {
-					value = (long) multiplier;
+					//Calculate the greatest common factor
+
+					unsigned long denominator = 1000000, d = denominator;
+					unsigned long numerator = multiplier * denominator, gcf = numerator;
+
+					while (d != 0) {
+						unsigned long i = gcf % d;
+						gcf = d;
+						d = i;
+					}
+					
+					value = denominator / gcf;
 					successful = true;
 				}
 			}
@@ -248,19 +261,70 @@ long GetPointerAccelerationMultiplier() {
 
 
 long GetPointerAccelerationThreshold() {
-	//FIXME Implement.
-	//kIOHIDPointerAccelerationKey
+	#if defined COREFOUNDATION
+	bool successful = false;
+	SInt32 threshold;
+	#endif
 
-	return -1;
+	long value = -1;
+
+	#ifdef COREFOUNDATION
+	if (!successful) {
+		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("mouseDriverMaxSpeed"), CFSTR("com.apple.universalaccess"), kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &threshold)) {
+				value = (long) threshold;
+			}
+		}
+	}
+	#endif
+
+	return value;
 }
 
 
 long GetPointerSensitivity() {
-	//FIXME Implement.
-	//"com.apple.mouse.scaling" ?
-	//kIOHIDPointerResolutionKey
+	#if defined IOKIT
+	bool successful = false;
+	double sensitivity;
+	#endif
 
-	return -1;
+	long value = -1;
+
+	#ifdef IOKIT
+	if (!successful) {
+		io_service_t service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching(kIOHIDSystemClass));
+
+		if (service) {
+			kern_return_t kren_ret = kIOReturnError;
+			io_connect_t connection;
+
+			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
+			if (kren_ret == kIOReturnSuccess) {
+				//IOByteCount size = sizeof(multiplier);
+
+				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &sensitivity);
+				if (kren_ret == kIOReturnSuccess) {
+					//Calculate the greatest common factor
+
+					unsigned long denominator = 1000000, d = denominator;
+					unsigned long numerator = sensitivity * denominator, gcf = numerator;
+
+					while (d != 0) {
+						unsigned long i = gcf % d;
+						gcf = d;
+						d = i;
+					}
+
+					value = numerator / gcf;
+					successful = true;
+				}
+			}
+		}
+	}
+	#endif
+
+	return value;
 }
 
 long GetMultiClickTime() {
@@ -301,18 +365,20 @@ long GetMultiClickTime() {
 	#endif
 
 	#ifdef COREFOUNDATION
-	Float32 clicktime;
-	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.doubleClickThreshold"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberFloat32Type, &clicktime)) {
-			/* This is in some undefined unit of time that if we happen
-			 * to multiply by 900 gives us the time in milliseconds.  It is
-			 * completely possible that this value is in seconds and should be
-			 * multiplied by 1000 but because IOKit values are undocumented and
-			 * I have no idea what a Carbon 'tick' is so there really is no way
-			 * to confirm this.
-			 */
-			value = (long) (clicktime * 900);
+	if (!successful) {
+		Float32 clicktime;
+		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.doubleClickThreshold"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberFloat32Type, &clicktime)) {
+				/* This is in some undefined unit of time that if we happen
+				 * to multiply by 900 gives us the time in milliseconds.  It is
+				 * completely possible that this value is in seconds and should be
+				 * multiplied by 1000 but because IOKit values are undocumented and
+				 * I have no idea what a Carbon 'tick' is so there really is no way
+				 * to confirm this.
+				 */
+				value = (long) (clicktime * 900);
+			}
 		}
 	}
 	#endif
