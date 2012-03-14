@@ -324,7 +324,7 @@ public class GlobalScreen {
 		int id = e.getID();
 		
 		EventListener[] listeners;
-		if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED) {
+		if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED || id == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
 			listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
 		}
 		else {

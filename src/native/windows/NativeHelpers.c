@@ -20,7 +20,6 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
-#include "JMouseWheel.h"
 #include "NativeErrors.h"
 
 //Global Variables
@@ -88,36 +87,6 @@ long GetMultiClickTime() {
 
 	clicktime = GetDoubleClickTime();
 	value = (long) clicktime;
-
-	return value;
-}
-
-long GetScrollWheelType() {
-	long value = -1;
-	UINT WINAPI wheeltype;
-
-	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
-	if (wheeltype == WHEEL_PAGESCROLL) {
-		value = WHEEL_BLOCK_SCROLL;
-	}
-	else {
-		value = WHEEL_UNIT_SCROLL;
-	}
-
-	return value;
-}
-
-long GetScrollWheelAmount() {
-	long value = -1;
-	UINT WINAPI wheelamount;
-
-	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheelamount, 0);
-	if (wheelamount == WHEEL_PAGESCROLL) {
-		value = 1;
-	}
-	else {
-		value = (long) wheelamount;
-	}
 
 	return value;
 }

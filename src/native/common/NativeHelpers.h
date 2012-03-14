@@ -24,8 +24,6 @@ extern long GetPointerAccelerationMultiplier();
 extern long GetPointerAccelerationThreshold();
 extern long GetPointerSensitivity();
 extern long GetMultiClickTime();
-extern long GetScrollWheelType();
-extern long GetScrollWheelAmount();
 extern void OnLibraryLoad();
 extern void OnLibraryUnload();
 

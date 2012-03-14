@@ -30,7 +30,6 @@
 #include <Carbon/Carbon.h>
 #endif
 
-#include "JMouseWheel.h"
 #include "NativeErrors.h"
 
 /*
@@ -234,21 +233,19 @@ long GetPointerAccelerationMultiplier() {
 	#endif
 
 	#ifdef COREFOUNDATION
-	CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.scaling"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
-		if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &multiplier)) {
-			value = (long) multiplier;
+	if (!successful) {
+		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("com.apple.mouse.scaling"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
+			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &multiplier)) {
+				value = (long) multiplier;
+			}
 		}
 	}
 	#endif
 
-	
-	//kIOHIDPointerResolutionKey
-
-	//
-	//com.apple.trackpad.scaling
 	return value;
 }
+
 
 long GetPointerAccelerationThreshold() {
 	//FIXME Implement.
@@ -261,7 +258,7 @@ long GetPointerAccelerationThreshold() {
 long GetPointerSensitivity() {
 	//FIXME Implement.
 	//"com.apple.mouse.scaling" ?
-
+	//kIOHIDPointerResolutionKey
 
 	return -1;
 }
@@ -334,35 +331,6 @@ long GetMultiClickTime() {
 	#endif
 
 	return value;
-}
-
-long GetScrollWheelType() {
-	//FIXME Implement.
-	// "com.apple.trackpad.scrollBehavior" = 2;  ??
-
-	return (long) WHEEL_UNIT_SCROLL;
-}
-
-long GetScrollWheelAmount() {
-	//FIXME Implement.
-
-	/*
-    "com.apple.driver.AppleHIDMouse" =     {
-        Button1 = 1;
-        Button2 = 1;
-        Button3 = 3;
-        Button4 = 4;
-        Button4Click = 0;
-        Button4Force = 0;
-        ButtonDominance = 1;
-        ScrollH = 1;
-        ScrollS = 4;
-        ScrollSSize = 30;
-        ScrollV = 1;
-    };
-	*/
-
-	return 3;
 }
 
 void OnLibraryLoad() {

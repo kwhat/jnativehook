@@ -23,6 +23,7 @@
 #include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
+#include "JMouseWheel.h"
 #include "JConvertFromNative.h"
 #include "OSXButtonCodes.h"
 #include "OSXKeyCodes.h"
@@ -264,29 +265,27 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			break;
 
 			case kCGEventScrollWheel:
+				//TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
 				if (CGEventGetIntegerValueField(event, kCGScrollWheelEventIsContinuous) == 0) {
-					scrollType = (jint)  WHEEL_BLOCK_SCROLL;
-				}
-				else {
 					scrollType = (jint)  WHEEL_UNIT_SCROLL;
 				}
+				else {
+					scrollType = (jint)  WHEEL_BLOCK_SCROLL;
+				}
+				
+				//Scrolling data uses a fixed-point 16.16 signed integer format (Ex: 1.0 = 0x00010000)
+				wheelRotation = (jint) CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) * -1;
 
-				scrollAmount = (jint) GetScrollWheelAmount();
-				wheelRotation = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) / -10;
+				//TODO Figure out the scroll wheel amounts are correct.  I suspect that Apples Java implementaion
+				//maybe reporting a static "1" inaccuratly.
+				scrollAmount = (jint) CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1) * -1;
 
 				#ifdef DEBUG
-				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (%i) (Unimplemented)\n", (int) wheelRotation);
+				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (%i, %i, %i)\n", (int) scrollType, (int) scrollAmount, (int) wheelRotation);
 				#endif
 
-				/*
-				delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis#);
+				modifiers = doModifierConvert(event_mask);
 
-				kCGScrollWheelEventDeltaAxis1 = 11,
-				kCGScrollWheelEventDeltaAxis2 = 12,
-				*/
-
-				//TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
-				
 				//Fire mouse wheel event.
 				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, scrollType, scrollAmount, wheelRotation);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);

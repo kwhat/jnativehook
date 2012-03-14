@@ -18,7 +18,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
-#include "JMouseWheel.h"
 
 #ifdef XKB
 #include <X11/XKBlib.h>
@@ -179,26 +178,6 @@ long GetMultiClickTime() {
 	}
 
 	return value;
-}
-
-long GetScrollWheelType() {
-	/* X11 does not have an API call for aquiring the mouse scroll type.  This
-	 * maybe part of the XInput2 (XI2) extention but I will wont know until it
-	 * is available on my platform.  For the time being we will just use the
-	 * unit scroll value.
-	 */
-
-	return (long) WHEEL_UNIT_SCROLL;
-}
-
-long GetScrollWheelAmount() {
-	/* Some scroll wheel properties are avaiable via the new XInput2 (XI2)
-	 * extention.  Unfortunately the extention is not available on my
-	 * development platform at this time.  For the time being we will just
-	 * use the Windows default value of 3.
-	 */
-
-	return 3;
 }
 
 void OnLibraryLoad() {

@@ -24,6 +24,7 @@
 #include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
+#include "JMouseWheel.h"
 #include "JConvertFromNative.h"
 #include "WinKeyCodes.h"
 
@@ -34,6 +35,37 @@ extern HINSTANCE hInst;
 static DWORD hookThreadId = 0;
 static HANDLE hookThreadHandle = NULL, hookEventHandle = NULL;
 static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
+
+
+static long GetScrollWheelType() {
+	long value;
+	UINT WINAPI wheeltype;
+
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
+	if (wheeltype == WHEEL_PAGESCROLL) {
+		value = WHEEL_BLOCK_SCROLL;
+	}
+	else {
+		value = WHEEL_UNIT_SCROLL;
+	}
+
+	return value;
+}
+
+static long GetScrollWheelAmount() {
+	long value;
+	UINT WINAPI wheelamount;
+
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheelamount, 0);
+	if (wheelamount == WHEEL_PAGESCROLL) {
+		value = 1;
+	}
+	else {
+		value = (long) wheelamount;
+	}
+
+	return value;
+}
 
 static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	//We should already be attached to the JVM at this point.  This should only

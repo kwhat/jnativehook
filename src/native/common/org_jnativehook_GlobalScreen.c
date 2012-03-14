@@ -162,50 +162,6 @@ static void SetNativeProperties(JNIEnv * env) {
 			fprintf(stderr, "GetMultiClickTime(): failure!\n");
 		}
 		#endif
-
-
-		long scrolltype = GetScrollWheelType();
-		if (scrolltype >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetScrollWheelType(): successful. (type: %li)\n", scrolltype);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", scrolltype) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.wheelScrollType"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetScrollWheelType(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "GetScrollWheelType(): failure!\n");
-		}
-		#endif
-
-
-		long scrollamount = GetScrollWheelAmount();
-		if (scrollamount >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetScrollWheelAmount(): successful. (type: %li)\n", scrollamount);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", scrollamount) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.wheelScrollAmount"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetScrollWheelAmount(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "GetScrollWheelAmount(): failure!\n");
-		}
-		#endif
 	}
 }
 

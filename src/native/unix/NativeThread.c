@@ -27,6 +27,7 @@
 #include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "JConvertFromNative.h"
+#include "JMouseWheel.h"
 #include "XButtonCodes.h"
 #include "XEventModifiers.h"
 
@@ -154,8 +155,20 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 							Vertical unit increment: 15 pixels
 						*/
 
-						scrollType = (jint) GetScrollWheelType();
-						scrollAmount = (jint) GetScrollWheelAmount();
+						/* X11 does not have an API call for aquiring the mouse scroll type.  This
+						 * maybe part of the XInput2 (XI2) extention but I will wont know until it
+						 * is available on my platform.  For the time being we will just use the
+						 * unit scroll value.
+						 */
+						scrollType = (jint) WHEEL_UNIT_SCROLL;
+
+						/* Some scroll wheel properties are avaiable via the new XInput2 (XI2)
+						 * extention.  Unfortunately the extention is not available on my
+						 * development platform at this time.  For the time being we will just
+						 * use the Windows default value of 3.
+						 */
+						scrollAmount = (jint) 3;
+						
 						if (event_code == 4) {
 							//Wheel Rotated Up and Away
 							wheelRotation = -1;
