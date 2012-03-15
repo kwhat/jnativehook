@@ -25,22 +25,22 @@
 
 #include <jni.h>
 
-//Define some simple function return codes.
+/* Define some simple function return codes. */
 #define RETURN_SUCCESS 0
 #define RETURN_FAILURE 1
 
-//Global Ref to the JVM
+/* Global Ref to the JVM */
 extern JavaVM * jvm;
 
-//GlobalScreen object and dispatch id.
+/* GlobalScreen object and dispatch id. */
 extern jobject objGlobalScreen;
 extern jmethodID idDispatchEvent;
 
-//Java callback classes and constructor id's
+/* Java callback classes and constructor id's. */
 extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
-//Common function stubs.
+/* Common function stubs. */
 extern int CreateJNIGlobals();
 extern int DestroyJNIGlobals();
 

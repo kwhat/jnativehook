@@ -507,7 +507,7 @@
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} -std=c99 ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
@@ -535,7 +535,7 @@
 		</condition>
 
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>

@@ -541,7 +541,8 @@ bool IsNativeThreadRunning() {
 	#ifdef DEBUG
 	else {
 		//Lock Failure. This should always be caused by an invalid pointer
-		//and/or an uninitialized mutex.
+		//and/or an uninitialized mutex.  Note that hookControlMutex maybe
+		//uninitialized in this context.
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 	}
 	#endif

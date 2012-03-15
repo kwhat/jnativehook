@@ -18,7 +18,7 @@
 #ifndef _Included_JInputModifiers_h
 #define _Included_JInputModifiers_h
 
-//Reference: org/jnativehook/NativeInputEvent.java
+/* Reference: org/jnativehook/NativeInputEvent.java */
 #define JK_SHIFT_MASK			1
 #define JK_CTRL_MASK			2
 #define JK_META_MASK			4

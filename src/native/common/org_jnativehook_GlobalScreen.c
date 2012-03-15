@@ -26,10 +26,10 @@ static void SetNativeProperties(JNIEnv * env) {
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 	if (clsSystem != NULL && setProperty_ID != NULL) {
-		//Create a buffer for converting numbers to strings.
+		/* Create a buffer for converting numbers to strings. */
 		char buffer[16];
 
-		//Set the native keyboard auto repeat rate.
+		/* Set the native keyboard auto repeat rate. */
 		long rate = GetAutoRepeatRate();
 		if (rate >= 0) {
 			#ifdef DEBUG
@@ -74,7 +74,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 		
-		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
 		long multiplier = GetPointerAccelerationMultiplier();
 		if (multiplier >= 0) {
 			#ifdef DEBUG
@@ -97,7 +97,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 
-		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
 		long threshold = GetPointerAccelerationThreshold();
 		if (threshold >= 0) {
 			#ifdef DEBUG
@@ -184,10 +184,10 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 }
 
 
-//This is where java attaches to the native machine.  Its kind of like the java + native constructor.
+/* This is where java attaches to the native machine.  Its kind of like the java + native constructor. */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
-	//Grab the currently running virtual machine so we can attach to it in
-	//functions that are not called from java. ( I.E. ThreadLoop )
+	/* Grab the currently running virtual machine so we can attach to it in */
+	/* functions that are not called from java. ( I.E. ThreadLoop ) */
 	jvm = vm;
 	JNIEnv * env = 0;
 
@@ -197,16 +197,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		fprintf(stdout, "JNI_OnLoad(): AttachCurrentThread() successful.\n");
 		#endif
 
-		//Run platform specific load items.
+		/* Run platform specific load items. */
 		OnLibraryLoad();
 
-		//Set java properties from native sources.
+		/* Set java properties from native sources. */
 		SetNativeProperties(env);
 	}
 	#ifdef DEBUG
 	else {
 		fprintf(stderr, "JNI_OnLoad(): AttachCurrentThread() failed!\n");
-		//TODO Throw a runtime exception
+		/* TODO Throw a runtime exception */
 	}
 	#endif
 
@@ -214,15 +214,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
-	//Stop the native thread if its running.
+	/* Stop the native thread if its running. */
 	if (IsNativeThreadRunning()) {
 		StopNativeThread();
 	}
 
-	//Run platform specific unload items.
+	/* Run platform specific unload items. */
 	OnLibraryUnload();
 
-	//Detach the current thread to the JVM.
+	/* Detach the current thread to the JVM. */
 	#ifdef DEBUG
 	if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
 		fprintf(stdout, "JNI_OnUnload(): DetachCurrentThread() successful.\n");

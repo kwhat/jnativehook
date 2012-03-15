@@ -27,14 +27,14 @@
 #include "JNativeEventTypes.h"
 
 typedef struct {
-	jint keycode;		//Key Code
-	jint rawcode;		//Raw Code
-	jint location;		//Key Location
+	jint keycode;		/* Key Code */
+	jint rawcode;		/* Raw Code */
+	jint location;		/* Key Location */
 } JKeyDatum;
 
 typedef struct {
-	//jint modifiers;	//Mod Mask
-	jint button;		//Btn Code
+	/* jint modifiers;	/* Mod Mask */
+	jint button;		/* Btn Code */
 } JButtonDatum;
 
 
