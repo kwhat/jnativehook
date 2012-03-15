@@ -121,7 +121,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @param wheelRotation The amount that the mouse wheel was rotated (the
      * number of "clicks")
      *
-     * @see NativeMouseEvent#NativeMouseEvent()
+     * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int)
 	 */
 	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int scrollType, int scrollAmount, int wheelRotation) {
 		super(id, when, modifiers, x, y);

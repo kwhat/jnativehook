@@ -45,6 +45,7 @@
 		
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
 			<fileset dir="${dir.bin}" includes="**/*" />
+			<fileset file="build.properties" />
 		</delete>
 	</target>
 	
@@ -57,7 +58,6 @@
 			<fileset dir="${dir.dist}" includes="**/*" />
 			<fileset dir="${dir.lib}" includes="**/*" />
 			<fileset dir="${dir.jar}" includes="**/*" />
-			<fileset file="build.properties" />
 		</delete>
 	</target>
 	
@@ -766,10 +766,8 @@
 		</delete>
 		
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
-			<packageset dir="src" defaultexcludes="yes">
+			<packageset dir="${dir.src.java}" defaultexcludes="yes">
 				<include name="org/jnativehook/**" />
-				<exclude name="org/jnativehook/c_source/**" />
-				<exclude name="org/jnativehook/lib/**" />
 			</packageset>
 			
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>

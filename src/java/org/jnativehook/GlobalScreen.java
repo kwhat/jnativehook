@@ -73,7 +73,7 @@ public class GlobalScreen {
 	
 	/**
 	 * A deconstructor that will perform native cleanup by calling the
-	 * {@link #unregisterHook} method.  This method will not run until the
+	 * {@link #unregisterNativeHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 *
 	 * @throws Throwable The <code>Exception</code> raised by this method.
