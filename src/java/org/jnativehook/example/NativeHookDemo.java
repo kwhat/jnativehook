@@ -70,15 +70,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * Instantiates a new native hook demo.
 	 */
 	public NativeHookDemo() {
-		try {
-			//Initialze native hook.
-			//Note: This function is not AWT Thread Safe!
-			GlobalScreen.getInstance().registerNativeHook();
-		}
-		catch (NativeHookException ex) {
-			ex.printStackTrace();
-		}
-		
 		//Setup the main window.
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
@@ -298,6 +289,11 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 			txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointerSensitivity"));
 			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointerAccelerationMultiplier"));
 			txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + System.getProperty("jnativehook.pointerAccelerationThreshold"));
+
+			//Initialze native hook.  This is done on window open because the
+			//listener requires the txtEventInfo object to be constructed.
+			//Note: This function is not AWT Thread Safe!
+			GlobalScreen.getInstance().registerNativeHook();
 		}
 		catch (Exception ex) {
 			txtEventInfo.setText("Error: " + ex.toString() + "\n");

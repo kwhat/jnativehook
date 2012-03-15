@@ -223,7 +223,6 @@ public class GlobalScreen {
 	 * 
 	 * @since 1.1
 	 */
-	//FIXME this needs to be AWT thread safe.
 	public native void registerNativeHook() throws NativeHookException;
 	
 	/**
@@ -234,7 +233,6 @@ public class GlobalScreen {
 	 * 
 	 * @since 1.1
 	 */
-	//FIXME this needs to be AWT thread safe.
 	public native void unregisterNativeHook() throws NativeHookException;
 	
 	/**
