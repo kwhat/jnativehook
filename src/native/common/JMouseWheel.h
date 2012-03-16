@@ -18,8 +18,8 @@
 #ifndef _Included_JMouseWheel_h
 #define _Included_JMouseWheel_h
 
-/* Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java */
-#define WHEEL_UNIT_SCROLL	0	/* AnyButton */
+//Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
+#define WHEEL_UNIT_SCROLL	0	//AnyButton
 #define WHEEL_BLOCK_SCROLL	1
 
 #endif

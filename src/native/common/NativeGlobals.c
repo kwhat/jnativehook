@@ -17,14 +17,14 @@
 
 #include "NativeGlobals.h"
 
-/* Global Ref to the JVM */
+//Global Ref to the JVM
 JavaVM * jvm;
 
-/* GlobalScreen object and dispatch id. */
+//GlobalScreen object and dispatch id.
 jobject objGlobalScreen;
 jmethodID idDispatchEvent;
 
-/* Java callback classes and constructor id's */
+//Java callback classes and constructor id's
 jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
@@ -32,16 +32,16 @@ int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
 
 	JNIEnv * env = NULL;
-	/* TODO Should swtich to GetEnv */
+	//Should swtich to GetEnv
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 
-		/* Class and getInstance method id for the GlobalScreen Object */
+		//Class and getInstance method id for the GlobalScreen Object
 		jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 		if (clsGlobalScreen != NULL) {
-			/* Get the method ID for GlobalScreen.getInstance() */
+			//Get the method ID for GlobalScreen.getInstance()
 			jmethodID getInstance_ID = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
 			if (getInstance_ID != NULL) {
-				/* Create a global reference for the GlobalScreen Object */
+				//Create a global reference for the GlobalScreen Object
 				jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 				objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
 
@@ -51,7 +51,7 @@ int CreateJNIGlobals() {
 				}
 				#endif
 
-				/* Get the method ID for GlobalScreen.dispatchEvent(). */
+				//Get the method ID for GlobalScreen.dispatchEvent().
 				idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 
 				#ifdef DEBUG
@@ -73,7 +73,7 @@ int CreateJNIGlobals() {
 		#endif
 
 
-		/* Class and Constructor for the NativeKeyEvent Object. */
+		//Class and Constructor for the NativeKeyEvent Object
 		jclass clsLocalKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 		if (clsLocalKeyEvent != NULL) {
 			clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
@@ -92,7 +92,7 @@ int CreateJNIGlobals() {
 		}
 		#endif
 
-		/* Class and Constructor for the NativeMouseEvent Object. */
+		//Class and Constructor for the NativeMouseEvent Object
 		jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 		if (clsLocalMouseEvent != NULL) {
 			clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
@@ -108,7 +108,7 @@ int CreateJNIGlobals() {
 		#endif
 
 		
-		/* Class and Constructor for the NativeMouseWheelEvent Object. */
+		//Class and Constructor for the NativeMouseWheelEvent Object
 		jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 		if (clsLocalMouseWheelEvent != NULL) {
 			clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
@@ -125,9 +125,10 @@ int CreateJNIGlobals() {
 	}
 	#ifdef DEBUG
 	else {
-		/* We cant do a whole lot of anything if we cant attach to the current thread. */
-		/* FIXME An exception should be raised. */
+		//We cant do a whole lot of anything if we cant attach to the current thread.
+		//FIXME An exception should be raised.
 		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
+
 	}
 	#endif
 
@@ -138,7 +139,7 @@ int DestroyJNIGlobals() {
 	int status = RETURN_FAILURE;
 	JNIEnv * env = NULL;
 
-	/* TODO Should swtich to GetEnv */
+	//Should swtich to GetEnv
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		(*env)->DeleteGlobalRef(env, clsKeyEvent);
 		clsKeyEvent = NULL;
@@ -163,8 +164,8 @@ int DestroyJNIGlobals() {
 	}
 	#ifdef DEBUG
 	else {
-		/* We cant do a whole lot of anything if we cant attach to the current thread. */
-		/* FIXME An exception should be raised. */
+		//We cant do a whole lot of anything if we cant attach to the current thread.
+		//FIXME An exception should be raised.
 		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
 
 	}

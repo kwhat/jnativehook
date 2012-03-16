@@ -18,17 +18,16 @@
 #ifndef _Included_OSXKeyCodes_h
 #define _Included_OSXKeyCodes_h
 
-/* Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png */
-/* Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm */
-/* Reference: http://www.mactech.com/macintosh-c/chap02-1.html */
+//Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
+//Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
+//Reference: http://www.mactech.com/macintosh-c/chap02-1.html
 
-/* #include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants. */
-/* FIXME We should be using the IOKit constants outlined below. */
-/* #include <IOKit/hid/IOHIDUsageTables.h> */ /* For IOKit kHIDUsage_KeyboardA keycode constants. */
+//#include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants.
+//FIXME We should be using the IOKit constants outlined below.
+//#include <IOKit/hid/IOHIDUsageTables.h> //For IOKit kHIDUsage_KeyboardA keycode constants.
 
-
-/* Used in lieu of the Carbon frameworks HIToolbox. */
-/* Keycodes for ansi keys */
+//Used in lieu of the Carbon frameworks HIToolbox.
+//keycodes for ansi keys
 #define kVK_ANSI_A						0x00
 #define kVK_ANSI_S						0x01
 #define kVK_ANSI_D						0x02
@@ -95,7 +94,7 @@
 #define kVK_ANSI_Keypad8				0x5B
 #define kVK_ANSI_Keypad9				0x5C
 
-/* Keycodes for keys that are independent of keyboard layout */
+//keycodes for keys that are independent of keyboard layout
 #define kVK_Return						0x24
 #define kVK_Tab					 		0x30
 #define kVK_Space						0x31
@@ -144,18 +143,18 @@
 #define kVK_DownArrow					0x7D
 #define kVK_UpArrow					 	0x7E
 
-/* ISO keyboards only */
+//ISO keyboards only
 #define kVK_ISO_Section				 	0x0A
 
-/* JIS keyboards only */
+//JIS keyboards only
 #define kVK_JIS_Yen					 	0x5D
 #define kVK_JIS_Underscore				0x5E
 #define kVK_JIS_KeypadComma		 		0x5F
 #define kVK_JIS_Eisu					0x66
 #define kVK_JIS_Kana					0x68
 
-/* Suplemental virtual key information */
+//Suplemental virtual key information
 #define kVK_RightCommand				0x36
-#define kVK_ContextMenu					0x6E	/* AKA kMenuPowerGlyph */
+#define kVK_ContextMenu					0x6E	//AKA kMenuPowerGlyph
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Reference: http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html */
+//Reference: http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html
 #include "JConvertFromNative.h"
 #include "OSXKeyCodes.h"
 #include "OSXButtonCodes.h"
@@ -30,7 +30,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_Return:								jkey.keycode = JK_ENTER;						return jkey;
 		case kVK_Delete:								jkey.keycode = JK_BACK_SPACE;					return jkey;
 		case kVK_Tab:									jkey.keycode = JK_TAB;							return jkey;
-		/* case XK_Cancel:								jkey.keycode = JK_CANCEL;						return jkey; */	/* No Apple Support */
+		//case XK_Cancel:								jkey.keycode = JK_CANCEL;						return jkey;	//No Apple Support
 
 		case kVK_Shift:
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_SHIFT;						return jkey;
@@ -48,15 +48,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_META;							return jkey;
 		case kVK_RightCommand:
 			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_META;							return jkey;
-		/*
-		case XK_Super_L:
-			jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
-		case XK_Super_R:
-			jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
+		//case XK_Super_L:
+		//	jkey.location = JK_LOCATION_LEFT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
+		//case XK_Super_R:
+		//	jkey.location = JK_LOCATION_RIGHT;			jkey.keycode = JK_WINDOWS;						return jkey;	//No Apple Support
 		case kVK_ContextMenu:							jkey.keycode = JK_CONTEXT_MENU;					return jkey;
-		*/
 
-		/* case XK_Pause:								jkey.keycode = JK_PAUSE;						return jkey; */	/* No Apple Support */
+		//case XK_Pause:								jkey.keycode = JK_PAUSE;						return jkey;	//No Apple Support
 		case kVK_CapsLock:								jkey.keycode = JK_CAPS_LOCK;					return jkey;
 		case kVK_Escape:								jkey.keycode = JK_ESCAPE;						return jkey;
 		case kVK_Space:									jkey.keycode = JK_SPACE;						return jkey;
@@ -141,10 +139,8 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_MULTIPLY;						return jkey;
 		case kVK_ANSI_KeypadPlus:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_ADD;							return jkey;
-		/*
-		case XK_KP_Separator:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR;					return jkey;	//No Apple Support
-		*/
+		//case XK_KP_Separator:
+		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SEPARATOR;					return jkey;	//No Apple Support
 		case kVK_ANSI_KeypadMinus:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SUBTRACT;						return jkey;
 		case kVK_ANSI_KeypadDecimal:
@@ -153,12 +149,10 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_DIVIDE;						return jkey;
 		case kVK_ANSI_KeypadClear:
 			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_CLEAR;						return jkey;
-		/*
-		case XK_Num_Lock:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUM_LOCK;						return jkey;	//No Apple Support
-		case XK_Scroll_Lock:
-			jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SCROLL_LOCK;					return jkey;	//No Apple Support
-		*/
+		//case XK_Num_Lock:
+		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_NUM_LOCK;						return jkey;	//No Apple Support
+		//case XK_Scroll_Lock:
+		//	jkey.location = JK_LOCATION_NUMPAD;			jkey.keycode = JK_SCROLL_LOCK;					return jkey;	//No Apple Support
 
 		case kVK_F1:									jkey.keycode = JK_F1;							return jkey;
 		case kVK_F2:									jkey.keycode = JK_F2;							return jkey;
@@ -181,15 +175,13 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_F18:									jkey.keycode = JK_F18;							return jkey;
 		case kVK_F19:									jkey.keycode = JK_F19;							return jkey;
 		case kVK_F20:									jkey.keycode = JK_F20;							return jkey;
-		/*
-		case XK_F21:									jkey.keycode = JK_F21;							return jkey;	//No Apple Support
-		case XK_F22:									jkey.keycode = JK_F22;							return jkey;	//No Apple Support
-		case XK_F23:									jkey.keycode = JK_F23;							return jkey;	//No Apple Support
-		case XK_F24:									jkey.keycode = JK_F24;							return jkey;	//No Apple Support
+		//case XK_F21:									jkey.keycode = JK_F21;							return jkey;	//No Apple Support
+		//case XK_F22:									jkey.keycode = JK_F22;							return jkey;	//No Apple Support
+		//case XK_F23:									jkey.keycode = JK_F23;							return jkey;	//No Apple Support
+		//case XK_F24:									jkey.keycode = JK_F24;							return jkey;	//No Apple Support
 
-		case XK_Print:									jkey.keycode = JK_PRINTSCREEN;					return jkey;	//No Apple Support
-		case XK_Insert:									jkey.keycode = JK_INSERT;						return jkey;	//No Apple Support
-		*/
+		//case XK_Print:								jkey.keycode = JK_PRINTSCREEN;					return jkey;	//No Apple Support
+		//case XK_Insert:								jkey.keycode = JK_INSERT;						return jkey;	//No Apple Support
 		case kVK_Help:									jkey.keycode = JK_HELP;							return jkey;
 		case kVK_ForwardDelete:							jkey.keycode = JK_DELETE;						return jkey;
 
@@ -254,9 +246,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown Apple Support
 		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown Apple Support
 		//case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	//Unknown Apple Support
-		case kVK_JIS_Kana:								jkey.keycode = JK_KANA;							return jkey;	/* TODO Testing Needed */
+		case kVK_JIS_Kana:								jkey.keycode = JK_KANA;							return jkey;	//TODO Testing Needed
 		//case XK_Kanji:								jkey.keycode = JK_KANJI;						return jkey;	//Unknown Apple Support
-		case kVK_JIS_Eisu:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	/* TODO Testing Needed */
+		case kVK_JIS_Eisu:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	//TODO Testing Needed
 		//case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;	//Unknown Apple Support
 		//case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;	//Unknown Apple Support
 		//case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;	//Unknown Apple Support
@@ -287,7 +279,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		#endif
 		*/
 
-		/* case XK_Begin:								jkey.keycode = JK_BEGIN;						return jkey; */	/* No Apple Support */
+		//case XK_Begin:								jkey.keycode = JK_BEGIN;						return jkey;	//No Apple Support
 
 		default:
 		case 0xFF:										jkey.keycode = JK_UNDEFINED;					return jkey;

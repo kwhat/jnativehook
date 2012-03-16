@@ -18,7 +18,7 @@
 #ifndef _Included_JKeyLocations_h
 #define _Included_JKeyLocations_h
 
-/* Reference: org/jnativehook/keyboard/NativeKeyEvent.java */
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
 #define JK_LOCATION_UNKNOWN			0
 #define JK_LOCATION_STANDARD		1
 #define JK_LOCATION_LEFT			2

@@ -24,7 +24,7 @@
  * manually.
  */
 
-/* These codes do not appear to be defined anywhere by Apple. */
+//These codes do not appear to be defined anywhere by Apple.
 #define kVK_LBUTTON						kCGMouseButtonLeft
 #define kVK_RBUTTON						kCGMouseButtonRight
 #define kVK_MBUTTON						kCGMouseButtonCenter

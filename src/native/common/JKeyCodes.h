@@ -18,8 +18,8 @@
 #ifndef _Included_JKeyCodes_h
 #define _Included_JKeyCodes_h
 
-/* Reference: org/jnativehook/keyboard/NativeKeyEvent.java */
-/* http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED */
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
+//http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED
 #define JK_ENTER						'\n'
 #define JK_BACK_SPACE					'\b'
 #define JK_TAB							'\t'
@@ -27,8 +27,8 @@
 
 #define JK_SHIFT						0x10
 #define JK_CONTROL						0x11
-#define JK_ALT							0x12	/* option or alt key */
-#define JK_META							0x9D	/* osx: command */
+#define JK_ALT							0x12	//option or alt key
+#define JK_META							0x9D	//osx: command
 #define JK_WINDOWS						0x020C
 #define JK_CONTEXT_MENU					0x020D
 
@@ -42,10 +42,10 @@
 #define JK_LEFT							0x25
 #define JK_RIGHT						0x27
 
-#define JK_COMMA						0x2C	/* ',' */
-#define JK_MINUS						0x2D	/* '-' */
-#define JK_PERIOD						0x2E	/* '.' */
-#define JK_SLASH						0x2F	/* '/' */
+#define JK_COMMA						0x2C	// ','
+#define JK_MINUS						0x2D	// '-'
+#define JK_PERIOD						0x2E	// '.'
+#define JK_SLASH						0x2F	// '/'
 
 #define JK_0							0x30
 #define JK_1							0x31
@@ -58,8 +58,8 @@
 #define JK_8							0x38
 #define JK_9							0x39
 
-#define JK_SEMICOLON					0x3B	/* ';' */
-#define JK_EQUALS						0x3D	/* '=' */
+#define JK_SEMICOLON					0x3B	// ';'
+#define JK_EQUALS						0x3D	// '='
 
 #define JK_A							0x41
 #define JK_B							0x42
@@ -88,9 +88,9 @@
 #define JK_Y							0x59
 #define JK_Z							0x5A
 
-#define JK_OPEN_BRACKET					0x5B	/* '[' */
-#define JK_BACK_SLASH					0x5C	/* '\' */
-#define JK_CLOSE_BRACKET				0x5D	/* ']' */
+#define JK_OPEN_BRACKET					0x5B	// '['
+#define JK_BACK_SLASH					0x5C	// '\'
+#define JK_CLOSE_BRACKET				0x5D	// ']'
 
 #define JK_NUMPAD0						0x60
 #define JK_NUMPAD1						0x61
@@ -116,7 +116,7 @@
 #define JK_DIVIDE						0x6F
 #define JK_DELETE						0x7F
 #define JK_NUM_LOCK						0x90
-#define JK_CLEAR						0x03	/* osx: number lock */
+#define JK_CLEAR						0x03	//osx: number lock
 #define JK_SCROLL_LOCK					0x91
 
 #define JK_F1							0x70
@@ -203,11 +203,11 @@
 
 
 /* For input method support on Asian Keyboards */
-#define JK_FINAL						0x0018	/* Unknown Win32 API */
+#define JK_FINAL						0x0018	//Unknown Win32 API
 #define JK_CONVERT						0x001C
 #define JK_NONCONVERT					0x001D
 #define JK_ACCEPT						0x001E
-#define JK_MODECHANGE					0x001F	/* Unknown Win32 API */
+#define JK_MODECHANGE					0x001F	//Unknown Win32 API
 #define JK_KANA							0x0015
 #define JK_KANJI						0x0019
 #define JK_ALPHANUMERIC					0x00F0
@@ -239,6 +239,6 @@
 
 #define JK_BEGIN						0xFF58
 
-#define JK_UNDEFINED					0x0		/* KeyCode Unknown */
+#define JK_UNDEFINED					0x0		// KeyCode Unknown
 
 #endif

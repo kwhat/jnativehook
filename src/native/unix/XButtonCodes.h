@@ -18,7 +18,7 @@
 #ifndef _Included_XButtonCodes_h
 #define _Included_XButtonCodes_h
 
-/* XButton Virtual Codes that are not defined by xorg. */
+//XButton Virtual Codes that are not defined by xorg.
 #define XK_NoButton			0
 #define XK_Button1			1
 #define XK_Button2			2

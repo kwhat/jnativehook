@@ -18,13 +18,13 @@
 #ifndef _Included_JNativeEventTypes_h
 #define _Included_JNativeEventTypes_h
 
-/* Reference: org/jnativehook/keyboard/NativeKeyEvent.java */
+//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
 #define JK_NATIVE_KEY_FIRST			2400
 #define JK_NATIVE_KEY_LAST			2401
 #define JK_NATIVE_KEY_PRESSED		JK_NATIVE_KEY_FIRST
 #define JK_NATIVE_KEY_RELEASED		1 + JK_NATIVE_KEY_FIRST
 
-/* Reference: org/jnativehook/mouse/NativeMouseEvent.java */
+//Reference: org/jnativehook/mouse/NativeMouseEvent.java
 #define JK_NATIVE_MOUSE_FIRST		2500
 #define JK_NATIVE_MOUSE_LAST		2504
 #define JK_NATIVE_MOUSE_PRESSED		JK_NATIVE_MOUSE_FIRST

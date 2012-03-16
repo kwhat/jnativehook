@@ -17,8 +17,8 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>				/* Reduced symbol set */
-/* #include <X11/keysymdef.h> */	/* Full symbol set */
+#include <X11/keysym.h> //Reduced symbol set
+//#include <X11/keysymdef.h>  //Full symbol set
 #ifdef SUN_KEYBOARD
 #include <X11/Sunkeysym.h>
 #endif
@@ -259,31 +259,29 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 
 		/* For input method support on Asian Keyboards */
-		/*
-		case XK_Cancel:									jkey.keycode = JK_FINAL;						return jkey;	//Unknown X11 Support
-		case XK_Henkan:									jkey.keycode = JK_CONVERT;						return jkey;	//Unknown X11 Support
-		case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown X11 Support
-		case XK_VoidSymbol:								jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown X11 Support
-		*/
+		//case XK_Cancel:								jkey.keycode = JK_FINAL;						return jkey;	//Unknown X11 Support
+		//case XK_Henkan:								jkey.keycode = JK_CONVERT;						return jkey;	//Unknown X11 Support
+		//case XK_Muhenkan:								jkey.keycode = JK_NONCONVERT;					return jkey;	//Unknown X11 Support
+		//case XK_VoidSymbol:							jkey.keycode = JK_ACCEPT;						return jkey;	//Unknown X11 Support
 		#ifndef SUN_KEYBOARD
-		case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	/* TODO Testing Needed */
+		case XK_Mode_switch:							jkey.keycode = JK_MODECHANGE;					return jkey;	//TODO Testing Needed
 		#endif
-		case XK_Kana_Shift:								jkey.keycode = JK_KANA;							return jkey;	/* TODO Testing Needed */
-		case XK_Kanji:									jkey.keycode = JK_KANJI;						return jkey;	/* TODO Testing Needed */
-		case XK_Eisu_Shift:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	/* TODO Testing Needed */
-		case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;	/* TODO Testing Needed */
-		case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;	/* TODO Testing Needed */
-		case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;	/* TODO Testing Needed */
-		case XK_Hankaku:								jkey.keycode = JK_HALF_WIDTH;					return jkey;	/* TODO Testing Needed */
-		case XK_Romaji:									jkey.keycode = JK_ROMAN_CHARACTERS;				return jkey;	/* TODO Testing Needed */
-		case XK_MultipleCandidate:						jkey.keycode = JK_ALL_CANDIDATES;				return jkey;	/* TODO Testing Needed */
-		case XK_PreviousCandidate:						jkey.keycode = JK_PREVIOUS_CANDIDATE;			return jkey;	/* TODO Testing Needed */
-		case XK_Codeinput:								jkey.keycode = JK_CODE_INPUT;					return jkey;	/* TODO Testing Needed */
-		case XK_Hiragana_Katakana:						jkey.keycode = JK_JAPANESE_KATAKANA;			return jkey;	/* TODO Testing Needed */
-		case XK_Zenkaku_Hankaku:						jkey.keycode = JK_JAPANESE_HIRAGANA;			return jkey;	/* TODO Testing Needed */
-		/* case XK_Romaji:								jkey.keycode = JK_JAPANESE_ROMAN;				return jkey; */	/* TODO Testing Needed */
-		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;	/* TODO Testing Needed */
-		case XK_Eisu_toggle:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	/* TODO Testing Needed */
+		case XK_Kana_Shift:								jkey.keycode = JK_KANA;							return jkey;	//TODO Testing Needed
+		case XK_Kanji:									jkey.keycode = JK_KANJI;						return jkey;	//TODO Testing Needed
+		case XK_Eisu_Shift:								jkey.keycode = JK_ALPHANUMERIC;					return jkey;	//TODO Testing Needed
+		case XK_Katakana:								jkey.keycode = JK_KATAKANA;						return jkey;	//TODO Testing Needed
+		case XK_Hiragana:								jkey.keycode = JK_HIRAGANA;						return jkey;	//TODO Testing Needed
+		case XK_Zenkaku:								jkey.keycode = JK_FULL_WIDTH;					return jkey;	//TODO Testing Needed
+		case XK_Hankaku:								jkey.keycode = JK_HALF_WIDTH;					return jkey;	//TODO Testing Needed
+		case XK_Romaji:									jkey.keycode = JK_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
+		case XK_MultipleCandidate:						jkey.keycode = JK_ALL_CANDIDATES;				return jkey;	//TODO Testing Needed
+		case XK_PreviousCandidate:						jkey.keycode = JK_PREVIOUS_CANDIDATE;			return jkey;	//TODO Testing Needed
+		case XK_Codeinput:								jkey.keycode = JK_CODE_INPUT;					return jkey;	//TODO Testing Needed
+		case XK_Hiragana_Katakana:						jkey.keycode = JK_JAPANESE_KATAKANA;			return jkey;	//TODO Testing Needed
+		case XK_Zenkaku_Hankaku:						jkey.keycode = JK_JAPANESE_HIRAGANA;			return jkey;	//TODO Testing Needed
+		//case XK_Romaji:								jkey.keycode = JK_JAPANESE_ROMAN;				return jkey;	//TODO Testing Needed
+		case XK_Kana_Lock:								jkey.keycode = JK_KANA_LOCK;					return jkey;	//TODO Testing Needed
+		case XK_Eisu_toggle:							jkey.keycode = JK_INPUT_METHOD_ON_OFF;			return jkey;	//TODO Testing Needed
 
 		/* For Sun keyboards */
 		#ifdef SUN_KEYBOARD
