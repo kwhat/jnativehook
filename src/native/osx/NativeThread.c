@@ -265,6 +265,8 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			break;
 
 			case kCGEventScrollWheel:
+				event_point = CGEventGetLocation(event);
+				
 				//TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
 				if (CGEventGetIntegerValueField(event, kCGScrollWheelEventIsContinuous) == 0) {
 					scrollType = (jint)  WHEEL_UNIT_SCROLL;

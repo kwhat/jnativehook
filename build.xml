@@ -496,14 +496,14 @@
 		
 		<!-- set gcc standard flags (primarily for windows right now) -->
 		<!-- FIXME try this instead: http://www.aquaphoenix.com/ref/gnu_c_library/libc_12.html -->
-		<condition property="native.cc.flags.standard" value="-std=c99 -pedantic" else="-std=c99">
+		<condition property="native.cc.flags.standard" value="-Werror -std=c99 -pedantic" else="-std=c99">
 			<not>
 				<istrue value="${project.debug}" />
 			</not>
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="-arch ${native.arch.tune} -mtune=${native.arch} ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-arch ${native.arch.tune} -mtune=${native.arch} -mmacosx-version-min=10.4 ${native.cc.flags.optimize}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -535,15 +535,15 @@
 		</condition>
 
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
 			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} ${native.cc.includes}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.cc.args2" value="-o" />
