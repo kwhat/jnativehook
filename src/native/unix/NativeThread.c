@@ -288,26 +288,32 @@ static void * ThreadProc(void * arg) {
 				context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 				XFree(range);
 			}
-			#ifdef DEBUG
 			else {
+				#ifdef DEBUG
 				fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
+				#endif
+
+				ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to allocate XRecord range");
 			}
-			#endif
 		}
-		#ifdef DEBUG
 		else {
+			#ifdef DEBUG
 			fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
+			#endif
+			
+			ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to locate X record");
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
+		#ifdef DEBUG
 		fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
+		#endif
+
+		ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to open X display");
 	}
-	#endif
 
 
-	if (context != 0) {
+	if (false && context != 0) {
 		//Set the exit status.
 		*status = RETURN_SUCCESS;
 
@@ -334,11 +340,14 @@ static void * ThreadProc(void * arg) {
 		pthread_mutex_lock(&hookControlMutex);
 		XRecordFreeContext(disp_ctrl, context);
 	}
-	#ifdef DEBUG
 	else {
+		#ifdef DEBUG
 		fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
+		#endif
+
+		//FIXME This exception does not get thrown.
+		ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to create X record context");
 	}
-	#endif
 
 	//Close down any open displays.
 	if (disp_ctrl != NULL) {
@@ -403,17 +412,17 @@ int StartNativeThread() {
 				#ifdef DEBUG
 				fprintf(stderr, "StartNativeThread(): start failure!\n");
 				#endif
+
+				ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
 			}
 		}
+		#ifdef DEBUG
 		else {
-			//We cant do a whole lot of anything if we cant attach to the current thread.
-			#ifdef DEBUG
+			//We cant do a whole lot of anything if we cant create JNI globals.
+			//Any exceptions are thrown by CreateJNIGlobals().
 			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
-			#endif
-
-
-			//FIXME An exception should be raised.
 		}
+		#endif
 	}
 
 	return status;
@@ -450,9 +459,6 @@ int StopNativeThread() {
 		//Destroy all created globals.
 		#ifdef DEBUG
 		if (DestroyJNIGlobals() == RETURN_FAILURE) {
-			//Leaving dangling global references will leak a small amout of memory
-			//but because there is nothing that can be done about it at this point
-			//an exception will not be thrown.
 			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
 		}
 		#else

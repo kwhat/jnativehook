@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "NativeErrors.h"
 #include "NativeGlobals.h"
 
 //Global Ref to the JVM
@@ -32,7 +33,6 @@ int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
 
 	JNIEnv * env = NULL;
-	//Should swtich to GetEnv
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 
 		//Class and getInstance method id for the GlobalScreen Object
@@ -45,32 +45,40 @@ int CreateJNIGlobals() {
 				jobject objScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, getInstance_ID);
 				objGlobalScreen = (*env)->NewGlobalRef(env, objScreen);
 
-				#ifdef DEBUG
-				if (objGlobalScreen == NULL) {
-					fprintf(stderr, "CreateJNIGlobals(): Failed to create global reference to GlobalScreen!\n");
-				}
-				#endif
+				if (objGlobalScreen != NULL) {
+					//Get the method ID for GlobalScreen.dispatchEvent().
+					idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+					if (idDispatchEvent == NULL) {
+						#ifdef DEBUG
+						fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
+						#endif
 
-				//Get the method ID for GlobalScreen.dispatchEvent().
-				idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
-
-				#ifdef DEBUG
-				if (idDispatchEvent == NULL) {
-					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID GlobalScreen.dispatchEvent()!\n");
+						ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#dispatchEvent()");
+					}
 				}
-				#endif
+				else {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to create global reference for GlobalScreen!\n");
+					#endif
+
+					ThrowException(OUT_OF_MEMORY_ERROR, "Failed to create JNI global reference for org.jnativehook.GlobalScreen");
+				}
 			}
-			#ifdef DEBUG
 			else {
+				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID GlobalScreen.getInstance()!\n");
+				#endif
+				
+				ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#getInstance()");
 			}
-			#endif
 		}
-		#ifdef DEBUG
 		else {
+			#ifdef DEBUG
 			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the GlobalScreen class!\n");
+			#endif
+
+			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.GlobalScreen class");
 		}
-		#endif
 
 
 		//Class and Constructor for the NativeKeyEvent Object
@@ -79,18 +87,31 @@ int CreateJNIGlobals() {
 			clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
 			if (clsKeyEvent != NULL) {
 				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+				if (idKeyEvent == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.NativeKeyEvent(int, long, int, int, int, int)!\n");
+					#endif
+
+					ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.keyboard.NativeKeyEvent#NativeKeyEvent(int, long, int, int, int, int)");
+				}
 			}
-			#ifdef DEBUG
 			else {
+				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to create global reference to NativeKeyEvent!\n");
+				#endif
+
+				ThrowException(OUT_OF_MEMORY_ERROR, "Failed to create JNI global reference for org.jnativehook.keyboard.NativeKeyEvent");
 			}
-			#endif
+			
 		}
-		#ifdef DEBUG
 		else {
+			#ifdef DEBUG
 			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeKeyEvent class!\n");
+			#endif
+
+			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.keyboard.NativeKeyEvent class");
 		}
-		#endif
+		
 
 		//Class and Constructor for the NativeMouseEvent Object
 		jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
@@ -98,48 +119,92 @@ int CreateJNIGlobals() {
 			clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
 			if (clsMouseEvent != NULL) {
 				idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+				if (idMouseButtonEvent == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int, int)!\n");
+					#endif
+
+					ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.mouse.NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)");
+				}
+
 				idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+				if (idMouseMotionEvent == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int)!\n");
+					#endif
+
+					ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.mouse.NativeMouseEvent#NativeMouseEvent(int, long, int, int, int)");
+				}
+			}
+			else {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to create global reference for NativeMouseEvent!\n");
+				#endif
+
+				ThrowException(OUT_OF_MEMORY_ERROR, "Failed to create JNI global reference for org.jnativehook.mouse.NativeMouseEvent");
 			}
 		}
-		#ifdef DEBUG
 		else {
+			#ifdef DEBUG
 			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeMouseEvent class!\n");
+			#endif
+			
+			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.mouse.NativeMouseEvent class");
 		}
-		#endif
 
 		
 		//Class and Constructor for the NativeMouseWheelEvent Object
 		jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 		if (clsLocalMouseWheelEvent != NULL) {
 			clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
-			idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIII)V");
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeMouseWheelEvent class!\n");
-		}
-		#endif
+			if (clsMouseWheelEvent != NULL) {
+				idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIII)V");
+				if (idMouseWheelEvent == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseWheelEvent.NativeMouseWheelEvent(int, long, int, int, int, int, int, int)!\n");
+					#endif
 
-		//FIXME Check and make sure everything is correct.
-		status = RETURN_SUCCESS;
+					ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.mouse.NativeMouseWheelEvent#NativeMouseWheelEvent(int, long, int, int, int, int, int, int)");
+				}
+			}
+			else {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to create global reference for NativeMouseWheelEvent!\n");
+				#endif
+
+				ThrowException(OUT_OF_MEMORY_ERROR, "Failed to create JNI global reference for org.jnativehook.mouse.NativeMouseWheelEvent");
+			}
+		}
+		else {
+			#ifdef DEBUG
+			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeMouseWheelEvent class!\n");
+			#endif
+
+			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.mouse.NativeMouseWheelEvent class");
+		}
+
+
+		//Check and make sure everything is correct.
+		if (idDispatchEvent != NULL && idKeyEvent != NULL && idMouseButtonEvent != NULL && idMouseMotionEvent != NULL && idMouseWheelEvent != NULL) {
+			status = RETURN_SUCCESS;
+		}
 	}
-	#ifdef DEBUG
 	else {
 		//We cant do a whole lot of anything if we cant attach to the current thread.
-		//FIXME An exception should be raised.
+		#ifdef DEBUG
 		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
+		#endif
 
+		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
-	#endif
 
 	return status;
 }
 
 int DestroyJNIGlobals() {
 	int status = RETURN_FAILURE;
-	JNIEnv * env = NULL;
 
-	//Should swtich to GetEnv
+	JNIEnv * env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		(*env)->DeleteGlobalRef(env, clsKeyEvent);
 		clsKeyEvent = NULL;
@@ -164,10 +229,10 @@ int DestroyJNIGlobals() {
 	}
 	#ifdef DEBUG
 	else {
-		//We cant do a whole lot of anything if we cant attach to the current thread.
-		//FIXME An exception should be raised.
+		//Leaving dangling global references will leak a small amout of memory
+		//but because there is nothing that can be done about it at this point
+		//an exception will not be thrown.
 		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
-
 	}
 	#endif
 

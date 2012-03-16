@@ -18,39 +18,46 @@
 #include "NativeErrors.h"
 #include "NativeGlobals.h"
 
-void ThrowFatalError(JNIEnv * env, const char * message) {
+void ThrowFatalError(const char * message) {
 	#ifdef DEBUG
 	fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
-	(*env)->FatalError(env, message);
+	JNIEnv * env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		(*env)->FatalError(env, message);
+	}
+
 	exit(EXIT_FAILURE);
 }
 
-void ThrowException(JNIEnv * env, const char * classname, const char * message) {
-	//Locate our exception class
-	jclass clsException = (*env)->FindClass(env, classname);
-
-	if (clsException != NULL) {
-		(*env)->ThrowNew(env, clsException, message);
-		#ifdef DEBUG
-		(*env)->ExceptionDescribe(env);
-		#endif
-		(*env)->DeleteLocalRef(env, clsException);
-	}
-	else {
-		clsException = (*env)->FindClass(env, "java/lang/NoClassDefFoundError");
+void ThrowException(const char * classname, const char * message) {
+	JNIEnv * env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		//Locate our exception class
+		jclass clsException = (*env)->FindClass(env, classname);
 
 		if (clsException != NULL) {
-			(*env)->ThrowNew(env, clsException, classname);
+			(*env)->ThrowNew(env, clsException, message);
 			#ifdef DEBUG
 			(*env)->ExceptionDescribe(env);
 			#endif
 			(*env)->DeleteLocalRef(env, clsException);
 		}
 		else {
-			//Unable to find exception class, Terminate with error.
-			ThrowFatalError(env, "Unable to locate exception class.");
+			clsException = (*env)->FindClass(env, NO_CLASS_DEF_FOUND_ERROR);
+
+			if (clsException != NULL) {
+				(*env)->ThrowNew(env, clsException, classname);
+				#ifdef DEBUG
+				(*env)->ExceptionDescribe(env);
+				#endif
+				(*env)->DeleteLocalRef(env, clsException);
+			}
+			else {
+				//Unable to find exception class, Terminate with error.
+				ThrowFatalError("Unable to locate exception class.");
+			}
 		}
 	}
 }

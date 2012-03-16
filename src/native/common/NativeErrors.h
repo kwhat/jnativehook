@@ -36,12 +36,16 @@
 #include <stdlib.h>
 
 //Exception class definitions.
-#define NATIVE_HOOK_EXCEPTION	"org/jnativehook/NativeHookException"
-#define NATIVE_KEY_EXCEPTION	"org/jnativehook/keyboard/NativeKeyException"
-#define NATIVE_MOUSE_EXCEPTION	"org/jnativehook/mouse/NativeMouseException"
+#define INTERNAL_ERROR				"java/lang/InternalError"
+#define OUT_OF_MEMORY_ERROR			"java/lang/OutOfMemoryError"
+#define NO_CLASS_DEF_FOUND_ERROR	"java/lang/NoClassDefFoundError"
+
+#define NATIVE_HOOK_EXCEPTION		"org/jnativehook/NativeHookException"
+#define NATIVE_KEY_EXCEPTION		"org/jnativehook/keyboard/NativeKeyException"
+#define NATIVE_MOUSE_EXCEPTION		"org/jnativehook/mouse/NativeMouseException"
 
 //Common function stubs.
-extern void ThrowFatalError(JNIEnv * env, const char * message);
-extern void ThrowException(JNIEnv * env, const char * classname, const char * message);
+extern void ThrowFatalError(const char * message);
+extern void ThrowException(const char * classname, const char * message);
 
 #endif

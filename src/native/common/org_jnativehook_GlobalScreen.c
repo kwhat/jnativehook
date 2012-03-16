@@ -166,17 +166,13 @@ static void SetNativeProperties(JNIEnv * env) {
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * env, jobject UNUSED(obj)) {
-	if (StartNativeThread() != EXIT_SUCCESS) {
-		ThrowException(env, NATIVE_HOOK_EXCEPTION, "Could not register the native hook.");
-	}
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	StartNativeThread();
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv * env, jobject UNUSED(obj)) {
-	if (StopNativeThread() != EXIT_SUCCESS) {
-		ThrowException(env, NATIVE_HOOK_EXCEPTION, "Could not unregister the native hook.");
-	}
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	StopNativeThread();
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
@@ -203,12 +199,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		//Set java properties from native sources.
 		SetNativeProperties(env);
 	}
-	#ifdef DEBUG
 	else {
+		#ifdef DEBUG
 		fprintf(stderr, "JNI_OnLoad(): AttachCurrentThread() failed!\n");
-		//TODO Throw a runtime exception
+		#endif
+		
+		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
-	#endif
 
     return jni_version;
 }
