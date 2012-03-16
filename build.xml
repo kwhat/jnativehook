@@ -535,11 +535,11 @@
 		</condition>
 
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -D_POSIX_C_SOURCE=199506L -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra -Werror ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
 			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
 			<istrue value="${native.os.isUnix}" />
 		</condition>
@@ -818,12 +818,13 @@
 			</zipfileset>
 		</zip>
 		
-		<!-- Increment and write out the build numbers -->
+		<!-- Increment and write out the build numbers
 		<propertyfile file="build.num" comment="Build Number for ANT. Do not edit!">
 			<entry key="build.major" type="int" value="${build.major}" />
 			<entry key="build.minor" type="int" value="${build.minor}" />
 			<entry key="build.revision" type="int" value="1" operation="+" />
 		</propertyfile>
+		 -->
 	</target>
 	
 	
