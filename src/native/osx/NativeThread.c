@@ -28,6 +28,13 @@
 #include "OSXButtonCodes.h"
 #include "OSXKeyCodes.h"
 
+//Structure get transport exceptions out of the native thread.
+typedef struct {
+	char * class;
+	char * message;
+} Exception;
+static Exception thread_ex;
+
 //Thread and hook handles.
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
@@ -64,10 +71,8 @@ static jint doModifierConvert(CGEventFlags event_mask) {
 }
 
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void * UNUSED(refcon)) {
-	//We should already be attached to the JVM at this point.  This should only
-	//be a formality that causes a NOOP.
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		//Event Data
 		CGPoint event_point;
 		CGEventTimestamp event_time = CGEventGetTimestamp(event);
@@ -318,11 +323,11 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 }
 
 static void * ThreadProc(void * arg) {
-	pthread_mutex_lock(&hookControlMutex);
 	pthread_mutex_lock(&hookRunningMutex);
 
 	int * status = (int *) arg;
 	*status = RETURN_FAILURE;
+	JNIEnv * env = NULL;
 
 	CGEventMask event_mask =	CGEventMaskBit(kCGEventKeyDown) |
 								CGEventMaskBit(kCGEventKeyUp) |
@@ -371,39 +376,67 @@ static void * ThreadProc(void * arg) {
 				fprintf(stdout, "ThreadProc(): CFRunLoopGetCurrent() success.\n");
 				#endif
 
-				//Set the exit status.
-				*status = RETURN_SUCCESS;
+				if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+					#ifdef DEBUG
+					fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
+					#endif
 
-				CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
-				pthread_mutex_unlock(&hookControlMutex);
+					//Set the exit status.
+					*status = RETURN_SUCCESS;
 
-				CFRunLoopRun();
+					CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
+					pthread_mutex_unlock(&hookControlMutex);
 
-				//Lock back up until we are done processing the exit.
-				pthread_mutex_lock(&hookControlMutex);
-				CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
+					CFRunLoopRun();
+
+					//Lock back up until we are done processing the exit.
+					pthread_mutex_lock(&hookControlMutex);
+					CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
+				}
+				else {
+					#ifdef DEBUG
+					fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
+					#endif
+
+					thread_ex.class = NATIVE_HOOK_EXCEPTION;
+					thread_ex.message = "Failed to attach the native thread to the virtual machine";
+				}
 			}
-			#ifdef DEBUG
 			else {
-				fprintf(stderr, "ThreadProc(): CFMachPortCreateRunLoopSource() failure.\n");
+				#ifdef DEBUG
+				fprintf(stderr, "ThreadProc(): CFRunLoopGetCurrent() failure.\n");
+				#endif
+
+				thread_ex.class = NATIVE_HOOK_EXCEPTION;
+				thread_ex.message = "Failed to attach to the run loop";
 			}
-			#endif
 		}
-		#ifdef DEBUG
 		else {
+			#ifdef DEBUG
 			fprintf(stderr, "ThreadProc(): CFMachPortCreateRunLoopSource() failure.\n");
+			#endif
+
+			thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			thread_ex.message = "Failed to create run loop";
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
+		#ifdef DEBUG
 		fprintf(stderr, "ThreadProc(): Failed to create event port!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to create event port";
 	}
-	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
+
+	//Detach this thread from the JVM
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		(*jvm)->DetachCurrentThread(jvm);
+	}
 
 	//Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
@@ -423,57 +456,77 @@ int StartNativeThread() {
 		//Create all the global references up front to save time in the callbacks.
 		if (CreateJNIGlobals() == RETURN_SUCCESS) {
 			//Check and make sure assistive devices is enabled.
-			//FIXME This needs to set an error msg for Exception in Java_org_jnativehook_GlobalScreen_registerNativeHook
 			if (AXAPIEnabled() == true) {
 				#ifdef DEBUG
 				printf ("Native: Accessibility API is enabled.\n");
 				#endif
+
+				//We shall use the default pthread attributes: thread is joinable
+				//(not detached) and has default (non real-time) scheduling policy.
+				pthread_mutex_lock(&hookControlMutex);
+				if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
+					#ifdef DEBUG
+					fprintf(stdout, "StartNativeThread(): start successful.\n");
+					#endif
+
+					//Wait for the thread to start up.
+					if (pthread_mutex_lock(&hookControlMutex) == 0) {
+						pthread_mutex_unlock(&hookControlMutex);
+					}
+
+					//Handle any possible JNI issue that may have occured.
+					if (IsNativeThreadRunning()) {
+						#ifdef DEBUG
+						fprintf(stdout, "StartNativeThread(): initialization successful.\n");
+						#endif
+
+						status = RETURN_SUCCESS;
+					}
+					else {
+						#ifdef DEBUG
+						fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+						#endif
+
+						//Wait for the thread to die.
+						void * thread_status;
+						pthread_join(hookThreadId, (void *) &thread_status);
+						status = *(int *) thread_status;
+						free(thread_status);
+
+						#ifdef DEBUG
+						fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
+						#endif
+
+						if (thread_ex.class != NULL && thread_ex.message != NULL)  {
+							ThrowException(thread_ex.class, thread_ex.message);
+						}
+					}
+				}
+				else {
+					#ifdef DEBUG
+					fprintf(stderr, "StartNativeThread(): start failure!\n");
+					#endif
+
+					ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+				}
 			}
 			else {
 				#ifdef DEBUG
 				printf("Native: Accessibility API is not enabled.\n");
 				#endif
-
-				//FIXME this needs to throw an exception!  Move out the
-				//throwException("org/jnativehook/NativeHookException", "Please enabled access for assistive devices in the Universal Access section of the System Preferences.");
-				//return JNI_ERR; //Naturaly exit so jni exception is thrown.
+				
+				ThrowException(NATIVE_HOOK_EXCEPTION, "Please enabled access for assistive devices in the Universal Access section of the System Preferences");
 			}
 
-			//We shall use the default pthread attributes: thread is joinable
-			//(not detached) and has default (non real-time) scheduling policy.
-			if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
-				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): start successful.\n");
-				#endif
-
-				//Wait for the thread to start up.
-				if (pthread_mutex_lock(&hookControlMutex) == 0) {
-					pthread_mutex_unlock(&hookControlMutex);
-				}
-
-				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
-				#endif
-
-				status = RETURN_SUCCESS;
-			}
-			else {
-				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): start failure!\n");
-				#endif
-				//FIXME
-				//return JNI_ERR; //Naturally exit so jni exception is thrown.
-			}
+			
 		}
+		#ifdef DEBUG
 		else {
-			//We cant do a whole lot of anything if we cant attach to the current thread.
-			#ifdef DEBUG
+			//We cant do a whole lot of anything if we cant create JNI globals.
+			//Any exceptions are thrown by CreateJNIGlobals().
 			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
-			#endif
-
-
-			//FIXME An exception should be raised.
 		}
+		#endif
 	}
 
 	return status;
@@ -495,10 +548,10 @@ int StopNativeThread() {
 		void * thread_status;
 		pthread_join(hookThreadId, (void *) &thread_status);
 		status = *(int *) thread_status;
+		free(thread_status);
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
 		#endif
-		free(thread_status);
 
 		//Destroy all created globals.
 		#ifdef DEBUG

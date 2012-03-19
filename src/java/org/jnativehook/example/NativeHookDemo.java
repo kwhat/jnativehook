@@ -282,6 +282,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
+
 		try {
 			txtEventInfo.setText("Auto Repate Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
 			txtEventInfo.append("\n" + "Auto Repate Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
@@ -296,7 +297,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 			GlobalScreen.getInstance().registerNativeHook();
 		}
 		catch (Exception ex) {
-			txtEventInfo.setText("Error: " + ex.toString() + "\n");
+			txtEventInfo.append("\n" + "Error: " + ex.toString());
 		}
 		
 		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());

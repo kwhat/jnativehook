@@ -31,6 +31,7 @@
 
 //Global Ref to the JVM
 extern JavaVM * jvm;
+extern jint jni_version;
 
 //GlobalScreen object and dispatch id.
 extern jobject objGlobalScreen;

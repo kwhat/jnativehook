@@ -20,6 +20,7 @@
 
 //Global Ref to the JVM
 JavaVM * jvm;
+jint jni_version = JNI_VERSION_1_4;
 
 //GlobalScreen object and dispatch id.
 jobject objGlobalScreen;
@@ -29,12 +30,12 @@ jmethodID idDispatchEvent;
 jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
+
 int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
-
+	
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		//Class and getInstance method id for the GlobalScreen Object
 		jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 		if (clsGlobalScreen != NULL) {
@@ -185,19 +186,19 @@ int CreateJNIGlobals() {
 
 
 		//Check and make sure everything is correct.
-		if (idDispatchEvent != NULL && idKeyEvent != NULL && idMouseButtonEvent != NULL && idMouseMotionEvent != NULL && idMouseWheelEvent != NULL) {
+		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
 			status = RETURN_SUCCESS;
 		}
 	}
 	else {
 		//We cant do a whole lot of anything if we cant attach to the current thread.
 		#ifdef DEBUG
-		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
+		fprintf(stderr, "StartNativeThread(): GetEnv() failed!\n");
 		#endif
 
 		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
-
+	
 	return status;
 }
 
@@ -205,7 +206,7 @@ int DestroyJNIGlobals() {
 	int status = RETURN_FAILURE;
 
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*env)->DeleteGlobalRef(env, clsKeyEvent);
 		clsKeyEvent = NULL;
 
@@ -232,7 +233,7 @@ int DestroyJNIGlobals() {
 		//Leaving dangling global references will leak a small amout of memory
 		//but because there is nothing that can be done about it at this point
 		//an exception will not be thrown.
-		fprintf(stderr, "StartNativeThread(): AttachCurrentThread() failed!\n");
+		fprintf(stderr, "DestroyJNIGlobals(): GetEnv() failed!\n");
 	}
 	#endif
 

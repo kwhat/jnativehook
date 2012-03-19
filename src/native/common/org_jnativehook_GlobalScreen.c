@@ -183,14 +183,12 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 //This is where java attaches to the native machine.  Its kind of like the java + native constructor.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	//Grab the currently running virtual machine so we can attach to it in
-	//functions that are not called from java. ( I.E. ThreadLoop )
+	//functions that are not called from java. ( I.E. ThreadProc )
 	jvm = vm;
-	JNIEnv * env = 0;
-
-	jint jni_version = JNI_VERSION_1_4;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+	JNIEnv * env = NULL;
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		#ifdef DEBUG
-		fprintf(stdout, "JNI_OnLoad(): AttachCurrentThread() successful.\n");
+		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
 		#endif
 
 		//Run platform specific load items.
@@ -201,7 +199,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	}
 	else {
 		#ifdef DEBUG
-		fprintf(stderr, "JNI_OnLoad(): AttachCurrentThread() failed!\n");
+		fprintf(stderr, "JNI_OnLoad(): GetEnv() failed!\n");
 		#endif
 		
 		ThrowFatalError("Failed to aquire JNI interface pointer");
@@ -218,18 +216,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 
 	//Run platform specific unload items.
 	OnLibraryUnload();
-
-	//Detach the current thread to the JVM.
-	#ifdef DEBUG
-	if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
-		fprintf(stdout, "JNI_OnUnload(): DetachCurrentThread() successful.\n");
-	}
-	else {
-		fprintf(stderr, "JNI_OnUnload(): DetachCurrentThread() failed!\n");
-	}
-	#else
-	(*jvm)->DetachCurrentThread(jvm);
-	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI Unloaded.\n");

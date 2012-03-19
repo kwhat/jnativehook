@@ -91,6 +91,7 @@ long GetMultiClickTime() {
 	return value;
 }
 
+//using namespace std;
 void OnLibraryLoad() {
 	//Do Nothing.
 }

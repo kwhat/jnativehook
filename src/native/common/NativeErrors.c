@@ -24,7 +24,7 @@ void ThrowFatalError(const char * message) {
 	#endif
 
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*env)->FatalError(env, message);
 	}
 
@@ -33,14 +33,14 @@ void ThrowFatalError(const char * message) {
 
 void ThrowException(const char * classname, const char * message) {
 	JNIEnv * env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		//Locate our exception class
 		jclass clsException = (*env)->FindClass(env, classname);
 
 		if (clsException != NULL) {
 			(*env)->ThrowNew(env, clsException, message);
 			#ifdef DEBUG
-			(*env)->ExceptionDescribe(env);
+			fprintf(stderr, "ThrowException(): %s: %s\n", classname, message);
 			#endif
 			(*env)->DeleteLocalRef(env, clsException);
 		}
@@ -50,7 +50,7 @@ void ThrowException(const char * classname, const char * message) {
 			if (clsException != NULL) {
 				(*env)->ThrowNew(env, clsException, classname);
 				#ifdef DEBUG
-				(*env)->ExceptionDescribe(env);
+				fprintf(stderr, "ThrowException(): %s: %s\n", NO_CLASS_DEF_FOUND_ERROR, classname);
 				#endif
 				(*env)->DeleteLocalRef(env, clsException);
 			}

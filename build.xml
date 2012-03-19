@@ -543,7 +543,7 @@
 			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.cc.args2" value="-o" />
