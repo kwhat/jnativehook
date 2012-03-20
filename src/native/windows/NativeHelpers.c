@@ -83,7 +83,7 @@ long GetPointerSensitivity() {
 
 long GetMultiClickTime() {
 	long value = -1;
-	UINT WINAPI clicktime;
+	UINT clicktime;
 
 	clicktime = GetDoubleClickTime();
 	value = (long) clicktime;

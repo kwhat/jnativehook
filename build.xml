@@ -135,26 +135,24 @@
 				<os family="winnt" name="Windows Vista" />
 				<os family="winnt" name="Windows 2007" />
 				<os family="winnt" name="Windows 7" />
+				<os family="winnt" name="Windows 8" />
 			</or>
 		</condition>
 		
 		<!-- Figure out the os family -->
 		<condition property="native.os.isApple" value="true">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-			</and>
+			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.os.isUnix" value="true">
-			<and>
-				<os family="unix" />
-				<not>
-					<istrue value="${native.os.isApple}" />
-				</not>
-			</and>
+			<or>
+				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="openbsd" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true" />
+			</or>
 		</condition>
 		<condition property="native.os.isWindows" value="true">
-			<os family="winnt" />
+			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
 		</condition>
 
 		<!-- set system specific lib directory -->
@@ -244,8 +242,7 @@
 				<os arch="i686" />
 			</or>
 		</condition>
-		<condition property="native.arch" value="x86-64">
-			<!-- FIXME This should be set to k8 instead of x86-64 for better gcc compatiblity -->
+		<condition property="native.arch" value="k8">
 			<or>
 				<os arch="x86-64" />
 				<os arch="x86_64" />
@@ -272,7 +269,7 @@
 			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.name" value="x86_64">
-			<equals arg1="${native.arch}" arg2="x86-64" casesensitive="false" trim="true" />
+			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.name" value="ppc">
 			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true" />
@@ -293,6 +290,7 @@
 			<and>
 				<os family="mac" />
 				<os family="unix" />
+				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
 			</and>
 		</condition>
 		<condition property="native.arch.tune" value="generic">

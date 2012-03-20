@@ -46,7 +46,7 @@ static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
 static long GetScrollWheelType() {
 	long value;
-	UINT WINAPI wheeltype;
+	UINT wheeltype;
 
 	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
 	if (wheeltype == WHEEL_PAGESCROLL) {
@@ -61,7 +61,7 @@ static long GetScrollWheelType() {
 
 static long GetScrollWheelAmount() {
 	long value;
-	UINT WINAPI wheelamount;
+	UINT wheelamount;
 
 	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheelamount, 0);
 	if (wheelamount == WHEEL_PAGESCROLL) {

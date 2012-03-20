@@ -57,7 +57,7 @@ public class GlobalScreen {
 	
 	/**
 	 * Private constructor to prevent multiple instances of the global screen.
-	 * The {@link #registerHook} method will be called on construction to unpack 
+	 * The {@link #registerNativeHook} method will be called on construction to unpack
 	 * and load the native library.
 	 */
 	private GlobalScreen() {
@@ -217,7 +217,9 @@ public class GlobalScreen {
 	
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
-	 * the function has no effect.
+	 * the function has no effect. <b>Note that this method may block the AWT
+	 * event dispatching thread.</b> It is recomended to call this method from
+	 * outside the scope of the graphical user interface event queue.
 	 *
 	 * @throws NativeHookException the native hook exception
 	 * 
@@ -227,7 +229,9 @@ public class GlobalScreen {
 	
 	/**
 	 * Disable the native hook if it is currently running. If it is not running
-	 * the function has no effect.
+	 * the function has no effect. <b>Note that this method may block the AWT
+	 * event dispatching thread.</b> It is recomended to call this method from
+	 * outside the scope of the graphical user interface event queue.
 	 *
 	 * @throws NativeHookException the native hook exception
 	 * 
