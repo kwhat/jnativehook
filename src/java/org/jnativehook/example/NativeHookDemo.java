@@ -132,23 +132,23 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void itemStateChanged(ItemEvent e) {
 		ItemSelectable item = e.getItemSelectable();
 		
-        if (item == chkKeyboard) {
-        	//Keyboard checkbox was changed, adjust listeners accordingly
-        	if (e.getStateChange() == ItemEvent.SELECTED) {
-        		GlobalScreen.getInstance().addNativeKeyListener(this);
-        	}
-        	else {
-        		GlobalScreen.getInstance().removeNativeKeyListener(this);
-        	}
+		if (item == chkKeyboard) {
+			//Keyboard checkbox was changed, adjust listeners accordingly
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				GlobalScreen.getInstance().addNativeKeyListener(this);
+			}
+			else {
+				GlobalScreen.getInstance().removeNativeKeyListener(this);
+			}
 		}
 		else if (item == chkButton) {
 			//Button checkbox was changed, adjust listeners accordingly
-        	if (e.getStateChange() == ItemEvent.SELECTED) {
-        		GlobalScreen.getInstance().addNativeMouseListener(this);
-        	}
-        	else {
-        		GlobalScreen.getInstance().removeNativeMouseListener(this);
-        	}
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				GlobalScreen.getInstance().addNativeMouseListener(this);
+			}
+			else {
+				GlobalScreen.getInstance().removeNativeMouseListener(this);
+			}
 		}
 		else if (item == chkMotion) {
 			//Motion checkbox was changed, adjust listeners accordingly
