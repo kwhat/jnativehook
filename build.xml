@@ -234,13 +234,32 @@
 		
 		<!-- Figure out of the system arch to pass to the compiler -->
 		<condition property="native.arch" value="i586">
-			<or>
-				<os arch="x86" />
-				<os arch="i386" />
-				<os arch="i486" />
-				<os arch="i586" />
-				<os arch="i686" />
-			</or>
+			<and>
+				<or>
+					<os arch="x86" />
+					<os arch="i386" />
+					<os arch="i486" />
+					<os arch="i586" />
+					<os arch="i686" />
+				</or>
+				
+				<not>
+					<istrue value="${native.os.isApple}" />
+				</not>
+			</and>
+		</condition>
+		<condition property="native.arch" value="i386">
+			<and>
+				<or>
+					<os arch="x86" />
+					<os arch="i386" />
+					<os arch="i486" />
+					<os arch="i586" />
+					<os arch="i686" />
+				</or>
+				
+				<istrue value="${native.os.isApple}" />
+			</and>
 		</condition>
 		<condition property="native.arch" value="k8">
 			<or>
@@ -250,13 +269,13 @@
 				<os arch="k8" />
 			</or>
 		</condition>
-		<condition property="native.arch" value="powerpc">
+		<condition property="native.arch" value="ppc">
 			<or>
 				<os arch="ppc" />
 				<os arch="PowerPC" />
 			</or>
 		</condition>
-		<condition property="native.arch" value="powerpc64">
+		<condition property="native.arch" value="ppc64">
 			<or>
 				<os arch="ppc64" />
 				<os arch="PowerPC64" />
@@ -271,34 +290,24 @@
 		<condition property="native.arch.name" value="x86_64">
 			<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true" />
 		</condition>
-		<condition property="native.arch.name" value="ppc">
-			<equals arg1="${native.arch}" arg2="powerpc" casesensitive="false" trim="true" />
-		</condition>
-		<condition property="native.arch.name" value="ppc64">
-			<equals arg1="${native.arch}" arg2="powerpc64" casesensitive="false" trim="true" />
+		<condition property="native.arch.name" value="${native.arch}">
+			<or>
+				<equals arg1="${native.arch}" arg2="ppc" casesensitive="false" trim="true" />
+				<equals arg1="${native.arch}" arg2="ppc64" casesensitive="false" trim="true" />
+			</or>
 		</condition>
 
 		<!-- Set the arch tune value -->
-		<condition property="native.arch.tune" value="i386">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
-			</and>
+		<condition property="native.arch.tune" value="i586">
+			<equals arg1="${native.arch}" arg2="i386" casesensitive="false" trim="true" />
 		</condition>
-		<condition property="native.arch.tune" value="${native.arch.name}">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-				<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
-			</and>
+		<condition property="native.arch.tune" value="powerpc">
+			<equals arg1="${native.arch}" arg2="ppc" casesensitive="false" trim="true" />
 		</condition>
-		<condition property="native.arch.tune" value="generic">
-			<not>
-				<isset property="native.arch.tune" />
-			</not>
+		<condition property="native.arch.tune" value="powerpc64">
+			<equals arg1="${native.arch}" arg2="ppc64" casesensitive="false" trim="true" />
 		</condition>
-
+		<property name="native.arch.tune" value="generic" />
 		<fail message="The ${os.arch} architecture is not currently supported.">
 			<condition>
 				<not>
@@ -501,7 +510,7 @@
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="-arch ${native.arch.tune} -mtune=${native.arch} -mmacosx-version-min=10.4 ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} -mmacosx-version-min=10.4 ${native.cc.flags.optimize}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -554,7 +563,7 @@
 		</condition>
 
 		<!-- set system specific ldflags -->
-		<condition property="native.ld.flags" value="-arch ${native.arch.tune}">
+		<condition property="native.ld.flags" value="-arch ${native.arch}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,${native.ld.flags.optimize}">
