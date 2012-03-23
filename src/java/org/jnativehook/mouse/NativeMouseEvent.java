@@ -108,37 +108,44 @@ public class NativeMouseEvent extends NativeInputEvent {
 	public static final int NATIVE_MOUSE_FIRST		= 2500;
 	
 	/** The last number in the range of id's used for native mouse events. */
-	public static final int NATIVE_MOUSE_LAST		= 2504;
-	
+	public static final int NATIVE_MOUSE_LAST		= 2505;
+
+	/**
+	 * The native mouse pressed event. This <code>NativeMouseEvent</code>
+	 * occurs when a mouse button is pressed and released.
+	 */
+	public static final int NATIVE_MOUSE_CLICKED	= NATIVE_MOUSE_FIRST;
+
 	/**
 	 * The native mouse pressed event. This <code>NativeMouseEvent</code>
 	 * occurs when a mouse button is depressed.
 	 */
-	public static final int NATIVE_MOUSE_PRESSED	= NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_PRESSED	= 1 + NATIVE_MOUSE_FIRST;
 	
 	/**
 	 * The native mouse released event. This <code>NativeMouseEvent</code>
 	 * occurs when a mouse button is released.
 	 */
-	public static final int NATIVE_MOUSE_RELEASED	= 1 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_RELEASED	= 2 + NATIVE_MOUSE_FIRST;
 	
 	/**
 	 * The native mouse moved event. This <code>NativeMouseEvent</code>
 	 * occurs when the mouse pointer changes position.
 	 */
-	public static final int NATIVE_MOUSE_MOVED		= 2 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_MOVED		= 3 + NATIVE_MOUSE_FIRST;
 	
 	/**
 	 * The native mouse dragged event. This <code>NativeMouseEvent</code>
-	 * is not currently implemented.
+	 * occurs when the mouse pointer changes position while a mouse button
+	 * is pressed.
 	 */
-	public static final int NATIVE_MOUSE_DRAGGED	= 3 + NATIVE_MOUSE_FIRST;
+	public static final int NATIVE_MOUSE_DRAGGED	= 4 + NATIVE_MOUSE_FIRST;
 	
 	/**
 	 * The native mouse dragged event. This <code>NativeMouseEvent</code>
-	 * is not currently implemented.
+	 * occurs when the mouse wheel is rotated.
 	 */
-	public static final int NATIVE_MOUSE_WHEEL		= 4 + NATIVE_MOUSE_FIRST; 
+	public static final int NATIVE_MOUSE_WHEEL		= 5 + NATIVE_MOUSE_FIRST;
 
 	
 	/** Indicates no mouse buttons; used by getButton(). */

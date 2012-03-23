@@ -15,31 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JConvertFromNative_h
-#define _Included_JConvertFromNative_h
+//Reference: org/jnativehook/NativeInputEvent.java
+#ifndef _Included_org_jnativehook_NativeInputEvent
+#define _Included_org_jnativehook_NativeInputEvent
 
-#include <jni.h>
+#define org_jnativehook_NativeInputEvent_SHIFT_MASK				1
+#define org_jnativehook_NativeInputEvent_CTRL_MASK				2
+#define org_jnativehook_NativeInputEvent_META_MASK				4
+#define org_jnativehook_NativeInputEvent_ALT_MASK				8
 
-#include "JInputModifiers.h"
-#include "JKeyCodes.h"
-#include "JKeyLocations.h"
-#include "JMouseButtons.h"
-#include "JNativeEventTypes.h"
-
-typedef struct {
-	jint keycode;		//Key Code
-	jint rawcode;		//Raw Code
-	jint location;		//Key Location
-} JKeyDatum;
-
-typedef struct {
-	//jint modifiers;	//Mod Mask
-	jint button;		//Btn Code
-} JButtonDatum;
-
-
-extern JKeyDatum NativeToJKey(unsigned int keysym);
-extern jint NativeToJButton(unsigned int button);
-extern jint NativeToJModifier(unsigned int modifier);
+#define org_jnativehook_NativeInputEvent_BUTTON1_MASK			16;
+#define org_jnativehook_NativeInputEvent_BUTTON2_MASK			32;
+#define org_jnativehook_NativeInputEvent_BUTTON3_MASK			64;
+#define org_jnativehook_NativeInputEvent_BUTTON4_MASK			128;
+#define org_jnativehook_NativeInputEvent_BUTTON5_MASK			256;
 
 #endif

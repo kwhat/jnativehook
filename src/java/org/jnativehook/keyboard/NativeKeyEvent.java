@@ -55,13 +55,16 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int NATIVE_KEY_FIRST		= 2400;
 	
 	/** The last number in the range of ID's used for native key events. */
-	public static final int NATIVE_KEY_LAST			= 2401;
-	
+	public static final int NATIVE_KEY_LAST			= 2402;
+
+	/** The "native key typed" event ID. */
+	public static final int NATIVE_KEY_TYPED		= NATIVE_KEY_FIRST;
+
 	/** The "native key pressed" event ID. */
-	public static final int NATIVE_KEY_PRESSED		= NATIVE_KEY_FIRST;
+	public static final int NATIVE_KEY_PRESSED		= 1 + NATIVE_KEY_FIRST;
 	
 	/** The "native key released" event ID. */
-	public static final int NATIVE_KEY_RELEASED		= 1 + NATIVE_KEY_FIRST;
+	public static final int NATIVE_KEY_RELEASED		= 2 + NATIVE_KEY_FIRST;
 
 	public static final int KEY_LOCATION_UNKNOWN 	= 0;
 	public static final int KEY_LOCATION_STANDARD	= 1;

@@ -15,31 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JConvertFromNative_h
-#define _Included_JConvertFromNative_h
+//Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
+#ifndef _Included_org_jnativehook_mouse_NativeMouseWheelEvent
+#define _Included_org_jnativehook_mouse_NativeMouseWheelEvent
 
-#include <jni.h>
-
-#include "JInputModifiers.h"
-#include "JKeyCodes.h"
-#include "JKeyLocations.h"
-#include "JMouseButtons.h"
-#include "JNativeEventTypes.h"
-
-typedef struct {
-	jint keycode;		//Key Code
-	jint rawcode;		//Raw Code
-	jint location;		//Key Location
-} JKeyDatum;
-
-typedef struct {
-	//jint modifiers;	//Mod Mask
-	jint button;		//Btn Code
-} JButtonDatum;
-
-
-extern JKeyDatum NativeToJKey(unsigned int keysym);
-extern jint NativeToJButton(unsigned int button);
-extern jint NativeToJModifier(unsigned int modifier);
+#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL	0
+#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL	1
 
 #endif
