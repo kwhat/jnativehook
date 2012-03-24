@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_XEventModifiers_h
-#define _Included_XEventModifiers_h
+#ifndef _Included_XEventModifiers
+#define _Included_XEventModifiers
 
 //XEvent Modifiers that are not defined by xorg.
 #define KeyButMaskAny			0

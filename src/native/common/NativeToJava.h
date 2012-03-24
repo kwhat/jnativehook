@@ -15,15 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JMouseButtons_h
-#define _Included_JMouseButtons_h
+#ifndef _Included_JConvertFromNative
+#define _Included_JConvertFromNative
 
-//Reference: org/jnativehook/mouse/NativeMouseEvent.java
-#define JNOBUTTON			0	//AnyButton
-#define JBUTTON1			1
-#define JBUTTON2			2
-#define JBUTTON3			3
-#define JBUTTON4			4	//Extra Mouse Button
-#define JBUTTON5			5	//Extra Mouse Button
+#include <jni.h>
+
+#include "org_jnativehook_NativeInputEvent.h"
+#include "org_jnativehook_keyboard_NativeKeyEvent.h"
+#include "org_jnativehook_mouse_NativeMouseEvent.h"
+#include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
+
+typedef struct {
+	jint keycode;		//Key Code
+	jint rawcode;		//Raw Code
+	jint location;		//Key Location
+} JKeyDatum;
+
+typedef struct {
+	//jint modifiers;	//Mod Mask
+	jint button;		//Btn Code
+} JButtonDatum;
+
+
+extern JKeyDatum NativeToJKey(unsigned int keysym);
+extern jint NativeToJButton(unsigned int button);
+extern jint NativeToJModifier(unsigned int modifier);
 
 #endif

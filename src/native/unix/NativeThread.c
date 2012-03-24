@@ -26,8 +26,7 @@
 #include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
-#include "JConvertFromNative.h"
-#include "JMouseWheel.h"
+#include "NativeToJava.h"
 #include "XButtonCodes.h"
 #include "XEventModifiers.h"
 
@@ -116,7 +115,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					modifiers = DoModifierConvert(event_mask);
 
 					//Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+
+					//Fire key typed event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				break;
 
@@ -130,7 +133,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					modifiers = DoModifierConvert(event_mask);
 
 					//Fire key released event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				break;
 
@@ -148,7 +151,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						jbutton = NativeToJButton(event_code);
 
 						//Fire mouse released event.
-						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
 					else if (event_code == 4 || event_code == 5) {
@@ -165,7 +168,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						 * is available on my platform.  For the time being we will just use the
 						 * unit scroll value.
 						 */
-						scrollType = (jint) WHEEL_UNIT_SCROLL;
+						scrollType = (jint) org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
 
 						/* Some scroll wheel properties are avaiable via the new XInput2 (XI2)
 						 * extention.  Unfortunately the extention is not available on my
@@ -184,7 +187,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						}
 
 						//Fire mouse wheel event.
-						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, scrollType, scrollAmount, wheelRotation);
+						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, scrollType, scrollAmount, wheelRotation);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					}
 				break;
@@ -201,7 +204,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						modifiers = DoModifierConvert(event_mask);
 
 						//Fire mouse released event.
-						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+
+						//Fire mouse clicked event.
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
 					/*
@@ -221,11 +228,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					//Check the upper half of java modifiers for non zero value.
 					if (modifiers >> 4 > 0) {
 						//Create Mouse Dragged event.
-						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 					}
 					else {
 						//Create a Mouse Moved event
-						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
+						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y);
 					}
 					
 					//Fire mouse moved event.

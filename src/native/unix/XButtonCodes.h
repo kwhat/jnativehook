@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_XButtonCodes_h
-#define _Included_XButtonCodes_h
+#ifndef _Included_XButtonCodes
+#define _Included_XButtonCodes
 
 //XButton Virtual Codes that are not defined by xorg.
 #define XK_NoButton			0

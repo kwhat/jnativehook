@@ -29,11 +29,11 @@
 #define org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL		5 + org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST
 
 
-#define JNOBUTTON			0	//AnyButton
-#define JBUTTON1			1
-#define JBUTTON2			2
-#define JBUTTON3			3
-#define JBUTTON4			4	//Extra Mouse Button
-#define JBUTTON5			5	//Extra Mouse Button
+#define org_jnativehook_mouse_NativeMouseEvent_NOBUTTON					0	//AnyButton
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON1					1
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON2					2
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON3					3
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON4					4	//Extra Mouse Button
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON5					5	//Extra Mouse Button
 
 #endif
