@@ -37,6 +37,14 @@ import org.jnativehook.GlobalScreen;
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
+	/**
+	 * Invoked when a mouse button has been clicked (pressed and released)
+	 * without being moved.
+	 *
+	 * @param e The native mouse event.
+	 */
+	public void mouseClicked(NativeMouseEvent e);
+
 	/** 
 	 * Invoked when a mouse button has been pressed
 	 * 
@@ -50,14 +58,4 @@ public interface NativeMouseListener extends EventListener {
 	 * @param e The native mouse event.
 	 */
 	public void mouseReleased(NativeMouseEvent e);
-	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
-	 * 
-	 * @param e the native mouse event
-	 * @since 1.1
-	 */
-	//public void mouseWheel(NativeMouseEvent e);
-	
-
 }

@@ -335,6 +335,19 @@ public class GlobalScreen {
 		
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
+				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeMouseListener) this.getListener()).mouseClicked((NativeMouseEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeMouseListener) listeners[i]).mouseClicked(e);
+					}
+				break;
+
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
 					if (SwingUtilities.isEventDispatchThread()) {
 						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {

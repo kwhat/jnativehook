@@ -21,7 +21,7 @@
 #include <windows.h>
 
 #include "NativeErrors.h"
-#include "JConvertFromNative.h"
+#include "NativeToJava.h"
 #include "WinKeyCodes.h"
 
 //FIXME We should store the modifiers as Java modifiers not Native Modifiers to speed up the getModifiers function.

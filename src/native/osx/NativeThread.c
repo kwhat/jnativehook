@@ -23,17 +23,17 @@
 #include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
-#include "JMouseWheel.h"
-#include "JConvertFromNative.h"
+#include "NativeToJava.h"
 #include "OSXButtonCodes.h"
 #include "OSXKeyCodes.h"
 
-//Structure get transport exceptions out of the native thread.
-typedef struct {
-	char * class;
-	char * message;
-} Exception;
+//Exception global for thread initialization.
 static Exception thread_ex;
+
+//Click count globals
+static unsigned short click_count = 0;
+static CGEventTimestamp click_time = 0;
+static bool mouse_dragged = false;
 
 //Thread and hook handles.
 static CFRunLoopRef event_loop;
@@ -75,7 +75,8 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		//Event Data
 		CGPoint event_point;
-		CGEventTimestamp event_time = CGEventGetTimestamp(event);
+		//Make sure to convert from nanoseconds to milliseconds
+		CGEventTimestamp event_time = CGEventGetTimestamp(event) / 1000000;
 		UInt64	keysym, button;
 		CGEventFlags event_mask = CGEventGetFlags(event);
 
@@ -100,7 +101,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire key pressed event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 			break;
 
@@ -114,7 +115,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire key released event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 			break;
 
@@ -154,12 +155,12 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				for (i = 0; i < size; i++) {
 					if (keydown_event_mask & event_modifiers[i]) {
 						//Fire key pressed event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
 					else if (keyup_event_mask & event_modifiers[i]) {
 						//Fire key released event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
 				}
@@ -193,12 +194,25 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Button Pressed (%i)\n", (unsigned int) button);
 				#endif
 
+				//Track the number of clicks.
+				#ifdef DEBUG
+				fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (event_time - click_time));
+				#endif
+
+				if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+					click_count++;
+				}
+				else {
+					click_count = 1;
+				}
+				click_time = event_time;
+
 				event_point = CGEventGetLocation(event);
 				jbutton = NativeToJButton(button);
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire mouse pressed event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -235,8 +249,14 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire mouse released event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, jbutton);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+
+				if (mouse_dragged != true) {
+					//Fire mouse clicked event.
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, jbutton);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+				}
 			break;
 
 
@@ -249,10 +269,17 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 				#endif
 
+				//Reset the clickcount
+				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+					click_count = 0;
+				}
 				modifiers = doModifierConvert(event_mask);
 
-				//Fire mouse moved event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
+				//Set the mouse draged flag
+				mouse_dragged = true;
+
+				//Fire mouse dragged event.
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -262,10 +289,17 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 				#endif
 
+				//Reset the clickcount
+				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+					click_count = 0;
+				}
 				modifiers = doModifierConvert(event_mask);
 
+				//Set the mouse draged flag
+				mouse_dragged = false;
+
 				//Fire mouse moved event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -274,10 +308,10 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				
 				//TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
 				if (CGEventGetIntegerValueField(event, kCGScrollWheelEventIsContinuous) == 0) {
-					scrollType = (jint)  WHEEL_UNIT_SCROLL;
+					scrollType = (jint)  org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
 				}
 				else {
-					scrollType = (jint)  WHEEL_BLOCK_SCROLL;
+					scrollType = (jint)  org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL;
 				}
 				
 				//Scrolling data uses a fixed-point 16.16 signed integer format (Ex: 1.0 = 0x00010000)
@@ -291,10 +325,19 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (%i, %i, %i)\n", (int) scrollType, (int) scrollAmount, (int) wheelRotation);
 				#endif
 
+				//Track the number of clicks.
+				if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+					click_count++;
+				}
+				else {
+					click_count = 1;
+				}
+				click_time = event_time;
+
 				modifiers = doModifierConvert(event_mask);
 
 				//Fire mouse wheel event.
-				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, scrollType, scrollAmount, wheelRotation);
+				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 			break;
 

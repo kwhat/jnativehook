@@ -19,6 +19,12 @@
 
 #include <stdbool.h>
 
+//Structure get transport exceptions out of the native thread.
+typedef struct {
+	char * class;
+	char * message;
+} Exception;
+
 extern int StopNativeThread();
 extern int StartNativeThread();
 extern bool IsNativeThreadRunning();

@@ -123,8 +123,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      *
      * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int)
 	 */
-	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int scrollType, int scrollAmount, int wheelRotation) {
-		super(id, when, modifiers, x, y);
+	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation) {
+		super(id, when, modifiers, x, y, clickCount);
 
 		this.scrollType = scrollType;
 		this.scrollAmount = scrollAmount;

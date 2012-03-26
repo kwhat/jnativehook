@@ -67,6 +67,7 @@ import org.jnativehook.NativeInputEvent;
  * modifiers and buttons.
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version	1.1
  * @since	1.0
  * 
  * @see GlobalScreen
@@ -75,7 +76,7 @@ import org.jnativehook.NativeInputEvent;
  */
 public class NativeMouseEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -1241061060064904571L;
+	private static final long serialVersionUID = 4284036646158864372L;
 	
 	/**
 	 * The native mouse event's x pointer position.
@@ -90,6 +91,13 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @see #getY()
 	 */
 	private int y;
+
+	/**
+	 * The native mouse event's click count.
+	 *
+	 * @see #getClickCount()
+	 */
+	private int clickCount;
 	
 	/**
 	 * Indicates which, if any, of the mouse buttons has changed state.
@@ -166,6 +174,26 @@ public class NativeMouseEvent extends NativeInputEvent {
 	/** Indicates mouse button #5; used by getButton(). */
 	public static final int	BUTTON5		= 5;
 	
+
+	/**
+	 * Instantiates a new <code>NativeMouseEvent</code> object.
+	 *
+	 * @param id an integer that identifies the event
+	 * @param when a long integer that gives the time the event occurred
+	 * @param modifiers a modifier mask describing the modifier keys and mouse
+	 * buttons active for the event.
+	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
+	 * not compatible with the extended _DOWN_MASK or the old _MASK
+	 * <code>InputEvent</code> modifiers.
+	 * @param x The x coordinate of the native pointer.
+	 * @param y The y coordinate of the native pointer.
+	 *
+	 * @since 1.1
+	 *
+	 */
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount) {
+		this(id, when, modifiers, x, y, clickCount, NOBUTTON);
+	}
 	
 	/**
 	 * Instantiates a new <code>NativeMouseEvent</code> object.
@@ -182,29 +210,13 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @param button The mouse buttons that has changed state. NOBUTTON, 
 	 * BUTTON1, BUTTON2, BUTTON3, BUTTON5 or BUTTON5.
 	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int button) {
+	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount, int button) {
 		super(GlobalScreen.getInstance(), id, when, modifiers);
 		
 		this.x = x;
 		this.y = y;
+		this.clickCount = clickCount;
 		this.button = button;
-	}
-
-	/**
-	 * Instantiates a new <code>NativeMouseEvent</code> object.
-	 *
-	 * @param id an integer that identifies the event
-	 * @param when a long integer that gives the time the event occurred
-	 * @param modifiers a modifier mask describing the modifier keys and mouse 
-	 * buttons active for the event. 
-	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are 
-	 * not compatible with the extended _DOWN_MASK or the old _MASK 
-	 * <code>InputEvent</code> modifiers.
-	 * @param x The x coordinate of the native pointer.
-	 * @param y The y coordinate of the native pointer.
-	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y) {
-		this(id, when, modifiers, x, y, NOBUTTON);
 	}
 
 	/**
@@ -220,6 +232,15 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 */
 	public int getButton() {
 		return button;
+	}
+
+	/**
+	 * Returns the number of button clicks associated with this event.
+	 *
+	 * @returnan integer indicating the number of button clicks
+	 */
+	public int getClickCount() {
+		return clickCount;
 	}
 
 	/**
@@ -246,10 +267,15 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 *
 	 * @return A string identifying the native event and its attributes.
 	 */
+	@Override
 	public String  paramString() {
 		StringBuilder param = new StringBuilder(255); 
 		
 		switch(getID()) {
+			case NATIVE_MOUSE_CLICKED:
+				 param.append("NATIVE_MOUSE_CLICKED");
+			break;
+
 			case NATIVE_MOUSE_PRESSED:
 				 param.append("NATIVE_MOUSE_PRESSED");
 			break;
@@ -274,25 +300,25 @@ public class NativeMouseEvent extends NativeInputEvent {
 				param.append("unknown type");
 			break;
 		}
-		param.append(',');
 		
-		param.append('(');
+		param.append(",(");
 		param.append(x);
 		param.append(',');
 		param.append(y);
-		param.append(')');
-		param.append(',');
+		param.append("),");
 		
 		
 		param.append("button=");
 		param.append(button);
 		
 		if (getModifiers() != 0) {
-			param.append(',');
-			param.append("modifiers=");
+			param.append(",modifiers=");
 			param.append(getModifiersText(getModifiers()));
 		}
 		
+		param.append(",clickCount=");
+		param.append(getClickCount());
+
 		return param.toString();
 	}
 }

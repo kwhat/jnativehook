@@ -24,16 +24,16 @@
 #include "NativeGlobals.h"
 #include "NativeHelpers.h"
 #include "NativeThread.h"
-#include "JMouseWheel.h"
-#include "JConvertFromNative.h"
+#include "NativeToJava.h"
 #include "WinKeyCodes.h"
 
-//Structure get transport exceptions out of the native thread.
-typedef struct {
-	char * class;
-	char * message;
-} Exception;
+//Exception global for thread initialization.
 static Exception thread_ex;
+
+//Click count globals
+static unsigned short click_count = 0;
+static DWORD click_time = 0;
+static bool mouse_dragged = false;
 
 //The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH
 extern HINSTANCE hInst;
@@ -50,10 +50,10 @@ static long GetScrollWheelType() {
 
 	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
 	if (wheeltype == WHEEL_PAGESCROLL) {
-		value = WHEEL_BLOCK_SCROLL;
+		value = org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL;
 	}
 	else {
-		value = WHEEL_UNIT_SCROLL;
+		value = org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
 	}
 
 	return value;
@@ -108,7 +108,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				modifiers = getModifiers();
 
 				//Fire key pressed event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 			break;
 
@@ -132,7 +132,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				modifiers = getModifiers();
 
 				//Fire key released event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, JK_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 			break;
 		}
@@ -208,10 +208,20 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): Button pressed. (%i)\n", (int) jbutton);
 				#endif
 
+				//Track the number of clicks.
+				if ((long) (mshook->time - click_time) <= GetMultiClickTime()) {
+					click_count++;
+				}
+				else {
+					click_count = 1;
+				}
+				click_time = mshook->time;
+
+				//Convert native modifiers to java modifiers.
 				modifiers = getModifiers();
 
 				//Fire mouse pressed event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 			break;
 
@@ -252,8 +262,14 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				modifiers = getModifiers();
 
 				//Fire mouse released event.
-				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, JK_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, jbutton);
+				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+
+				if (mouse_dragged != true) {
+					//Fire mouse clicked event.
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, jbutton);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+				}
 			break;
 
 			case WM_MOUSEMOVE:
@@ -261,16 +277,23 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 				#endif
 
+				//Reset the clickcount
+				if (click_count != 0 && (long) (mshook->time - click_time) > GetMultiClickTime()) {
+					click_count = 0;
+				}
 				modifiers = getModifiers();
+
+				//Set the mouse draged flag
+				mouse_dragged = modifiers >> 4 > 0;
 
 				//Check the upper half of java modifiers for non zero value.
 				if (modifiers >> 4 > 0) {
 					//Create Mouse Dragged event.
-					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_DRAGGED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count);
 				}
 				else {
 					//Create a Mouse Moved event
-					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, JK_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y);
+					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count);
 				}
 
 				//Fire mouse moved event.
@@ -281,6 +304,15 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				#ifdef DEBUG
 				fprintf(stdout, "LowLevelMouseProc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
 				#endif
+
+				//Track the number of clicks.
+				if ((long) (mshook->time - click_time) <= GetMultiClickTime()) {
+					click_count++;
+				}
+				else {
+					click_count = 1;
+				}
+				click_time = mshook->time;
 
 				modifiers = getModifiers();
 
@@ -294,7 +326,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				wheelRotation = (jint) ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
 				
 				//Fire mouse wheel event.
-				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, JK_NATIVE_MOUSE_WHEEL, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, scrollType, scrollAmount, wheelRotation);
+				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 			break;
 

@@ -41,8 +41,8 @@
 #define NO_CLASS_DEF_FOUND_ERROR	"java/lang/NoClassDefFoundError"
 
 #define NATIVE_HOOK_EXCEPTION		"org/jnativehook/NativeHookException"
-#define NATIVE_KEY_EXCEPTION		"org/jnativehook/keyboard/NativeKeyException"
-#define NATIVE_MOUSE_EXCEPTION		"org/jnativehook/mouse/NativeMouseException"
+//#define NATIVE_KEY_EXCEPTION		"org/jnativehook/keyboard/NativeKeyException"
+//#define NATIVE_MOUSE_EXCEPTION	"org/jnativehook/mouse/NativeMouseException"
 
 //Common function stubs.
 extern void ThrowFatalError(const char * message);

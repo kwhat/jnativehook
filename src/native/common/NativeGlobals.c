@@ -119,7 +119,7 @@ int CreateJNIGlobals() {
 		if (clsLocalMouseEvent != NULL) {
 			clsMouseEvent = (*env)->NewGlobalRef(env, clsLocalMouseEvent);
 			if (clsMouseEvent != NULL) {
-				idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+				idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIIII)V");
 				if (idMouseButtonEvent == NULL) {
 					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int, int)!\n");
@@ -128,7 +128,7 @@ int CreateJNIGlobals() {
 					ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.mouse.NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)");
 				}
 
-				idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIII)V");
+				idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
 				if (idMouseMotionEvent == NULL) {
 					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int)!\n");
@@ -159,7 +159,7 @@ int CreateJNIGlobals() {
 		if (clsLocalMouseWheelEvent != NULL) {
 			clsMouseWheelEvent = (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
 			if (clsMouseWheelEvent != NULL) {
-				idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIII)V");
+				idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIIII)V");
 				if (idMouseWheelEvent == NULL) {
 					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseWheelEvent.NativeMouseWheelEvent(int, long, int, int, int, int, int, int)!\n");
