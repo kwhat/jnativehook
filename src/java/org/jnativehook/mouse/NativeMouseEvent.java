@@ -17,6 +17,7 @@
 package org.jnativehook.mouse;
 
 //Imports
+import java.awt.Point;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
  
@@ -189,7 +190,6 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @param y The y coordinate of the native pointer.
 	 *
 	 * @since 1.1
-	 *
 	 */
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount) {
 		this(id, when, modifiers, x, y, clickCount, NOBUTTON);
@@ -244,7 +244,18 @@ public class NativeMouseEvent extends NativeInputEvent {
 	}
 
 	/**
-	 * Returns the x coordinate of the native pointer.
+	 * Returns the x,y position of the native event.
+	 *
+	 * @return a Point object containing the x and y coordinates of the native pointer
+	 * 
+	 * @since	1.1
+	 */
+	public Point getPoint() {
+		return new Point(x, y);
+	}
+
+	/**
+	 * Returns the x coordinate of the native event.
 	 *
 	 * @return x an integer indicating horizontal position of the native pointer
 	 */
@@ -253,7 +264,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	}
 	
 	/**
-	 * Returns the y coordinate of the native pointer.
+	 * Returns the y coordinate of the native event.
 	 *
 	 * @return y an integer indicating horizontal position of the native pointer
 	 */

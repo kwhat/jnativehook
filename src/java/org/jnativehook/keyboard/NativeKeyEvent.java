@@ -366,9 +366,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VK_NUMPAD7:
 			case VK_NUMPAD8:
 			case VK_NUMPAD9:		param += Toolkit.getProperty("AWT.numpad", "NumPad") + " ";
-									keyCode -= 0x30; //Dirty subtraction to bring us back in range.
-									//FIXME should probably cleanup the above code because the 
-									//difference may not always be 0x30.
+									keyCode -= VK_NUMPAD0 - VK_0; //subtraction to bring us back in range.
+									//NOTE This should work as long as the VK_0 to VK_9 and VK_NUMPAD0
+									//to VK_NUMPAD9 are ordered consecutively.
 			
 			case VK_0:
 			case VK_1:
@@ -475,6 +475,119 @@ public class NativeKeyEvent extends NativeInputEvent {
 		return Toolkit.getProperty("AWT.unknown", "Unknown") + " keyCode: 0x" + Integer.toString(keyCode, 16);
 	}
 	
+	
+    /**
+     * Returns whether the key in this event is an "action" key.  Typically an
+	 * action key does not fire a unicode character and is not a modifier key.
+     *
+     * @return <code>true</code> if the key is an "action" key, 
+	 * <code>false</code> otherwise
+	 *
+	 * @since 1.1
+     */
+    public boolean isActionKey() {
+        switch (keyCode) {
+			case VK_SHIFT:
+			case VK_CONTROL:
+			case VK_ALT:
+			case VK_META:
+			case VK_WINDOWS:
+			case VK_CONTEXT_MENU:
+
+			case VK_UP:
+			case VK_DOWN:
+			case VK_LEFT:
+			case VK_RIGHT:
+
+			case VK_F1:
+			case VK_F2:
+			case VK_F3:
+			case VK_F4:
+			case VK_F5:
+			case VK_F6:
+			case VK_F7:
+			case VK_F8:
+			case VK_F9:
+			case VK_F10:
+			case VK_F11:
+			case VK_F12:
+			
+			case VK_F13:
+			case VK_F14:
+			case VK_F15:
+			case VK_F16:
+			case VK_F17:
+			case VK_F18:
+			case VK_F19:
+			case VK_F20:
+			case VK_F21:
+			case VK_F22:
+			case VK_F23:
+			case VK_F24:
+
+			case VK_PRINTSCREEN:
+			case VK_INSERT:
+			case VK_HELP:
+
+			case VK_PAGE_UP:
+			case VK_PAGE_DOWN:
+			case VK_HOME:
+			case VK_END:
+
+			case VK_KP_LEFT:
+			case VK_KP_UP:
+			case VK_KP_RIGHT:
+			case VK_KP_DOWN:
+
+
+			case VK_SCROLL_LOCK:
+			case VK_CAPS_LOCK:
+			case VK_NUM_LOCK:
+			case VK_PAUSE:
+
+			case VK_BEGIN:
+
+			/* FIXME implement constants.
+			 * Sun Keyboard keys
+			case VK_AGAIN:
+			case VK_UNDO:
+			case VK_COPY:
+			case VK_PASTE:
+			case VK_CUT:
+			case VK_FIND:
+			case VK_PROPS:
+			case VK_STOP:
+
+			case VK_FINAL:
+			case VK_CONVERT:
+			case VK_NONCONVERT:
+			case VK_ACCEPT:
+			case VK_MODECHANGE:
+			case VK_KANA:
+			case VK_KANJI:
+			case VK_ALPHANUMERIC:
+			case VK_KATAKANA:
+			case VK_HIRAGANA:
+			case VK_FULL_WIDTH:
+			case VK_HALF_WIDTH:
+			case VK_ROMAN_CHARACTERS:
+			case VK_ALL_CANDIDATES:
+			case VK_PREVIOUS_CANDIDATE:
+			case VK_CODE_INPUT:
+			case VK_JAPANESE_KATAKANA:
+			case VK_JAPANESE_HIRAGANA:
+			case VK_JAPANESE_ROMAN:
+			case VK_KANA_LOCK:
+			case VK_INPUT_METHOD_ON_OFF:
+			*/
+          
+
+				return true;
+        }
+		
+        return false;
+    }
+
 	
 	/**
 	 * Returns a parameter string identifying this event. This method is useful 
