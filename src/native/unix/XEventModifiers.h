@@ -27,7 +27,7 @@
 #define KeyButMaskMod2			16		// Number Lock Mask
 #define KeyButMaskMod3			32		// ??? Kana Lock Mask ???
 #define KeyButMaskMod4			64		// Meta Mask
-#define KeyButMaskMod5			128
+#define KeyButMaskMod5			128		// Mode Switch Mask
 #define KeyButMaskButton1		256
 #define KeyButMaskButton2		512
 #define KeyButMaskButton3		1024

@@ -95,6 +95,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			Time event_time = hook->server_time;
 			KeySym keysym;
 
+			#ifdef DEBUG
+			fprintf(stdout, "TESTING(): 0x%X\n", event_mask);
+			#endif
+
 			//Java Event Data
 			JKeyDatum jkey;
 			jint jbutton;

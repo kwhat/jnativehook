@@ -54,7 +54,7 @@ static jint doModifierConvert(CGEventFlags event_mask) {
 	jint modifiers = 0;
 
 	//Apply all our modifiers to the java modifiers return.
-	int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
+	unsigned int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
 	for (i = 0; i < size; i++) {
 		if (event_mask & event_modifiers[i]) {
 			modifiers |= NativeToJModifier(event_modifiers[i]);
@@ -151,7 +151,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				//Update the previous event mask.
 				prev_event_mask = event_mask;
 
-				int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
+				unsigned i, size = sizeof(event_modifiers) / sizeof(unsigned int);
 				for (i = 0; i < size; i++) {
 					if (keydown_event_mask & event_modifiers[i]) {
 						//Fire key pressed event.
@@ -462,6 +462,9 @@ static void * ThreadProc(void * arg) {
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
 			thread_ex.message = "Failed to create run loop";
 		}
+
+		//Stop the CFMachPort from receiving any more messages.
+		CFMachPortInvalidate(event_port);
 	}
 	else {
 		#ifdef DEBUG
@@ -472,14 +475,18 @@ static void * ThreadProc(void * arg) {
 		thread_ex.message = "Failed to create event port";
 	}
 
-	#ifdef DEBUG
-	fprintf(stdout, "ThreadProc(): complete.\n");
-	#endif
-
 	//Detach this thread from the JVM
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
+		#endif
 	}
+
+	#ifdef DEBUG
+	fprintf(stdout, "ThreadProc(): complete.\n");
+	#endif
 
 	//Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
