@@ -202,7 +202,6 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				 * which all illegal groups correspond. If the specified group is
 				 * also out of range, all illegal groups map to Group1.
 				 */
-				printf("XkbRedirectIntoRange\n");
 				group = XkbOutOfRangeGroupInfo(info);
 				if (group >= num_groups) {
 					group = 0;
@@ -217,7 +216,6 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				 * example, a key with two groups of symbols uses Group2 type and
 				 * symbols if the global effective group is either Group3 or Group4.
 				 */
-				printf("XkbClampIntoRange\n");
 				group = num_groups - 1;
 			break;
 
@@ -227,9 +225,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				 * groups wrap uses Group1 symbols if the global effective group is
 				 * Group3 or Group2 symbols if the global effective group is Group4.
 				 */
-				printf("XkbWrapIntoRange\n");
 			default:
-				printf("Default\n");
 				if (num_groups != 0) {
 					group %= num_groups;
 				}
@@ -239,7 +235,6 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 		XkbKeyTypePtr key_type = XkbKeyKeyType(keyboard_map, keycode, group);
 		unsigned int active_mods = event_mask & key_type->mods.mask;
 
-		KeySym keysym = NoSymbol;
 		int i, level = 0;
 		for (i = 0; i < key_type->map_count; i++) {
 			if (key_type->map[i].active && key_type->map[i].mods.mask == active_mods) {
