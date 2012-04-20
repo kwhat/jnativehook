@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -O0 -g2 -ggdb -pipe -Wall
+CFLAGS := -O0 -ggdb -pipe -Wall
 LDFLAGS := -Wl,-execute
 
 PROGRAMS = EventMonitor EventTap RegisterEventHotKey
