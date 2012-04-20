@@ -43,23 +43,16 @@ static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId = 0;
 
 static CGEventFlags prev_event_mask = 0;
-static unsigned int event_modifiers[] = {
-	kCGEventFlagMaskShift,
-	kCGEventFlagMaskControl,
-	kCGEventFlagMaskAlternate,
-	kCGEventFlagMaskCommand
-};
+static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagMaskControl + kCGEventFlagMaskAlternate + kCGEventFlagMaskCommand;
 
 static jint doModifierConvert(CGEventFlags event_mask) {
 	jint modifiers = 0;
 
 	//Apply all our modifiers to the java modifiers return.
-	unsigned int i, size = sizeof(event_modifiers) / sizeof(unsigned int);
-	for (i = 0; i < size; i++) {
-		if (event_mask & event_modifiers[i]) {
-			modifiers |= NativeToJModifier(event_modifiers[i]);
-		}
-	}
+	if (event_mask & kCGEventFlagMaskShift)				modifiers |= NativeToJModifier(kCGEventFlagMaskShift);
+	if (event_mask & kCGEventFlagMaskControl)			modifiers |= NativeToJModifier(kCGEventFlagMaskControl);
+	if (event_mask & kCGEventFlagMaskAlternate)			modifiers |= NativeToJModifier(kCGEventFlagMaskAlternate);
+	if (event_mask & kCGEventFlagMaskCommand)			modifiers |= NativeToJModifier(kCGEventFlagMaskCommand);
 
 	if (isModifierMask(kCGEventFlagMaskButtonLeft))		modifiers |= NativeToJModifier(kCGEventFlagMaskButtonLeft);
 	if (isModifierMask(kCGEventFlagMaskButtonRight))	modifiers |= NativeToJModifier(kCGEventFlagMaskButtonRight);
@@ -128,8 +121,9 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				jkey = NativeToJKey(keysym);
 				modifiers = doModifierConvert(event_mask);
 
-				//Because of the way apple handles modifiers we need to send a key up or key down event for each time this changes.
-				/*	Outline of what is happening on the next 3 lines.
+				/*	Because of the way apple handles modifiers we need to track 
+					the key changes and handle our own keyup and down events.
+					Outline of what is happening on the next 3 lines.
 					1010 1100	prev
 					1100 1010	curr
 					0110 0110	prev xor curr
@@ -144,25 +138,40 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					0110 0110	(prev xor curr)
 					0010 0100	(prev xor curr) and prev
 				 */
+				//FIXME this needs some work.
 				CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
-				CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+				//CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
 				CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
 
 				//Update the previous event mask.
 				prev_event_mask = event_mask;
 
-				unsigned i, size = sizeof(event_modifiers) / sizeof(unsigned int);
-				for (i = 0; i < size; i++) {
-					if (keydown_event_mask & event_modifiers[i]) {
-						//Fire key pressed event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-					}
-					else if (keyup_event_mask & event_modifiers[i]) {
-						//Fire key released event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-					}
+				/*
+				printf("Control:\t0x%X\n", kCGEventFlagMaskControl);
+				printf("Down Mask:\t0x%X\n", (int) keydown_event_mask);
+				printf("Up Mask:\t0x%X\n", (int) keyup_event_mask);
+				printf("Diff Mask:\t0x%X\n\n", (int) diff_event_mask);
+				 *
+					Control:	0x40000
+
+					Down Mask:	0x40101
+					Up Mask:	0x40001
+					Diff Mask:	0x40001
+					
+					Down Mask:	0x40101
+					Up Mask:	0x0
+					Diff Mask:	0x40001
+
+				*/
+				if (diff_event_mask & key_event_mask && keyup_event_mask & key_event_mask) {
+					//Fire key pressed event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				}
+				else if (diff_event_mask & key_event_mask && keyup_event_mask ^ key_event_mask) {
+					//Fire key released event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				}
 			break;
 
