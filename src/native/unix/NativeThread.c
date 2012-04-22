@@ -27,8 +27,8 @@
 #include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "NativeToJava.h"
-#include "XButtonCodes.h"
-#include "XEventModifiers.h"
+#include "XKeyboardHelper.h"
+#include "XWheelCodes.h"
 
 //For this struct, refer to libxnee
 typedef union {
@@ -65,16 +65,16 @@ static pthread_t hookThreadId = 0;
 static jint DoModifierConvert(int event_mask) {
 	jint modifiers = 0;
 
-	if (event_mask & KeyButMaskShift)		modifiers |= NativeToJModifier(KeyButMaskShift);
-	if (event_mask & KeyButMaskControl)		modifiers |= NativeToJModifier(KeyButMaskControl);
-	if (event_mask & KeyButMaskMod4)		modifiers |= NativeToJModifier(KeyButMaskMod4);
-	if (event_mask & KeyButMaskMod1)		modifiers |= NativeToJModifier(KeyButMaskMod1);
+	if (event_mask & ShiftMask)		modifiers |= NativeToJModifier(ShiftMask);
+	if (event_mask & ControlMask)	modifiers |= NativeToJModifier(ControlMask);
+	if (event_mask & Mod4Mask)		modifiers |= NativeToJModifier(Mod4Mask);
+	if (event_mask & Mod1Mask)		modifiers |= NativeToJModifier(Mod1Mask);
 
-	if (event_mask & KeyButMaskButton1)		modifiers |= NativeToJModifier(KeyButMaskButton1);
-	if (event_mask & KeyButMaskButton2)		modifiers |= NativeToJModifier(KeyButMaskButton2);
-	if (event_mask & KeyButMaskButton3)		modifiers |= NativeToJModifier(KeyButMaskButton3);
-	if (event_mask & KeyButMaskButton4)		modifiers |= NativeToJModifier(KeyButMaskButton4);
-	if (event_mask & KeyButMaskButton5)		modifiers |= NativeToJModifier(KeyButMaskButton5);
+	if (event_mask & Button1Mask)	modifiers |= NativeToJModifier(Button1Mask);
+	if (event_mask & Button2Mask)	modifiers |= NativeToJModifier(Button2Mask);
+	if (event_mask & Button3Mask)	modifiers |= NativeToJModifier(Button3Mask);
+	if (event_mask & Button4Mask)	modifiers |= NativeToJModifier(Button4Mask);
+	if (event_mask & Button5Mask)	modifiers |= NativeToJModifier(Button5Mask);
 
 	return modifiers;
 }
@@ -95,10 +95,6 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			Time event_time = hook->server_time;
 			KeySym keysym;
 
-			#ifdef DEBUG
-			fprintf(stdout, "TESTING(): 0x%X\n", event_mask);
-			#endif
-
 			//Java Event Data
 			JKeyDatum jkey;
 			jint jbutton;
@@ -114,7 +110,8 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Key pressed. (%i)\n", event_code);
 					#endif
 
-					keysym = XKeycodeToKeysym(disp_ctrl, event_code, 0);
+					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
+					keysym = KeyCodeToKeySym(event_code, LockMask);
 					jkey = NativeToJKey(keysym);
 					modifiers = DoModifierConvert(event_mask);
 
@@ -132,7 +129,8 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
 					#endif
 
-					keysym = XKeycodeToKeysym(disp_ctrl, event_code, 0);
+					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
+					keysym = KeyCodeToKeySym(event_code, LockMask);
 					jkey = NativeToJKey(keysym);
 					modifiers = DoModifierConvert(event_mask);
 

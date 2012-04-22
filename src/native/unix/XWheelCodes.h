@@ -15,19 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_XButtonCodes
-#define _Included_XButtonCodes
+#ifndef _Included_XWheelCodes
+#define _Included_XWheelCodes
 
-//XButton Virtual Codes that are not defined by xorg.
-#define XK_NoButton			0
-#define XK_Button1			1
-#define XK_Button2			2
-#define XK_Button3			3
-#define XK_Button4			8
-#define XK_Button5			9
-#define XK_WheelUp			4
-#define XK_WheelDown		5
-#define XK_WheelLeft		6
-#define XK_WheelRight		7
+//Virtual Codes that are not defined by X11.
+#define WheelUp			4
+#define WheelDown		5
+#define WheelLeft		6
+#define WheelRight		7
 
 #endif
