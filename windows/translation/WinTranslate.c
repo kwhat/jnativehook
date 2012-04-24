@@ -37,7 +37,13 @@ WORD KeyCodeToKeySym(UINT scancode, UINT keycode) {
 
 int main(int argc, const char * argv[]) {
 	WORD keysym = KeyCodeToKeySym(48, VK_B);
-
-	printf("KeySym: %s\n", XKeysymToString(keysym));
+	
+	printf("KeySym: %s\n", GetKeyNameText(scancode, keysym));
+	
+	UINT scancode = MapVirtualKey(VK_B, MAPVK_VK_TO_VSC);
+	char buffer[256];
+	if (GetKeyNameTextW(scancode, buffer, 256) > 0) {
+		printf("KeySym: %ls\n", buffer);
+	}
 	return EXIT_SUCCESS;
 }
