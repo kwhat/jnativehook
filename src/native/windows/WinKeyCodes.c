@@ -24,7 +24,6 @@
 #include "NativeToJava.h"
 #include "WinKeyCodes.h"
 
-//FIXME We should store the modifiers as Java modifiers not Native Modifiers to speed up the getModifiers function.
 static unsigned short current_modifiers = 0x0000;
 
 void setModifierMask(unsigned short mod) {

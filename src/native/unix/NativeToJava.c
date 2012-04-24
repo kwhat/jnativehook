@@ -263,74 +263,74 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_KP_0:
 		case XK_KP_Insert:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD0;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_1:
 		case XK_KP_End:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD1;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_2:
 		case XK_KP_Down:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD2;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_3:
 		case XK_KP_Page_Down:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD3;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_4:
 		case XK_KP_Left:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD4;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_5:
 		case XK_KP_Begin:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD5;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_6:
 		case XK_KP_Right:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD6;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_7:
 		case XK_KP_Home:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD7;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_8:
 		case XK_KP_Up:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD8;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_9:
 		case XK_KP_Page_Up:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD9;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Multiply:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_MULTIPLY;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Add:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ADD;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Separator:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SEPARATOR;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Subtract:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SUBTRACT;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Enter:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ENTER;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Decimal:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DECIMAL;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Divide:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DIVIDE;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_KP_Delete:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DELETE;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_Num_Lock:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUM_LOCK;
-			goto LOCATION_KP;
+			goto LOCATION_NP;
 		case XK_Clear:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CLEAR;
-			goto LOCATION_KP;
-		LOCATION_KP:
+			goto LOCATION_NP;
+		LOCATION_NP:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 			return jkey;
 
@@ -618,7 +618,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_Zenkaku_Hankaku:		//TODO Testing Needed
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_HIRAGANA;
 			return jkey;
-		//case XK_Romaji:								jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_ROMAN;				return jkey;	//TODO Testing Needed
+		//case XK_Romaji:				//TODO Testing Needed
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_ROMAN;
+		//	return jkey;
 		case XK_Kana_Lock:				//TODO Testing Needed
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_KANA_LOCK;
 			return jkey;

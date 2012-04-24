@@ -222,7 +222,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_BEGIN				= 0xFF58;
 	
 	/** This value is used to indicate that the keyCode is unknown. */
-	public static final char VK_UNDEFINED			= 0x00;
+	public static final int VK_UNDEFINED			= 0x00;
 	
 	/**
 	 * Instantiates a new native key event.
