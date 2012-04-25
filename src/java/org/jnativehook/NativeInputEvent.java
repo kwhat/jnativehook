@@ -49,7 +49,7 @@ public class NativeInputEvent extends EventObject {
 	private int modifiers;
 	
 	/** The Shift key modifier constant. */
-	public static final int SHIFT_MASK	= 1;
+	public static final int SHIFT_MASK		= 1;
 	
 	/** The Ctrl key modifier constant. */
 	public static final int CTRL_MASK		= 2;

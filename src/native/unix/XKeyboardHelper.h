@@ -15,6 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
-void KeyboardHelperInit();
-void KeyboardHelperCleanup();
+extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
+extern void KeyboardHelperInit();
+extern void KeyboardHelperCleanup();

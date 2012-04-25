@@ -64,9 +64,9 @@
 #define MOD_XBUTTON2	4096
 
 //Helper functions for tracking the modifers.
-extern void setModifierMask(unsigned short mod);
-extern void unsetModifierMask(unsigned short mod);
-extern bool isModifierMask(unsigned short mod);
+extern inline void setModifierMask(unsigned short int mod);
+extern inline void unsetModifierMask(unsigned short int mod);
+extern inline bool isModifierMask(unsigned short int mod);
 extern jint getModifiers();
 
 #endif

@@ -24,10 +24,10 @@
 #define org_jnativehook_NativeInputEvent_META_MASK				4
 #define org_jnativehook_NativeInputEvent_ALT_MASK				8
 
-#define org_jnativehook_NativeInputEvent_BUTTON1_MASK			16;
-#define org_jnativehook_NativeInputEvent_BUTTON2_MASK			32;
-#define org_jnativehook_NativeInputEvent_BUTTON3_MASK			64;
-#define org_jnativehook_NativeInputEvent_BUTTON4_MASK			128;
-#define org_jnativehook_NativeInputEvent_BUTTON5_MASK			256;
+#define org_jnativehook_NativeInputEvent_BUTTON1_MASK			16
+#define org_jnativehook_NativeInputEvent_BUTTON2_MASK			32
+#define org_jnativehook_NativeInputEvent_BUTTON3_MASK			64
+#define org_jnativehook_NativeInputEvent_BUTTON4_MASK			128
+#define org_jnativehook_NativeInputEvent_BUTTON5_MASK			256
 
 #endif

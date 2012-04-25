@@ -54,7 +54,7 @@ static XRecordContext context;
 
 //Thread and hook handles.
 #ifdef XRECORD_ASYNC
-static bool running;
+static volatile bool running;
 #endif
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
@@ -111,7 +111,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					#endif
 
 					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
-					keysym = KeyCodeToKeySym(event_code, LockMask);
+					keysym = KeyCodeToKeySym(event_code, event_mask);
 					jkey = NativeToJKey(keysym);
 					modifiers = DoModifierConvert(event_mask);
 
@@ -119,9 +119,15 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-					//Fire key typed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					//Check to make sure the key is printable
+					char * keytxt = XKeysymToString(keysym);
+					//TODO Check and See what gets returned by XKeysymToString when keysym is unicode.  Ex: XK_dead_grave
+					if (keytxt != NULL && keytxt[1] == NULL) {
+						//Fire key typed event.
+						//FIXME Change the Prototype for this object to include Char argument.
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					}
 				break;
 
 				case KeyRelease:

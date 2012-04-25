@@ -24,17 +24,17 @@
 #include "NativeToJava.h"
 #include "WinKeyCodes.h"
 
-static unsigned short current_modifiers = 0x0000;
+static register unsigned short int current_modifiers = 0x0000;
 
-void setModifierMask(unsigned short mod) {
+inline void setModifierMask(unsigned short int mod) {
 	current_modifiers |= mod;
 }
 
-void unsetModifierMask(unsigned short mod) {
+inline void unsetModifierMask(unsigned short int mod) {
 	current_modifiers ^= mod;
 }
 
-bool isModifierMask(unsigned short mod) {
+inline bool isModifierMask(unsigned short int mod) {
 	return current_modifiers & mod;
 }
 
@@ -54,11 +54,21 @@ jint getModifiers() {
 	if (isModifierMask(MOD_LWIN) || isModifierMask(MOD_RWIN))
 		modifiers |= NativeToJModifier(MOD_WIN);
 
-	if (isModifierMask(MOD_LBUTTON))	modifiers |= NativeToJModifier(MOD_LBUTTON);
-	if (isModifierMask(MOD_RBUTTON))	modifiers |= NativeToJModifier(MOD_RBUTTON);
-	if (isModifierMask(MOD_MBUTTON))	modifiers |= NativeToJModifier(MOD_MBUTTON);
-	if (isModifierMask(MOD_XBUTTON1))	modifiers |= NativeToJModifier(MOD_XBUTTON1);
-	if (isModifierMask(MOD_XBUTTON2))	modifiers |= NativeToJModifier(MOD_XBUTTON2);
+
+	if (isModifierMask(MOD_LBUTTON))
+		modifiers |= NativeToJModifier(MOD_LBUTTON);
+
+	if (isModifierMask(MOD_RBUTTON))
+		modifiers |= NativeToJModifier(MOD_RBUTTON);
+
+	if (isModifierMask(MOD_MBUTTON))
+		modifiers |= NativeToJModifier(MOD_MBUTTON);
+
+	if (isModifierMask(MOD_XBUTTON1))
+		modifiers |= NativeToJModifier(MOD_XBUTTON1);
+
+	if (isModifierMask(MOD_XBUTTON2))
+		modifiers |= NativeToJModifier(MOD_XBUTTON2);
 
 	return modifiers;
 }

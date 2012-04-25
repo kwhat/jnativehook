@@ -25,6 +25,7 @@
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
+	//FIXME Check and see if we should use the virtual key code or the scan code.
 	jkey.rawcode = MapVirtualKey(keysym, MAPVK_VK_TO_VSC);
 	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
 
@@ -283,7 +284,6 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case  VK_NUMPAD9:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD9;
 			goto LOCATION_NP;
-
 		case VK_MULTIPLY:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_MULTIPLY;
 			goto LOCATION_NP;
@@ -291,7 +291,6 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ADD;
 			goto LOCATION_NP;
 		//case VK_SEPARATOR:
-		//	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SEPARATOR;
 		//	goto LOCATION_NP;
 		case VK_SUBTRACT:
