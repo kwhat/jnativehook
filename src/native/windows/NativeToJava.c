@@ -20,6 +20,7 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
+#include "NativeErrors.h"
 #include "NativeToJava.h"
 #include "WinInputHelpers.h"
 
@@ -678,52 +679,38 @@ jint NativeToJButton (unsigned int button) {
 	}
 }
 
-jint NativeToJEventMask(unsigned int mask) {
+jint NativeToJEventMask(unsigned int UNUSED(mask)) {
 	jint java_mask = 0;
-	unsigned short int modifiers[9] = {
-		MOD_SHIFT,
-		MOD_CONTROL,
-		MOD_WIN,
-		MOD_ALT,
-		MOD_LBUTTON,
-		MOD_RBUTTON,
-		MOD_MBUTTON,
-		MOD_XBUTTON1,
-		MOD_XBUTTON2
-	};
 
-	for (unsigned short int i = 0; i < sizeof(modifiers) / sizeof(unsigned short int); i++) {
-		switch (mask & modifiers[i]) {
-			case MOD_SHIFT:
-				java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
-			break;
-			case MOD_CONTROL:
-				java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
-			break;
-			case MOD_WIN:
-				java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
-			break;
-			case MOD_ALT:
-				java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
-			break;
+	
+	if (GetModifierState(VK_SHIFT))
+		java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
 
-			case MOD_LBUTTON:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
-			break;
-			case MOD_RBUTTON:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
-			break;
-			case MOD_MBUTTON:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
-			break;
-			case MOD_XBUTTON1:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
-			break;
-			case MOD_XBUTTON2:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
-			break;
-		}
-	}
+	if (GetModifierState(VK_CONTROL))
+		java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
+	
+	if (GetModifierState(VK_LWIN) || GetModifierState(VK_RWIN))
+		java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
+		
+	if (GetModifierState(VK_MENU))
+		java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
 
+
+	if (GetModifierState(VK_LBUTTON))
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
+
+	if (GetModifierState(VK_RBUTTON))
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
+
+	if (GetModifierState(VK_MBUTTON))
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
+
+	if (GetModifierState(VK_XBUTTON1))
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
+
+	if (GetModifierState(VK_XBUTTON2))
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
+
+	
 	return java_mask;
 }

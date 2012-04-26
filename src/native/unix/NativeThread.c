@@ -425,6 +425,10 @@ int StartNativeThread() {
 			//We shall use the default pthread attributes: thread is joinable
 			//(not detached) and has default (non real-time) scheduling policy.
 			pthread_mutex_lock(&hookControlMutex);
+
+			//Initialize Native Input Functions
+			LoadInputHelper();
+
 			if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 				#ifdef DEBUG
 				fprintf(stdout, "StartNativeThread(): start successful.\n");
@@ -515,6 +519,9 @@ int StopNativeThread() {
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
+
+		//Cleanup Native Input Functions
+		UnloadInputHelper();
 
 		//Destroy all created globals.
 		#ifdef DEBUG

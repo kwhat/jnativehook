@@ -19,7 +19,7 @@
 #define _Included_XInputHelpers
 
 extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
-extern void KeyboardHelperInit();
-extern void KeyboardHelperCleanup();
+extern void LoadInputHelper();
+extern void UnloadInputHelper();
 
 #endif

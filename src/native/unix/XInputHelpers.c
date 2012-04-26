@@ -206,7 +206,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 }
 
 
-void KeyboardHelperInit() {
+void LoadInputHelper() {
 	#ifdef XKB
 	//Get the map
 	keyboard_map = XkbGetMap(disp, XkbAllClientInfoMask, XkbUseCoreKbd);
@@ -261,7 +261,7 @@ void KeyboardHelperInit() {
 	#endif
 }
 
-void KeyboardHelperCleanup() {
+void UnloadInputHelper() {
 	if (keyboard_map) {
 		#ifdef XKB
 		XkbFreeClientMap(keyboard_map, XkbAllClientInfoMask, true);

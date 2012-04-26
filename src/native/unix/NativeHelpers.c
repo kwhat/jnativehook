@@ -18,7 +18,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
-#include "XKeyboardHelper.h"
 
 #ifdef XKB
 #include <X11/XKBlib.h>
@@ -214,9 +213,6 @@ void OnLibraryLoad() {
 	isAutoRepeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
 	#endif
 
-	//Initialize Native Keyboard Functions
-	KeyboardHelperInit();
-
 	#ifdef DEBUG
 	if (isAutoRepeat) {
 		fprintf(stdout, "OnLibraryLoad(): Successfully enabled detectable autorepeat.\n");
@@ -231,9 +227,6 @@ void OnLibraryUnload() {
 	#ifdef XT
 	XtDestroyApplicationContext(app_context);
 	#endif
-
-	//Cleanup Native Keyboard Functions
-	KeyboardHelperCleanup();
 
 	//Destroy the native displays.
 	if (disp != NULL) {
