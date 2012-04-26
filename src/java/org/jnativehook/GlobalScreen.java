@@ -296,6 +296,19 @@ public class GlobalScreen {
 						((NativeKeyListener) listeners[i]).keyPressed(e);
 					}
 				break;
+
+				case NativeKeyEvent.NATIVE_KEY_TYPED:
+					if (SwingUtilities.isEventDispatchThread()) {
+						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
+							public void run() {
+								((NativeKeyListener) this.getListener()).keyTyped((NativeKeyEvent) this.getEvent());
+							}
+						});
+					}
+					else {
+						((NativeKeyListener) listeners[i]).keyTyped(e);
+					}
+				break;
 				
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
 					if (SwingUtilities.isEventDispatchThread()) {

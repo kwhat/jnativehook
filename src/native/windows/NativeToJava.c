@@ -21,56 +21,56 @@
 #include <windows.h>
 
 #include "NativeToJava.h"
-#include "WinKeyCodes.h"
+#include "WinInputHelpers.h"
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
 	//FIXME Check and see if we should use the virtual key code or the scan code.
-	jkey.rawcode = MapVirtualKey(keysym, MAPVK_VK_TO_VSC);
+	jkey.rawcode = MapVirtualKey(keysym, 0);
 	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
 
 	switch (keysym) {
 		case VK_RETURN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ENTER;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ENTER;
 			return jkey;
 		case VK_BACK:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BACK_SPACE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_SPACE;
 			return jkey;
 		case VK_TAB:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_TAB;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_TAB;
 			return jkey;
 		case VK_CANCEL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CANCEL;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CANCEL;
 			return jkey;
 
 
 		case VK_LSHIFT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SHIFT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SHIFT;
 			goto LOCATION_L;
 		case VK_LCONTROL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CONTROL;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONTROL;
 			goto LOCATION_L;
 		case VK_LMENU:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ALT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALT;
 			goto LOCATION_L;
 		case VK_LWIN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_WINDOWS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
 			goto LOCATION_L;
 		LOCATION_L:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
 			return jkey;
 			
 		case VK_RSHIFT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SHIFT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SHIFT;
 			goto LOCATION_R;
 		case VK_RCONTROL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CONTROL;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONTROL;
 			goto LOCATION_R;
 		case VK_RMENU:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ALT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALT;
 			goto LOCATION_R;
 		case VK_RWIN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_WINDOWS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
 			goto LOCATION_R;
 		LOCATION_R:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
@@ -78,238 +78,238 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 
 		case VK_APPS:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CONTEXT_MENU;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONTEXT_MENU;
 			return jkey;
 
 		case VK_PAUSE:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PAUSE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAUSE;
 			return jkey;
 		case VK_CAPITAL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CAPS_LOCK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CAPS_LOCK;
 			return jkey;
 		case VK_ESCAPE:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ESCAPE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ESCAPE;
 			return jkey;
 		case VK_SPACE:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SPACE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SPACE;
 			return jkey;
 
 
 		case VK_UP:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_UP;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UP;
 			return jkey;
 		case VK_DOWN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DOWN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DOWN;
 			return jkey;
 		case VK_LEFT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_LEFT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LEFT;
 			return jkey;
 		case VK_RIGHT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_RIGHT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_RIGHT;
 			return jkey;
 
 
 		case VK_OEM_COMMA:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_COMMA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COMMA;
 			return jkey;
 		case VK_OEM_MINUS:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_MINUS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MINUS;
 			return jkey;
 		case VK_OEM_PERIOD:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PERIOD;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PERIOD;
 			return jkey;
 		case VK_OEM_2:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SLASH;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SLASH;
 			return jkey;
 
 
 		case 0x30:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_0;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_0;
 			return jkey;
 		case 0x31:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_1;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_1;
 			return jkey;
 		case 0x32:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_2;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_2;
 			return jkey;
 		case 0x33:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_3;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_3;
 			return jkey;
 		case 0x34:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_4;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_4;
 			return jkey;
 		case 0x35:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_5;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_5;
 			return jkey;
 		case 0x36:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_6;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_6;
 			return jkey;
 		case 0x37:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_7;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_7;
 			return jkey;
 		case 0x38:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_8;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_8;
 			return jkey;
 		case 0x39:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_9;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_9;
 			return jkey;
 
 
 		case VK_OEM_1:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SEMICOLON;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SEMICOLON;
 			return jkey;
 		case VK_OEM_PLUS:				//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_EQUALS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EQUALS;
 			return jkey;
 
 
 		case 0x41:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_A;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_A;
 			return jkey;
 		case 0x42:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_B;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_B;
 			return jkey;
 		case 0x43:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_C;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_C;
 			return jkey;
 		case 0x44:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_D;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_D;
 			return jkey;
 		case 0x45:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_E;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_E;
 			return jkey;
 		case 0x46:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F;
 			return jkey;
 		case 0x47:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_G;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_G;
 			return jkey;
 		case 0x48:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_H;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_H;
 			return jkey;
 		case 0x49:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_I;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_I;
 			return jkey;
 		case 0x4A:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_J;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_J;
 			return jkey;
 		case 0x4B:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_K;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_K;
 			return jkey;
 		case 0x4C:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_L;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_L;
 			return jkey;
 		case 0x4D:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_M;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_M;
 			return jkey;
 		case 0x4E:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_N;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_N;
 			return jkey;
 		case 0x4F:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_O;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_O;
 			return jkey;
 		case 0x50:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_P;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_P;
 			return jkey;
 		case 0x51:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_Q;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Q;
 			return jkey;
 		case 0x52:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_R;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_R;
 			return jkey;
 		case 0x53:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_S;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_S;
 			return jkey;
 		case 0x54:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_T;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_T;
 			return jkey;
 		case 0x55:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_U;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_U;
 			return jkey;
 		case 0x56:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_V;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_V;
 			return jkey;
 		case 0x57:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_W;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_W;
 			return jkey;
 		case 0x58:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_X;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_X;
 			return jkey;
 		case 0x59:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_Y;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Y;
 			return jkey;
 		case 0x5A:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_Z;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Z;
 			return jkey;
 
 
 		case VK_OEM_4:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_OPEN_BRACKET;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_OPEN_BRACKET;
 			return jkey;
 		case VK_OEM_5:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BACK_SLASH;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_SLASH;
 			return jkey;
 		case VK_OEM_6:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CLOSE_BRACKET;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CLOSE_BRACKET;
 			return jkey;
 
 
 		case  VK_NUMPAD0:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD0;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD0;
 			goto LOCATION_NP;
 		case  VK_NUMPAD1:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD1;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD1;
 			goto LOCATION_NP;
 		case  VK_NUMPAD2:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD2;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD2;
 			goto LOCATION_NP;
 		case  VK_NUMPAD3:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD3;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD3;
 			goto LOCATION_NP;
 		case  VK_NUMPAD4:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD4;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD4;
 			goto LOCATION_NP;
 		case  VK_NUMPAD5:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD5;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD5;
 			goto LOCATION_NP;
 		case  VK_NUMPAD6:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD6;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD6;
 			goto LOCATION_NP;
 		case  VK_NUMPAD7:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD7;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD7;
 			goto LOCATION_NP;
 		case  VK_NUMPAD8:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD8;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD8;
 			goto LOCATION_NP;
 		case  VK_NUMPAD9:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMPAD9;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD9;
 			goto LOCATION_NP;
 		case VK_MULTIPLY:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_MULTIPLY;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MULTIPLY;
 			goto LOCATION_NP;
 		case VK_ADD:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ADD;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ADD;
 			goto LOCATION_NP;
 		//case VK_SEPARATOR:
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SEPARATOR;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SEPARATOR;
 		//	goto LOCATION_NP;
 		case VK_SUBTRACT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SUBTRACT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SUBTRACT;
 			goto LOCATION_NP;
 		//case XK_KP_Enter:
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ENTER;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ENTER;
 		//	goto LOCATION_NP;
 		case VK_DECIMAL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DECIMAL;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DECIMAL;
 			goto LOCATION_NP;
 		case VK_DIVIDE:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DIVIDE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DIVIDE;
 			goto LOCATION_NP;
 		//case VK_DELETE:
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DELETE;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DELETE;
 		//	goto LOCATION_NP;
 		case VK_NUMLOCK:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUM_LOCK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK;
 			goto LOCATION_NP;
 		LOCATION_NP:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
@@ -317,345 +317,345 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 
 		case VK_SCROLL:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_SCROLL_LOCK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SCROLL_LOCK;
 			return jkey;
 
 		case VK_F1:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F1;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F1;
 			return jkey;
 		case VK_F2:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F2;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F2;
 			return jkey;
 		case VK_F3:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F3;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F3;
 			return jkey;
 		case VK_F4:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F4;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F4;
 			return jkey;
 		case VK_F5:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F5;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F5;
 			return jkey;
 		case VK_F6:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F6;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F6;
 			return jkey;
 		case VK_F7:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F7;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F7;
 			return jkey;
 		case VK_F8:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F8;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F8;
 			return jkey;
 		case VK_F9:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F9;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F9;
 			return jkey;
 		case VK_F10:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F10;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F10;
 			return jkey;
 		case VK_F11:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F11;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F11;
 			return jkey;
 		case VK_F12:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F12;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F12;
 			return jkey;
 
 		case VK_F13:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F13;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F13;
 			return jkey;
 		case VK_F14:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F14;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F14;
 			return jkey;
 		case VK_F15:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F15;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F15;
 			return jkey;
 		case VK_F16:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F16;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F16;
 			return jkey;
 		case VK_F17:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F17;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F17;
 			return jkey;
 		case VK_F18:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F18;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F18;
 			return jkey;
 		case VK_F19:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F19;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F19;
 			return jkey;
 		case VK_F20:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F20;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F20;
 			return jkey;
 		case VK_F21:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F21;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F21;
 			return jkey;
 		case VK_F22:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F22;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F22;
 			return jkey;
 		case VK_F23:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F23;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F23;
 			return jkey;
 		case VK_F24:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_F24;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F24;
 			return jkey;
 
 
 		case VK_SNAPSHOT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PRINTSCREEN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PRINTSCREEN;
 			return jkey;
 		case VK_INSERT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_INSERT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INSERT;
 			return jkey;
 		//case VK_HELP:
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_HELP;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HELP;
 		//	return jkey;
 		case VK_DELETE:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DELETE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DELETE;
 			return jkey;
 
 
 		case VK_PRIOR:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PAGE_UP;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAGE_UP;
 			return jkey;
 		case VK_NEXT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PAGE_DOWN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAGE_DOWN;
 			return jkey;
 		case VK_HOME:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_HOME;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HOME;
 			return jkey;
 		case VK_END:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_END;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_END;
 			return jkey;
 
 
 		case VK_OEM_7:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_QUOTE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_QUOTE;
 			return jkey;
 		case VK_OEM_3:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BACK_QUOTE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_QUOTE;
 			return jkey;
 
 		/* For European keyboards */
 		/*
 		case XK_dead_grave:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_GRAVE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_GRAVE;
 			return jkey;
 		case XK_dead_acute:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_ACUTE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ACUTE;
 			return jkey;
 		case XK_dead_circumflex:		//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_CIRCUMFLEX;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CIRCUMFLEX;
 			return jkey;
 		case XK_dead_tilde:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_TILDE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_TILDE;
 			return jkey;
 		case XK_dead_macron:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_MACRON;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_MACRON;
 			return jkey;
 		case XK_dead_breve:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_BREVE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_BREVE;
 			return jkey;
 		case XK_dead_abovedot:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_ABOVEDOT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ABOVEDOT;
 			return jkey;
 		case XK_dead_diaeresis			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_DIAERESIS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_DIAERESIS;
 			return jkey;
 		case XK_dead_abovering:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_ABOVERING;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ABOVERING;
 			return jkey;
 		case XK_dead_doubleacute:		//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_DOUBLEACUTE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_DOUBLEACUTE;
 			return jkey;
 		case XK_dead_caron:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_CARON;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CARON;
 			return jkey;
 		case XK_dead_cedilla:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_CEDILLA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CEDILLA;
 			return jkey;
 		case XK_dead_ogonek:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_OGONEK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_OGONEK;
 			return jkey;
 		case XK_dead_iota:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_IOTA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_IOTA;
 			return jkey;
 		case XK_dead_voiced_sound:		//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_VOICED_SOUND;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_VOICED_SOUND;
 			return jkey;
 		case XK_dead_semivoiced_sound:	//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DEAD_SEMIVOICED_SOUND;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_SEMIVOICED_SOUND;
 			return jkey;
 		*/
 
 		/* Unknown Keyboard Codes */
 		/*
 		case XK_ampersand:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_AMPERSAND;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AMPERSAND;
 			return jkey;
 		case XK_asterisk:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ASTERISK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ASTERISK;
 			return jkey;
 		case XK_quotedbl:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_QUOTEDBL;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_QUOTEDBL;
 			return jkey;
 		case XK_less:					//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_LESS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LESS;
 			return jkey;
 		case XK_greater:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_GREATER;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_GREATER;
 			return jkey;
 		case XK_braceleft:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BRACELEFT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BRACELEFT;
 			return jkey;
 		case XK_braceright:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BRACERIGHT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BRACERIGHT;
 			return jkey;
 		*/
 
 		/* Unknown Extended Keyboard Codes */
 		/*
 		case XK_at:						//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_AT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AT;
 			return jkey;
 		case VK_OEM_1:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_COLON;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COLON;
 			return jkey;
 		case XK_asciicircum:			//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CIRCUMFLEX;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CIRCUMFLEX;
 			return jkey;
 		case XK_dollar:					//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_DOLLAR;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DOLLAR;
 			return jkey;
 		case XK_EuroSign:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_EURO_SIGN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EURO_SIGN;
 			return jkey;
 		case XK_exclam:					//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_EXCLAMATION_MARK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EXCLAMATION_MARK;
 			return jkey;
 		case XK_exclamdown:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_INVERTED_EXCLAMATION_MARK;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INVERTED_EXCLAMATION_MARK;
 			return jkey;
 		case XK_parenleft:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_LEFT_PARENTHESIS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LEFT_PARENTHESIS;
 			return jkey;
 		case XK_numbersign:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NUMBER_SIGN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMBER_SIGN;
 			return jkey;	
 		case VK_OEM_PLUS:				//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PLUS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PLUS;
 			return jkey;
 		case XK_parenright:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_RIGHT_PARENTHESIS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_RIGHT_PARENTHESIS;
 			return jkey;
 		case XK_underscore:				//Unknown Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_UNDERSCORE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDERSCORE;
 			return jkey;
 		*/
 
 		/* For input method support on Asian Keyboards */
 		//case XK_Cancel:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_FINAL;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL;
 		//	return jkey;
 		//case XK_Henkan:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CONVERT;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT;
 		//	return jkey;
 		//case XK_Muhenkan:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_NONCONVERT;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT;
 		//	return jkey;
 		//case XK_VoidSymbol:			//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ACCEPT;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT;
 		//	return jkey;
 		//case XK_Mode_switch:			//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_MODECHANGE;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE;
 		//	return jkey;
 		case VK_KANA:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_KANA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA;
 			return jkey;
 		case VK_KANJI:					//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_KANJI;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI;
 			return jkey;
 		case VK_DBE_ALPHANUMERIC:		//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ALPHANUMERIC;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALPHANUMERIC;
 			return jkey;
 		case VK_DBE_KATAKANA:			//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_KATAKANA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KATAKANA;
 			return jkey;
 		case VK_DBE_HIRAGANA:			//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_HIRAGANA;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HIRAGANA;
 			return jkey;
 		case VK_DBE_DBCSCHAR:			//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_FULL_WIDTH;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FULL_WIDTH;
 			return jkey;
 		case VK_DBE_SBCSCHAR:			//TODO Testing Needed
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_HALF_WIDTH;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HALF_WIDTH;
 			return jkey;
 		case VK_DBE_ROMAN:
 
 		case VK_DBE_NOROMAN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
 		//case XK_Zen_Koho:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ALL_CANDIDATES;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
 		//	return jkey;
 		//case XK_Mae_Koho:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PREVIOUS_CANDIDATE;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PREVIOUS_CANDIDATE;
 		//	return jkey;
 		case VK_DBE_CODEINPUT:			//TODO Testing Needed
 		case VK_DBE_NOCODEINPUT:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CODE_INPUT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CODE_INPUT;
 			return jkey;
 		//case XK_Hiragana_Katakana:	//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_KATAKANA;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_KATAKANA;
 		//	return jkey;
 		//case XK_Hiragana_Katakana:	//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_HIRAGANA;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_HIRAGANA;
 		//	return jkey;
 		//case XK_Romaji:				//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_JAPANESE_ROMAN;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
 		//	return jkey;
 		//case XK_Kana_Lock:			//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_KANA_LOCK;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA_LOCK;
 		//	return jkey;
 		//case XK_VoidSymbol:			//Unknown Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_INPUT_METHOD_ON_OFF;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INPUT_METHOD_ON_OFF;
 		//	return jkey;
 
 		/* For Sun keyboards */
 		/*
 		#ifdef SUN_KEYBOARD
 		case SunXK_Cut:					//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_CUT;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CUT;
 			return jkey;
 		case SunXK_Copy:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_COPY;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COPY;
 			return jkey;
 		case SunXK_Paste:				//No Microsoft Support
-		 	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PASTE;
+		 	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PASTE;
 			return jkey;
 		case SunXK_Undo:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_UNDO;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDO;
 			return jkey;
 		case SunXK_Again:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_AGAIN;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AGAIN;
 			return jkey;
 		case SunXK_Find:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_FIND;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FIND;
 			return jkey;
 		case SunXK_Props:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_PROPS;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PROPS;
 			return jkey;
 		case SunXK_Stop:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_STOP;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_STOP;
 
 		case SunXK_Compose:				//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_COMPOSE;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COMPOSE;
 			return jkey;
 		case SunXK_AltGraph:			//No Microsoft Support
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_ALT_GRAPH;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALT_GRAPH;
 			return jkey;
 		#endif
 		*/
 
 		//case XK_Begin:				//No Microsoft Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_BEGIN;
+		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN;
 		//	return jkey;
 
 		default:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_UNDEFINED;
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED;
 			return jkey;
 	}
 }
@@ -678,29 +678,52 @@ jint NativeToJButton (unsigned int button) {
 	}
 }
 
-jint NativeToJModifier(unsigned int mod) {
-	switch (mod) {
-		case MOD_SHIFT:
-			return org_jnativehook_NativeInputEvent_SHIFT_MASK;
-		case MOD_CONTROL:
-			return org_jnativehook_NativeInputEvent_CTRL_MASK;
-		case MOD_WIN:
-			return org_jnativehook_NativeInputEvent_META_MASK;
-		case MOD_ALT:
-			return org_jnativehook_NativeInputEvent_ALT_MASK;
+jint NativeToJEventMask(unsigned int mask) {
+	jint java_mask = 0;
+	unsigned short int modifiers[9] = {
+		MOD_SHIFT,
+		MOD_CONTROL,
+		MOD_WIN,
+		MOD_ALT,
+		MOD_LBUTTON,
+		MOD_RBUTTON,
+		MOD_MBUTTON,
+		MOD_XBUTTON1,
+		MOD_XBUTTON2
+	};
 
-		case MOD_LBUTTON:
-			return org_jnativehook_NativeInputEvent_BUTTON1_MASK;
-		case MOD_RBUTTON:
-			return org_jnativehook_NativeInputEvent_BUTTON2_MASK;
-		case MOD_MBUTTON:
-			return org_jnativehook_NativeInputEvent_BUTTON3_MASK;
-		case MOD_XBUTTON1:
-			return org_jnativehook_NativeInputEvent_BUTTON4_MASK;
-		case MOD_XBUTTON2:
-			return org_jnativehook_NativeInputEvent_BUTTON5_MASK;
+	for (unsigned short int i = 0; i < sizeof(modifiers) / sizeof(unsigned short int); i++) {
+		switch (mask & modifiers[i]) {
+			case MOD_SHIFT:
+				java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
+			break;
+			case MOD_CONTROL:
+				java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
+			break;
+			case MOD_WIN:
+				java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
+			break;
+			case MOD_ALT:
+				java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
+			break;
 
-		default:
-			return org_jnativehook_keyboard_NativeKeyEvent_UNDEFINED;
+			case MOD_LBUTTON:
+				java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
+			break;
+			case MOD_RBUTTON:
+				java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
+			break;
+			case MOD_MBUTTON:
+				java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
+			break;
+			case MOD_XBUTTON1:
+				java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
+			break;
+			case MOD_XBUTTON2:
+				java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
+			break;
+		}
 	}
+
+	return java_mask;
 }

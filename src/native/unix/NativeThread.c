@@ -27,7 +27,7 @@
 #include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "NativeToJava.h"
-#include "XKeyboardHelper.h"
+#include "XInputHelpers.h"
 #include "XWheelCodes.h"
 
 //For this struct, refer to libxnee
@@ -61,24 +61,6 @@ static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId = 0;
 
 
-//Convert the XEvent modifier mask to a Java modifier mask.
-static jint DoModifierConvert(int event_mask) {
-	jint modifiers = 0;
-
-	if (event_mask & ShiftMask)		modifiers |= NativeToJModifier(ShiftMask);
-	if (event_mask & ControlMask)	modifiers |= NativeToJModifier(ControlMask);
-	if (event_mask & Mod4Mask)		modifiers |= NativeToJModifier(Mod4Mask);
-	if (event_mask & Mod1Mask)		modifiers |= NativeToJModifier(Mod1Mask);
-
-	if (event_mask & Button1Mask)	modifiers |= NativeToJModifier(Button1Mask);
-	if (event_mask & Button2Mask)	modifiers |= NativeToJModifier(Button2Mask);
-	if (event_mask & Button3Mask)	modifiers |= NativeToJModifier(Button3Mask);
-	if (event_mask & Button4Mask)	modifiers |= NativeToJModifier(Button4Mask);
-	if (event_mask & Button5Mask)	modifiers |= NativeToJModifier(Button5Mask);
-
-	return modifiers;
-}
-
 static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		JNIEnv * env = NULL;
@@ -94,6 +76,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			int event_root_y = data->event.u.keyButtonPointer.rootY;
 			Time event_time = hook->server_time;
 			KeySym keysym;
+			char * keytxt;
 
 			//Java Event Data
 			JKeyDatum jkey;
@@ -113,19 +96,19 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
 					keysym = KeyCodeToKeySym(event_code, event_mask);
 					jkey = NativeToJKey(keysym);
-					modifiers = DoModifierConvert(event_mask);
+					modifiers = NativeToJEventMask(event_mask);
 
 					//Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
 					//Check to make sure the key is printable
-					char * keytxt = XKeysymToString(keysym);
-					//TODO Check and See what gets returned by XKeysymToString when keysym is unicode.  Ex: XK_dead_grave
-					if (keytxt != NULL && keytxt[1] == NULL) {
+					keytxt = XKeysymToString(keysym);
+					if (keytxt != NULL && keytxt[1] == '\0') {
+						//TODO Check and See what gets returned by XKeysymToString when keysym is unicode.  Ex: XK_dead_grave
+
 						//Fire key typed event.
-						//FIXME Change the Prototype for this object to include Char argument.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) keytxt[0], jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
 				break;
@@ -138,10 +121,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
 					keysym = KeyCodeToKeySym(event_code, LockMask);
 					jkey = NativeToJKey(keysym);
-					modifiers = DoModifierConvert(event_mask);
+					modifiers = NativeToJEventMask(event_mask);
 
 					//Fire key released event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, jkey.location);
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				break;
 
@@ -160,7 +143,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					click_time = event_time;
 
 					//Convert native modifiers to java modifiers.
-					modifiers = DoModifierConvert(event_mask);
+					modifiers = NativeToJEventMask(event_mask);
 
 					/* This information is all static for X11, its up to the WM to
 					 * decide how to interpret the wheel events.
@@ -219,7 +202,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						//Handle button release events
 						jbutton = NativeToJButton(event_code);
-						modifiers = DoModifierConvert(event_mask);
+						modifiers = NativeToJEventMask(event_mask);
 
 						//Fire mouse released event.
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, jbutton);
@@ -242,7 +225,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 						click_count = 0;
 					}
-					modifiers = DoModifierConvert(event_mask);
+					modifiers = NativeToJEventMask(event_mask);
 
 					//Set the mouse draged flag
 					mouse_dragged = modifiers >> 4 > 0;

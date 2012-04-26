@@ -30,7 +30,7 @@ static Bool is_caps_lock = false, is_shift_lock = false;
 //Use the NativeHelpers display
 extern Display * disp;
 
-//FIXME I dont think this is correct or that it is needed.
+/* FIXME I dont think this is correct or that it is needed.
 unsigned short KeyCodeToScanCode(KeyCode keycode) {
 	//if (keycode == 0xFF13) //GDK_Pause
 	//	return 0x100//VKC_PAUSE;
@@ -39,20 +39,20 @@ unsigned short KeyCodeToScanCode(KeyCode keycode) {
 		return 0;
 
 	if (keycode < 97)
-		return keycode - 8; /* just an offset */
+		return keycode - 8; //offset
 
 	if (keycode < 158)
-		return keyboard_map[keycode - 97];
+		return (unsigned short) keyboard_map[keycode - 97];
 
-	if (keycode == 208) /* Hiragana_Katakana */
+	if (keycode == 208) //Hiragana_Katakana
 		return 0x70;
 
-	if (keycode == 211) /* backslash */
+	if (keycode == 211) //backslash
 		return 0x73;
 
 	return 0;
 }
-
+*/
 
 //Faster more flexible alternative to XKeycodeToKeysym...
 KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {

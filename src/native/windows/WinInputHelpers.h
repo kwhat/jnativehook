@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_WinKeyCodes_h
-#define _Included_WinKeyCodes_h
+#ifndef _Included_WinInputHelpers
+#define _Included_WinInputHelpers
 
-#include <jni.h>
 #include <stdbool.h>
 
 /* Some versions of MinGW do not include the extended East Asian Input Method
@@ -64,9 +63,12 @@
 #define MOD_XBUTTON2	4096
 
 //Helper functions for tracking the modifers.
-extern inline void setModifierMask(unsigned short int mod);
-extern inline void unsetModifierMask(unsigned short int mod);
-extern inline bool isModifierMask(unsigned short int mod);
-extern jint getModifiers();
+extern void SetModifierMask(unsigned short int mask);
+extern void UnsetModifierMask(unsigned short int mask);
+extern bool IsModifierMask(unsigned short int mask);
+extern unsigned short int GetModifiers();
+
+extern unsigned short int GetScrollWheelType();
+extern unsigned short int GetScrollWheelAmount();
 
 #endif

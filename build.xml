@@ -599,7 +599,7 @@
 		<condition property="native.ld.libs" value="-framework ApplicationServices -framework IOKit -framework Carbon">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst">
+		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst -lc">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.libs" value="-lmsvcrt -luser32 -lkernel32">

@@ -40,23 +40,23 @@ import org.jnativehook.GlobalScreen;
  */
 public interface NativeKeyListener extends EventListener {
 	/** 
-	 * Invoked when a key has been pressed
+	 * Invoked when a key has been pressed.
 	 * 
 	 * @param e The native key event.
 	 */
 	public void keyPressed(NativeKeyEvent e);
 	
 	/** 
-	 * Invoked when a key has been released
+	 * Invoked when a key has been released.
 	 * 
 	 * @param e The native key event.
 	 */
 	public void keyReleased(NativeKeyEvent e);
 	
-	/* (non-Javadoc)
-	 * Currently Unimplemented
+	/**
+	 * Invoked when a key has been released.
 	 * 
-	 * @param e the native mouse event
+	 * @param e the native mouse event.
 	 */
-	//public void keyTyped(NativeKeyEvent e);
+	public void keyTyped(NativeKeyEvent e);
 }

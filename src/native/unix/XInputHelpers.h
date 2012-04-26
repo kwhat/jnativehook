@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_XInputHelpers
+#define _Included_XInputHelpers
+
 extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
 extern void KeyboardHelperInit();
 extern void KeyboardHelperCleanup();
+
+#endif

@@ -87,7 +87,7 @@ int CreateJNIGlobals() {
 		if (clsLocalKeyEvent != NULL) {
 			clsKeyEvent = (*env)->NewGlobalRef(env, clsLocalKeyEvent);
 			if (clsKeyEvent != NULL) {
-				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIII)V");
+				idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 				if (idKeyEvent == NULL) {
 					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.NativeKeyEvent(int, long, int, int, int, int)!\n");

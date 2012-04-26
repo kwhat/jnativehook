@@ -17,16 +17,16 @@
 
 #include <stdbool.h>
 
-unsigned short _current_modifiers = 0x0000;
+static register unsigned short int current_modifiers = 0x0000;
 
 void setModifierMask(unsigned short mod) {
-	_current_modifiers |= mod;
+	current_modifiers |= mod;
 }
 
 void unsetModifierMask(unsigned short mod) {
-	_current_modifiers ^= mod;
+	current_modifiers ^= mod;
 }
 
 bool isModifierMask(unsigned short mod) {
-	return _current_modifiers & mod;
+	return current_modifiers & mod;
 }

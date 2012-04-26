@@ -39,6 +39,6 @@ typedef struct {
 
 extern JKeyDatum NativeToJKey(unsigned int keysym);
 extern jint NativeToJButton(unsigned int button);
-extern jint NativeToJModifier(unsigned int modifier);
+extern jint NativeToJEventMask(unsigned int mask);
 
 #endif
