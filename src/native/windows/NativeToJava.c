@@ -20,7 +20,6 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
-#include "NativeErrors.h"
 #include "NativeToJava.h"
 #include "WinInputHelpers.h"
 
@@ -679,36 +678,35 @@ jint NativeToJButton (unsigned int button) {
 	}
 }
 
-jint NativeToJEventMask(unsigned int UNUSED(mask)) {
+jint NativeToJEventMask(unsigned int mask) {
 	jint java_mask = 0;
 
-	
-	if (GetModifierState(VK_SHIFT))
+	if (mask & MOD_LSHIFT || mask & MOD_RSHIFT)
 		java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
 
-	if (GetModifierState(VK_CONTROL))
+	if (mask & MOD_LCONTROL || mask & MOD_RCONTROL)
 		java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
 	
-	if (GetModifierState(VK_LWIN) || GetModifierState(VK_RWIN))
+	if (mask & MOD_LWIN || mask & MOD_RWIN)
 		java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
 		
-	if (GetModifierState(VK_MENU))
+	if (mask & MOD_LALT || mask & MOD_RALT)
 		java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
 
 
-	if (GetModifierState(VK_LBUTTON))
+	if (mask & MOD_LBUTTON)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
 
-	if (GetModifierState(VK_RBUTTON))
+	if (mask & MOD_RBUTTON)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
 
-	if (GetModifierState(VK_MBUTTON))
+	if (mask & MOD_MBUTTON)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
 
-	if (GetModifierState(VK_XBUTTON1))
+	if (mask & MOD_XBUTTON1)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
 
-	if (GetModifierState(VK_XBUTTON2))
+	if (mask & MOD_XBUTTON2)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
 
 	

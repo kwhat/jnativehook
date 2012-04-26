@@ -39,18 +39,35 @@
 #define VK_DBE_NOCODEINPUT				0x0FB		// Changes the mode to no-code input.
 #endif
 
-//Helper functions for tracking the modifers.
-extern void SetModifier(unsigned short int vkCode);
-extern void UnsetModifier(unsigned short int vkCode);
-extern bool IsModifierSet(unsigned short int vkCode);
-extern unsigned short int GetModifierState(unsigned short int vkCode);
+/* Windows does not track the button masks of its events so we need to do it
+ * manually.  The left and right masks solve the problem of if both control
+ * keys are depressed a the same time and only one is removed we should still
+ * have a control mask but the key up event would have reset that.
+ */
 
-extern int KeycodeToUnicode(unsigned short int vkCode, unsigned short int scanCode, WCHAR * buffer, unsigned short int buffer_size);
+#define MOD_LALT				MOD_ALT				// 1
+#define MOD_LCONTROL			MOD_CONTROL			// 2
+#define MOD_LSHIFT				MOD_SHIFT			// 4
+#define MOD_LWIN				MOD_WIN				// 8
+
+#define MOD_RALT				MOD_ALT		<< 4	// 16
+#define MOD_RCONTROL			MOD_CONTROL	<< 4	// 32
+#define MOD_RSHIFT				MOD_SHIFT	<< 4	// 64
+#define MOD_RWIN				MOD_WIN		<< 4	// 128
+
+#define MOD_RBUTTON				256
+#define MOD_LBUTTON				512
+#define MOD_MBUTTON				1024
+#define MOD_XBUTTON1			2048
+#define MOD_XBUTTON2			4096
+
+//Helper functions for tracking the modifers.
+extern void SetModifierMask(unsigned short int mask);
+extern void UnsetModifierMask(unsigned short int mask);
+extern bool IsModifierMask(unsigned short int mask);
+extern unsigned short int GetModifiers();
 
 extern unsigned short int GetScrollWheelType();
 extern unsigned short int GetScrollWheelAmount();
-
-extern void LoadInputHelper();
-extern void UnloadInputHelper();
 
 #endif

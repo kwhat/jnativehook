@@ -24,76 +24,22 @@
 #include "NativeToJava.h"
 #include "WinInputHelpers.h"
 
-static BYTE * keyboard_map;
+static unsigned short int current_modifiers = 0x0000;
 
-void SetModifier(unsigned short int vkCode) {
-	BYTE mask = 1 << 7;
-	switch (vkCode) {
-		case VK_CAPITAL:
-		case VK_NUMLOCK:
-		case VK_SCROLL:
-			mask = 1;
-			break;
-
-		case VK_LSHIFT:
-		case VK_RSHIFT:
-			keyboard_map[VK_SHIFT] |= mask;
-			break;
-		case VK_LCONTROL:
-		case VK_RCONTROL:
-			keyboard_map[VK_CONTROL] |= mask;
-			break;
-
-		case VK_LMENU:
-		case VK_RMENU:
-			keyboard_map[VK_MENU] |= mask;
-			break;
-	}
-	
-	keyboard_map[vkCode] |= mask;
+void SetModifierMask(unsigned short int mask) {
+        current_modifiers |= mask;
 }
 
-void UnsetModifier(unsigned short int vkCode) {
-	BYTE mask = 1 << 7;
-	switch (vkCode) {
-		case VK_CAPITAL:
-		case VK_NUMLOCK:
-		case VK_SCROLL:
-			mask = 1;
-			break;
-	}
-
-	if ((vkCode == VK_LSHIFT && ! (keyboard_map[VK_RSHIFT] & mask)) ||
-		(vkCode == VK_RSHIFT && ! (keyboard_map[VK_LSHIFT] & mask))) {
-		keyboard_map[VK_SHIFT] ^= mask;
-	}
-	else if ((vkCode == VK_LCONTROL && ! (keyboard_map[VK_RCONTROL] & mask)) ||
-			(vkCode == VK_RCONTROL && ! (keyboard_map[VK_LCONTROL] & mask))) {
-		keyboard_map[VK_CONTROL] ^= mask;
-	}
-	else if ((vkCode == VK_LMENU && ! (keyboard_map[VK_RMENU] & mask)) ||
-			(vkCode == VK_RMENU && ! (keyboard_map[VK_LMENU] & mask))) {
-		keyboard_map[VK_MENU] ^= mask;
-	}
-	
-	keyboard_map[vkCode] ^= mask;
+void UnsetModifierMask(unsigned short int mask) {
+        current_modifiers ^= mask;
 }
 
-unsigned short int GetModifierState(unsigned short int vkCode) {
-	BYTE mask = 1 << 7;
-	switch (vkCode) {
-		case VK_CAPITAL:
-		case VK_NUMLOCK:
-		case VK_SCROLL:
-			mask = 1;
-			break;
-	}
-
-	return keyboard_map[vkCode] &= mask;;
+bool IsModifierMask(unsigned short int mask) {
+        return current_modifiers & mask;
 }
 
-int KeycodeToUnicode(unsigned short int vkCode, unsigned short int scanCode, WCHAR * buffer, unsigned short int buffer_size) {
-	return ToUnicode(vkCode, scanCode, keyboard_map, buffer, buffer_size, 0);
+unsigned short int GetModifiers() {
+        return current_modifiers;
 }
 
 unsigned short int GetScrollWheelType() {
@@ -124,18 +70,4 @@ unsigned short int GetScrollWheelAmount() {
 	}
 
 	return value;
-}
-
-
-void LoadInputHelper() {
-	keyboard_map = malloc(256);
-	if (!GetKeyboardState(keyboard_map)) {
-		//FIXME Thorw exception!
-		printf("Throw Error!!!\n");
-	}
-
-}
-
-void UnloadInputHelper() {
-	free(keyboard_map);
 }
