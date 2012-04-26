@@ -195,15 +195,15 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 		switch(getScrollType()) {
 			case WHEEL_UNIT_SCROLL:
 				param.append("WHEEL_UNIT_SCROLL");
-			break;
+				break;
 			
 			case WHEEL_BLOCK_SCROLL:
 				param.append("WHEEL_BLOCK_SCROLL");
-			break;
+				break;
 			
 			default:
 				param.append("unknown scroll type");
-			break;
+				break;
 		}
 		
 		param.append(",scrollAmount=");

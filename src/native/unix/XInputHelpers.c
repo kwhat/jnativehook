@@ -77,7 +77,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				if (group >= num_groups) {
 					group = 0;
 				}
-			break;
+				break;
 
 			case XkbClampIntoRange:
 				/* If the ClampIntoRange flag is set, out-of-range groups correspond
@@ -88,7 +88,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				 * symbols if the global effective group is either Group3 or Group4.
 				 */
 				group = num_groups - 1;
-			break;
+				break;
 
 			case XkbWrapIntoRange:
 				/* If neither flag is set, group is wrapped into range using integer
@@ -100,7 +100,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 				if (num_groups != 0) {
 					group %= num_groups;
 				}
-			break;
+				break;
 		}
 
 		XkbKeyTypePtr key_type = XkbKeyKeyType(keyboard_map, keycode, group);

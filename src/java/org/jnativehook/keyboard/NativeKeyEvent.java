@@ -942,19 +942,19 @@ public class NativeKeyEvent extends NativeInputEvent {
 		switch(getID()) {
 			case NATIVE_KEY_PRESSED:
 				param.append("NATIVE_KEY_PRESSED");
-			break;
+				break;
 			
 			case NATIVE_KEY_RELEASED:
 				param.append("NATIVE_KEY_RELEASED");
-			break;
+				break;
 
 			case NATIVE_KEY_TYPED:
-				param.append("NATIVE_KEY_RELEASED");
-			break;
+				param.append("NATIVE_KEY_TYPED");
+				break;
 
 			default:
 				param.append("unknown type");
-			break;
+				break;
 		}
 		param.append(',');
 		
@@ -989,28 +989,28 @@ public class NativeKeyEvent extends NativeInputEvent {
 		switch (keyLocation) {
 			case KEY_LOCATION_UNKNOWN:
 				param.append("KEY_LOCATION_UNKNOWN");
-			break;
+				break;
 			
 			case KEY_LOCATION_STANDARD:
 				param.append("KEY_LOCATION_STANDARD");
-			break;
+				break;
 			
 			case KEY_LOCATION_LEFT:
 				param.append("KEY_LOCATION_LEFT");
-			break;
+				break;
 			
 			case KEY_LOCATION_RIGHT:
 				param.append("KEY_LOCATION_RIGHT");
-			break;
+				break;
 			
 			case KEY_LOCATION_NUMPAD:
 				param.append("KEY_LOCATION_NUMPAD");
-			break;
+				break;
 			
 			default:
 				param.append("KEY_LOCATION_UNKNOWN");
-			break;
-		}
+				break;
+			}
 		param.append(',');
 		
 		param.append("rawCode=");

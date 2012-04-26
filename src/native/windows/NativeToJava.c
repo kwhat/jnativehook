@@ -586,8 +586,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			return jkey;
 		case VK_DBE_ROMAN:
 
-		case VK_DBE_NOROMAN:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;				return jkey;	//TODO Testing Needed
+		case VK_DBE_NOROMAN:			//TODO Testing Needed
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;
+			return jkey;
 		//case XK_Zen_Koho:				//Unknown Microsoft Support
 		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
 		//	return jkey;

@@ -27,19 +27,19 @@
 static unsigned short int current_modifiers = 0x0000;
 
 void SetModifierMask(unsigned short int mask) {
-        current_modifiers |= mask;
+	current_modifiers |= mask;
 }
 
 void UnsetModifierMask(unsigned short int mask) {
-        current_modifiers ^= mask;
+	current_modifiers ^= mask;
 }
 
 bool IsModifierMask(unsigned short int mask) {
-        return current_modifiers & mask;
+	return current_modifiers & mask;
 }
 
 unsigned short int GetModifiers() {
-        return current_modifiers;
+	return current_modifiers;
 }
 
 unsigned short int GetScrollWheelType() {

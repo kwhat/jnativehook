@@ -711,32 +711,32 @@ jint NativeToJEventMask(unsigned int mask) {
 		switch (mask & modifiers[i]) {
 			case ShiftMask:
 				java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
-			break;
+				break;
 			case ControlMask:
 				java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
-			break;
+				break;
 			case Mod4Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
-			break;
+				break;
 			case Mod1Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
-			break;
+				break;
 
 			case Button1Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
-			break;
+				break;
 			case Button2Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
-			break;
+				break;
 			case Button3Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
-			break;
+				break;
 			case Button4Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
-			break;
+				break;
 			case Button5Mask:
 				java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
-			break;
+				break;
 		}
 	}
 

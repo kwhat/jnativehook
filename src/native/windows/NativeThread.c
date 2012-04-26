@@ -54,7 +54,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		JKeyDatum jkey;
 		jint modifiers;
 		WCHAR keytxt[4];
-		BYTE keyboard_map[256];
+		BYTE keymap[256];
 
 		//Jave Key Event Object.
 		jobject objKeyEvent;
@@ -84,14 +84,14 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-				if (GetKeyboardState(keyboard_map)) {
-					if (ToUnicode(kbhook->vkCode, kbhook->scanCode, keyboard_map, keytxt, sizeof(keytxt) / sizeof(WCHAR), 0) > 0) {
+				if (GetKeyboardState(keymap)) {
+					if (ToUnicode(kbhook->vkCode, kbhook->scanCode, keymap, keytxt, sizeof(keytxt) / sizeof(WCHAR), 0) > 0) {
 						//Fire key typed event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, (jchar) keytxt[0], jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->scanCode, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt[0], jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
 				}
-			break;
+				break;
 
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
@@ -115,7 +115,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				//Fire key released event.
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) kbhook->time, modifiers, kbhook->scanCode, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-			break;
+				break;
 		}
 
 		//Handle any possible JNI issue that may have occured.
@@ -158,17 +158,17 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 			case WM_LBUTTONDOWN:
 				jbutton = NativeToJButton(VK_LBUTTON);
 				SetModifierMask(MOD_LBUTTON);
-			goto BUTTONDOWN;
+				goto BUTTONDOWN;
 
 			case WM_RBUTTONDOWN:
 				jbutton = NativeToJButton(VK_RBUTTON);
 				SetModifierMask(MOD_RBUTTON);
-			goto BUTTONDOWN;
+				goto BUTTONDOWN;
 
 			case WM_MBUTTONDOWN:
 				jbutton = NativeToJButton(VK_MBUTTON);
 				SetModifierMask(MOD_MBUTTON);
-			goto BUTTONDOWN;
+				goto BUTTONDOWN;
 
 			case WM_XBUTTONDOWN:
 			case WM_NCXBUTTONDOWN:
@@ -204,22 +204,22 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				//Fire mouse pressed event.
 				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, jbutton);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-			break;
+				break;
 
 			case WM_LBUTTONUP:
 				jbutton = NativeToJButton(VK_LBUTTON);
 				UnsetModifierMask(MOD_LBUTTON);
-			goto BUTTONUP;
+				goto BUTTONUP;
 
 			case WM_RBUTTONUP:
 				jbutton = NativeToJButton(VK_RBUTTON);
 				UnsetModifierMask(MOD_RBUTTON);
-			goto BUTTONUP;
+				goto BUTTONUP;
 
 			case WM_MBUTTONUP:
 				jbutton = NativeToJButton(VK_MBUTTON);
 				UnsetModifierMask(MOD_MBUTTON);
-			goto BUTTONUP;
+				goto BUTTONUP;
 
 			case WM_XBUTTONUP:
 			case WM_NCXBUTTONUP:
@@ -251,7 +251,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				}
-			break;
+				break;
 
 			case WM_MOUSEMOVE:
 				#ifdef DEBUG
@@ -279,7 +279,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 				//Fire mouse moved event.
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-			break;
+				break;
 
 			case WM_MOUSEWHEEL:
 				#ifdef DEBUG
@@ -309,7 +309,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				//Fire mouse wheel event.
 				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
-			break;
+				break;
 
 			/*
 			// Settings change message notifies us when change is made
@@ -322,7 +322,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 			#ifdef DEBUG
 			default:
 				fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
-			break;
+				break;
 			#endif
 		}
 
@@ -480,6 +480,17 @@ int StartNativeThread() {
 					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 					#endif
 
+					#ifdef DEBUG
+					if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, true)) {
+						fprintf(stdout, "StartNativeThread(): successfully attached thread input.\n");
+					}
+					else {
+						fprintf(stderr, "StartNativeThread(): failed to attach thread input.\n");
+					}
+					#else
+					AttachThreadInput(GetCurrentThreadId(), hookThreadId, true);
+					#endif
+
 					status = RETURN_SUCCESS;
 				}
 				else {
@@ -516,6 +527,17 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
+		#ifdef DEBUG
+		if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, false)) {
+			fprintf(stdout, "StartNativeThread(): successfully detached thread input.\n");
+		}
+		else {
+			fprintf(stderr, "StartNativeThread(): failed to detach thread input.\n");
+		}
+		#else
+		AttachThreadInput(GetCurrentThreadId(), hookThreadId, false);
+		#endif
+
 		//Try to exit the thread naturally.
 		PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
 		WaitForSingleObject(hookThreadHandle, 5000);

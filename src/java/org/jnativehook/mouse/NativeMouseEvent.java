@@ -285,31 +285,31 @@ public class NativeMouseEvent extends NativeInputEvent {
 		switch(getID()) {
 			case NATIVE_MOUSE_CLICKED:
 				 param.append("NATIVE_MOUSE_CLICKED");
-			break;
+				break;
 
 			case NATIVE_MOUSE_PRESSED:
 				 param.append("NATIVE_MOUSE_PRESSED");
-			break;
+				break;
 			
 			case NATIVE_MOUSE_RELEASED:
 				param.append("NATIVE_MOUSE_RELEASED");
-			break;
+				break;
 			
 			case NATIVE_MOUSE_MOVED:
 				param.append("NATIVE_MOUSE_MOVED");
-			break;
+				break;
 			
 			case NATIVE_MOUSE_DRAGGED:
 				param.append("NATIVE_MOUSE_DRAGGED");
-			break;
+				break;
 			
 			case NATIVE_MOUSE_WHEEL:
 				param.append("NATIVE_MOUSE_WHEEL");
-			break;
+				break;
 			
 			default:
 				param.append("unknown type");
-			break;
+				break;
 		}
 		
 		param.append(",(");

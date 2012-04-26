@@ -295,7 +295,7 @@ public class GlobalScreen {
 					else {
 						((NativeKeyListener) listeners[i]).keyPressed(e);
 					}
-				break;
+					break;
 
 				case NativeKeyEvent.NATIVE_KEY_TYPED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -308,7 +308,7 @@ public class GlobalScreen {
 					else {
 						((NativeKeyListener) listeners[i]).keyTyped(e);
 					}
-				break;
+					break;
 				
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -321,7 +321,7 @@ public class GlobalScreen {
 					else {
 						((NativeKeyListener) listeners[i]).keyReleased(e);
 					}
-				break;
+					break;
 			}
 		}
 	}
@@ -359,7 +359,7 @@ public class GlobalScreen {
 					else {
 						((NativeMouseListener) listeners[i]).mouseClicked(e);
 					}
-				break;
+					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -372,7 +372,7 @@ public class GlobalScreen {
 					else {
 						((NativeMouseListener) listeners[i]).mousePressed(e);
 					}
-				break;
+					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -385,7 +385,7 @@ public class GlobalScreen {
 					else {
 						((NativeMouseListener) listeners[i]).mouseReleased(e);
 					}
-				break;
+					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -398,7 +398,7 @@ public class GlobalScreen {
 					else {
 						((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
 					}
-				break;
+					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
 					if (SwingUtilities.isEventDispatchThread()) {
@@ -411,7 +411,7 @@ public class GlobalScreen {
 					else {
 						((NativeMouseMotionListener) listeners[i]).mouseDragged(e);
 					}
-				break;
+					break;
 			}
 		}
 	}

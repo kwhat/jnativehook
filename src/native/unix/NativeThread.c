@@ -108,10 +108,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						//TODO Check and See what gets returned by XKeysymToString when keysym is unicode.  Ex: XK_dead_grave
 
 						//Fire key typed event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, jkey.keycode, (jchar) keytxt[0], jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt[0], jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
-				break;
+					break;
 
 				case KeyRelease:
 					#ifdef DEBUG
@@ -126,7 +126,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					//Fire key released event.
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-				break;
+					break;
 
 				case ButtonPress:
 					#ifdef DEBUG
@@ -191,7 +191,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					}
-				break;
+					break;
 
 				case ButtonRelease:
 					#ifdef DEBUG
@@ -214,7 +214,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 						}
 					}
-				break;
+					break;
 
 				case MotionNotify:
 					#ifdef DEBUG
@@ -242,12 +242,12 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					
 					//Fire mouse moved event.
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-				break;
+					break;
 
 				#ifdef DEBUG
 				default:
 					fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
-				break;
+					break;
 				#endif
 			}
 

@@ -28,6 +28,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -36,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.BadLocationException;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -251,7 +254,13 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	private void displayEventInfo(NativeInputEvent e) {
 		txtEventInfo.append("\n" + e.paramString());
-		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+
+		try {
+			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
+		}
+		catch (BadLocationException ex) {
+			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+		}
 	}
 
 	/**
@@ -314,7 +323,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 			txtEventInfo.append("\n" + "Error: " + ex.toString());
 		}
 		
-		txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+		try {
+			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
+		}
+		catch (BadLocationException ex) {
+			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+		}
 	}
 	
 	/**

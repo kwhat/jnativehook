@@ -104,7 +104,7 @@ BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 		case DLL_PROCESS_ATTACH:
 			hInst = (HINSTANCE) _hInst;
 			//hInst = GetModuleHandle(NULL);
-		break;
+			break;
 	}
 
 	return TRUE;
