@@ -143,7 +143,7 @@ long GetPointerSensitivity() {
 }
 
 long GetMultiClickTime() {
-	long value = -1;
+	long value = 200;
 	int clicktime;
 	bool successful = false;
 

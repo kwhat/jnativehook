@@ -26,7 +26,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#ifdef CARBON
+#ifdef CARBON_LEGACY
 #include <Carbon/Carbon.h>
 #endif
 
@@ -61,7 +61,7 @@
  */
 
 long GetAutoRepeatRate() {
-	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	SInt64 rate;
 	#endif
@@ -115,7 +115,7 @@ long GetAutoRepeatRate() {
 	}
 	#endif
 
-	#ifdef CARBON
+	#ifdef CARBON_LEGACY
 	if (!successful) {
 		//Apple documentation states that value is in 'ticks'. I am not sure
 		//what that means, but it looks a lot like the arbitrary slider value.
@@ -132,7 +132,7 @@ long GetAutoRepeatRate() {
 }
 
 long GetAutoRepeatDelay() {
-	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	SInt64 delay;
 	#endif
@@ -187,7 +187,7 @@ long GetAutoRepeatDelay() {
 	}
 	#endif
 
-	#ifdef CARBON
+	#ifdef CARBON_LEGACY
 	if (!successful) {
 		//Apple documentation states that value is in 'ticks'. I am not sure
 		//what that means, but it looks a lot like the arbitrary slider value.
@@ -328,10 +328,10 @@ long GetPointerSensitivity() {
 }
 
 long GetMultiClickTime() {
-	#if defined IOKIT || defined COREFOUNDATION || defined CARBON
+	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
-	#if defined IOKIT || defined CARBON
-	//This needs to be defiend only if we have IOKIT or Carbon
+	#if defined IOKIT || defined CARBON_LEGACY
+	//This needs to be defiend only if we have IOKIT or CARBON_LEGACY
 	SInt64 time;
 	#endif
 	#endif
@@ -383,7 +383,7 @@ long GetMultiClickTime() {
 	}
 	#endif
 
-	#ifdef CARBON
+	#ifdef CARBON_LEGACY
 	if (!successful) {
 		//Apple documentation states that value is in 'ticks'. I am not sure
 		//what that means, but it looks a lot like the arbitrary slider value.

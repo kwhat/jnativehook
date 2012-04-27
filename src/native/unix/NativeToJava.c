@@ -300,6 +300,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_KP_Page_Up:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD9;
 			goto LOCATION_NP;
+			
 		case XK_KP_Multiply:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MULTIPLY;
 			goto LOCATION_NP;

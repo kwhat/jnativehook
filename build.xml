@@ -352,7 +352,7 @@
 		
 		
 		<!-- Set the project config options to their default values -->
-		<property name="project.option.carbon" value="false" />
+		<property name="project.option.carbon_legacy" value="false" />
 		<property name="project.option.corefoundation" value="true" />
 		<property name="project.option.iokit" value="true" />
 
@@ -362,10 +362,10 @@
 
 
 		<!-- Set Apple configuration options to their default values -->
-		<condition property="native.cc.macros.carbon" value="-DCARBON" else="">
+		<condition property="native.cc.macros.carbon_legacy" value="-DCARBON_LEGACY" else="">
 			<and>
 				<istrue value="${native.os.isApple}" />
-				<istrue value="${project.option.carbon}" />
+				<istrue value="${project.option.carbon_legacy}" />
 			</and>
 		</condition>
 		<condition property="native.cc.macros.corefoundation" value="-DCOREFOUNDATION" else="">
@@ -563,7 +563,7 @@
 		</condition>
 
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>

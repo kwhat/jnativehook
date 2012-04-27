@@ -34,65 +34,73 @@ CGEventFlags GetModifiers() {
 }
 
 CFStringRef KeyCodeToString(CGKeyCode keycode) {
-	CFStringRef keytxt = "";
+	CFStringRef keytxt = CFSTR("");
 
+	#ifdef CARBON_LEGACY
+	KeyboardLayoutRef currentKeyboardLayout;
+	if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
+	#else
 	TISInputSourceRef keyboard_ref = TISCopyCurrentKeyboardLayoutInputSource();
 	if (keyboard_ref) {
+	#endif
+		#ifdef CARBON_LEGACY
+		const void * resource;
+		if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, &resource) == noErr) {
+			const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) resource;
+		#else
 		CFDataRef data_ref = (CFDataRef) TISGetInputSourceProperty(keyboard_ref, kTISPropertyUnicodeKeyLayoutData);
+		const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
+		if (keyboard_layout) {
+		#endif
+			CGEventFlags modifiers = current_modifiers;
 
-		if (data_ref) {
-			const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
+			static const CGEventFlags cmd_modifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
+			bool isCommand = ((modifiers & cmd_modifiers) != 0);
+			modifiers &= ~cmd_modifiers;
+			if (isCommand) {
+				modifiers &= ~kCGEventFlagMaskAlternate;
+			}
 
-			if (keyboard_layout) {
-				CGEventFlags modifiers = current_modifiers & 0xFFFF0000;
-				
-				static const CGEventFlags commandModifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
-				bool isCommand = ((modifiers & commandModifiers) != 0);
-				modifiers &= ~commandModifiers;
-				if (isCommand) {
-					modifiers &= ~kCGEventFlagMaskAlternate;
-				}
+			const UniCharCount buff_size = 4;
+			UniChar buffer[buff_size];
+			UniCharCount buff_len = 0;
+			UInt32 deadkey_state = 0;
 
-				const UniCharCount buff_size = 4;
-				UniChar buffer[buff_size];
-				UniCharCount buff_len = 0;
-				UInt32 deadkey_state = 0;
-				
-				OSStatus status = UCKeyTranslate(
-										keyboard_layout,
-										keycode,
-										kUCKeyActionDown,
-										(modifiers >> 8) & 0xffu,
-										LMGetKbdType(),
-										kUCKeyTranslateNoDeadKeysBit,
-										&deadkey_state,
-										buff_size,
-										&buff_len,
-										buffer);
+			OSStatus status = UCKeyTranslate(
+									keyboard_layout,
+									keycode,
+									kUCKeyActionDown,
+									(modifiers >> 16) & 0xFF,
+									LMGetKbdType(),
+									kUCKeyTranslateNoDeadKeysBit,
+									&deadkey_state,
+									buff_size,
+									&buff_len,
+									buffer);
 
-				if (buff_len == 0 && deadkey_state) {
-					//Convert for Dead Key with a space after.
-					status = UCKeyTranslate(
-										keyboard_layout,
-										kVK_Space,
-										kUCKeyActionDown,
-										(modifiers >> 8) & 0xffu,
-										LMGetKbdType(),
-										kUCKeyTranslateNoDeadKeysBit,
-										&deadkey_state,
-										buff_size,
-										&buff_len,
-										buffer);
-				}
-				
-				
-				if (status == noErr && buff_len > 0) {
-					//Figure out when buffer > 1
-					//keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, 1);
-					keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, buff_len);
-				}
+			if (buff_len == 0 && deadkey_state) {
+				//Convert for Dead Key with a space after.
+				status = UCKeyTranslate(
+									keyboard_layout,
+									kVK_Space,
+									kUCKeyActionDown,
+									(modifiers >> 16) & 0xFF,
+									LMGetKbdType(),
+									kUCKeyTranslateNoDeadKeysBit,
+									&deadkey_state,
+									buff_size,
+									&buff_len,
+									buffer);
+			}
+
+
+			if (status == noErr && buff_len > 0) {
+				//Figure out when buffer > 1
+				//keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, 1);
+				keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, buff_len);
 			}
 		}
+		
 
 		CFRelease(keyboard_ref);
 	}
