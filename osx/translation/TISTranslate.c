@@ -54,8 +54,11 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 			
 			if (keyboard_layout) {
 				//FIXME Defined in JNativeHook
-				static const UInt32 numLock = 1 << 16;
 				
+				CGEventFlags modifiers = event_mask;
+				printf("Test1: 0x%X\n", (unsigned int) modifiers);
+				/*
+				static const UInt32 numLock = 1 << 16;
 				UInt32 modifiers = 0;
 				if ((bool) (event_mask & kCGEventFlagMaskAlphaShift))	modifiers |= alphaLock;
 				if ((bool) (event_mask & kCGEventFlagMaskShift))		modifiers |= shiftKey;
@@ -63,6 +66,7 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 				if ((bool) (event_mask & kCGEventFlagMaskAlternate))	modifiers |= optionKey;
 				if ((bool) (event_mask & kCGEventFlagMaskCommand))		modifiers |= cmdKey;
 				if ((bool) (event_mask & kCGEventFlagMaskNumericPad))	modifiers |= numLock;
+				*/
 				/* FIXME Defined in JNativeHook
 				if (isModifierMask(kCGEventFlagMaskAlphaShift))		modifiers |= alphaLock;
 				if (isModifierMask(kCGEventFlagMaskShift))			modifiers |= shiftKey;
@@ -77,6 +81,7 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 				if (isCommand) {
 					modifiers &= ~optionKey;
 				}
+				printf("Test2: 0x%X\n", (unsigned int) (modifiers >> 16) & 0xFF);
 				
 				const UniCharCount buff_size = 4;
 				UniChar buffer[buff_size];
@@ -86,7 +91,7 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 										keyboard_layout, 
 										keycode, 
 										kUCKeyActionDown, 
-										(modifiers >> 8) & 0xffu, 
+										(modifiers >> 16) & 0xFF, 
 										LMGetKbdType(), 
 										kUCKeyTranslateNoDeadKeysBit, 
 										&deadkey_state, 
@@ -100,7 +105,7 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 										keyboard_layout, 
 										kVK_Space, 
 										kUCKeyActionDown, 
-										(modifiers >> 8) & 0xffu, 
+										(modifiers >> 16) & 0xFF, 
 										LMGetKbdType(), 
 										kUCKeyTranslateNoDeadKeysBit, 
 										&deadkey_state, 
@@ -123,7 +128,7 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 				}
 			}
 			
-			CFRelease(data_ref);
+			//CFRelease(data_ref);
 		}
 
 		CFRelease(keyboard_ref);
@@ -136,10 +141,10 @@ CFStringRef KeyCodeToKeySym(CGKeyCode keycode, CGEventFlags event_mask) {
 int main(int argc, const char * argv[]) {
 
 	UInt16 keycode = 11; // b
-	UInt32 event_mask = kCGEventFlagMaskAlphaShift | kCGEventFlagMaskShift; //kCGEventFlagMaskAlphaShift | kCGEventFlagMaskShift | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate
+	UInt32 event_mask = kCGEventFlagMaskShift; //kCGEventFlagMaskAlphaShift | kCGEventFlagMaskShift | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate
 	CFStringRef keysym = KeyCodeToKeySym(keycode, event_mask);
 
-	printf("KeySym: %s\n", CFStringGetCStringPtr(keysym, kCFStringEncodingMacRoman));
+	printf("KeySym: %s\n", CFStringGetCStringPtr(keysym, CFStringGetSystemEncoding()));
 
 	return EXIT_SUCCESS;
 }

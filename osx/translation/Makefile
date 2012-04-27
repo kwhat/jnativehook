@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -O0 -ggdb -pipe -Wall
 LDFLAGS := -Wl,-execute
 
-PROGRAMS = TISTranslate CarbonTranslate
+PROGRAMS = TISTranslate #CarbonTranslate
 
 all: $(PROGRAMS)
 
