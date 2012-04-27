@@ -16,38 +16,23 @@
  */
 
 #include <stdbool.h>
+#include "OSXInputHelpers.h"
 
 //Keyboard Upper 16 / Mouse Lower 16
 static CGEventFlags current_modifiers = 0x00000000;
 
 void SetModifierMask(CGEventFlags mask) {
 	current_modifiers |= mask;
+	printf("Set: 0x%X\n\n", (unsigned int)current_modifiers);
 }
 
 void UnsetModifierMask(CGEventFlags mask) {
 	current_modifiers ^= mask;
+	printf("Unset: 0x%X\n\n", (unsigned int)current_modifiers);
 }
 
 CGEventFlags GetModifiers() {
 	return current_modifiers;
-}
-
-static jint DoModifierConvert(CGEventFlags event_mask) {
-	jint modifiers = 0;
-
-	//Apply all our modifiers to the java modifiers return.
-	if (event_mask & kCGEventFlagMaskShift)				modifiers |= NativeToJModifier(kCGEventFlagMaskShift);
-	if (event_mask & kCGEventFlagMaskControl)			modifiers |= NativeToJModifier(kCGEventFlagMaskControl);
-	if (event_mask & kCGEventFlagMaskAlternate)			modifiers |= NativeToJModifier(kCGEventFlagMaskAlternate);
-	if (event_mask & kCGEventFlagMaskCommand)			modifiers |= NativeToJModifier(kCGEventFlagMaskCommand);
-
-	if (IsModifierMask(kCGEventFlagMaskButtonLeft))		modifiers |= NativeToJModifier(kCGEventFlagMaskButtonLeft);
-	if (IsModifierMask(kCGEventFlagMaskButtonRight))	modifiers |= NativeToJModifier(kCGEventFlagMaskButtonRight);
-	if (IsModifierMask(kCGEventFlagMaskButtonCenter))	modifiers |= NativeToJModifier(kCGEventFlagMaskButtonCenter);
-	if (IsModifierMask(kCGEventFlagMaskXButton1))		modifiers |= NativeToJModifier(kCGEventFlagMaskXButton1);
-	if (IsModifierMask(kCGEventFlagMaskXButton2))		modifiers |= NativeToJModifier(kCGEventFlagMaskXButton2);
-
-	return modifiers;
 }
 
 CFStringRef KeyCodeToString(CGKeyCode keycode) {
@@ -61,22 +46,13 @@ CFStringRef KeyCodeToString(CGKeyCode keycode) {
 			const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
 
 			if (keyboard_layout) {
-				//FIXME Shouldn't this be defined somewhere? 
-				static const UInt32 numLock = 1 << 16;
-
-				UInt32 modifiers = 0;
-				if (IsModifierMask(kCGEventFlagMaskAlphaShift))		modifiers |= alphaLock;
-				if (IsModifierMask(kCGEventFlagMaskShift))			modifiers |= shiftKey;
-				if (IsModifierMask(kCGEventFlagMaskControl))		modifiers |= controlKey;
-				if (IsModifierMask(kCGEventFlagMaskAlternate))		modifiers |= optionKey;
-				if (IsModifierMask(kCGEventFlagMaskCommand))		modifiers |= cmdKey;
-				if (IsModifierMask(kCGEventFlagMaskNumericPad))		modifiers |= numLock;
+				CGEventFlags modifiers = current_modifiers & 0xFFFF0000;
 				
-				static const UInt32 s_commandModifiers = cmdKey | controlKey | rightControlKey;
-				bool isCommand = ((modifiers & s_commandModifiers) != 0);
-				modifiers &= ~s_commandModifiers;
+				static const CGEventFlags commandModifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
+				bool isCommand = ((modifiers & commandModifiers) != 0);
+				modifiers &= ~commandModifiers;
 				if (isCommand) {
-					modifiers &= ~optionKey;
+					modifiers &= ~kCGEventFlagMaskAlternate;
 				}
 
 				const UniCharCount buff_size = 4;

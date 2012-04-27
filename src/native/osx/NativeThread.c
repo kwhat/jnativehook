@@ -24,8 +24,7 @@
 #include "NativeHelpers.h"
 #include "NativeThread.h"
 #include "NativeToJava.h"
-#include "OSXButtonCodes.h"
-#include "OSXKeyCodes.h"
+#include "OSXInputHelpers.h"
 
 //Exception global for thread initialization.
 static Exception thread_ex;
@@ -42,9 +41,8 @@ static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId = 0;
 
-static CGEventFlags prev_event_mask = 0;
+static CGEventFlags prev_event_mask, diff_event_mask, keyup_event_mask;
 static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagMaskControl + kCGEventFlagMaskAlternate + kCGEventFlagMaskCommand;
-
 
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void * UNUSED(refcon)) {
 	JNIEnv * env = NULL;
@@ -61,6 +59,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 		jint jbutton;
 		jint scrollType, scrollAmount, wheelRotation;
 		jint modifiers;
+		CFStringRef keytxt;
 
 		//Java Event Objects
 		jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
@@ -78,8 +77,15 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire key pressed event.
-				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
+				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+
+				keytxt = KeyCodeToString(jkey.rawcode);
+				if (CFStringGetLength(keytxt) == 1) {
+					//Fire key pressed event.
+					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, jkey.rawcode, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) CFStringGetCharacterAtIndex(keytxt, 0), jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				}
 				break;
 
 			case kCGEventKeyUp:
@@ -118,20 +124,19 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					1010 1100	prev
 					0110 0110	(prev xor curr)
 					0010 0100	(prev xor curr) and prev
+
+					CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
+					CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+					CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
 				 */
 
-				//FIXME this needs some work.
-				//CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
-				////CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
-				//CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
-
-				//FIXME Test
-				CGEventFlags diff_event_mask = GetModifiers() ^ event_mask;
-				CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
+				prev_event_mask = GetModifiers() & 0xFFFF0000;
+				diff_event_mask = prev_event_mask ^ (event_mask & 0xFFFF0000);
+				keyup_event_mask = (event_mask & 0xFFFF0000) & diff_event_mask;
 
 				//Update the previous event mask.
-				UnsetModifierMask(0xFFFF0000);
-				SetModifierMask(event_mask);
+				UnsetModifierMask(prev_event_mask);
+				SetModifierMask(event_mask & 0xFFFF0000);
 
 				if (diff_event_mask & key_event_mask && keyup_event_mask & key_event_mask) {
 					//Process as a key pressed event.
@@ -141,6 +146,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					//Process as a key released event.
 					goto EVENT_KEYUP;
 				}
+
 				break;
 
 			case kCGEventLeftMouseDown:
