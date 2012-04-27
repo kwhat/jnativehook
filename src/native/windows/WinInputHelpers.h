@@ -64,7 +64,6 @@
 //Helper functions for tracking the modifers.
 extern void SetModifierMask(unsigned short int mask);
 extern void UnsetModifierMask(unsigned short int mask);
-extern bool IsModifierMask(unsigned short int mask);
 extern unsigned short int GetModifiers();
 
 extern unsigned short int GetScrollWheelType();

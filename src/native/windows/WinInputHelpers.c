@@ -34,10 +34,6 @@ void UnsetModifierMask(unsigned short int mask) {
 	current_modifiers ^= mask;
 }
 
-bool IsModifierMask(unsigned short int mask) {
-	return current_modifiers & mask;
-}
-
 unsigned short int GetModifiers() {
 	return current_modifiers;
 }

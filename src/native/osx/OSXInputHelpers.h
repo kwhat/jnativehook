@@ -3,30 +3,35 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation either version 3 of the License or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef _Included_OSXKeyCodes_h
-#define _Included_OSXKeyCodes_h
 
 //Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
 //Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
 //Reference: http://www.mactech.com/macintosh-c/chap02-1.html
 
-//#include <Carbon/Carbon.h> //For HIToolbox kVK_ keycode constants.
-//FIXME We should be using the IOKit constants outlined below.
-//#include <IOKit/hid/IOHIDUsageTables.h> //For IOKit kHIDUsage_KeyboardA keycode constants.
+#ifndef _Included_OSXInputHelpers
+#define _Included_OSXInputHelpers
 
+#include <stdbool.h>
+
+#include <ApplicationServices/ApplicationServices.h>
+
+#ifdef CARBON
+//For HIToolbox kVK_ keycode constants.
+#include <Carbon/Carbon.h>
+#else
 //Used in lieu of the Carbon frameworks HIToolbox.
+
 //keycodes for ansi keys
 #define kVK_ANSI_A						0x00
 #define kVK_ANSI_S						0x01
@@ -152,9 +157,33 @@
 #define kVK_JIS_KeypadComma		 		0x5F
 #define kVK_JIS_Eisu					0x66
 #define kVK_JIS_Kana					0x68
+#endif
 
 //Suplemental virtual key information
 #define kVK_RightCommand				0x36
 #define kVK_ContextMenu					0x6E	//AKA kMenuPowerGlyph
 
+
+//These codes do not appear to be defined anywhere by Apple.
+#define kVK_LBUTTON						kCGMouseButtonLeft
+#define kVK_RBUTTON						kCGMouseButtonRight
+#define kVK_MBUTTON						kCGMouseButtonCenter
+#define kVK_XBUTTON1					3
+#define kVK_XBUTTON2					4
+
+#define kCGEventFlagMaskButtonLeft		1
+#define kCGEventFlagMaskButtonRight		2
+#define kCGEventFlagMaskButtonCenter	4
+#define kCGEventFlagMaskXButton1		8
+#define kCGEventFlagMaskXButton2		16
+
+
+/* OSX does not track the button masks of its events so we need to do it
+ * manually.
+ */
+extern void SetModifierMask(CGEventFlags mask);
+extern void UnsetModifierMask(CGEventFlags mask);
+extern CGEventFlags GetModifiers();
+
+extern CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags mask)
 #endif

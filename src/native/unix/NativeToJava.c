@@ -695,50 +695,34 @@ jint NativeToJButton(unsigned int button) {
 
 jint NativeToJEventMask(unsigned int mask) {
 	jint java_mask = 0;
-	unsigned short int modifiers[9] = {
-		ShiftMask, 
-		ControlMask, 
-		Mod4Mask, 
-		Mod1Mask, 
-		Button1Mask, 
-		Button1Mask, 
-		Button1Mask, 
-		Button1Mask, 
-		Button1Mask
-	};
 
-	for (unsigned short int i = 0; i < sizeof(modifiers) / sizeof(unsigned short int); i++) {
-		switch (mask & modifiers[i]) {
-			case ShiftMask:
-				java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
-				break;
-			case ControlMask:
-				java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
-				break;
-			case Mod4Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
-				break;
-			case Mod1Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
-				break;
+	if (mask & ShiftMask)
+		java_mask |= org_jnativehook_NativeInputEvent_SHIFT_MASK;
 
-			case Button1Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
-				break;
-			case Button2Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
-				break;
-			case Button3Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
-				break;
-			case Button4Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
-				break;
-			case Button5Mask:
-				java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
-				break;
-		}
-	}
+	if (mask & ControlMask)
+		java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
+
+	if (mask & Mod4Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
+
+	if (mask & Mod1Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
+
+
+	if (mask & Button1Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON1_MASK;
+
+	if (mask & Button2Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON2_MASK;
+
+	if (mask & Button3Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON3_MASK;
+
+	if (mask & Button4Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON4_MASK;
+
+	if (mask & Button5Mask)
+		java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
 
 	return java_mask;
 }

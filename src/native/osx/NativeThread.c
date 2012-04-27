@@ -45,23 +45,6 @@ static pthread_t hookThreadId = 0;
 static CGEventFlags prev_event_mask = 0;
 static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagMaskControl + kCGEventFlagMaskAlternate + kCGEventFlagMaskCommand;
 
-static jint doModifierConvert(CGEventFlags event_mask) {
-	jint modifiers = 0;
-
-	//Apply all our modifiers to the java modifiers return.
-	if (event_mask & kCGEventFlagMaskShift)				modifiers |= NativeToJModifier(kCGEventFlagMaskShift);
-	if (event_mask & kCGEventFlagMaskControl)			modifiers |= NativeToJModifier(kCGEventFlagMaskControl);
-	if (event_mask & kCGEventFlagMaskAlternate)			modifiers |= NativeToJModifier(kCGEventFlagMaskAlternate);
-	if (event_mask & kCGEventFlagMaskCommand)			modifiers |= NativeToJModifier(kCGEventFlagMaskCommand);
-
-	if (isModifierMask(kCGEventFlagMaskButtonLeft))		modifiers |= NativeToJModifier(kCGEventFlagMaskButtonLeft);
-	if (isModifierMask(kCGEventFlagMaskButtonRight))	modifiers |= NativeToJModifier(kCGEventFlagMaskButtonRight);
-	if (isModifierMask(kCGEventFlagMaskButtonCenter))	modifiers |= NativeToJModifier(kCGEventFlagMaskButtonCenter);
-	if (isModifierMask(kCGEventFlagMaskXButton1))		modifiers |= NativeToJModifier(kCGEventFlagMaskXButton1);
-	if (isModifierMask(kCGEventFlagMaskXButton2))		modifiers |= NativeToJModifier(kCGEventFlagMaskXButton2);
-
-	return modifiers;
-}
 
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void * UNUSED(refcon)) {
 	JNIEnv * env = NULL;
@@ -85,13 +68,14 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 		// get the event class
 		switch (type) {
 			case kCGEventKeyDown:
+			EVENT_KEYDOWN:
 				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 				#ifdef DEBUG
 				fprintf(stdout, "LowLevelProc(): Key Pressed (%i)\n", (unsigned int) keysym);
 				#endif
 
 				jkey = NativeToJKey(keysym);
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire key pressed event.
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
@@ -99,13 +83,14 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				break;
 
 			case kCGEventKeyUp:
+			EVENT_KEYUP:
 				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 				#ifdef DEBUG
 				fprintf(stdout, "LowLevelProc(): Key Released (%i)\n", (unsigned int) keysym);
 				#endif
 
 				jkey = NativeToJKey(keysym);
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire key released event.
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
@@ -113,13 +98,9 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				break;
 
 			case kCGEventFlagsChanged:
-				keysym = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 				#ifdef DEBUG
-				fprintf(stdout, "LowLevelProc(): Modifiers Changed (%X %i)\n", (unsigned int) event_mask, (unsigned int) keysym);
+				fprintf(stdout, "LowLevelProc(): Modifiers Changed (0x%X)\n", (unsigned int) event_mask);
 				#endif
-
-				jkey = NativeToJKey(keysym);
-				modifiers = doModifierConvert(event_mask);
 
 				/*	Because of the way apple handles modifiers we need to track 
 					the key changes and handle our own keyup and down events.
@@ -138,64 +119,51 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					0110 0110	(prev xor curr)
 					0010 0100	(prev xor curr) and prev
 				 */
+
 				//FIXME this needs some work.
-				CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
-				//CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+				//CGEventFlags diff_event_mask = prev_event_mask ^ event_mask;
+				////CGEventFlags keydown_event_mask = prev_event_mask | diff_event_mask;
+				//CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
+
+				//FIXME Test
+				CGEventFlags diff_event_mask = GetModifiers() ^ event_mask;
 				CGEventFlags keyup_event_mask = event_mask & diff_event_mask;
 
 				//Update the previous event mask.
-				prev_event_mask = event_mask;
+				UnsetModifierMask(0xFFFF0000);
+				SetModifierMask(event_mask);
 
-				/*
-				printf("Control:\t0x%X\n", kCGEventFlagMaskControl);
-				printf("Down Mask:\t0x%X\n", (int) keydown_event_mask);
-				printf("Up Mask:\t0x%X\n", (int) keyup_event_mask);
-				printf("Diff Mask:\t0x%X\n\n", (int) diff_event_mask);
-				 *
-					Control:	0x40000
-
-					Down Mask:	0x40101
-					Up Mask:	0x40001
-					Diff Mask:	0x40001
-					
-					Down Mask:	0x40101
-					Up Mask:	0x0
-					Diff Mask:	0x40001
-
-				*/
 				if (diff_event_mask & key_event_mask && keyup_event_mask & key_event_mask) {
-					//Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					//Process as a key pressed event.
+					goto EVENT_KEYDOWN;
 				}
 				else if (diff_event_mask & key_event_mask && keyup_event_mask ^ key_event_mask) {
-					//Fire key released event.
-					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					//Process as a key released event.
+					goto EVENT_KEYUP;
 				}
 				break;
 
 			case kCGEventLeftMouseDown:
 				button = kVK_LBUTTON;
-				setModifierMask(kCGEventFlagMaskButtonLeft);
+				SetModifierMask(kCGEventFlagMaskButtonLeft);
 				goto BUTTONDOWN;
 
 			case kCGEventRightMouseDown:
 				button = kVK_RBUTTON;
-				setModifierMask(kCGEventFlagMaskButtonRight);
+				SetModifierMask(kCGEventFlagMaskButtonRight);
 				goto BUTTONDOWN;
 
 			case kCGEventOtherMouseDown:
 				button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
 
 				if (button == kVK_MBUTTON) {
-					setModifierMask(kCGEventFlagMaskButtonCenter);
+					SetModifierMask(kCGEventFlagMaskButtonCenter);
 				}
 				else if (button == kVK_XBUTTON1) {
-					setModifierMask(kCGEventFlagMaskXButton1);
+					SetModifierMask(kCGEventFlagMaskXButton1);
 				}
 				else if (button == kVK_XBUTTON2) {
-					setModifierMask(kCGEventFlagMaskXButton2);
+					SetModifierMask(kCGEventFlagMaskXButton2);
 				}
 
 			BUTTONDOWN:
@@ -218,7 +186,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				event_point = CGEventGetLocation(event);
 				jbutton = NativeToJButton(button);
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire mouse pressed event.
 				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, jbutton);
@@ -227,25 +195,25 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 			case kCGEventLeftMouseUp:
 				button = kVK_LBUTTON;
-				unsetModifierMask(kCGEventFlagMaskButtonLeft);
+				UnsetModifierMask(kCGEventFlagMaskButtonLeft);
 				goto BUTTONUP;
 
 			case kCGEventRightMouseUp:
 				button = kVK_RBUTTON;
-				unsetModifierMask(kCGEventFlagMaskButtonRight);
+				UnsetModifierMask(kCGEventFlagMaskButtonRight);
 				goto BUTTONUP;
 
 			case kCGEventOtherMouseUp:
 				button = CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber);
 
 				if (button == kVK_MBUTTON) {
-					unsetModifierMask(kCGEventFlagMaskButtonCenter);
+					UnsetModifierMask(kCGEventFlagMaskButtonCenter);
 				}
 				else if (button == kVK_XBUTTON1) {
-					unsetModifierMask(kCGEventFlagMaskXButton1);
+					UnsetModifierMask(kCGEventFlagMaskXButton1);
 				}
 				else if (button == kVK_XBUTTON2) {
-					unsetModifierMask(kCGEventFlagMaskXButton2);
+					UnsetModifierMask(kCGEventFlagMaskXButton2);
 				}
 
 			BUTTONUP:
@@ -255,7 +223,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				event_point = CGEventGetLocation(event);
 				jbutton = NativeToJButton(button);
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire mouse released event.
 				objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, jbutton);
@@ -282,7 +250,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Set the mouse draged flag
 				mouse_dragged = true;
@@ -302,7 +270,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Set the mouse draged flag
 				mouse_dragged = false;
@@ -343,7 +311,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				}
 				click_time = event_time;
 
-				modifiers = doModifierConvert(event_mask);
+				modifiers = NativeToJEventMask(GetModifiers());
 
 				//Fire mouse wheel event.
 				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_point.x, (jint) event_point.y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
