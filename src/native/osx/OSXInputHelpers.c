@@ -23,12 +23,10 @@ static CGEventFlags current_modifiers = 0x00000000;
 
 void SetModifierMask(CGEventFlags mask) {
 	current_modifiers |= mask;
-	printf("Set: 0x%X\n\n", (unsigned int)current_modifiers);
 }
 
 void UnsetModifierMask(CGEventFlags mask) {
 	current_modifiers ^= mask;
-	printf("Unset: 0x%X\n\n", (unsigned int)current_modifiers);
 }
 
 CGEventFlags GetModifiers() {
@@ -36,7 +34,7 @@ CGEventFlags GetModifiers() {
 }
 
 CFStringRef KeyCodeToString(CGKeyCode keycode) {
-	CFStringRef keytxt = NULL;
+	CFStringRef keytxt = "";
 
 	TISInputSourceRef keyboard_ref = TISCopyCurrentKeyboardLayoutInputSource();
 	if (keyboard_ref) {
@@ -59,6 +57,7 @@ CFStringRef KeyCodeToString(CGKeyCode keycode) {
 				UniChar buffer[buff_size];
 				UniCharCount buff_len = 0;
 				UInt32 deadkey_state = 0;
+				
 				OSStatus status = UCKeyTranslate(
 										keyboard_layout,
 										keycode,
@@ -85,15 +84,14 @@ CFStringRef KeyCodeToString(CGKeyCode keycode) {
 										&buff_len,
 										buffer);
 				}
-
+				
+				
 				if (status == noErr && buff_len > 0) {
 					//Figure out when buffer > 1
 					//keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, 1);
 					keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, buff_len);
 				}
 			}
-
-			CFRelease(data_ref);
 		}
 
 		CFRelease(keyboard_ref);

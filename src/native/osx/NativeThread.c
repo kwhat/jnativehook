@@ -79,7 +79,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				//Fire key pressed event.
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-
+				
 				keytxt = KeyCodeToString(jkey.rawcode);
 				if (CFStringGetLength(keytxt) == 1) {
 					//Fire key pressed event.
@@ -100,7 +100,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				//Fire key released event.
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, jkey.location);
-				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+				//(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				break;
 
 			case kCGEventFlagsChanged:
@@ -146,7 +146,6 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					//Process as a key released event.
 					goto EVENT_KEYUP;
 				}
-
 				break;
 
 			case kCGEventLeftMouseDown:
