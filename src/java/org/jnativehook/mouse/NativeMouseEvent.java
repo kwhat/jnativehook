@@ -237,7 +237,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	/**
 	 * Returns the number of button clicks associated with this event.
 	 *
-	 * @returnan integer indicating the number of button clicks
+	 * @return An integer indicating the number of button clicks
 	 */
 	public int getClickCount() {
 		return clickCount;
