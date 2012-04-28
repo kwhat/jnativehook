@@ -21,7 +21,7 @@
 #include <X11/XKBlib.h>
 static XkbDescPtr keyboard_map;
 #else
-#include <X11//Xutil.h>
+#include <X11/Xutil.h>
 static KeySym * keyboard_map;
 static int keysyms_per_keycode;
 static Bool is_caps_lock = false, is_shift_lock = false;
@@ -30,29 +30,6 @@ static Bool is_caps_lock = false, is_shift_lock = false;
 //Use the NativeHelpers display
 extern Display * disp;
 
-/* FIXME I dont think this is correct or that it is needed.
-unsigned short KeyCodeToScanCode(KeyCode keycode) {
-	//if (keycode == 0xFF13) //GDK_Pause
-	//	return 0x100//VKC_PAUSE;
-
-	if (keycode < 9)
-		return 0;
-
-	if (keycode < 97)
-		return keycode - 8; //offset
-
-	if (keycode < 158)
-		return (unsigned short) keyboard_map[keycode - 97];
-
-	if (keycode == 208) //Hiragana_Katakana
-		return 0x70;
-
-	if (keycode == 211) //backslash
-		return 0x73;
-
-	return 0;
-}
-*/
 
 //Faster more flexible alternative to XKeycodeToKeysym...
 KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
@@ -166,10 +143,12 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			//i = 0;
 			keysym = keyboard_map[keycode * keysyms_per_keycode];
 
-			//FIXME if alpha
-			KeySym lower_keysym, upper_keysym;
-			XConvertCase(keysym, &lower_keysym, &upper_keysym);
-			keysym = upper_keysym;
+			if (keysym >= 'a' && keysym <= 'z') {
+				//keysym is an alpha char
+				KeySym lower_keysym, upper_keysym;
+				XConvertCase(keysym, &lower_keysym, &upper_keysym);
+				keysym = upper_keysym;
+			}
 		}
 		else if (event_mask & ShiftMask && event_mask & LockMask && is_caps_lock) {
 			/* The Shift modifier is on, and the Lock modifier is on and
@@ -181,10 +160,12 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			//i = 1;
 			keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
 
-			//FIXME if alpha
-			KeySym lower_keysym, upper_keysym;
-			XConvertCase(keysym, &lower_keysym, &upper_keysym);
-			keysym = lower_keysym;
+			if (keysym >= 'A' && keysym <= 'Z') {
+				//keysym is an alpha char
+				KeySym lower_keysym, upper_keysym;
+				XConvertCase(keysym, &lower_keysym, &upper_keysym);
+				keysym = lower_keysym;
+			}
 		}
 		else if (event_mask & ShiftMask || (event_mask & LockMask && is_shift_lock) || event_mask & (ShiftMask + LockMask)) {
 			/* The Shift modifier is on, or the Lock modifier is on and

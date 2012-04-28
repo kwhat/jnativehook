@@ -25,8 +25,7 @@
 
 JKeyDatum NativeToJKey(unsigned int keysym) {
 	JKeyDatum jkey;
-	//FIXME Check and see if we should use the virtual key code or the scan code.
-	jkey.rawcode = MapVirtualKey(keysym, 0);
+	jkey.rawcode = keysym;
 	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
 
 	switch (keysym) {

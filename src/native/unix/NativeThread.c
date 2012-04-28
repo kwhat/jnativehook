@@ -148,7 +148,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					/* This information is all static for X11, its up to the WM to
 					 * decide how to interpret the wheel events.
 					 */
-					//FIXME Button2 and 3 are reversed from other platforms.
+					//TODO Should use constants for button codes.
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
 
@@ -198,7 +198,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
 					#endif
 
-					//FIXME Button2 and 3 are reversed from other platforms.
+					//TODO Should use constants for button codes.
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						//Handle button release events
 						jbutton = NativeToJButton(event_code);

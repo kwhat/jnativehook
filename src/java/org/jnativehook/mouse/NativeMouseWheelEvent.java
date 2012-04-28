@@ -38,7 +38,6 @@ import org.jnativehook.GlobalScreen;
  * then dispatches a NativeMouseEvent to each listener. 
  * <p/>
  * 
- * FIXME - Next paragraph needs some work.
  * Platforms offer customization of the amount of scrolling that should take 
  * place when the mouse wheel is moved. The two most common settings are to 
  * scroll a certain number of "units" (commonly lines of text in a text-based 

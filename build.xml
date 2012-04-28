@@ -517,13 +517,12 @@
 		<echo level="info">Java compatibility: ${java.target}</echo>
 
 
-		<!-- Set optimization level flag -->
-		<condition property="native.cc.flags.optimize" value="-O2 -fomit-frame-pointer" else="-O0 -ggdb">
+		<!-- Set compiler optimization flags -->
+		<condition property="native.cc.flags.optimize" value="-O2 -fomit-frame-pointer" else="-O0">
 			<istrue value="${project.optimize}" />
 		</condition>
 		
-		<!-- set gcc standard flags (primarily for windows right now) -->
-		<!-- FIXME try this instead: http://www.aquaphoenix.com/ref/gnu_c_library/libc_12.html -->
+		<!-- Set compiler standards flags -->
 		<condition property="native.cc.flags.standard" value="-Werror -std=c99 -pedantic" else="-std=c99">
 			<not>
 				<istrue value="${project.debug}" />
@@ -531,14 +530,14 @@
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} -mmacosx-version-min=10.4 ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -563,31 +562,40 @@
 		</condition>
 
 		<!-- Set the compiler arguments for compiling. -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
-			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
+		<!-- TODO Test without  -fno-strict-aliasing -->
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
-			<!-- -std=c99 -pedantic -D_POSIX_C_SOURCE=199506 -->
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing ${native.cc.flags.pic} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.cc.args2" value="-o" />
 
 
-
+		<!-- set system specific library name -->
+		<condition property="native.executable" value="lib${project.name}.jnilib">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="native.executable" value="lib${project.name}.so">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="native.executable" value="${project.name}.dll">
+			<istrue value="${native.os.isWindows}" />
+		</condition>
+		
 		<!-- Set optimization level flag -->
 		<condition property="native.ld.flags.optimize" value="-O1" else="-O0">
 			<istrue value="${project.optimize}" />
 		</condition>
 
 		<!-- set system specific ldflags -->
-		<condition property="native.ld.flags" value="-arch ${native.arch}">
+		<condition property="native.ld.flags" value="-arch ${native.arch} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,${native.ld.flags.optimize}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname,${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}">
@@ -595,7 +603,6 @@
 		</condition>
 		
 		<!-- Guess what system specific libraries to link against -->
-		<!-- FIXME These need to be dynamically created based on the options for the macros -->
 		<condition property="native.ld.libs" value="-framework ApplicationServices -framework IOKit -framework Carbon">
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -617,17 +624,6 @@
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.ld.args2" value="${native.ld.libs} -o" />
-
-		<!-- set system specific library name -->
-		<condition property="native.executable" value="lib${project.name}.jnilib">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.executable" value="lib${project.name}.so">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.executable" value="${project.name}.dll">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
 		
 
 
