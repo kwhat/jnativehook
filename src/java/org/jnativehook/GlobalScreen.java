@@ -533,7 +533,7 @@ public class GlobalScreen {
 			e.printStackTrace();
 		}
 	}
-	
+
 	
 	/**
 	 * AWTDispatchRunnable is a small abstract inner class used for dispatching  

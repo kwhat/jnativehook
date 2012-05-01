@@ -595,7 +595,7 @@
 		<condition property="native.ld.flags" value="-arch ${native.arch} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname,${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname=${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}">
