@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.EventListener;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -53,7 +52,7 @@ public class GlobalScreen {
 	
 	/** The list of event listeners to notify. */
 	private EventListenerList eventListeners;
-	
+
 	/**
 	 * Private constructor to prevent multiple instances of the global screen.
 	 * The {@link #registerNativeHook} method will be called on construction to unpack
@@ -62,7 +61,7 @@ public class GlobalScreen {
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
-		
+
 		//Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
 	}
@@ -253,7 +252,7 @@ public class GlobalScreen {
 	 *
 	 * @since 1.1
 	 */
-	public static native boolean isEventDispatchThread();
+	public static native boolean isNativeDispatchThread();
 	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is 
@@ -290,42 +289,15 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeKeyListener) this.getListener()).keyPressed((NativeKeyEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeKeyListener) listeners[i]).keyPressed(e);
-					}
+					((NativeKeyListener) listeners[i]).keyPressed(e);
 					break;
 
 				case NativeKeyEvent.NATIVE_KEY_TYPED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeKeyListener) this.getListener()).keyTyped((NativeKeyEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeKeyListener) listeners[i]).keyTyped(e);
-					}
+					((NativeKeyListener) listeners[i]).keyTyped(e);
 					break;
 				
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeKeyListener) this.getListener()).keyReleased((NativeKeyEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeKeyListener) listeners[i]).keyReleased(e);
-					}
+					((NativeKeyListener) listeners[i]).keyReleased(e);
 					break;
 			}
 		}
@@ -354,68 +326,23 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeMouseListener) this.getListener()).mouseClicked((NativeMouseEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeMouseListener) listeners[i]).mouseClicked(e);
-					}
+					((NativeMouseListener) listeners[i]).mouseClicked(e);
 					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeMouseListener) this.getListener()).mousePressed((NativeMouseEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeMouseListener) listeners[i]).mousePressed(e);
-					}
+					((NativeMouseListener) listeners[i]).mousePressed(e);
 					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeMouseListener) this.getListener()).mouseReleased((NativeMouseEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeMouseListener) listeners[i]).mouseReleased(e);
-					}
+					((NativeMouseListener) listeners[i]).mouseReleased(e);
 					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeMouseMotionListener) this.getListener()).mouseMoved((NativeMouseEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
-					}
+					((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
 					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-					if (SwingUtilities.isEventDispatchThread()) {
-						SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-							public void run() {
-								((NativeMouseMotionListener) this.getListener()).mouseDragged((NativeMouseEvent) this.getEvent());
-							}
-						});
-					}
-					else {
-						((NativeMouseMotionListener) listeners[i]).mouseDragged(e);
-					}
+					((NativeMouseMotionListener) listeners[i]).mouseDragged(e);
 					break;
 			}
 		}
@@ -436,16 +363,7 @@ public class GlobalScreen {
 		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
 		for (int i = 0; i < listeners.length; i++) {
-			if (SwingUtilities.isEventDispatchThread()) {
-				SwingUtilities.invokeLater(new AWTDispatchRunnable(listeners[i], e) {
-					public void run() {
-						((NativeMouseWheelListener) this.getListener()).mouseWheelMoved((NativeMouseWheelEvent) this.getEvent());
-					}
-				});
-			}
-			else {
-				((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
-			}
+			((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
 		}
 	}
 	
@@ -536,56 +454,6 @@ public class GlobalScreen {
 		}
 		catch (NativeHookException e) {
 			e.printStackTrace();
-		}
-	}
-
-	
-	/**
-	 * AWTDispatchRunnable is a small abstract inner class used for dispatching  
-	 * events that may conflict with the AWT Event dispatching thread.  This 
-	 * custom runnable allows <code>SwingUtilities.invokeLater(java.lang.Runnable)</code> 
-	 * to be called without requring that event objects be declared final. 
-	 * 
-	 * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
-	 * @since	1.1
-	 * 
-	 * @see javax.swing.SwingUtilities#invokeLater(java.lang.Runnable)
-	 */
-	private abstract class AWTDispatchRunnable implements Runnable {
-		/** The EventListener to send events to. */
-		private EventListener listener;
-		
-		/** The NativeInputEvent to send out. */
-		private NativeInputEvent event;
-		
-		/**
-		 * Instantiates a new <code>AWTDispatchRunnable</code> for use with 
-		 * <code>SwingUtilities.invokeLater()</code>.
-		 * 
-		 * @param listener The listener to dispatch events to.
-		 * @param e The event to dispatch.
-		 */
-		public AWTDispatchRunnable(EventListener listener, NativeInputEvent e) {
-			this.listener = listener;
-			this.event = e;
-		}
-		
-		/**
-		 * Gets the event listener.
-		 *
-		 * @return the event listener
-		 */
-		public EventListener getListener() {
-			return listener;
-		}
-		
-		/**
-		 * Gets the event.
-		 *
-		 * @return the event
-		 */
-		public NativeInputEvent getEvent() {
-			return event;
 		}
 	}
 }

@@ -574,6 +574,6 @@ bool IsNativeThreadRunning() {
 	return status == STILL_ACTIVE;
 }
 
-bool IsEventDispatchThread() {
+bool IsNativeDispatchThread() {
 	return hookThreadId == GetCurrentThreadId();
 }

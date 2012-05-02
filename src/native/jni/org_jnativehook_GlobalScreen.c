@@ -178,8 +178,8 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 	return (jboolean) IsNativeThreadRunning();
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isEventDispatchThread(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
-	return (jboolean) IsEventDispatchThread();
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThread(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+	return (jboolean) IsNativeDispatchThread();
 }
 
 

@@ -29,6 +29,6 @@ typedef struct {
 extern int StopNativeThread();
 extern int StartNativeThread();
 extern bool IsNativeThreadRunning();
-extern bool IsEventDispatchThread();
+extern bool IsNativeDispatchThread();
 
 #endif

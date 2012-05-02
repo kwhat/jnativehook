@@ -576,6 +576,6 @@ bool IsNativeThreadRunning() {
 	return isRunning;
 }
 
-bool IsEventDispatchThread() {
+bool IsNativeDispatchThread() {
 	return pthread_equal(hookThreadId, pthread_self());
 }
