@@ -46,7 +46,6 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * @since	1.0
  */
 public class GlobalScreen {
 	/** The GlobalScreen singleton. */
@@ -61,9 +60,6 @@ public class GlobalScreen {
 	 * and load the native library.
 	 */
 	private GlobalScreen() {
-		//Enable extra mouse button support in java.
-		System.setProperty("sun.awt.enableExtraMouseButtons", "true");
-		
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
 		
@@ -97,7 +93,7 @@ public class GlobalScreen {
 	 *
 	 * @return single instance of GlobalScreen
 	 */
-	public static GlobalScreen getInstance() {
+	public static final GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
 	
@@ -248,7 +244,16 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public native boolean isNativeHookRegistered();
-	
+
+	/**
+	 * Returns true if the current thread is the native event dispatching thread.
+	 *
+	 * @return true if the current thread is the native event dispatching thread.
+	 * @throws NativeHookException the native hook exception
+	 *
+	 * @since 1.1
+	 */
+	public static native boolean isEventDispatchThread();
 	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is 

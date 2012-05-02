@@ -518,7 +518,7 @@
 
 
 		<!-- Set compiler optimization flags -->
-		<condition property="native.cc.flags.optimize" value="-O3 -fomit-frame-pointer -frename-registers -fweb" else="-O0">
+		<condition property="native.cc.flags.optimize" value="-O3 -fomit-frame-pointer -frename-registers -fweb" else="-O0 -ggdb">
 			<istrue value="${project.optimize}" />
 		</condition>
 		
@@ -530,14 +530,14 @@
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
+		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} -ggdb">
+		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 

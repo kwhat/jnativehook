@@ -527,7 +527,7 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
-		if (hookThreadId != GetCurrentThreadId()) {
+		if (IsEventDispatchThread()) {
 			#ifdef DEBUG
 			if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, false)) {
 				fprintf(stdout, "StartNativeThread(): successfully detached thread input.\n");
@@ -572,4 +572,8 @@ bool IsNativeThreadRunning() {
 	GetExitCodeThread(hookThreadHandle, &status);
 
 	return status == STILL_ACTIVE;
+}
+
+bool IsEventDispatchThread() {
+	return hookThreadId == GetCurrentThreadId();
 }

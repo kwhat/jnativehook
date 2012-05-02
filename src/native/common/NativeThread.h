@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef _Included_NativeThread_h
 #define _Included_NativeThread_h
 
@@ -28,5 +29,6 @@ typedef struct {
 extern int StopNativeThread();
 extern int StartNativeThread();
 extern bool IsNativeThreadRunning();
+extern bool IsEventDispatchThread();
 
 #endif

@@ -58,7 +58,7 @@ static volatile bool running;
 #endif
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
-static pthread_t hookThreadId = 0;
+static pthread_t hookThreadId;
 
 
 static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) {
@@ -574,4 +574,8 @@ bool IsNativeThreadRunning() {
 	#endif
 
 	return isRunning;
+}
+
+bool IsEventDispatchThread() {
+	return pthread_equal(hookThreadId, pthread_self());
 }
