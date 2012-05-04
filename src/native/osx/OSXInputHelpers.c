@@ -33,7 +33,7 @@ CGEventFlags GetModifiers() {
 	return current_modifiers;
 }
 
-CFStringRef KeyCodeToString(CGKeyCode keycode) {
+CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 	CFStringRef keytxt = CFSTR("");
 
 	#ifdef CARBON_LEGACY
@@ -52,8 +52,6 @@ CFStringRef KeyCodeToString(CGKeyCode keycode) {
 		const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
 		if (keyboard_layout) {
 		#endif
-			CGEventFlags modifiers = current_modifiers;
-
 			static const CGEventFlags cmd_modifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
 			bool isCommand = ((modifiers & cmd_modifiers) != 0);
 			modifiers &= ~cmd_modifiers;

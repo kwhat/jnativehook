@@ -19,6 +19,7 @@
 #define _Included_XInputHelpers
 
 extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
+extern wchar_t KeySymToUnicode(KeySym keysym);
 extern void LoadInputHelper();
 extern void UnloadInputHelper();
 

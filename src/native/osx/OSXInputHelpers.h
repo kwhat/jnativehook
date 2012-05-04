@@ -54,5 +54,5 @@ extern void SetModifierMask(CGEventFlags mask);
 extern void UnsetModifierMask(CGEventFlags mask);
 extern CGEventFlags GetModifiers();
 
-extern CFStringRef KeyCodeToString(CGKeyCode keycode);
+extern CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers);
 #endif

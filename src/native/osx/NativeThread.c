@@ -80,10 +80,8 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, jkey.rawcode, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				
-				keytxt = KeyCodeToString(jkey.rawcode);
-				if (CFStringGetLength(keytxt) > 0) {
-					printf("KeySym: %s\n", CFStringGetCStringPtr(keytxt, CFStringGetSystemEncoding()));
-					
+				keytxt = KeyCodeToString(jkey.rawcode, GetModifiers());
+				if (CFStringGetLength(keytxt) == 1) {
 					//Fire key pressed event.
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, jkey.rawcode, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) CFStringGetCharacterAtIndex(keytxt, 0), jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);

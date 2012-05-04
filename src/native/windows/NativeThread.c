@@ -85,7 +85,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
 				if (GetKeyboardState(keymap)) {
-					if (ToUnicode(kbhook->vkCode, kbhook->scanCode, keymap, keytxt, sizeof(keytxt) / sizeof(WCHAR), 0) > 0) {
+					if (ToUnicode(kbhook->vkCode, kbhook->scanCode, keymap, keytxt, sizeof(keytxt) / sizeof(WCHAR), 0) == 1) {
 						//Fire key typed event.
 						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) kbhook->time, modifiers, kbhook->scanCode, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt[0], jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);

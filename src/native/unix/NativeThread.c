@@ -76,7 +76,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			int event_root_y = data->event.u.keyButtonPointer.rootY;
 			Time event_time = hook->server_time;
 			KeySym keysym;
-			char * keytxt;
+			wchar_t keytxt;
 
 			//Java Event Data
 			JKeyDatum jkey;
@@ -103,12 +103,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
 					//Check to make sure the key is printable
-					keytxt = XKeysymToString(keysym);
-					if (keytxt != NULL && keytxt[1] == '\0') {
-						//TODO Check and See what gets returned by XKeysymToString when keysym is unicode.  Ex: XK_dead_grave
-
+					keytxt = KeySymToUnicode(keysym);
+					if (keytxt != 0x0000) {
 						//Fire key typed event.
-						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt[0], jkey.location);
+						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt, jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
 					break;
