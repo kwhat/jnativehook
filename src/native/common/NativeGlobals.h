@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -25,23 +26,23 @@
 
 #include <jni.h>
 
-//Define some simple function return codes.
+/* Define some simple function return codes */
 #define RETURN_SUCCESS 0
 #define RETURN_FAILURE 1
 
-//Global Ref to the JVM
+/* Global Ref to the JVM */
 extern JavaVM * jvm;
 extern jint jni_version;
 
-//GlobalScreen object and dispatch id.
+/* GlobalScreen object and dispatch id */
 extern jobject objGlobalScreen;
 extern jmethodID idDispatchEvent;
 
-//Java callback classes and constructor id's
+/* Java callback classes and constructor id's */
 extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
-//Common function stubs.
+/* Common function stubs */
 extern int CreateJNIGlobals();
 extern int DestroyJNIGlobals();
 

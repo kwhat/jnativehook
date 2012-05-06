@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -14,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-//#include <ApplicationServices/ApplicationServices.h>
 
 #ifdef IOKIT
 #include <IOKit/hidsystem/IOHIDLib.h>
@@ -40,7 +39,7 @@
  *
  * Value	MS		Char/Sec
  *
- * 1		15		66		//Out of standard range.
+ * 1		15		66		* Out of standard range *
  *
  * 2		30		33
  * 6		90		11
@@ -86,13 +85,13 @@ long GetAutoRepeatRate() {
 					 * add 0.5 to the result so that when we cast to long we
 					 * actually get a rounded result.  Saves the math.h depend.
 					 *
-					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
+					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	* Fast *
 					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
   					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
   					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
 					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
 					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
-					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
+					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				* Slow *
 					 */
 					value = (long) (900.0 * ((double) rate) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
@@ -107,7 +106,7 @@ long GetAutoRepeatRate() {
 		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &rate)) {
-				//This is the slider value, we must multiply by 15 to convert to milliseconds.
+				/* This is the slider value, we must multiply by 15 to convert to milliseconds */
 				value = (long) rate * 15;
 				successful = true;
 			}
@@ -117,11 +116,14 @@ long GetAutoRepeatRate() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		//Apple documentation states that value is in 'ticks'. I am not sure
-		//what that means, but it looks a lot like the arbitrary slider value.
+		/* Apple documentation states that value is in 'ticks'. I am not sure
+		 * what that means, but it looks a lot like the arbitrary slider value.
+		 */
 		rate = LMGetKeyRepThresh();
 		if (rate > -1) {
-			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			/* This is the slider value, we must multiply by 15 to convert to
+			 * milliseconds.
+			 */
 			value = (long) rate * 15;
 			successful = true;
 		}
@@ -157,13 +159,13 @@ long GetAutoRepeatDelay() {
 					 * add 0.5 to the result so that when we cast to long we
 					 * actually get a rounded result.  Saves the math.h depend.
 					 *
-					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	//Fast
+					 *    33,333,333.0 / 1000.0 / 1000.0 / 1000.0 == 0.033333333	* Fast *
 					 *   100,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.1
   					 *   200,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.2
   					 *   500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 0.5
 					 * 1,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1
 					 * 1,500,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 1.5
-					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				//Slow
+					 * 2,000,000,000.0 / 1000.0 / 1000.0 / 1000.0 == 2				* Slow *
 					 */
 					value = (long) (900.0 * ((double) delay) / 1000.0 / 1000.0 / 1000.0 + 0.5);
 					successful = true;
@@ -178,7 +180,9 @@ long GetAutoRepeatDelay() {
 		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
-				//This is the slider value, we must multiply by 15 to convert to milliseconds.
+				/* This is the slider value, we must multiply by 15 to convert to
+				 * milliseconds.
+				 */
 				printf("Test: %i\n\n", (int) delay);
 				value = (long) delay * 15;
 				successful = true;
@@ -189,11 +193,14 @@ long GetAutoRepeatDelay() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		//Apple documentation states that value is in 'ticks'. I am not sure
-		//what that means, but it looks a lot like the arbitrary slider value.
+		/* Apple documentation states that value is in 'ticks'. I am not sure
+		 * what that means, but it looks a lot like the arbitrary slider value.
+		 */
 		delay = LMGetKeyThresh();
 		if (delay > -1) {
-			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			/* This is the slider value, we must multiply by 15 to convert to
+			 * milliseconds.
+			 */
 			value = (long) delay * 15;
 			successful = true;
 		}
@@ -222,11 +229,11 @@ long GetPointerAccelerationMultiplier() {
 
 			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
 			if (kren_ret == kIOReturnSuccess) {
-				//IOByteCount size = sizeof(multiplier);
+				/* IOByteCount size = sizeof(multiplier); */
 
 				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &multiplier);
 				if (kren_ret == kIOReturnSuccess) {
-					//Calculate the greatest common factor
+					/* Calculate the greatest common factor */
 
 					unsigned long denominator = 1000000, d = denominator;
 					unsigned long numerator = multiplier * denominator, gcf = numerator;
@@ -301,11 +308,11 @@ long GetPointerSensitivity() {
 
 			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
 			if (kren_ret == kIOReturnSuccess) {
-				//IOByteCount size = sizeof(multiplier);
+				/* IOByteCount size = sizeof(multiplier); */
 
 				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &sensitivity);
 				if (kren_ret == kIOReturnSuccess) {
-					//Calculate the greatest common factor
+					/* Calculate the greatest common factor */
 
 					unsigned long denominator = 1000000, d = denominator;
 					unsigned long numerator = sensitivity * denominator, gcf = numerator;
@@ -331,7 +338,7 @@ long GetMultiClickTime() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	#if defined IOKIT || defined CARBON_LEGACY
-	//This needs to be defiend only if we have IOKIT or CARBON_LEGACY
+	/* This needs to be defiend only if we have IOKIT or CARBON_LEGACY */
 	SInt64 time;
 	#endif
 	#endif
@@ -385,11 +392,14 @@ long GetMultiClickTime() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		//Apple documentation states that value is in 'ticks'. I am not sure
-		//what that means, but it looks a lot like the arbitrary slider value.
+		/* Apple documentation states that value is in 'ticks'. I am not sure
+		 * what that means, but it looks a lot like the arbitrary slider value.
+		 */
 		time = GetDblTime();
 		if (time > -1) {
-			//This is the slider value, we must multiply by 15 to convert to milliseconds.
+			/* This is the slider value, we must multiply by 15 to convert to
+			 * milliseconds.
+			 */
 			value = (long) time * 15;
 			successful = true;
 		}
@@ -400,9 +410,9 @@ long GetMultiClickTime() {
 }
 
 void OnLibraryLoad() {
-	//Do Nothing.
+	/* Do Nothing */
 }
 
 void OnLibraryUnload() {
-	//Do Nothing.
+	/* Do Nothing */
 }

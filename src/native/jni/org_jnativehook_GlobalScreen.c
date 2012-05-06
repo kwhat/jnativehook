@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -26,10 +27,10 @@ static void SetNativeProperties(JNIEnv * env) {
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 	if (clsSystem != NULL && setProperty_ID != NULL) {
-		//Create a buffer for converting numbers to strings.
+		/* Create a buffer for converting numbers to strings */
 		char buffer[16];
 
-		//Set the native keyboard auto repeat rate.
+		/* Set the native keyboard auto repeat rate */
 		long rate = GetAutoRepeatRate();
 		if (rate >= 0) {
 			#ifdef DEBUG
@@ -74,7 +75,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 		
-		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
 		long multiplier = GetPointerAccelerationMultiplier();
 		if (multiplier >= 0) {
 			#ifdef DEBUG
@@ -97,7 +98,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 
-		// 0-Threshold X, 1-Threshold Y and 2-Speed
+		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
 		long threshold = GetPointerAccelerationThreshold();
 		if (threshold >= 0) {
 			#ifdef DEBUG
@@ -183,10 +184,11 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThr
 }
 
 
-//This is where java attaches to the native machine.  Its kind of like the java + native constructor.
+/* JNI entry point, This is executed when the Java virutal machine attaches to the native library. */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
-	//Grab the currently running virtual machine so we can attach to it in
-	//functions that are not called from java. ( I.E. ThreadProc )
+	/* Grab the currently running virtual machine so we can attach to it in
+	 * functions that are not called from java. ( I.E. ThreadProc )
+	 */
 	jvm = vm;
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
@@ -194,10 +196,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
 		#endif
 
-		//Run platform specific load items.
+		/* Run platform specific load items. */
 		OnLibraryLoad();
 
-		//Set java properties from native sources.
+		/* Set java properties from native sources. */
 		SetNativeProperties(env);
 	}
 	else {
@@ -208,19 +210,24 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
 
+	#ifdef DEBUG
+	fprintf(stdout, "JNI_Load(): JNI Loaded.\n");
+	#endif
+
     return jni_version;
 }
 
+/* JNI exit point, This is executed when the Java virutal machine detaches from the native library. */
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
-	//Stop the native thread if its running.
+	/* Stop the native thread if its running. */
 	if (IsNativeThreadRunning()) {
 		StopNativeThread();
 	}
 
-	//Run platform specific unload items.
+	/* Run platform specific unload items. */
 	OnLibraryUnload();
 
 	#ifdef DEBUG
-	fprintf(stdout, "JNI Unloaded.\n");
+	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");
 	#endif
 }

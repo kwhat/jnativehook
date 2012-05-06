@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,9 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
-//Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
-//Reference: http://www.mactech.com/macintosh-c/chap02-1.html
+/* Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
+ * Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
+ * Reference: http://www.mactech.com/macintosh-c/chap02-1.html
+ */
 
 #ifndef _Included_OSXInputHelpers
 #define _Included_OSXInputHelpers
@@ -25,15 +27,15 @@
 #include <stdbool.h>
 
 #include <ApplicationServices/ApplicationServices.h>
-#include <Carbon/Carbon.h>		//For HIToolbox kVK_ keycodes and TIS funcitons.
+#include <Carbon/Carbon.h>	/* For HIToolbox kVK_ keycodes and TIS funcitons */
 
 
-//Suplemental virtual key information
+/* Suplemental virtual key information */
 #define kVK_RightCommand				0x36
-#define kVK_ContextMenu					0x6E	//AKA kMenuPowerGlyph
+#define kVK_ContextMenu					0x6E	/* AKA kMenuPowerGlyph */
 
 
-//These codes do not appear to be defined anywhere by Apple.
+/* These codes do not appear to be defined anywhere by Apple */
 #define kVK_LBUTTON						kCGMouseButtonLeft
 #define kVK_RBUTTON						kCGMouseButtonRight
 #define kVK_MBUTTON						kCGMouseButtonCenter

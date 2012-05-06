@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Reference: http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html
-#include <ApplicationServices/ApplicationServices.h> //For CoreGraphics kCGEventFlagMask constants
+/* Reference: http://developer.apple.com/mac/library/documentation/Carbon/Reference/CarbonRefUpdate/Articles/Carbon_10.4-10.5_SymbolChanges.html */
+#include <ApplicationServices/ApplicationServices.h> /* For CoreGraphics kCGEventFlagMask constants */
 
 #include "NativeToJava.h"
 #include "OSXInputHelpers.h"
@@ -36,9 +37,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_Tab:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_TAB;
 			return jkey;
-		//case XK_Cancel:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CANCEL;
-		//	return jkey;
+		/* case XK_Cancel:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CANCEL;
+			return jkey;*/
 
 
 		case kVK_Shift:
@@ -53,9 +54,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_Command:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_META;
 			goto LOCATION_L;
-		//case XK_Super_L:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
-		//	return jkey;
+		/* case XK_Super_L:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
+			return jkey; */
 		LOCATION_L:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
 
@@ -71,9 +72,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_RightCommand:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_META;
 			goto LOCATION_R;
-		//case XK_Super_R:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
-		//	goto LOCATION_R;
+		/* case XK_Super_R:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS;
+			goto LOCATION_R; */
 		LOCATION_R:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
 			return jkey;
@@ -83,9 +84,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			return jkey;
 
 
-		//case XK_Pause:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAUSE;
-		//	return jkey;
+		/* case XK_Pause:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAUSE;
+			return jkey; */
 		case kVK_CapsLock:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CAPS_LOCK;
 			return jkey;
@@ -292,9 +293,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_ANSI_KeypadPlus:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ADD;
 			goto LOCATION_NP;
-		//case XK_KP_Separator:				//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SEPARATOR;
-		//	goto LOCATION_NP;
+		/* case XK_KP_Separator:			* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SEPARATOR;
+			goto LOCATION_NP; */
 		case kVK_ANSI_KeypadMinus:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SUBTRACT;
 			goto LOCATION_NP;
@@ -307,12 +308,12 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_ANSI_KeypadClear:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CLEAR;
 			goto LOCATION_NP;
-		//case XK_Num_Lock:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK;
-		//	goto LOCATION_NP;
-		//case XK_Scroll_Lock:				//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SCROLL_LOCK;
-		//	goto LOCATION_NP;
+		/* case XK_Num_Lock:				* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK;
+			goto LOCATION_NP;
+		case XK_Scroll_Lock:				* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SCROLL_LOCK;
+			goto LOCATION_NP; */
 		LOCATION_NP:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 			return jkey;
@@ -378,26 +379,26 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case kVK_F20:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F20;
 			return jkey;
-		//case XK_F21:						//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F21;
-		//	return jkey;
-		//case XK_F22:						//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F22;
-		//	return jkey;
-		//case XK_F23:						//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F23;
-		//	return jkey;
-		//case XK_F24:						//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F24;
-		//	return jkey;
+		/* case XK_F21:						* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F21;
+			return jkey;
+		case XK_F22:						* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F22;
+			return jkey;
+		case XK_F23:						* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F23;
+			return jkey;
+		case XK_F24:						* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F24;
+			return jkey; */
 
 
-		//case XK_Print:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PRINTSCREEN;
-		//	return jkey;
-		//case XK_Insert:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INSERT;
-		//	return jkey;
+		/* case XK_Print:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PRINTSCREEN;
+			return jkey;
+		case XK_Insert:						* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INSERT;
+			return jkey; */
 		case kVK_Help:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HELP;
 			return jkey;
@@ -430,52 +431,52 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		/* For European keyboards */
 		/*
-		case XK_dead_grave:					//Unknown Apple Support
+		case XK_dead_grave:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_GRAVE;
 			return jkey;
-		case XK_dead_acute:					//Unknown Apple Support
+		case XK_dead_acute:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ACUTE;
 			return jkey;
-		case XK_dead_circumflex:			//Unknown Apple Support
+		case XK_dead_circumflex:			* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CIRCUMFLEX;
 			return jkey;
-		case XK_dead_tilde:					//Unknown Apple Support
+		case XK_dead_tilde:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_TILDE;
 			return jkey;
-		case XK_dead_macron:				//Unknown Apple Support
+		case XK_dead_macron:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_MACRON;
 			return jkey;
-		case XK_dead_breve:					//Unknown Apple Support
+		case XK_dead_breve:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_BREVE;
 			return jkey;
-		case XK_dead_abovedot:				//Unknown Apple Support
+		case XK_dead_abovedot:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ABOVEDOT;
 			return jkey;
-		case XK_dead_diaeresis:				//Unknown Apple Support
+		case XK_dead_diaeresis:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_DIAERESIS;
 			return jkey;
-		case XK_dead_abovering:				//Unknown Apple Support
+		case XK_dead_abovering:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ABOVERING;
 			return jkey;
-		case XK_dead_doubleacute:			//Unknown Apple Support
+		case XK_dead_doubleacute:			* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_DOUBLEACUTE;
 			return jkey;
-		case XK_dead_caron:					//Unknown Apple Support
+		case XK_dead_caron:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CARON;
 			return jkey;
-		case XK_dead_cedilla:				//Unknown Apple Support
+		case XK_dead_cedilla:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CEDILLA;
 			return jkey;
-		case XK_dead_ogonek:				//Unknown Apple Support
+		case XK_dead_ogonek:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_OGONEK;
 			return jkey;
-		case XK_dead_iota:					//Unknown Apple Support
+		case XK_dead_iota:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_IOTA;
 			return jkey;
-		case XK_dead_voiced_sound:			//Unknown Apple Support
+		case XK_dead_voiced_sound:			* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_VOICED_SOUND;
 			return jkey;
-		case XK_dead_semivoiced_sound:		//Unknown Apple Support
+		case XK_dead_semivoiced_sound:		* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_SEMIVOICED_SOUND;
 			return jkey;
 		*/
@@ -483,25 +484,25 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		/* Unknown Keyboard Codes */
 		/*
-		case XK_ampersand:					//No Apple Support
+		case XK_ampersand:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AMPERSAND;
 			return jkey;
-		case XK_asterisk:					//No Apple Support
+		case XK_asterisk:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ASTERISK;
 			return jkey;
-		case XK_quotedbl:					//No Apple Support
+		case XK_quotedbl:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_QUOTEDBL;
 			return jkey;
-		case XK_less:						//No Apple Support
+		case XK_less:						* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LESS;
 			return jkey;
-		case XK_greater:					//No Apple Support
+		case XK_greater:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_GREATER;
 			return jkey;
-		case XK_braceleft:					//No Apple Support
+		case XK_braceleft:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BRACELEFT;
 			return jkey;
-		case XK_braceright:					//No Apple Support
+		case XK_braceright:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BRACERIGHT;
 			return jkey;
 		*/
@@ -509,150 +510,150 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		/* Unknown Extended Keyboard Codes */
 		/*
-		case XK_at:							//Unknown Apple Support
+		case XK_at:							* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AT;
 			return jkey;
-		case XK_colon:						//Unknown Apple Support
+		case XK_colon:						* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COLON;
 			return jkey;
-		case XK_asciicircum:				//Unknown Apple Support
+		case XK_asciicircum:				* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CIRCUMFLEX;
 			return jkey;
-		case XK_dollar:						//Unknown Apple Support
+		case XK_dollar:						* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DOLLAR;
 			return jkey;
-		case XK_EuroSign:					//Unknown Apple Support
+		case XK_EuroSign:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EURO_SIGN;
 			return jkey;
-		case XK_exclam:						//Unknown Apple Support
+		case XK_exclam:						* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EXCLAMATION_MARK;
 			return jkey;
-		case XK_exclamdown:					//Unknown Apple Support
+		case XK_exclamdown:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INVERTED_EXCLAMATION_MARK;
 			return jkey;
-		case XK_parenleft:					//Unknown Apple Support
+		case XK_parenleft:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LEFT_PARENTHESIS;
 			return jkey;
-		case XK_numbersign:					//Unknown Apple Support
+		case XK_numbersign:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMBER_SIGN;
 			return jkey;
-		case XK_plus:						//Unknown Apple Support
+		case XK_plus:						* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PLUS;
 			return jkey;
-		case XK_parenright:					//Unknown Apple Support
+		case XK_parenright:					* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_RIGHT_PARENTHESIS;
 			return jkey;
-		case kVK_JIS_Underscore:			//Unknown Apple Support
+		case kVK_JIS_Underscore:			* Unknown Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDERSCORE;
 			return jkey;
 		*/
 
 
 		/* For input method support on Asian Keyboards */
-		//case XK_Cancel:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL;
-		//	return jkey;
-		//case XK_Henkan:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT;
-		//	return jkey;
-		//case XK_Muhenkan:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT;
-		//	return jkey;
-		//case XK_VoidSymbol:				//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT;
-		//	return jkey;
-		//case XK_Mode_switch:				//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE;
-		//	return jkey;
-		case kVK_JIS_Kana:					//TODO Testing Needed
+		/* case XK_Cancel:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL;
+			return jkey;
+		case XK_Henkan:						* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT;
+			return jkey;
+		case XK_Muhenkan:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT;
+			return jkey;
+		case XK_VoidSymbol:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT;
+			return jkey;
+		case XK_Mode_switch:				* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE;
+			return jkey; */
+		case kVK_JIS_Kana:					/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA;
 			return jkey;
-		//case XK_Kanji:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI;
-		//	return jkey;
-		case kVK_JIS_Eisu:					//TODO Testing Needed
+		/* case XK_Kanji:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI;
+			return jkey; */
+		case kVK_JIS_Eisu:					/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALPHANUMERIC;
 			return jkey;
-		//case XK_Katakana:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KATAKANA;
-		//	return jkey;
-		//case XK_Hiragana:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HIRAGANA;
-		//	return jkey;
-		//case XK_Zenkaku:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FULL_WIDTH;
-		//	return jkey;
-		//case XK_Hankaku:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HALF_WIDTH;
-		//	return jkey;
-		//case XK_Romaji:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;
-		//	return jkey;
-		//case XK_Zen_Koho:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
-		//	return jkey;
-		//case XK_Mae_Koho:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PREVIOUS_CANDIDATE;
-		//	return jkey;
-		//case XK_Kanji_Bangou:				//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CODE_INPUT;
-		//	return jkey;
-		//case XK_Hiragana_Katakana:		//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_KATAKANA;
-		//	return jkey;
-		//case XK_Hiragana_Katakana:		//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_HIRAGANA;
-		//	return jkey;
-		//case XK_Romaji:					//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
-		//	return jkey;
-		//case XK_Kana_Lock:				//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA_LOCK;
-		//	return jkey;
-		//case XK_VoidSymbol:				//Unknown Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INPUT_METHOD_ON_OFF;
-		//	return jkey;
+		/* case XK_Katakana:				* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KATAKANA;
+			return jkey;
+		case XK_Hiragana:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HIRAGANA;
+			return jkey;
+		case XK_Zenkaku:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FULL_WIDTH;
+			return jkey;
+		case XK_Hankaku:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HALF_WIDTH;
+			return jkey;
+		case XK_Romaji:						* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;
+			return jkey;
+		case XK_Zen_Koho:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
+			return jkey;
+		case XK_Mae_Koho:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PREVIOUS_CANDIDATE;
+			return jkey;
+		case XK_Kanji_Bangou:				* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CODE_INPUT;
+			return jkey;
+		case XK_Hiragana_Katakana:			* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_KATAKANA;
+			return jkey;
+		case XK_Hiragana_Katakana:			* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_HIRAGANA;
+			return jkey;
+		case XK_Romaji:						* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
+			return jkey;
+		case XK_Kana_Lock:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA_LOCK;
+			return jkey;
+		case XK_VoidSymbol:					* Unknown Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INPUT_METHOD_ON_OFF;
+			return jkey; */
 
 
 		/* For Sun keyboards */
 		/*
 		#ifdef SUN_KEYBOARD
-		case SunXK_Cut:						//No Apple Support
+		case SunXK_Cut:						* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CUT;
 			return jkey;
-		case SunXK_Copy:					//No Apple Support
+		case SunXK_Copy:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COPY;
 			return jkey;
-		case SunXK_Paste:					//No Apple Support
+		case SunXK_Paste:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PASTE;
 			return jkey;
-		case SunXK_Undo:					//No Apple Support
+		case SunXK_Undo:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDO;
 			return jkey;
-		case SunXK_Again:					//No Apple Support
+		case SunXK_Again:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AGAIN;
 			return jkey;
-		case SunXK_Find:					//No Apple Support
+		case SunXK_Find:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FIND;
 			return jkey;
-		case SunXK_Props:					//No Apple Support
+		case SunXK_Props:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PROPS;
 			return jkey;
-		case SunXK_Stop:					//No Apple Support
+		case SunXK_Stop:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_STOP;
 			return jkey;
-		case SunXK_Compose:					//No Apple Support
+		case SunXK_Compose:					* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COMPOSE;
 			return jkey;
-		case SunXK_AltGraph:				//No Apple Support
+		case SunXK_AltGraph:				* No Apple Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALT_GRAPH;
 			return jkey;
 		#endif
 		*/
 
-		//case XK_Begin:					//No Apple Support
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN;
-		//	return jkey;
+		/* case XK_Begin:					* No Apple Support *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN;
+			return jkey; */
 
 		default:
 		case 0xFF:

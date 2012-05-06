@@ -1,16 +1,17 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
- * 
- * This program is free software: you can redistribute it and/or modify
+ * http://code.google.com/p/jnativehook/
+ *
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
+ *
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -18,7 +19,6 @@ package org.jnativehook.mouse;
 
 //Imports
 import java.util.EventListener;
-
 import org.jnativehook.GlobalScreen;
 
 /**
@@ -32,7 +32,7 @@ import org.jnativehook.GlobalScreen;
  * NativeMouseMotion event occurs, that object's appropriate method is invoked.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @since	1.0
+ * @version	1.1
  * 
  * @see NativeMouseEvent
  */
@@ -41,16 +41,17 @@ public interface NativeMouseMotionListener extends EventListener {
 	/**
 	 * Invoked when the mouse has been moved.
 	 *
-	 * @param e The native mouse event.
+	 * @param e the native mouse event.
 	 */
-	public void mouseMoved(NativeMouseEvent e);
+	public void nativeMouseMoved(NativeMouseEvent e);
 	
 	
 	/**
-	 * Invoked when the mouse has been moved while a button mask is present.
+	 * Invoked when the mouse has been moved while a button is despressed.
 	 *
 	 * @param e the native mouse event
+	 * 
 	 * @since 1.1
 	 */
-	public void mouseDragged(NativeMouseEvent e);
+	public void nativeMouseDragged(NativeMouseEvent e);
 }

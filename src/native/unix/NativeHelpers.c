@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -42,14 +43,18 @@ long GetAutoRepeatRate() {
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
-	//Attempt to acquire the keyboard auto repeat rate using the XKB extension if available.
+	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension 
+	 * if available.
+	 */
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
 	}
 	#endif
 
 	#ifdef XF86MISC
-	//Fallback to the XF86 Misc extension if available and other efforts failed.
+	/* Fallback to the XF86 Misc extension if available and other efforts
+	 * failed.
+	 */
 	if (!successful) {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
@@ -74,14 +79,18 @@ long GetAutoRepeatDelay() {
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
-	//Attempt to acquire the keyboard auto repeat rate using the XKB extension if available.
+	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension
+	 * if available.
+	 */
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
 	}
 	#endif
 
 	#ifdef XF86MISC
-	//Fallback to the XF86 Misc extension if available and other efforts failed.
+	/* Fallback to the XF86 Misc extension if available and other efforts
+	 * failed.
+	 */
 	if (!successful) {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
@@ -147,7 +156,7 @@ long GetMultiClickTime() {
 	int clicktime;
 	bool successful = false;
 
-	//Try and acquire the multi-click time from the user defined Xdefaults
+	/* Try and acquire the multi-click time from the user defined Xdefaults */
 	char * xprop = XGetDefault(disp, "*", "multiClickTime");
 	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
 		successful = true;
@@ -162,7 +171,9 @@ long GetMultiClickTime() {
 	int argc = 0;
 	char ** argv = {NULL};
 
-	//Fall back to the X Toolkit extension if available and other efforts failed.
+	/* Fall back to the X Toolkit extension if available and other efforts
+	 * failed.
+	 */
     XtDisplayInitialize(app_context, disp, "JNativeHook", "JNativeHook", NULL, 0, &argc, argv);
 	if (!successful) {
 		clicktime = XtGetMultiClickTime(disp);
@@ -181,7 +192,7 @@ long GetMultiClickTime() {
 
 
 void OnLibraryLoad() {
-	//Tell X Threads are OK
+	/* Tell X Threads are OK */
 	XInitThreads();
 
 	#ifdef XT
@@ -189,7 +200,7 @@ void OnLibraryLoad() {
 	app_context = XtCreateApplicationContext();
 	#endif
 
-	//Open local display.
+	/* Open local display */
 	disp = XOpenDisplay(XDisplayName(NULL));
 	#ifdef DEBUG
 	if (disp != NULL) {
@@ -202,7 +213,7 @@ void OnLibraryLoad() {
 	
 	Bool isAutoRepeat = false;
 	#ifdef XKB
-	//enable detectable autorepeat.
+	/* Enable detectable autorepeat */
 	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
 	#else
 	XAutoRepeatOn(disp);
@@ -228,7 +239,7 @@ void OnLibraryUnload() {
 	XtDestroyApplicationContext(app_context);
 	#endif
 
-	//Destroy the native displays.
+	/* Destroy the native displays */
 	if (disp != NULL) {
 		XCloseDisplay(disp);
 		disp = NULL;

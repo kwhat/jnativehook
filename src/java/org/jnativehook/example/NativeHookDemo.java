@@ -1,16 +1,17 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
- * 
- * This program is free software: you can redistribute it and/or modify
+ * http://code.google.com/p/jnativehook/
+ *
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
+ *
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,6 +35,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
@@ -52,14 +54,13 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * @since	1.0
  * 
  * @see GlobalScreen
  * @see NativeKeyListener
  */
 public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, ActionListener, WindowListener, ItemListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -5076634313730799059L;
+	private static final long serialVersionUID = 1865350670081087993L;
 	
 	/** Checkbox's for event delivery options. */
 	private JCheckBox chkKeyboard, chkButton, chkMotion, chkWheel;
@@ -183,82 +184,92 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	}
 	
 	/**
-	 * @see org.jnativehook.keyboard.NativeKeyListener#keyPressed(org.jnativehook.keyboard.NativeKeyEvent)
+	 * @see org.jnativehook.keyboard.NativeKeyListener#nativeKeyPressed(org.jnativehook.keyboard.NativeKeyEvent)
 	 */
-	public void keyPressed(NativeKeyEvent e) {
+	public void nativeKeyPressed(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see org.jnativehook.keyboard.NativeKeyListener#keyReleased(org.jnativehook.keyboard.NativeKeyEvent)
+	 * @see org.jnativehook.keyboard.NativeKeyListener#nativeKeyReleased(org.jnativehook.keyboard.NativeKeyEvent)
 	 */
-	public void keyReleased(NativeKeyEvent e) {
+	public void nativeKeyReleased(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 
 	/**
-	 * @see org.jnativehook.keyboard.NativeKeyListener#keyTyped(org.jnativehook.keyboard.NativeKeyEvent)
+	 * @see org.jnativehook.keyboard.NativeKeyListener#nativeKeyTyped(org.jnativehook.keyboard.NativeKeyEvent)
 	 */
-	public void keyTyped(NativeKeyEvent e) {
+	public void nativeKeyTyped(NativeKeyEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseListener#mouseClicked(org.jnativehook.mouse.NativeMouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#nativeMouseClicked(org.jnativehook.mouse.NativeMouseEvent)
 	 */
-	public void mouseClicked(NativeMouseEvent e) {
+	public void nativeMouseClicked(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseListener#mousePressed(org.jnativehook.mouse.NativeMouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#nativeMousePressed(org.jnativehook.mouse.NativeMouseEvent)
 	 */
-	public void mousePressed(NativeMouseEvent e) {
+	public void nativeMousePressed(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseListener#mouseReleased(org.jnativehook.mouse.NativeMouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseListener#nativeMouseReleased(org.jnativehook.mouse.NativeMouseEvent)
 	 */
-	public void mouseReleased(NativeMouseEvent e) {
+	public void nativeMouseReleased(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseMotionListener#mouseMoved(org.jnativehook.mouse.NativeMouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseMotionListener#nativeMouseMoved(org.jnativehook.mouse.NativeMouseEvent)
 	 */
-	public void mouseMoved(NativeMouseEvent e) {
+	public void nativeMouseMoved(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseMotionListener#mouseDragged(org.jnativehook.mouse.NativeMouseEvent)
+	 * @see org.jnativehook.mouse.NativeMouseMotionListener#nativeMouseDragged(org.jnativehook.mouse.NativeMouseEvent)
 	 */
-	public void mouseDragged(NativeMouseEvent e) {
+	public void nativeMouseDragged(NativeMouseEvent e) {
 		displayEventInfo(e);
 	}
 
 	/**
-	 * @see org.jnativehook.mouse.NativeMouseWheelListener#mouseWheelMoved(org.jnativehook.mouse.NativeMouseWheelEvent)
+	 * @see org.jnativehook.mouse.NativeMouseWheelListener#nativeMouseWheelMoved(org.jnativehook.mouse.NativeMouseWheelEvent)
 	 */
-	public void mouseWheelMoved(NativeMouseWheelEvent e) {
+	public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
 		displayEventInfo(e);
 	}
 	
 	/**
-	 * Write the <code>NativeInputEvent</code> to the text window.
+	 * Write information about the <code>NativeInputEvent</code> to the text
+	 * window.
 	 *
-	 * @param e The native key event.
+	 * @param e the native input event to dispay.
 	 */
-	private void displayEventInfo(NativeInputEvent e) {
-		txtEventInfo.append("\n" + e.paramString());
+	private void displayEventInfo(final NativeInputEvent e) {
+		/* Note: JNativeHook *CANNOT* operate on the event dispatch thread.
+		 * Because Swing components must be accessed on the event dispatching
+		 * thread, you *MUST* wrap access to Swing components using the
+		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
+		 */
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				txtEventInfo.append("\n" + e.paramString());
 
-		try {
-			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
-		}
-		catch (BadLocationException ex) {
-			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
-		}
+				try {
+					txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
+				}
+				catch (BadLocationException ex) {
+					txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+				}
+			}
+		});
 	}
 
 	/**
@@ -297,13 +308,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void windowIconified(WindowEvent e) { /* Do Nothing */ }
 
 	/**
-	 * Write the auto repeat rate and delay to the text window along with any 
+	 * Display information about the native keyboard and mouse along with any
 	 * errors that may have occurred.
 	 *
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
-
 		try {
 			txtEventInfo.setText("Auto Repate Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
 			txtEventInfo.append("\n" + "Auto Repate Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
@@ -314,10 +324,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 
 			//Initialze native hook.  This is done on window open because the
 			//listener requires the txtEventInfo object to be constructed.
-			//Note: This function is not AWT Thread Safe!
 			GlobalScreen.getInstance().registerNativeHook();
 		}
-		catch (Exception ex) {
+		catch (NativeHookException ex) {
 			txtEventInfo.append("\n" + "Error: " + ex.toString());
 		}
 		
@@ -337,7 +346,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void windowClosed(WindowEvent e) {
     	//Clean up the native hook.
    		try {
-   			//Note: This function is not AWT Thread Safe!
 			GlobalScreen.getInstance().unregisterNativeHook();
 		}
 		catch (NativeHookException ex) {

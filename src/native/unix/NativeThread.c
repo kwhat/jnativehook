@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -30,7 +31,7 @@
 #include "XInputHelpers.h"
 #include "XWheelCodes.h"
 
-//For this struct, refer to libxnee
+/* For this struct, refer to libxnee */
 typedef union {
 	unsigned char		type;
 	xEvent				event;
@@ -40,19 +41,19 @@ typedef union {
 	xConnSetupPrefix	setup;
 } XRecordDatum;
 
-//Exception global for thread initialization.
+/* Exception global for thread initialization */
 static Exception thread_ex;
 
-//Click count globals
+/* Mouse globals */
 static unsigned short click_count = 0;
 static Time click_time = 0;
 static bool mouse_dragged = false;
 
-//The pointer to the X11 display accessed by the callback.
+/* The pointer to the X11 display accessed by the callback  */
 static Display * disp_ctrl;
 static XRecordContext context;
 
-//Thread and hook handles.
+/* Thread and hook handles */
 #ifdef XRECORD_ASYNC
 static volatile bool running;
 #endif
@@ -65,10 +66,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		JNIEnv * env = NULL;
 		if (disp_ctrl != NULL && (*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-			//Get XRecord data.
+			/* Get XRecord data */
 			XRecordDatum * data = (XRecordDatum *) hook->data;
 
-			//Native Event Data
+			/* Native Event Data */
 			int event_type = data->type;
 			BYTE event_code = data->event.u.u.detail;
 			int event_mask = data->event.u.keyButtonPointer.state;
@@ -78,13 +79,13 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			KeySym keysym;
 			wchar_t keytxt;
 
-			//Java Event Data
+			/* Java Event Data */
 			JKeyDatum jkey;
 			jint jbutton;
 			jint scrollType, scrollAmount, wheelRotation;
 			jint modifiers;
 
-			//Java Event Objects
+			/* Java Event Objects */
 			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
 			switch (event_type) {
@@ -93,19 +94,18 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Key pressed. (%i)\n", event_code);
 					#endif
 
-					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
 					keysym = KeyCodeToKeySym(event_code, event_mask);
 					jkey = NativeToJKey(keysym);
 					modifiers = NativeToJEventMask(event_mask);
 
-					//Fire key pressed event.
+					/* Fire key pressed event */
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, (jlong) event_time, modifiers, event_code, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-					//Check to make sure the key is printable
+					/* Check to make sure the key is printable */
 					keytxt = KeySymToUnicode(keysym);
 					if (keytxt != 0x0000) {
-						//Fire key typed event.
+						/* Fire key typed event */
 						objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, (jlong) event_time, modifiers, event_code, org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, (jchar) keytxt, jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
@@ -116,12 +116,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
 					#endif
 
-					//keysym = XKeycodeToKeysym(disp_ctrl, event_code, 1);
 					keysym = KeyCodeToKeySym(event_code, LockMask);
 					jkey = NativeToJKey(keysym);
 					modifiers = NativeToJEventMask(event_mask);
 
-					//Fire key released event.
+					/* Fire key released event */
 					objKeyEvent = (*env)->NewObject(env, clsKeyEvent, idKeyEvent, org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, (jlong) event_time, modifiers, event_code, jkey.keycode, org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					break;
@@ -131,7 +130,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Button pressed. (%i)\n", event_code);
 					#endif
 
-					//Track the number of clicks.
+					/* Track the number of clicks */
 					if ((long) (event_time - click_time) <= GetMultiClickTime()) {
 						click_count++;
 					}
@@ -140,17 +139,17 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					}
 					click_time = event_time;
 
-					//Convert native modifiers to java modifiers.
+					/* Convert native modifiers to java modifiers */
 					modifiers = NativeToJEventMask(event_mask);
 
 					/* This information is all static for X11, its up to the WM to
 					 * decide how to interpret the wheel events.
 					 */
-					//TODO Should use constants for button codes.
+					/* TODO Should use constants and a lookup table for button codes */
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
 
-						//Fire mouse released event.
+						/* Fire mouse released event */
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
@@ -177,15 +176,15 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						scrollAmount = (jint) 3;
 						
 						if (event_code == 4) {
-							//Wheel Rotated Up and Away
+							/* Wheel Rotated Up and Away */
 							wheelRotation = -1;
 						}
-						else { //event_code == 5
-							//Wheel Rotated Down and Towards
+						else { /* event_code == 5 */
+							/* Wheel Rotated Down and Towards */
 							wheelRotation = 1;
 						}
 
-						//Fire mouse wheel event.
+						/* Fire mouse wheel event  */
 						objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					}
@@ -196,18 +195,18 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
 					#endif
 
-					//TODO Should use constants for button codes.
+					/* TODO Should use constants for button codes */
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-						//Handle button release events
+						/* Handle button release events */
 						jbutton = NativeToJButton(event_code);
 						modifiers = NativeToJEventMask(event_mask);
 
-						//Fire mouse released event.
+						/* Fire mouse released event */
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 
 						if (mouse_dragged != true) {
-							//Fire mouse clicked event.
+							/* Fire mouse clicked event */
 							objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseButtonEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count, jbutton);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 						}
@@ -219,26 +218,26 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
 					#endif
 
-					//Reset the clickcount
+					/* Reset the clickcount */
 					if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 						click_count = 0;
 					}
 					modifiers = NativeToJEventMask(event_mask);
 
-					//Set the mouse draged flag
+					/* Set the mouse draged flag */
 					mouse_dragged = modifiers >> 4 > 0;
 
-					//Check the upper half of java modifiers for non zero value.
+					/* Check the upper half of java modifiers for non zero value */
 					if (modifiers >> 4 > 0) {
-						//Create Mouse Dragged event
+						/* Create Mouse Dragged event */
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count);
 					}
 					else {
-						//Create a Mouse Moved event
+						/* Create a Mouse Moved event */
 						objMouseEvent = (*env)->NewObject(env, clsMouseEvent, idMouseMotionEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED, (jlong) event_time, modifiers, (jint) event_root_x, (jint) event_root_y, (jint) click_count);
 					}
 					
-					//Fire mouse moved event.
+					/* Fire mouse moved event */
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					break;
 
@@ -249,7 +248,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 				#endif
 			}
 
-			//Handle any possible JNI issue that may have occured.
+			/* Handle any possible JNI issue that may have occured */
 			if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 				#ifdef DEBUG
 				fprintf(stderr, "LowLevelProc(): JNI error occurred!\n");
@@ -270,10 +269,10 @@ static void * ThreadProc(void * arg) {
 	*status = RETURN_FAILURE;
 	JNIEnv * env = NULL;
 
-	//XRecord context for use later.
+	/* XRecord context for use later */
 	context = 0;
 
-	//Grab the default display
+	/* Grab the default display */
 	char * disp_name = XDisplayName(NULL);
 	disp_ctrl = XOpenDisplay(disp_name);
 	Display * disp_data = XOpenDisplay(disp_name);
@@ -282,14 +281,14 @@ static void * ThreadProc(void * arg) {
 		fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
 		#endif
 
-		//Check to make sure XRecord is installed and enabled.
+		/* Check to make sure XRecord is installed and enabled */
 		int major, minor;
 		if (XRecordQueryVersion(disp_data, &major, &minor) != false) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
 			#endif
 
-			//Setup XRecord range
+			/* Setup XRecord range */
 			XRecordClientSpec clients = XRecordAllClients;
 			XRecordRange * range = XRecordAllocRange();
 			if (range != NULL) {
@@ -297,7 +296,7 @@ static void * ThreadProc(void * arg) {
 				fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
 				#endif
 
-				//Create XRecord Context
+				/* Create XRecord Context */
 				range->device_events.first = KeyPress;
 				range->device_events.last = MotionNotify;
 				context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
@@ -337,7 +336,7 @@ static void * ThreadProc(void * arg) {
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			//Set the exit status.
+			/* Set the exit status */
 			*status = RETURN_SUCCESS;
 
 			#ifdef DEBUG
@@ -347,7 +346,7 @@ static void * ThreadProc(void * arg) {
 			pthread_mutex_unlock(&hookControlMutex);
 
 			#ifdef XRECORD_ASYNC
-			//Async requires that we loop so that our thread does not return.
+			/* Async requires that we loop so that our thread does not return */
 			XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL);
 			while (running) {
 				XRecordProcessReplies(disp_data);
@@ -355,11 +354,11 @@ static void * ThreadProc(void * arg) {
 			XRecordDisableContext(disp_ctrl, context);
 			XSync(disp_ctrl, true);
 			#else
-			//We should be using this but its broken upstream.
+			/* We should be using this but its broken upstream */
 			XRecordEnableContext(disp_data, context, LowLevelProc, NULL);
 			#endif
 
-			//Lock back up until we are done processing the exit.
+			/* Lock back up until we are done processing the exit */
 			pthread_mutex_lock(&hookControlMutex);
 			XRecordFreeContext(disp_ctrl, context);
 		}
@@ -378,7 +377,7 @@ static void * ThreadProc(void * arg) {
 	}
 	#endif
 
-	//Close down any open displays.
+	/* Close down any open displays */
 	if (disp_ctrl != NULL) {
 		XCloseDisplay(disp_ctrl);
 		disp_ctrl = NULL;
@@ -393,12 +392,12 @@ static void * ThreadProc(void * arg) {
 	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
-	//Detach this thread from the JVM
+	/* Detach this thread from the JVM */
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
 	}
 
-	//Make sure we signal that we have passed any exception throwing code.
+	/* Make sure we signal that we have passed any exception throwing code */
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
@@ -408,23 +407,24 @@ static void * ThreadProc(void * arg) {
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
-	//Make sure the native thread is not already running.
+	/* Make sure the native thread is not already running */
 	if (IsNativeThreadRunning() != true) {
-		//Lock the mutex handle for the thread hook.
+		/* Lock the mutex handle for the thread hook */
 		pthread_mutex_init(&hookControlMutex, NULL);
 
-		//Create all the global references up front to save time in the callbacks.
+		/* Create all the global references up front to save time in the callbacks */
 		if (CreateJNIGlobals() == RETURN_SUCCESS) {
 			#ifdef XRECORD_ASYNC
-			//Allow the thread loop to block.
+			/* Allow the thread loop to block */
 			running = true;
 			#endif
 
-			//We shall use the default pthread attributes: thread is joinable
-			//(not detached) and has default (non real-time) scheduling policy.
+			/* We shall use the default pthread attributes: thread is joinable
+			 * (not detached) and has default (non real-time) scheduling policy
+			 */
 			pthread_mutex_lock(&hookControlMutex);
 
-			//Initialize Native Input Functions
+			/* Initialize Native Input Functions */
 			LoadInputHelper();
 
 			if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
@@ -432,12 +432,12 @@ int StartNativeThread() {
 				fprintf(stdout, "StartNativeThread(): start successful.\n");
 				#endif
 
-				//Wait for the thread to start up.
+				/* Wait for the thread to start up */
 				if (pthread_mutex_lock(&hookControlMutex) == 0) {
 					pthread_mutex_unlock(&hookControlMutex);
 				}
 
-				//Handle any possible JNI issue that may have occured.
+				/* Handle any possible JNI issue that may have occured */
 				if (IsNativeThreadRunning()) {
 					#ifdef DEBUG
 					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
@@ -450,7 +450,7 @@ int StartNativeThread() {
 					fprintf(stderr, "StartNativeThread(): initialization failure!\n");
 					#endif
 
-					//Wait for the thread to die.
+					/* Wait for the thread to die */
 					void * thread_status;
 					pthread_join(hookThreadId, (void *) &thread_status);
 					status = *(int *) thread_status;
@@ -479,8 +479,9 @@ int StartNativeThread() {
 		}
 		#ifdef DEBUG
 		else {
-			//We cant do a whole lot of anything if we cant create JNI globals.
-			//Any exceptions are thrown by CreateJNIGlobals().
+			/* We cant do a whole lot of anything if we cant create JNI globals.
+			 * Any exceptions are thrown by CreateJNIGlobals().
+			 */
 			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
 		}
 		#endif
@@ -494,22 +495,22 @@ int StopNativeThread() {
 
 	if (IsNativeThreadRunning()) {
 		if (hookThreadId != pthread_self()) {
-			//Lock the thread.
+			/* Lock the thread */
 			pthread_mutex_lock(&hookControlMutex);
 
 			#ifdef XRECORD_ASYNC
-			//Try to exit the thread naturally.
+			/* Try to exit the thread naturally */
 			running = false;
 			#else
-			//Try to exit the thread naturally.
+			/* Try to exit the thread naturally */
 			XRecordDisableContext(disp_ctrl, context);
 			XSync(disp_ctrl, true);
 			#endif
 
-			//Must unlock to allow the thread to finish cleaning up.
+			/* Must unlock to allow the thread to finish cleaning up */
 			pthread_mutex_unlock(&hookControlMutex);
 
-			//Wait for the thread to die.
+			/* Wait for the thread to die */
 			void * thread_status;
 			pthread_join(hookThreadId, &thread_status);
 			status = *(int *) thread_status;
@@ -519,10 +520,10 @@ int StopNativeThread() {
 			fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 			#endif
 
-			//Cleanup Native Input Functions
+			/* Cleanup Native Input Functions */
 			UnloadInputHelper();
 
-			//Destroy all created globals.
+			/* Destroy all created globals */
 			#ifdef DEBUG
 			if (DestroyJNIGlobals() == RETURN_FAILURE) {
 				fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
@@ -531,7 +532,7 @@ int StopNativeThread() {
 			DestroyJNIGlobals();
 			#endif
 
-			//Clean up the mutex.
+			/* Clean up the mutex */
 			pthread_mutex_destroy(&hookControlMutex);
 		}
 		else {
@@ -545,12 +546,12 @@ int StopNativeThread() {
 bool IsNativeThreadRunning() {
 	bool isRunning = false;
 
-	//Wait for a lock on the thread.
+	/* Wait for a lock on the thread */
 	if (pthread_mutex_lock(&hookControlMutex) == 0) {
-		//Lock Successful.
+		/* Lock Successful */
 
 		if (pthread_mutex_trylock(&hookRunningMutex) == 0) {
-			//Lock Successful, we are not running.
+			/* Lock Successful, we are not running */
 			pthread_mutex_unlock(&hookRunningMutex);
 		}
 		else {
@@ -565,8 +566,9 @@ bool IsNativeThreadRunning() {
 	}
 	#ifdef DEBUG
 	else {
-		//Lock Failure. This should always be caused by an invalid pointer
-		//and/or an uninitialized mutex.
+		/* Lock Failure. This should always be caused by an invalid pointer
+		 * and/or an uninitialized mutex.
+		 */
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 	}
 	#endif

@@ -1,16 +1,17 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
- * 
- * This program is free software: you can redistribute it and/or modify
+ * http://code.google.com/p/jnativehook/
+ *
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
+ *
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,7 +30,7 @@ import org.jnativehook.NativeInputEvent;
  * This low-level event is generated natively for:
  * <ul>
  * 	<li>
- * 		Mouse Events
+ * 		Native Mouse Events
  * 		<ul>
  * 			<li>a mouse button is pressed</li>
  * 			<li>a mouse button is released</li>
@@ -37,7 +38,7 @@ import org.jnativehook.NativeInputEvent;
  * 		</ul>
  * 	</li>
  * 	<li>
- * 		Mouse Motion Events
+ * 		Native Mouse Motion Events
  * 		<ul>
  * 			<li>the mouse is moved
  * 			<li>the mouse is dragged</li>
@@ -69,7 +70,6 @@ import org.jnativehook.NativeInputEvent;
  * 
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * @since	1.0
  * 
  * @see GlobalScreen
  * @see NativeMouseListener
@@ -77,7 +77,7 @@ import org.jnativehook.NativeInputEvent;
  */
 public class NativeMouseEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 4284036646158864372L;
+	private static final long serialVersionUID = 6869201569046923469L;
 	
 	/**
 	 * The native mouse event's x pointer position.
@@ -158,22 +158,22 @@ public class NativeMouseEvent extends NativeInputEvent {
 
 	
 	/** Indicates no mouse buttons; used by getButton(). */
-	public static final int	NOBUTTON	= 0;
+	public static final int	NOBUTTON				= 0;
 	
 	/** Indicates mouse button #1; used by getButton(). */
-	public static final int	BUTTON1		= 1;
+	public static final int	BUTTON1					= 1;
 	
 	/** Indicates mouse button #2; used by getButton(). */
-	public static final int	BUTTON2		= 2;
+	public static final int	BUTTON2					= 2;
 	
 	/** Indicates mouse button #3; used by getButton(). */
-	public static final int	BUTTON3		= 3;
+	public static final int	BUTTON3					= 3;
 	
 	/** Indicates mouse button #4; used by getButton(). */
-	public static final int	BUTTON4		= 4;
+	public static final int	BUTTON4					= 4;
 	
 	/** Indicates mouse button #5; used by getButton(). */
-	public static final int	BUTTON5		= 5;
+	public static final int	BUTTON5					= 5;
 	
 
 	/**
@@ -186,8 +186,9 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
 	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
-	 * @param x The x coordinate of the native pointer.
-	 * @param y The y coordinate of the native pointer.
+	 * @param x the x coordinate of the native pointer.
+	 * @param y the y coordinate of the native pointer.
+	 * @param clickCount the number of button clicks associated with this event.
 	 *
 	 * @since 1.1
 	 */
@@ -205,10 +206,13 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are 
 	 * not compatible with the extended _DOWN_MASK or the old _MASK 
 	 * <code>InputEvent</code> modifiers.
-	 * @param x The x coordinate of the native pointer.
-	 * @param y The y coordinate of the native pointer.
+	 * @param x the x coordinate of the native pointer.
+	 * @param y the y coordinate of the native pointer.
 	 * @param button The mouse buttons that has changed state. NOBUTTON, 
 	 * BUTTON1, BUTTON2, BUTTON3, BUTTON5 or BUTTON5.
+	 * @param clickCount the number of button clicks associated with this event.
+	 * 
+	 * @since 1.1
 	 */
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount, int button) {
 		super(GlobalScreen.getInstance(), id, when, modifiers);
@@ -238,6 +242,8 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * Returns the number of button clicks associated with this event.
 	 *
 	 * @return An integer indicating the number of button clicks
+	 *
+	 * @since 1.1
 	 */
 	public int getClickCount() {
 		return clickCount;
@@ -246,9 +252,10 @@ public class NativeMouseEvent extends NativeInputEvent {
 	/**
 	 * Returns the x,y position of the native event.
 	 *
-	 * @return a Point object containing the x and y coordinates of the native pointer
+	 * @return a <code>Point</code> object containing the x and y coordinates
+	 * of the native pointer
 	 * 
-	 * @since	1.1
+	 * @since 1.1
 	 */
 	public Point getPoint() {
 		return new Point(x, y);
@@ -276,7 +283,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * Returns a parameter string identifying the native event.
 	 * This method is useful for event-logging and debugging.
 	 *
-	 * @return A string identifying the native event and its attributes.
+	 * @return a string identifying the native event and its attributes.
 	 */
 	@Override
 	public String  paramString() {

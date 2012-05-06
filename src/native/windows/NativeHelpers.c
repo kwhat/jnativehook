@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,7 +23,7 @@
 
 #include "NativeErrors.h"
 
-//Global Variables
+/* Global Variables */
 HINSTANCE hInst = NULL;
 
 long GetAutoRepeatRate() {
@@ -49,7 +50,7 @@ long GetAutoRepeatDelay() {
 
 long GetPointerAccelerationMultiplier() {
 	long value = -1;
-	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed
+	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
 		value = mouse[2];
@@ -60,10 +61,10 @@ long GetPointerAccelerationMultiplier() {
 
 long GetPointerAccelerationThreshold() {
 	long value = -1;
-	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed
+	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
-		//Average the x and y thresholds.
+		/* Average the x and y thresholds */
 		value = (mouse[0] + mouse[1]) / 2;
 	}
 
@@ -92,18 +93,18 @@ long GetMultiClickTime() {
 }
 
 void OnLibraryLoad() {
-	//Do Nothing.
+	/* Do Nothing */
 }
 
 void OnLibraryUnload() {
-	//Do Nothing.
+	/* Do Nothing */
 }
 
 BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			hInst = (HINSTANCE) _hInst;
-			//hInst = GetModuleHandle(NULL);
+			/* hInst = GetModuleHandle(NULL); */
 			break;
 	}
 

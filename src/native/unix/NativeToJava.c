@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -562,70 +563,70 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 
 		/* For input method support on Asian Keyboards */
 		/*
-		case XK_Cancel:					//Unknown X11 Support
+		case XK_Cancel:					* Unknown X11 Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL;
 			return jkey;
-		case XK_Henkan:					//Unknown X11 Support
+		case XK_Henkan:					* Unknown X11 Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT;
 			return jkey;
-		case XK_Muhenkan:				//Unknown X11 Support
+		case XK_Muhenkan:				* Unknown X11 Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT;
 			return jkey;
-		case XK_VoidSymbol:				//Unknown X11 Support
+		case XK_VoidSymbol:				* Unknown X11 Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT;
 			return jkey;
 		*/
 		#ifndef SUN_KEYBOARD
-		case XK_Mode_switch:			//TODO Testing Needed
+		case XK_Mode_switch:			/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE;
 			return jkey;
 		#endif
-		case XK_Kana_Shift:				//TODO Testing Needed
+		case XK_Kana_Shift:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA;
 			return jkey;
-		case XK_Kanji:					//TODO Testing Needed
+		case XK_Kanji:					/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI;
 			return jkey;
-		case XK_Eisu_Shift:				//TODO Testing Needed
+		case XK_Eisu_Shift:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALPHANUMERIC;
 			return jkey;
-		case XK_Katakana:				//TODO Testing Needed
+		case XK_Katakana:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KATAKANA;
 			return jkey;
-		case XK_Hiragana:				//TODO Testing Needed
+		case XK_Hiragana:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HIRAGANA;
 			return jkey;
-		case XK_Zenkaku:				//TODO Testing Needed
+		case XK_Zenkaku:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FULL_WIDTH;
 			return jkey;
-		case XK_Hankaku:				//TODO Testing Needed
+		case XK_Hankaku:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HALF_WIDTH;
 			return jkey;
-		case XK_Romaji:					//TODO Testing Needed
+		case XK_Romaji:					/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;
 			return jkey;
-		case XK_MultipleCandidate:		//TODO Testing Needed
+		case XK_MultipleCandidate:		/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
 			return jkey;
-		case XK_PreviousCandidate:		//TODO Testing Needed
+		case XK_PreviousCandidate:		/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PREVIOUS_CANDIDATE;
 			return jkey;
-		case XK_Codeinput:				//TODO Testing Needed
+		case XK_Codeinput:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CODE_INPUT;
 			return jkey;
-		case XK_Hiragana_Katakana:		//TODO Testing Needed
+		case XK_Hiragana_Katakana:		/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_KATAKANA;
 			return jkey;
-		case XK_Zenkaku_Hankaku:		//TODO Testing Needed
+		case XK_Zenkaku_Hankaku:		/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_HIRAGANA;
 			return jkey;
-		//case XK_Romaji:				//TODO Testing Needed
-		//	jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
-		//	return jkey;
-		case XK_Kana_Lock:				//TODO Testing Needed
+		/*case XK_Romaji:				* TODO Testing Needed *
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
+			return jkey; */
+		case XK_Kana_Lock:				/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA_LOCK;
 			return jkey;
-		case XK_Eisu_toggle:			//TODO Testing Needed
+		case XK_Eisu_toggle:			/* TODO Testing Needed */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INPUT_METHOD_ON_OFF;
 			return jkey;
 

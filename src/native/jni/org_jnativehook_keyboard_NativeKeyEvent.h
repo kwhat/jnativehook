@@ -1,12 +1,13 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
- * This program is free software: you can redistribute it and/or modify
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Reference: org/jnativehook/keyboard/NativeKeyEvent.java
-//http://java.sun.com/j2se/1.5.0/docs/api/constant-values.html#java.awt.event.KeyEvent.CHAR_UNDEFINED
+/* Reference: org/jnativehook/keyboard/NativeKeyEvent.java */
 #ifndef _Included_org_jnativehook_keyboard_NativeKeyEvent
 #define _Included_org_jnativehook_keyboard_NativeKeyEvent
 
@@ -41,8 +41,8 @@
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_SHIFT						0x10
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_CONTROL						0x11
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_ALT							0x12	//option or alt key
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_META							0x9D	//osx: command
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_ALT							0x12	/* Option or Alt Key */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_META							0x9D	/* OSX: Command */
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_WINDOWS						0x020C
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_CONTEXT_MENU					0x020D
 
@@ -56,10 +56,10 @@
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_LEFT							0x25
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_RIGHT						0x27
 
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_COMMA						0x2C	// ','
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_MINUS						0x2D	// '-'
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_PERIOD						0x2E	// '.'
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_SLASH						0x2F	// '/'
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_COMMA						0x2C	/* ',' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_MINUS						0x2D	/* '-' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_PERIOD						0x2E	/* '.' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_SLASH						0x2F	/* '/' */
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_0							0x30
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_1							0x31
@@ -72,8 +72,8 @@
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_8							0x38
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_9							0x39
 
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_SEMICOLON					0x3B	// ';'
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_EQUALS						0x3D	// '='
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_SEMICOLON					0x3B	/* ';' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_EQUALS						0x3D	/* '=' */
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_A							0x41
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_B							0x42
@@ -102,9 +102,9 @@
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_Y							0x59
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_Z							0x5A
 
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_OPEN_BRACKET					0x5B	// '['
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_SLASH					0x5C	// '\'
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_CLOSE_BRACKET				0x5D	// ']'
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_OPEN_BRACKET					0x5B	/* '[' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_SLASH					0x5C	/* '\' */
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_CLOSE_BRACKET				0x5D	/* ']' */
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD0						0x60
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD1						0x61
@@ -130,7 +130,7 @@
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_DIVIDE						0x6F
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_DELETE						0x7F
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK						0x90
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_CLEAR						0x03	//osx: number lock
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_CLEAR						0x03	/* OSX: Number Lock */
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_SCROLL_LOCK					0x91
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_F1							0x70
@@ -217,11 +217,11 @@
 
 
 /* For input method support on Asian Keyboards */
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL						0x0018	//Unknown Win32 API
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL						0x0018	/* Unknown Win32 API */
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT						0x001C
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT					0x001D
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT						0x001E
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE					0x001F	//Unknown Win32 API
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE					0x001F	/* Unknown Win32 API */
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_KANA							0x0015
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI						0x0019
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_ALPHANUMERIC					0x00F0
@@ -253,8 +253,8 @@
 
 #define org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN						0xFF58
 
-#define org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED					0xFFFF
+#define org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED					0xFFFF	/* CharCode Unknown */
 
-#define org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED					0x0000	// KeyCode Unknown
+#define org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED					0x0000	/* KeyCode Unknown */
 
 #endif

@@ -1,16 +1,17 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
- * 
- * This program is free software: you can redistribute it and/or modify
+ * http://code.google.com/p/jnativehook/
+ *
+ * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
+ *
+ * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,7 +39,7 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * GlobalScreen is used to represent the native screen area that Java does not 
  * usually have access to. This class can be thought of as the source component 
  * for native events.  
- * <p>
+ * <p />
  * This class also handles the loading, unpacking and communication with the 
  * native library. That includes registering new key and button hooks and the 
  * event dispatchers for each.
@@ -224,9 +225,7 @@ public class GlobalScreen {
 	
 	/**
 	 * Disable the native hook if it is currently running. If it is not running
-	 * the function has no effect. <b>Note that this method may block the AWT
-	 * event dispatching thread.</b> It is recomended to call this method from
-	 * outside the scope of the graphical user interface event queue.
+	 * the function has no effect.
 	 *
 	 * @throws NativeHookException the native hook exception
 	 * 
@@ -248,7 +247,6 @@ public class GlobalScreen {
 	 * Returns true if the current thread is the native event dispatching thread.
 	 *
 	 * @return true if the current thread is the native event dispatching thread.
-	 * @throws NativeHookException the native hook exception
 	 *
 	 * @since 1.1
 	 */
@@ -289,15 +287,15 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					((NativeKeyListener) listeners[i]).keyPressed(e);
+					((NativeKeyListener) listeners[i]).nativeKeyPressed(e);
 					break;
 
 				case NativeKeyEvent.NATIVE_KEY_TYPED:
-					((NativeKeyListener) listeners[i]).keyTyped(e);
+					((NativeKeyListener) listeners[i]).nativeKeyTyped(e);
 					break;
 				
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					((NativeKeyListener) listeners[i]).keyReleased(e);
+					((NativeKeyListener) listeners[i]).nativeKeyReleased(e);
 					break;
 			}
 		}
@@ -326,23 +324,23 @@ public class GlobalScreen {
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-					((NativeMouseListener) listeners[i]).mouseClicked(e);
+					((NativeMouseListener) listeners[i]).nativeMouseClicked(e);
 					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					((NativeMouseListener) listeners[i]).mousePressed(e);
+					((NativeMouseListener) listeners[i]).nativeMousePressed(e);
 					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					((NativeMouseListener) listeners[i]).mouseReleased(e);
+					((NativeMouseListener) listeners[i]).nativeMouseReleased(e);
 					break;
 				
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					((NativeMouseMotionListener) listeners[i]).mouseMoved(e);
+					((NativeMouseMotionListener) listeners[i]).nativeMouseMoved(e);
 					break;
 
 				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-					((NativeMouseMotionListener) listeners[i]).mouseDragged(e);
+					((NativeMouseMotionListener) listeners[i]).nativeMouseDragged(e);
 					break;
 			}
 		}
@@ -363,7 +361,7 @@ public class GlobalScreen {
 		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
 		for (int i = 0; i < listeners.length; i++) {
-			((NativeMouseWheelListener) listeners[i]).mouseWheelMoved(e);
+			((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(e);
 		}
 	}
 	
