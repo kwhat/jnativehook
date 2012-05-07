@@ -18,22 +18,23 @@
 package org.jnativehook.keyboard;
 
 //Imports
+import org.jnativehook.GlobalScreen;
 import java.util.EventListener;
 
 /**
  * The listener interface for receiving global <code>NativeKeyEvents</code>.
  * <p/>
- * 
- * The class that is interested in processing a <code>NativeKeyEvent</code> 
- * implements this interface, and the object created with that class is 
+ *
+ * The class that is interested in processing a <code>NativeKeyEvent</code>
+ * implements this interface, and the object created with that class is
  * registered with the <code>GlobalScreen</code> using the
- * {@link GlobalScreen#addNativeKeyListener} method. When the 
- * <code>NativeKeyEvent</code> occurs, that object's appropriate method is 
+ * {@link GlobalScreen#addNativeKeyListener(NativeKeyListener)} method. When the
+ * <code>NativeKeyEvent</code> occurs, that object's appropriate method is
  * invoked.
- * 
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * 
+ *
  * @see NativeKeyEvent
  */
 public interface NativeKeyListener extends EventListener {

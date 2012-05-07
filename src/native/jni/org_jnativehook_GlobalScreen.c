@@ -167,6 +167,21 @@ static void SetNativeProperties(JNIEnv * env) {
 }
 
 
+static void ClearNativeProperties(JNIEnv * env) {
+	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
+	jmethodID clearProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "clearProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+
+	if (clsSystem != NULL && clearProperty_ID != NULL) {
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate"));
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay"));
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier"));
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold"));
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity"));
+		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.multiClickInterval"));
+	}
+}
+
+
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
 	StartNativeThread();
 }
@@ -201,6 +216,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 
 		/* Set java properties from native sources. */
 		SetNativeProperties(env);
+		SetNativeProperties(env);
 	}
 	else {
 		#ifdef DEBUG
@@ -226,6 +242,23 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 
 	/* Run platform specific unload items. */
 	OnLibraryUnload();
+
+	/* Grab the currently JNI interface pointer so we can cleanup the
+	 * system properties set on load.
+	 */
+	JNIEnv * env = NULL;
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		/* Clear java properties from native sources. */
+		ClearNativeProperties(env);
+	}
+	#ifdef DEBUG
+	else {
+		/* It is not critical that these values are cleard so no exception
+		 * will be thrown.
+		 */
+		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
+	}
+	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");

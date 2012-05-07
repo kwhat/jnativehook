@@ -33,7 +33,8 @@ import org.jnativehook.NativeInputEvent;
  * {@link GlobalScreen#addNativeKeyListener(NativeKeyListener)} method. Each
  * <code>NativeKeyListener</code> object will receive a
  * <code>NativeKeyEvent</code> when the event occurs.
- * 
+ * <p/>
+ *
  * All <code>NativeKeyEvent</code> objects are dependent on the native platform 
  * and keyboard layout. <code>NATIVE_KEY_PRESSED</code> and 
  * <code>NATIVE_KEY_RELEASED</code> are generated for every key code recived by
@@ -41,7 +42,8 @@ import org.jnativehook.NativeInputEvent;
  * getKeyCode method, which returns a virtual key code. Native virtual 
  * keyCode constants maybe equivalent to their {@link java.awt.event.KeyEvent}
  * conterparts, however this this not gurenteed.
- * 
+ * <p/>
+ *
  * <code>NATIVE_KEY_TYPED</code> events are produced for
  * <code>NATIVE_KEY_PRESSED</code> events that produce valid unicode character
  * for the native keyboard layout. The getKeyChar method always returns a valid
@@ -50,14 +52,15 @@ import org.jnativehook.NativeInputEvent;
  * the getKeyCode method returns the event's keyCode. For
  * <code>NATIVE_KEY_TYPED</code> events, the getKeyCode method always returns
  * <code>VK_UNDEFINED</code>.
- * 
+ * <p/>
+ *
  * Virtual key codes only represent the physical key has been pressed and should
  * not be mistakin with the character mapped to that key by the opperating
  * system.  To determine the unicode representation of the
  * <code>NativeKeyEvent</code>, please use the {@link #getKeyChar()} method
  * for the <code>NATIVE_KEY_TYPED</code> event associated with that virtual key
  * codes.
- * 
+ * <p/>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
