@@ -18,17 +18,20 @@
 package org.jnativehook;
 
 /**
- * A small class to determine the native system's operating system family and 
- * architecture. The class is only used to determine which library to unpack 
- * and load at runtime. 
- * 
+ * A small class to determine the native system's operating system family and
+ * architecture. The class is only used to determine which native library to
+ * unpack and load at runtime. This class is never used if the native library
+ * is load using the <code>java.library.path</code> property.
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
  */
 public class NativeSystem {
-	
+
 	/**
 	 * The operating system family enum.
+	 *
+	 * @see NativeSystem
 	 */
 	public enum Family {
 		/** The FreeBSD operating system family. */
@@ -52,9 +55,11 @@ public class NativeSystem {
 		/** Any unsupported operating system family. */
 		UNSUPPORTED
 	}
-	
+
 	/**
 	 * The system architecture enum.
+	 *
+	 * @see NativeSystem
 	 */
 	public enum Arch {
 		/** The alpha architecture. */
@@ -68,32 +73,32 @@ public class NativeSystem {
 
 		/** The itanium64 architecture. */
 		IA64,
-		
+
 		/** The mips architecture. */
 		MIPS,
-		
+
 		/** The sparc architecture. */
 		SPARC,
 
 		/** The sparc64 architecture. */
 		SPARC64,
-		
+
 		/** The ppc architecture. */
 		PPC,
-		
+
 		/** The ppc64 architecture. */
 		PPC64,
 
 		/** The x86 architecture. */
 		x86,
-		
+
 		/** The amd64 architecture. */
 		x86_64,
-		
+
 		/** Any unsupported system architecture. */
 		UNSUPPORTED
 	}
-	
+
 	/**
 	 * Determines the current operating system family.
 	 *
@@ -112,7 +117,7 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("mac os x")) {
 			family = Family.OSX;
 		}
-		else if (osName.equalsIgnoreCase("solaris") || 
+		else if (osName.equalsIgnoreCase("solaris") ||
 				osName.equalsIgnoreCase("sunos")
 		) {
 			family = Family.SOLARIS;
@@ -126,10 +131,10 @@ public class NativeSystem {
 		else {
 			family = Family.UNSUPPORTED;
 		}
-		
+
 		return family;
 	}
-	
+
 	/**
 	 * Determines the current system architecture.
 	 *
@@ -138,7 +143,7 @@ public class NativeSystem {
 	public static Arch getArchitecture() {
 		String osArch = System.getProperty("os.arch");
 		Arch arch;
-		
+
 		if (osArch.equalsIgnoreCase("alpha")) {
 			arch = Arch.ALPHA;
 		}
@@ -171,15 +176,15 @@ public class NativeSystem {
 			arch = Arch.PPC64;
 		}
 		else if (osArch.equalsIgnoreCase("x86") ||
-			osArch.equalsIgnoreCase("i386") || 
+			osArch.equalsIgnoreCase("i386") ||
 			osArch.equalsIgnoreCase("i486") ||
 			osArch.equalsIgnoreCase("i586") ||
 			osArch.equalsIgnoreCase("i686")
 		) {
 			arch = Arch.x86;
 		}
-		else if (osArch.equalsIgnoreCase("x86_64") || 
-				osArch.equalsIgnoreCase("amd64") || 
+		else if (osArch.equalsIgnoreCase("x86_64") ||
+				osArch.equalsIgnoreCase("amd64") ||
 				osArch.equalsIgnoreCase("k8")
 		) {
 			arch = Arch.x86_64;
@@ -188,7 +193,7 @@ public class NativeSystem {
 		else {
 			arch = Arch.UNSUPPORTED;
 		}
-		
+
 		return arch;
 	}
 }

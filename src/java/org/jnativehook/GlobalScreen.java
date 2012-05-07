@@ -36,21 +36,22 @@ import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
- * GlobalScreen is used to represent the native screen area that Java does not 
- * usually have access to. This class can be thought of as the source component 
- * for native events.  
+ * GlobalScreen is used to represent the native screen area that Java does not
+ * usually have access to. This class can be thought of as the source component
+ * for native events.
  * <p />
- * This class also handles the loading, unpacking and communication with the 
- * native library. That includes registering new key and button hooks and the 
- * event dispatchers for each.
- * 
+ * This class also handles the loading, unpacking and communication with the
+ * native library. That includes registering new global keyboard and mouse
+ * listeners and registering the native hook with the underlying operating
+ * system.
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
  */
 public class GlobalScreen {
 	/** The GlobalScreen singleton. */
 	private static final GlobalScreen instance = new GlobalScreen();
-	
+
 	/** The list of event listeners to notify. */
 	private EventListenerList eventListeners;
 
@@ -66,7 +67,7 @@ public class GlobalScreen {
 		//Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
 	}
-	
+
 	/**
 	 * A deconstructor that will perform native cleanup by calling the
 	 * {@link #unregisterNativeHook} method.  This method will not run until the
@@ -93,13 +94,13 @@ public class GlobalScreen {
 	 *
 	 * @return single instance of GlobalScreen
 	 */
-	public static final GlobalScreen getInstance() {
+	public static GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
-	
+
 	/**
-	 * Adds the specified native key listener to receive key events from the 
-	 * native system. If listener is null, no exception is thrown and no action 
+	 * Adds the specified native key listener to receive key events from the
+	 * native system. If listener is null, no exception is thrown and no action
 	 * is performed.
 	 *
 	 * @param listener the native key listener
@@ -109,11 +110,11 @@ public class GlobalScreen {
 			eventListeners.add(NativeKeyListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Removes the specified native key listener so that it no longer receives 
-	 * key events from the native system. This method performs no function if 
-	 * the listener specified by the argument was not previously added.  If 
+	 * Removes the specified native key listener so that it no longer receives
+	 * key events from the native system. This method performs no function if
+	 * the listener specified by the argument was not previously added.  If
 	 * listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener the native key listener
@@ -123,10 +124,10 @@ public class GlobalScreen {
 			eventListeners.remove(NativeKeyListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Adds the specified native mouse listener to receive mouse events from the 
-	 * native system. If listener is null, no exception is thrown and no action 
+	 * Adds the specified native mouse listener to receive mouse events from the
+	 * native system. If listener is null, no exception is thrown and no action
 	 * is performed.
 	 *
 	 * @param listener the native mouse listener
@@ -136,11 +137,11 @@ public class GlobalScreen {
 			eventListeners.add(NativeMouseListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Removes the specified native mouse listener so that it no longer receives 
-	 * mouse events from the native system. This method performs no function if 
-	 * the listener specified by the argument was not previously added.  If 
+	 * Removes the specified native mouse listener so that it no longer receives
+	 * mouse events from the native system. This method performs no function if
+	 * the listener specified by the argument was not previously added.  If
 	 * listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener the native mouse listener
@@ -150,10 +151,10 @@ public class GlobalScreen {
 			eventListeners.remove(NativeMouseListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Adds the specified native mouse motion listener to receive mouse motion 
-	 * events from the native system. If listener is null, no exception is 
+	 * Adds the specified native mouse motion listener to receive mouse motion
+	 * events from the native system. If listener is null, no exception is
 	 * thrown and no action is performed.
 	 *
 	 * @param listener the native mouse motion listener
@@ -163,12 +164,12 @@ public class GlobalScreen {
 			eventListeners.add(NativeMouseMotionListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Removes the specified native mouse motion listener so that it no longer 
-	 * receives mouse motion events from the native system. This method performs 
-	 * no function if the listener specified by the argument was not previously 
-	 * added.  If listener is null, no exception is thrown and no action is 
+	 * Removes the specified native mouse motion listener so that it no longer
+	 * receives mouse motion events from the native system. This method performs
+	 * no function if the listener specified by the argument was not previously
+	 * added.  If listener is null, no exception is thrown and no action is
 	 * performed.
 	 *
 	 * @param listener the native mouse motion listener
@@ -178,14 +179,14 @@ public class GlobalScreen {
 			eventListeners.remove(NativeMouseMotionListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Adds the specified native mouse wheel listener to receive mouse wheel 
-	 * events from the native system. If listener is null, no exception is 
+	 * Adds the specified native mouse wheel listener to receive mouse wheel
+	 * events from the native system. If listener is null, no exception is
 	 * thrown and no action is performed.
 	 *
 	 * @param listener the native mouse wheel listener
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public void addNativeMouseWheelListener(NativeMouseWheelListener listener) {
@@ -193,16 +194,16 @@ public class GlobalScreen {
 			eventListeners.add(NativeMouseWheelListener.class, listener);
 		}
 	}
-	
+
 	/**
-	 * Removes the specified native mouse wheel listener so that it no longer 
-	 * receives mouse wheel events from the native system. This method performs 
-	 * no function if the listener specified by the argument was not previously 
-	 * added.  If listener is null, no exception is thrown and no action is 
+	 * Removes the specified native mouse wheel listener so that it no longer
+	 * receives mouse wheel events from the native system. This method performs
+	 * no function if the listener specified by the argument was not previously
+	 * added.  If listener is null, no exception is thrown and no action is
 	 * performed.
 	 *
 	 * @param listener the native mouse wheel listener
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public void removeNativeMouseWheelListener(NativeMouseWheelListener listener) {
@@ -210,38 +211,42 @@ public class GlobalScreen {
 			eventListeners.remove(NativeMouseWheelListener.class, listener);
 		}
 	}
-	
+
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
 	 * the function has no effect. <b>Note that this method may block the AWT
-	 * event dispatching thread.</b> It is recomended to call this method from
+	 * event dispatching thread.</b> It is recommended to call this method from
 	 * outside the scope of the graphical user interface event queue.
 	 *
 	 * @throws NativeHookException the native hook exception
-	 * 
+	 *
 	 * @since 1.1
 	 */
-	public native void registerNativeHook() throws NativeHookException;
-	
+	public static native void registerNativeHook() throws NativeHookException;
+
 	/**
-	 * Disable the native hook if it is currently running. If it is not running
-	 * the function has no effect.
+	 * Disable the native hook if it is currently registered. If the native
+	 * hook it is not registered the function has no effect.
+	 * <p />
+	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
+	 * if it is called from within the native event dispatching thread.  Use
+	 * {@link #isNativeDispatchThread()} to prevent this type of exception.
 	 *
 	 * @throws NativeHookException the native hook exception
-	 * 
+	 *
 	 * @since 1.1
 	 */
-	public native void unregisterNativeHook() throws NativeHookException;
-	
+	public static native void unregisterNativeHook() throws NativeHookException;
+
 	/**
 	 * Gets the current state of the native hook.
 	 *
 	 * @return the state of the native hook.
 	 * @throws NativeHookException the native hook exception
-	 * 
+	 *
 	 * @since 1.1
 	 */
-	public native boolean isNativeHookRegistered();
+	public static native boolean isNativeHookRegistered();
 
 	/**
 	 * Returns true if the current thread is the native event dispatching thread.
@@ -251,12 +256,12 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static native boolean isNativeDispatchThread();
-	
+
 	/**
-	 * Dispatches an event to the appropriate processor.  This method is 
-	 * generally called by the native library but maybe used to synthesize 
+	 * Dispatches an event to the appropriate processor.  This method is
+	 * generally called by the native library but maybe used to synthesize
 	 * native events from Java.
-	 * 
+	 *
 	 * @param e the native input event
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
@@ -270,11 +275,11 @@ public class GlobalScreen {
 			processMouseEvent((NativeMouseEvent) e);
 		}
 	}
-	
+
 	/**
-	 * Processes native key events by dispatching them to all registered 
+	 * Processes native key events by dispatching them to all registered
 	 * <code>NativeKeyListener</code> objects.
-	 * 
+	 *
 	 * @param e The <code>NativeKeyEvent</code> to dispatch.
 	 * @see NativeKeyEvent
 	 * @see NativeKeyListener
@@ -283,7 +288,7 @@ public class GlobalScreen {
 	protected void processKeyEvent(NativeKeyEvent e) {
 		int id = e.getID();
 		EventListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-		
+
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeKeyEvent.NATIVE_KEY_PRESSED:
@@ -293,18 +298,18 @@ public class GlobalScreen {
 				case NativeKeyEvent.NATIVE_KEY_TYPED:
 					((NativeKeyListener) listeners[i]).nativeKeyTyped(e);
 					break;
-				
+
 				case NativeKeyEvent.NATIVE_KEY_RELEASED:
 					((NativeKeyListener) listeners[i]).nativeKeyReleased(e);
 					break;
 			}
 		}
 	}
-	
+
 	/**
-	 * Processes native mouse events by dispatching them to all registered 
+	 * Processes native mouse events by dispatching them to all registered
 	 * <code>NativeMouseListener</code> objects.
-	 * 
+	 *
 	 * @param e The <code>NativeMouseEvent</code> to dispatch.
 	 * @see NativeMouseEvent
 	 * @see NativeMouseListener
@@ -312,7 +317,7 @@ public class GlobalScreen {
 	 */
 	protected void processMouseEvent(NativeMouseEvent e) {
 		int id = e.getID();
-		
+
 		EventListener[] listeners;
 		if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED || id == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
 			listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
@@ -320,7 +325,7 @@ public class GlobalScreen {
 		else {
 			listeners = eventListeners.getListeners(NativeMouseListener.class);
 		}
-		
+
 		for (int i = 0; i < listeners.length; i++) {
 			switch (id) {
 				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
@@ -330,11 +335,11 @@ public class GlobalScreen {
 				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
 					((NativeMouseListener) listeners[i]).nativeMousePressed(e);
 					break;
-				
+
 				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
 					((NativeMouseListener) listeners[i]).nativeMouseReleased(e);
 					break;
-				
+
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
 					((NativeMouseMotionListener) listeners[i]).nativeMouseMoved(e);
 					break;
@@ -345,16 +350,16 @@ public class GlobalScreen {
 			}
 		}
 	}
-	
+
 	/**
-	 * Processes native mouse wheel events by dispatching them to all registered 
+	 * Processes native mouse wheel events by dispatching them to all registered
 	 * <code>NativeMouseWheelListener</code> objects.
-	 * 
+	 *
 	 * @param e The <code>NativeMouseWheelEvent</code> to dispatch.
 	 * @see NativeMouseWheelEvent
 	 * @see NativeMouseWheelListener
 	 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	protected void processMouseWheelEvent(NativeMouseWheelEvent e) {
@@ -364,9 +369,9 @@ public class GlobalScreen {
 			((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(e);
 		}
 	}
-	
+
 	/**
-	 * Perform procedures to interface with the native library. These procedures 
+	 * Perform procedures to interface with the native library. These procedures
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
 	protected static void loadNativeLibrary() {
@@ -385,7 +390,7 @@ public class GlobalScreen {
 						"org/jnativehook/lib/" +
 						NativeSystem.getFamily().toString().toLowerCase() + "/" +
 						NativeSystem.getArchitecture().toString().toLowerCase() + "/";
-				
+
 				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
 
 				if (classFile.isFile()) {
@@ -399,14 +404,14 @@ public class GlobalScreen {
 					//Extract the lib from inside of the jar file.
 					InputStream jarInputStream = jarFile.getInputStream(jarLibEntry);
 					FileOutputStream tempLibOutputStream = new FileOutputStream(tmpLibFile);
-					
+
 					byte[] array = new byte[8192];
-					int read = 0;
+					int read;
 					while ( (read = jarInputStream.read(array)) > 0) {
 						tempLibOutputStream.write(array, 0, read);
 					}
 					tempLibOutputStream.close();
-					
+
 					tmpLibFile.deleteOnExit();
 					System.load(tmpLibFile.getPath());
 				}
@@ -417,14 +422,14 @@ public class GlobalScreen {
 
 					if (libFolder.isDirectory()) {
 						System.setProperty("java.library.path", System.getProperty("java.library.path", ".") + System.getProperty("path.separator", ":") + libFolder.getPath());
-						
+
 						//Refresh the library path
 						Field sysPath = ClassLoader.class.getDeclaredField("sys_paths");
 						sysPath.setAccessible(true);
 						if (sysPath != null) {
 							sysPath.set(System.class.getClassLoader(), null);
 						}
-						
+
 						//Try to load the native library
 						System.loadLibrary(libName);
 					}
@@ -440,18 +445,13 @@ public class GlobalScreen {
 			}
 		}
 	}
-	
+
 	/**
-	 * Perform procedures to cleanup the native library. This method is called 
+	 * Perform procedures to cleanup the native library. This method is called
 	 * on garbage collection to ensure proper native cleanup.
 	 */
-	protected static void unloadNativeLibrary() {
-		try {
-			//Make sure the native thread has stopped.
-			instance.unregisterNativeHook();
-		}
-		catch (NativeHookException e) {
-			e.printStackTrace();
-		}
+	protected static void unloadNativeLibrary() throws NativeHookException {
+		//Make sure the native thread has stopped.
+		instance.unregisterNativeHook();
 	}
 }

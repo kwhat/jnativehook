@@ -43,7 +43,7 @@ long GetAutoRepeatRate() {
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
-	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension 
+	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension
 	 * if available.
 	 */
 	if (!successful) {
@@ -156,7 +156,7 @@ long GetMultiClickTime() {
 	int clicktime;
 	bool successful = false;
 
-	/* Try and acquire the multi-click time from the user defined Xdefaults */
+	/* Try and acquire the multi-click time from the user defined X defaults */
 	char * xprop = XGetDefault(disp, "*", "multiClickTime");
 	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
 		successful = true;
@@ -210,7 +210,7 @@ void OnLibraryLoad() {
 		fprintf(stderr, "OnLibraryLoad(): XOpenDisplay failure!\n");
 	}
 	#endif
-	
+
 	Bool isAutoRepeat = false;
 	#ifdef XKB
 	/* Enable detectable autorepeat */

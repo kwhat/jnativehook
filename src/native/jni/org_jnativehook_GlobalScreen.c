@@ -74,7 +74,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		}
 		#endif
 
-		
+
 		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
 		long multiplier = GetPointerAccelerationMultiplier();
 		if (multiplier >= 0) {
@@ -199,7 +199,7 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThr
 }
 
 
-/* JNI entry point, This is executed when the Java virutal machine attaches to the native library. */
+/* JNI entry point, This is executed when the Java virtual machine attaches to the native library. */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	/* Grab the currently running virtual machine so we can attach to it in
 	 * functions that are not called from java. ( I.E. ThreadProc )
@@ -222,7 +222,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		#ifdef DEBUG
 		fprintf(stderr, "JNI_OnLoad(): GetEnv() failed!\n");
 		#endif
-		
+
 		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
 
@@ -233,7 +233,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
     return jni_version;
 }
 
-/* JNI exit point, This is executed when the Java virutal machine detaches from the native library. */
+/* JNI exit point, This is executed when the Java virtual machine detaches from the native library. */
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
 	/* Stop the native thread if its running. */
 	if (IsNativeThreadRunning()) {
@@ -253,7 +253,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	}
 	#ifdef DEBUG
 	else {
-		/* It is not critical that these values are cleard so no exception
+		/* It is not critical that these values are cleared so no exception
 		 * will be thrown.
 		 */
 		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");

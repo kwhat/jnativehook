@@ -57,7 +57,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		WCHAR keytxt[4];
 		BYTE keymap[256];
 
-		/* Jave Key Event Object */
+		/* Java Key Event Object */
 		jobject objKeyEvent;
 
 		switch(wParam) {
@@ -119,7 +119,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				break;
 		}
 
-		/* Handle any possible JNI issue that may have occured */
+		/* Handle any possible JNI issue that may have occurred */
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
 			fprintf(stderr, "LowLevelKeyboardProc(): JNI error occurred!\n");
@@ -261,13 +261,13 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 				#endif
 
-				/* Reset the clickcount */
+				/* Reset the click count */
 				if (click_count != 0 && (long) (mshook->time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Set the mouse draged flag */
+				/* Set the mouse dragged flag */
 				mouse_dragged = modifiers >> 4 > 0;
 
 				/* Check the upper half of java modifiers for non zero value */
@@ -304,13 +304,13 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				 * A positive value indicates that the wheel was rotated
 				 * forward, away from the user; a negative value indicates that
 				 * the wheel was rotated backward, toward the user. One wheel
-				 * click isdefined as WHEEL_DELTA, which is 120.
+				 * click is defined as WHEEL_DELTA, which is 120.
 				 */
-				
+
 				scrollType = (jint) GetScrollWheelType();
 				scrollAmount = (jint) GetScrollWheelAmount();
 				wheelRotation = (jint) ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
-				
+
 				/* Fire mouse wheel event */
 				objMouseWheelEvent = (*env)->NewObject(env, clsMouseWheelEvent, idMouseWheelEvent, org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, (jlong) mshook->time, modifiers, (jint) mshook->pt.x, (jint) mshook->pt.y, (jint) click_count, scrollType, scrollAmount, wheelRotation);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
@@ -368,7 +368,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 	/* Create the native hooks */
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
-	
+
 	if (handleKeyboardHook == NULL) {
 		#ifdef DEBUG
 		fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed!\n");
@@ -382,14 +382,14 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful.\n");
 	}
 	#endif
-	
+
 
 	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
 	if (handleMouseHook == NULL) {
 		#ifdef DEBUG
 		fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed!\n");
 		#endif
-		
+
 		thread_ex.class = NATIVE_HOOK_EXCEPTION;
 		thread_ex.message = "Failed to hook low level mouse events";
 

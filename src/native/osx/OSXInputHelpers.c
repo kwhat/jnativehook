@@ -99,7 +99,7 @@ CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 				keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, buff_len);
 			}
 		}
-		
+
 
 		CFRelease(keyboard_ref);
 	}

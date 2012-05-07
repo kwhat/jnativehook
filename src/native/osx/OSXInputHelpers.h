@@ -30,7 +30,7 @@
 #include <Carbon/Carbon.h>	/* For HIToolbox kVK_ keycodes and TIS funcitons */
 
 
-/* Suplemental virtual key information */
+/* Supplemental virtual key information */
 #define kVK_RightCommand				0x36
 #define kVK_ContextMenu					0x6E	/* AKA kMenuPowerGlyph */
 

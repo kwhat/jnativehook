@@ -46,21 +46,21 @@
  * have a control mask but the key up event would have reset that.
  */
 
-#define MOD_LALT				MOD_ALT				/* 1 */
-#define MOD_LCONTROL			MOD_CONTROL			/* 2 */
-#define MOD_LSHIFT				MOD_SHIFT			/* 4 */
-#define MOD_LWIN				MOD_WIN				/* 8 */
+#define MOD_LALT						MOD_ALT				/* 1 */
+#define MOD_LCONTROL					MOD_CONTROL			/* 2 */
+#define MOD_LSHIFT						MOD_SHIFT			/* 4 */
+#define MOD_LWIN						MOD_WIN				/* 8 */
 
-#define MOD_RALT				MOD_ALT		<< 4	/* 16 */
-#define MOD_RCONTROL			MOD_CONTROL	<< 4	/* 32 */
-#define MOD_RSHIFT				MOD_SHIFT	<< 4	/* 64 */
-#define MOD_RWIN				MOD_WIN		<< 4	/* 128 */
+#define MOD_RALT						MOD_ALT		<< 4	/* 16 */
+#define MOD_RCONTROL					MOD_CONTROL	<< 4	/* 32 */
+#define MOD_RSHIFT						MOD_SHIFT	<< 4	/* 64 */
+#define MOD_RWIN						MOD_WIN		<< 4	/* 128 */
 
-#define MOD_RBUTTON				256
-#define MOD_LBUTTON				512
-#define MOD_MBUTTON				1024
-#define MOD_XBUTTON1			2048
-#define MOD_XBUTTON2			4096
+#define MOD_RBUTTON						256
+#define MOD_LBUTTON						512
+#define MOD_MBUTTON						1024
+#define MOD_XBUTTON1					2048
+#define MOD_XBUTTON2					4096
 
 /* Helper functions for tracking the modifers  */
 extern void SetModifierMask(unsigned short int mask);

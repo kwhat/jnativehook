@@ -34,7 +34,7 @@ jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
-	
+
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		/* Class and getInstance method id for the GlobalScreen Object */
@@ -70,7 +70,7 @@ int CreateJNIGlobals() {
 				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID GlobalScreen.getInstance()!\n");
 				#endif
-				
+
 				ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#getInstance()");
 			}
 		}
@@ -104,7 +104,7 @@ int CreateJNIGlobals() {
 
 				ThrowException(OUT_OF_MEMORY_ERROR, "Failed to create JNI global reference for org.jnativehook.keyboard.NativeKeyEvent");
 			}
-			
+
 		}
 		else {
 			#ifdef DEBUG
@@ -113,7 +113,7 @@ int CreateJNIGlobals() {
 
 			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.keyboard.NativeKeyEvent class");
 		}
-		
+
 
 		/* Class and Constructor for the NativeMouseEvent Object */
 		jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
@@ -150,11 +150,11 @@ int CreateJNIGlobals() {
 			#ifdef DEBUG
 			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeMouseEvent class!\n");
 			#endif
-			
+
 			ThrowException(NO_CLASS_DEF_FOUND_ERROR, "Failed to locate the org.jnativehook.mouse.NativeMouseEvent class");
 		}
 
-		
+
 		/* Class and Constructor for the NativeMouseWheelEvent Object */
 		jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 		if (clsLocalMouseWheelEvent != NULL) {
@@ -199,7 +199,7 @@ int CreateJNIGlobals() {
 
 		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
-	
+
 	return status;
 }
 
@@ -231,7 +231,7 @@ int DestroyJNIGlobals() {
 	}
 	#ifdef DEBUG
 	else {
-		/* Leaving dangling global references will leak a small amout of memory
+		/* Leaving dangling global references will leak a small amount of memory
 		 * but because there is nothing that can be done about it at this point
 		 * an exception will not be thrown.
 		 */
