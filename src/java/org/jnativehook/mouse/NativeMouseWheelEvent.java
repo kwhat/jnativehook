@@ -27,7 +27,8 @@ import org.jnativehook.GlobalScreen;
  *
  * A <code>NativeMouseWheelEvent</code> object is passed to every
  * <code>NativeMouseWheelListener</code> object which is registered to receive
- * mouse wheel events using the {@link GlobalScreen#addNativeMouseWheelListener}
+ * mouse wheel events using the
+ * {@link GlobalScreen#addNativeMouseWheelListener(NativeMouseWheelListener)}
  * method. The <code>GlobalScreen</code> object then dispatches a
  * <code>NativeMouseWheelEvent</code> to each listener.
  * <p/>
@@ -35,8 +36,9 @@ import org.jnativehook.GlobalScreen;
  * A <code>NativeMouseEvent</code> object is also passed to every
  * <code>NativeMouseMotionListener</code> object which has been registered to
  * receive mouse motion events using the
- * {@link GlobalScreen#addNativeMouseListener} method. The GlobalScreen object
- * then dispatches a NativeMouseEvent to each listener.
+ * {@link GlobalScreen#addNativeMouseListener(NativeMouseWheelListener)}
+ * method. The GlobalScreen object then dispatches a NativeMouseEvent to each
+ * listener.
  * <p/>
  *
  * Platforms offer customization of the amount of scrolling that should take
@@ -104,22 +106,21 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	/**
 	 * Instantiates a new <code>NativeMouseWheelEvent</code> object.
 	 *
-	 * @param id The type of event.
+	 * @param an integer that identifies the native event type.
 	 * @param when a long integer that gives the time the event occurred
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
 	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
-	 * @param x The x coordinate of the native pointer.
-	 * @param y The y coordinate of the native pointer.
-	 *
-     * @param scrollType The type of scrolling which should take place in
+	 * @param x the x coordinate of the native pointer.
+	 * @param y the y coordinate of the native pointer.
+     * @param scrollType the type of scrolling which should take place in
      * response to this event;  valid values are <code>WHEEL_UNIT_SCROLL</code>
      * and <code>WHEEL_BLOCK_SCROLL</code>.
-     * @param scrollAmount For scrollType <code>WHEEL_UNIT_SCROLL</code>, the
+     * @param scrollAmount for scrollType <code>WHEEL_UNIT_SCROLL</code>, the
      * number of units to be scrolled.
-     * @param wheelRotation The amount that the mouse wheel was rotated (the
+     * @param wheelRotation the amount that the mouse wheel was rotated (the
      * number of "clicks")
      *
      * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)
@@ -180,14 +181,11 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	}
 
 
-
-
-
 	/**
 	 * Returns a parameter string identifying the native event.
 	 * This method is useful for event-logging and debugging.
 	 *
-	 * @return A string identifying the native event and its attributes.
+	 * @return a string identifying the native event and its attributes.
 	 */
 	@Override
 	public String  paramString() {

@@ -406,7 +406,7 @@ static void * ThreadProc(void * arg) {
 			#endif
 
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
-			thread_ex.message = "Failed to locate X record";
+			thread_ex.message = "Failed to locate the X record extension";
 		}
 	}
 	else {

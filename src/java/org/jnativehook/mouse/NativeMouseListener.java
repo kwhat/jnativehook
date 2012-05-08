@@ -22,19 +22,19 @@ import java.util.EventListener;
 import org.jnativehook.GlobalScreen;
 
 /**
- * The listener interface for receiving systemwide <code>NativeMouseEvents</code>. 
+ * The listener interface for receiving systemwide <code>NativeMouseEvents</code>.
  * (To track native mouse moves, use the <code>NativeMouseMotionListener</code>.)
  * <p>
- * The class that is interested in processing a <code>NativeMouseEvent</code> 
- * implements this interface, and the object created with that class is 
- * registered with the <code>GlobalScreen</code> using the 
- * {@link GlobalScreen#addNativeMouseListener} method. When the 
- * <code>NativeMouseMotion</code> event occurs, that object's appropriate 
+ * The class that is interested in processing a <code>NativeMouseEvent</code>
+ * implements this interface, and the object created with that class is
+ * registered with the <code>GlobalScreen</code> using the
+ * {@link GlobalScreen#addNativeMouseListener} method. When the
+ * <code>NativeMouseMotion</code> event occurs, that object's appropriate
  * method is invoked.
- * 
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * 
+ *
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
@@ -42,21 +42,21 @@ public interface NativeMouseListener extends EventListener {
 	 * Invoked when a mouse button has been clicked (pressed and released)
 	 * without being moved.
 	 *
-	 * @param e The native mouse event.
+	 * @param e the native mouse event.
 	 */
 	public void nativeMouseClicked(NativeMouseEvent e);
 
-	/** 
+	/**
 	 * Invoked when a mouse button has been pressed
-	 * 
-	 * @param e The native mouse event.
+	 *
+	 * @param e the native mouse event.
 	 */
 	public void nativeMousePressed(NativeMouseEvent e);
-	
-	/** 
+
+	/**
 	 * Invoked when a mouse button has been released
-	 * 
-	 * @param e The native mouse event.
+	 *
+	 * @param e the native mouse event.
 	 */
 	public void nativeMouseReleased(NativeMouseEvent e);
 }

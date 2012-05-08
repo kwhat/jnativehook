@@ -38,9 +38,9 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * for native events.
  * <p />
  * This class also handles the loading, unpacking and communication with the
- * native library. That includes registering new global keyboard and mouse
- * listeners and registering the native hook with the underlying operating
- * system.
+ * native library. That includes registering the native hook with the
+ * underlying operating system and adding global keyboard and mouse
+ * listeners.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
@@ -70,7 +70,8 @@ public class GlobalScreen {
 	 * {@link #unregisterNativeHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 *
-	 * @throws Throwable The <code>Exception</code> raised by this method.
+	 * @throws Throwable a <code>NativeHookException</code> raised by calling
+	 * {@link #unloadNativeLibrary()}
 	 * @see Object#finalize
 	 */
 	@Override
@@ -78,8 +79,8 @@ public class GlobalScreen {
 		try {
 			GlobalScreen.unloadNativeLibrary();
 		}
-		catch(Exception e) {
-			//Do Nothing
+		catch(NativeHookException e) {
+			throw e;
 		}
 		finally {
 			super.finalize();
@@ -100,7 +101,7 @@ public class GlobalScreen {
 	 * native system. If listener is null, no exception is thrown and no action
 	 * is performed.
 	 *
-	 * @param listener the native key listener
+	 * @param listener a native key listener object
 	 */
 	public void addNativeKeyListener(NativeKeyListener listener) {
 		if (listener != null) {
@@ -114,7 +115,7 @@ public class GlobalScreen {
 	 * the listener specified by the argument was not previously added.  If
 	 * listener is null, no exception is thrown and no action is performed.
 	 *
-	 * @param listener the native key listener
+	 * @param listener a native key listener object
 	 */
 	public void removeNativeKeyListener(NativeKeyListener listener) {
 		if (listener != null) {
@@ -127,7 +128,7 @@ public class GlobalScreen {
 	 * native system. If listener is null, no exception is thrown and no action
 	 * is performed.
 	 *
-	 * @param listener the native mouse listener
+	 * @param listener a native mouse listener object
 	 */
 	public void addNativeMouseListener(NativeMouseListener listener) {
 		if (listener != null) {
@@ -141,7 +142,7 @@ public class GlobalScreen {
 	 * the listener specified by the argument was not previously added.  If
 	 * listener is null, no exception is thrown and no action is performed.
 	 *
-	 * @param listener the native mouse listener
+	 * @param listener a native mouse listener object
 	 */
 	public void removeNativeMouseListener(NativeMouseListener listener) {
 		if (listener != null) {
@@ -154,7 +155,7 @@ public class GlobalScreen {
 	 * events from the native system. If listener is null, no exception is
 	 * thrown and no action is performed.
 	 *
-	 * @param listener the native mouse motion listener
+	 * @param listener a native mouse motion listener object
 	 */
 	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
 		if (listener != null) {
@@ -169,7 +170,7 @@ public class GlobalScreen {
 	 * added.  If listener is null, no exception is thrown and no action is
 	 * performed.
 	 *
-	 * @param listener the native mouse motion listener
+	 * @param listener a native mouse motion listener object
 	 */
 	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
 		if (listener != null) {
@@ -182,7 +183,7 @@ public class GlobalScreen {
 	 * events from the native system. If listener is null, no exception is
 	 * thrown and no action is performed.
 	 *
-	 * @param listener the native mouse wheel listener
+	 * @param listener a native mouse wheel listener object
 	 *
 	 * @since 1.1
 	 */
@@ -199,7 +200,7 @@ public class GlobalScreen {
 	 * added.  If listener is null, no exception is thrown and no action is
 	 * performed.
 	 *
-	 * @param listener the native mouse wheel listener
+	 * @param listener a native mouse wheel listener object
 	 *
 	 * @since 1.1
 	 */
@@ -211,11 +212,17 @@ public class GlobalScreen {
 
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
-	 * the function has no effect. <b>Note that this method may block the AWT
-	 * event dispatching thread.</b> It is recommended to call this method from
-	 * outside the scope of the graphical user interface event queue.
+	 * the function has no effect.
+	 * <p />
+	 * <b>Note: </b> This method will throw a <code>NativeHookException</code>
+	 * thrown if specific operating system features are unavailable or disabled.
+	 * For example: Access for assistive devices is unchecked in the Universal
+	 * Access section of the System Preferences on Apple's OS X platform or
+	 * <code>Load "record"</code> is missing for the xorg.conf file on
+	 * Unix/Linux/Solaris platforms.
 	 *
-	 * @throws NativeHookException the native hook exception
+	 * @throws NativeHookException problem registering the native hook with
+	 * the underlying operating system.
 	 *
 	 * @since 1.1
 	 */
@@ -229,7 +236,8 @@ public class GlobalScreen {
 	 * if it is called from within the native event dispatching thread.  Use
 	 * {@link #isNativeDispatchThread()} to prevent this type of exception.
 	 *
-	 * @throws NativeHookException the native hook exception
+	 * @throws NativeHookException problem unregistering the native hook from
+	 * the underlying operating system.
 	 *
 	 * @since 1.1
 	 */
@@ -246,9 +254,11 @@ public class GlobalScreen {
 	public static native boolean isNativeHookRegistered();
 
 	/**
-	 * Returns true if the current thread is the native event dispatching thread.
+	 * Check to determine if code is currently executing on the native event
+	 * dispatching thread.
 	 *
-	 * @return true if the current thread is the native event dispatching thread.
+	 * @return true if the current thread is the native event dispatching
+	 * thread.
 	 *
 	 * @since 1.1
 	 */
@@ -259,7 +269,7 @@ public class GlobalScreen {
 	 * generally called by the native library but maybe used to synthesize
 	 * native events from Java.
 	 *
-	 * @param e the native input event
+	 * @param e the <code>NativeInputEvent</code> to dispatch.
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
 		if (e instanceof NativeKeyEvent) {
@@ -277,7 +287,7 @@ public class GlobalScreen {
 	 * Processes native key events by dispatching them to all registered
 	 * <code>NativeKeyListener</code> objects.
 	 *
-	 * @param e The <code>NativeKeyEvent</code> to dispatch.
+	 * @param e the <code>NativeKeyEvent</code> to dispatch.
 	 * @see NativeKeyEvent
 	 * @see NativeKeyListener
 	 * @see #addNativeKeyListener(NativeKeyListener)
@@ -307,7 +317,7 @@ public class GlobalScreen {
 	 * Processes native mouse events by dispatching them to all registered
 	 * <code>NativeMouseListener</code> objects.
 	 *
-	 * @param e The <code>NativeMouseEvent</code> to dispatch.
+	 * @param e the <code>NativeMouseEvent</code> to dispatch.
 	 * @see NativeMouseEvent
 	 * @see NativeMouseListener
 	 * @see #addNativeMouseListener(NativeMouseListener)

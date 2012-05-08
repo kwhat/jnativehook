@@ -641,7 +641,7 @@ int StartNativeThread() {
 				printf("Native: Accessibility API is not enabled.\n");
 				#endif
 
-				ThrowException(NATIVE_HOOK_EXCEPTION, "Please enabled access for assistive devices in the Universal Access section of the System Preferences");
+				ThrowException(NATIVE_HOOK_EXCEPTION, "Access for assistive devices disabled");
 			}
 		}
 		#ifdef DEBUG

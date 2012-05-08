@@ -21,12 +21,12 @@ package org.jnativehook.mouse;
 import java.awt.Point;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
- 
+
 /**
- * An event which indicates that a mouse action occurred on the system.  
+ * An event which indicates that a mouse action occurred on the system.
  * This event is not limited to a particular component's scope or visibility.
  * <p/>
- * 
+ *
  * This low-level event is generated natively for:
  * <ul>
  * 	<li>
@@ -46,31 +46,31 @@ import org.jnativehook.NativeInputEvent;
  * 	</li>
  * </ul>
  * <p/>
- * 
- * A <code>NativeMouseEvent</code> object is passed to every 
- * <code>NativeMouseListener</code> object which is registered to receive mouse 
- * events using the {@link GlobalScreen#addNativeMouseListener} method. The  
- * <code>GlobalScreen</code> object then dispatches a 
+ *
+ * A <code>NativeMouseEvent</code> object is passed to every
+ * <code>NativeMouseListener</code> object which is registered to receive mouse
+ * events using the {@link GlobalScreen#addNativeMouseListener} method. The
+ * <code>GlobalScreen</code> object then dispatches a
  * <code>NativeMouseEvent</code> to each listener.
  * <p/>
- * 
- * A <code>NativeMouseEvent</code> object is also passed to every 
- * <code>NativeMouseMotionListener</code> object which has been registered to 
- * receive mouse motion events using the 
- * {@link GlobalScreen#addNativeMouseListener} method. The 
- * <code>GlobalScreen</code> object then dispatches a 
- * <code>NativeMouseEvent</code> to each listener. 
+ *
+ * A <code>NativeMouseEvent</code> object is also passed to every
+ * <code>NativeMouseMotionListener</code> object which has been registered to
+ * receive mouse motion events using the
+ * {@link GlobalScreen#addNativeMouseListener} method. The
+ * <code>GlobalScreen</code> object then dispatches a
+ * <code>NativeMouseEvent</code> to each listener.
  * <p/>
- * 
- * When a mouse button is clicked, events are generated and sent to the 
- * registered <code>NativeMouseListeners</code>. The state of modifiers can be 
- * retrieved using {@link NativeInputEvent#getModifiers}. All modifiers returned 
- * by {@link NativeInputEvent#getModifiers} reflect the current state of all 
+ *
+ * When a mouse button is clicked, events are generated and sent to the
+ * registered <code>NativeMouseListeners</code>. The state of modifiers can be
+ * retrieved using {@link NativeInputEvent#getModifiers}. All modifiers returned
+ * by {@link NativeInputEvent#getModifiers} reflect the current state of all
  * modifiers and buttons.
- * 
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * 
+ *
  * @see GlobalScreen
  * @see NativeMouseListener
  * @see NativeMouseMotionListener
@@ -78,17 +78,17 @@ import org.jnativehook.NativeInputEvent;
 public class NativeMouseEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 6869201569046923469L;
-	
+
 	/**
 	 * The native mouse event's x pointer position.
-	 * 
+	 *
 	 * @see #getX()
 	 */
 	private int x;
-	
+
 	/**
 	 * The native mouse event's y pointer position.
-	 * 
+	 *
 	 * @see #getY()
 	 */
 	private int y;
@@ -99,7 +99,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @see #getClickCount()
 	 */
 	private int clickCount;
-	
+
 	/**
 	 * Indicates which, if any, of the mouse buttons has changed state.
 	 *
@@ -115,7 +115,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 
 	/** The first number in the range of id's used for native mouse events. */
 	public static final int NATIVE_MOUSE_FIRST		= 2500;
-	
+
 	/** The last number in the range of id's used for native mouse events. */
 	public static final int NATIVE_MOUSE_LAST		= 2505;
 
@@ -130,56 +130,56 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * occurs when a mouse button is depressed.
 	 */
 	public static final int NATIVE_MOUSE_PRESSED	= 1 + NATIVE_MOUSE_FIRST;
-	
+
 	/**
 	 * The native mouse released event. This <code>NativeMouseEvent</code>
 	 * occurs when a mouse button is released.
 	 */
 	public static final int NATIVE_MOUSE_RELEASED	= 2 + NATIVE_MOUSE_FIRST;
-	
+
 	/**
 	 * The native mouse moved event. This <code>NativeMouseEvent</code>
 	 * occurs when the mouse pointer changes position.
 	 */
 	public static final int NATIVE_MOUSE_MOVED		= 3 + NATIVE_MOUSE_FIRST;
-	
+
 	/**
 	 * The native mouse dragged event. This <code>NativeMouseEvent</code>
 	 * occurs when the mouse pointer changes position while a mouse button
 	 * is pressed.
 	 */
 	public static final int NATIVE_MOUSE_DRAGGED	= 4 + NATIVE_MOUSE_FIRST;
-	
+
 	/**
 	 * The native mouse dragged event. This <code>NativeMouseEvent</code>
 	 * occurs when the mouse wheel is rotated.
 	 */
 	public static final int NATIVE_MOUSE_WHEEL		= 5 + NATIVE_MOUSE_FIRST;
 
-	
+
 	/** Indicates no mouse buttons; used by getButton(). */
 	public static final int	NOBUTTON				= 0;
-	
+
 	/** Indicates mouse button #1; used by getButton(). */
 	public static final int	BUTTON1					= 1;
-	
+
 	/** Indicates mouse button #2; used by getButton(). */
 	public static final int	BUTTON2					= 2;
-	
+
 	/** Indicates mouse button #3; used by getButton(). */
 	public static final int	BUTTON3					= 3;
-	
+
 	/** Indicates mouse button #4; used by getButton(). */
 	public static final int	BUTTON4					= 4;
-	
+
 	/** Indicates mouse button #5; used by getButton(). */
 	public static final int	BUTTON5					= 5;
-	
+
 
 	/**
 	 * Instantiates a new <code>NativeMouseEvent</code> object.
 	 *
-	 * @param id an integer that identifies the event
+	 * @param id an integer that identifies the native event type.
 	 * @param when a long integer that gives the time the event occurred
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
@@ -195,28 +195,28 @@ public class NativeMouseEvent extends NativeInputEvent {
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount) {
 		this(id, when, modifiers, x, y, clickCount, NOBUTTON);
 	}
-	
+
 	/**
 	 * Instantiates a new <code>NativeMouseEvent</code> object.
 	 *
-	 * @param id The type of event.
+	 * @param id an integer that identifies the native event type.
 	 * @param when a long integer that gives the time the event occurred
-	 * @param modifiers a modifier mask describing the modifier keys and mouse 
-	 * buttons active for the event. 
-	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are 
-	 * not compatible with the extended _DOWN_MASK or the old _MASK 
+	 * @param modifiers a modifier mask describing the modifier keys and mouse
+	 * buttons active for the event.
+	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
+	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
 	 * @param x the x coordinate of the native pointer.
 	 * @param y the y coordinate of the native pointer.
-	 * @param button The mouse buttons that has changed state. NOBUTTON, 
+	 * @param button The mouse buttons that has changed state. NOBUTTON,
 	 * BUTTON1, BUTTON2, BUTTON3, BUTTON5 or BUTTON5.
 	 * @param clickCount the number of button clicks associated with this event.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount, int button) {
 		super(GlobalScreen.getInstance(), id, when, modifiers);
-		
+
 		this.x = x;
 		this.y = y;
 		this.clickCount = clickCount;
@@ -254,7 +254,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 *
 	 * @return a <code>Point</code> object containing the x and y coordinates
 	 * of the native pointer
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public Point getPoint() {
@@ -269,7 +269,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	public int getX() {
 		return x;
 	}
-	
+
 	/**
 	 * Returns the y coordinate of the native event.
 	 *
@@ -278,7 +278,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	public int getY() {
 		return y;
 	}
-	
+
 	/**
 	 * Returns a parameter string identifying the native event.
 	 * This method is useful for event-logging and debugging.
@@ -287,8 +287,8 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 */
 	@Override
 	public String  paramString() {
-		StringBuilder param = new StringBuilder(255); 
-		
+		StringBuilder param = new StringBuilder(255);
+
 		switch(getID()) {
 			case NATIVE_MOUSE_CLICKED:
 				 param.append("NATIVE_MOUSE_CLICKED");
@@ -297,43 +297,43 @@ public class NativeMouseEvent extends NativeInputEvent {
 			case NATIVE_MOUSE_PRESSED:
 				 param.append("NATIVE_MOUSE_PRESSED");
 				break;
-			
+
 			case NATIVE_MOUSE_RELEASED:
 				param.append("NATIVE_MOUSE_RELEASED");
 				break;
-			
+
 			case NATIVE_MOUSE_MOVED:
 				param.append("NATIVE_MOUSE_MOVED");
 				break;
-			
+
 			case NATIVE_MOUSE_DRAGGED:
 				param.append("NATIVE_MOUSE_DRAGGED");
 				break;
-			
+
 			case NATIVE_MOUSE_WHEEL:
 				param.append("NATIVE_MOUSE_WHEEL");
 				break;
-			
+
 			default:
 				param.append("unknown type");
 				break;
 		}
-		
+
 		param.append(",(");
 		param.append(x);
 		param.append(',');
 		param.append(y);
 		param.append("),");
-		
-		
+
+
 		param.append("button=");
 		param.append(button);
-		
+
 		if (getModifiers() != 0) {
 			param.append(",modifiers=");
 			param.append(getModifiersText(getModifiers()));
 		}
-		
+
 		param.append(",clickCount=");
 		param.append(getClickCount());
 
