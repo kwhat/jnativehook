@@ -20,12 +20,9 @@ package org.jnativehook;
 //Imports
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
 import java.util.EventListener;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -385,61 +382,30 @@ public class GlobalScreen {
 		catch (UnsatisfiedLinkError linkError) {
 			//The library is not in the java.library.path so try to extract it.
 			try {
-				//Try to locate the jar file
-				String jarLibPath =
-						"org/jnativehook/lib/" +
-						NativeSystem.getFamily().toString().toLowerCase() + "/" +
-						NativeSystem.getArchitecture().toString().toLowerCase() + "/";
+				String libResourcePath = "/org/jnativehook/lib/"
+											+ NativeSystem.getFamily() + "/"
+											+ NativeSystem.getArchitecture() + "/";
 
-				File classFile = new File(GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsoluteFile();
+				File libFile = new File(System.getProperty("java.io.tmpdir")
+										+ System.getProperty("file.separator", File.separator)
+										+ System.mapLibraryName(libName));
 
-				if (classFile.isFile()) {
-					//Load the jar file and get the lib entry.
-					JarFile jarFile = new JarFile(classFile);
-					JarEntry jarLibEntry = jarFile.getJarEntry(jarLibPath + System.mapLibraryName(libName));
-
-					//Create a temp lib file in the systems tmp folder.
-					File tmpLibFile = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator", File.separator) + System.mapLibraryName(libName));
-
-					//Extract the lib from inside of the jar file.
-					InputStream jarInputStream = jarFile.getInputStream(jarLibEntry);
-					FileOutputStream tempLibOutputStream = new FileOutputStream(tmpLibFile);
-
-					byte[] array = new byte[8192];
-					int read;
-					while ( (read = jarInputStream.read(array)) > 0) {
-						tempLibOutputStream.write(array, 0, read);
-					}
-					tempLibOutputStream.close();
-
-					tmpLibFile.deleteOnExit();
-					System.load(tmpLibFile.getPath());
+				FileOutputStream libOutputStream = new FileOutputStream(libFile);
+				byte[] buffer = new byte[4 * 1024];
+				InputStream libInputStream = GlobalScreen.class
+									.getResourceAsStream(libResourcePath.toLowerCase()
+										+ System.mapLibraryName(libName));
+				int size;
+				while ((size = libInputStream.read(buffer)) != -1) {
+					libOutputStream.write(buffer, 0, size);
 				}
-				else if (classFile.isDirectory()) {
-					//Probably IDE environment, possible manual unpack.
-					//Setup the java.library.path to the load path and attempt a lib load.
-					File libFolder = new File(classFile.getAbsoluteFile() + "/" + jarLibPath);
+				libOutputStream.close();
+				libInputStream.close();
 
-					if (libFolder.isDirectory()) {
-						System.setProperty("java.library.path", System.getProperty("java.library.path", ".") + System.getProperty("path.separator", ":") + libFolder.getPath());
-
-						//Refresh the library path
-						Field sysPath = ClassLoader.class.getDeclaredField("sys_paths");
-						sysPath.setAccessible(true);
-						if (sysPath != null) {
-							sysPath.set(System.class.getClassLoader(), null);
-						}
-
-						//Try to load the native library
-						System.loadLibrary(libName);
-					}
-				}
+				libFile.deleteOnExit();
+				System.load(libFile.getPath());
 			}
-			catch (URISyntaxException e) {
-				//Tried and Failed to unpak the JAR container.
-				throw new RuntimeException(e.getMessage());
-			}
-			catch (Exception e) {
+			catch(IOException e) {
 				//Tried and Failed to manually setup the java.library.path
 				throw new RuntimeException(e.getMessage());
 			}
@@ -452,6 +418,6 @@ public class GlobalScreen {
 	 */
 	protected static void unloadNativeLibrary() throws NativeHookException {
 		//Make sure the native thread has stopped.
-		instance.unregisterNativeHook();
+		unregisterNativeHook();
 	}
 }
