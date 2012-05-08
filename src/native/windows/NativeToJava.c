@@ -511,11 +511,11 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		/*
 		case XK_at:						* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AT;
-			return jkey; */
-		case VK_OEM_1:					/* TODO Testing Needed */
+			return jkey;
+		case VK_OEM_1:					* Already Defined *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_COLON;
 			return jkey;
-		/* case XK_asciicircum:			* Unknown Microsoft Support *
+		case XK_asciicircum:			* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CIRCUMFLEX;
 			return jkey;
 		case XK_dollar:					* Unknown Microsoft Support *
@@ -535,11 +535,11 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			return jkey;
 		case XK_numbersign:				* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMBER_SIGN;
-			return jkey; */
-		case VK_OEM_PLUS:				/* TODO Testing Needed */
+			return jkey;
+		case VK_OEM_PLUS:				* Already Defined *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PLUS;
 			return jkey;
-		/* case XK_parenright:			* Unknown Microsoft Support *
+		case XK_parenright:				* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_RIGHT_PARENTHESIS;
 			return jkey;
 		case XK_underscore:				* Unknown Microsoft Support *
