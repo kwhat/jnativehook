@@ -789,12 +789,7 @@
 
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documenation...</echo>
-
-		<!-- Delete any previous javadocs -->
 		<mkdir dir="${dir.doc}" />
-		<delete includeemptydirs="true">
-			<fileset dir="${dir.doc}" includes="**/*" />
-		</delete>
 
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
 			<packageset dir="${dir.src.java}" defaultexcludes="yes">
