@@ -1014,12 +1014,16 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 		param.append("keyChar=");
 		switch (keyChar) {
-			case VK_ENTER:
 			case VK_BACK_SPACE:
-			case VK_TAB:
 			case VK_CANCEL:
 			case VK_DELETE:
+			case VK_ESCAPE:
+			case VK_ENTER:
+			case VK_TAB:
 				param.append(getKeyText(keyChar));
+				break;
+			case CHAR_UNDEFINED:
+				param.append(getKeyText(VK_UNDEFINED));
 				break;
 			default:
 				param.append('\'');

@@ -122,7 +122,8 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 												idKeyEvent,
 												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 												(jlong) event_time,
-												jmodifiers, event_code,
+												jmodifiers,
+												event_code,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
 												(jchar) keytxt,
 												jkey.location);
@@ -192,7 +193,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 													jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
-					else if (event_code == 4 || event_code == 5) {
+					else if (event_code == WheelUp || event_code == WheelDown) {
 						/* Scroll wheel release events.
 						 * Scroll type: WHEEL_UNIT_SCROLL
 						 * Scroll amount: 3 unit increments per notch
@@ -214,11 +215,11 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 						 */
 						jscrollAmount = (jint) 3;
 
-						if (event_code == 4) {
+						if (event_code == WheelUp) {
 							/* Wheel Rotated Up and Away */
 							jwheelRotation = -1;
 						}
-						else { /* event_code == 5 */
+						else { /* event_code == WheelDown */
 							/* Wheel Rotated Down and Towards */
 							jwheelRotation = 1;
 						}

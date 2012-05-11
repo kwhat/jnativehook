@@ -172,81 +172,107 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_EQUALS;
 			return jkey;
 
+		case XK_a:
 		case XK_A:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_A;
 			return jkey;
+		case XK_b:
 		case XK_B:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_B;
 			return jkey;
+		case XK_c:
 		case XK_C:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_C;
 			return jkey;
+		case XK_d:
 		case XK_D:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_D;
 			return jkey;
+		case XK_e:
 		case XK_E:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_E;
 			return jkey;
+		case XK_f:
 		case XK_F:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F;
 			return jkey;
+		case XK_g:
 		case XK_G:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_G;
 			return jkey;
+		case XK_h:
 		case XK_H:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_H;
 			return jkey;
+		case XK_i:
 		case XK_I:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_I;
 			return jkey;
+		case XK_j:
 		case XK_J:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_J;
 			return jkey;
+		case XK_k:
 		case XK_K:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_K;
 			return jkey;
+		case XK_l:
 		case XK_L:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_L;
 			return jkey;
+		case XK_m:
 		case XK_M:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_M;
 			return jkey;
+		case XK_n:
 		case XK_N:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_N;
 			return jkey;
+		case XK_o:
 		case XK_O:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_O;
 			return jkey;
+		case XK_p:
 		case XK_P:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_P;
 			return jkey;
+		case XK_q:
 		case XK_Q:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Q;
 			return jkey;
+		case XK_r:
 		case XK_R:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_R;
 			return jkey;
+		case XK_s:
 		case XK_S:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_S;
 			return jkey;
+		case XK_t:
 		case XK_T:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_T;
 			return jkey;
+		case XK_u:
 		case XK_U:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_U;
 			return jkey;
+		case XK_v:
 		case XK_V:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_V;
 			return jkey;
+		case XK_w:
 		case XK_W:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_W;
 			return jkey;
+		case XK_x:
 		case XK_X:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_X;
 			return jkey;
+		case XK_y:
 		case XK_Y:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Y;
 			return jkey;
+		case XK_z:
 		case XK_Z:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_Z;
 			return jkey;
@@ -301,7 +327,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_KP_Page_Up:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD9;
 			goto LOCATION_NP;
-			
+
 		case XK_KP_Multiply:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MULTIPLY;
 			goto LOCATION_NP;
