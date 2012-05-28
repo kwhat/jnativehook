@@ -30,18 +30,19 @@
 #include <Carbon/Carbon.h>	/* For HIToolbox kVK_ keycodes and TIS funcitons */
 
 
-/* Supplemental virtual key information */
+/* These virtual key codes do not appear to be defined anywhere by Apple */
 #define kVK_RightCommand				0x36
 #define kVK_ContextMenu					0x6E	/* AKA kMenuPowerGlyph */
 
 
-/* These codes do not appear to be defined anywhere by Apple */
+/* These button codes do not appear to be defined anywhere by Apple */
 #define kVK_LBUTTON						kCGMouseButtonLeft
 #define kVK_RBUTTON						kCGMouseButtonRight
 #define kVK_MBUTTON						kCGMouseButtonCenter
 #define kVK_XBUTTON1					3
 #define kVK_XBUTTON2					4
 
+/* These button masks do not appear to be defined anywhere by Apple */
 #define kCGEventFlagMaskButtonLeft		1
 #define kCGEventFlagMaskButtonRight		2
 #define kCGEventFlagMaskButtonCenter	4
@@ -49,12 +50,19 @@
 #define kCGEventFlagMaskXButton2		16
 
 
-/* OSX does not track the button masks of its events so we need to do it
- * manually.
- */
+/* Set the native modifier mask for future events. */
 extern void SetModifierMask(CGEventFlags mask);
+
+/* Unset the native modifier mask for future events. */
 extern void UnsetModifierMask(CGEventFlags mask);
+
+/* Get the current native modifier mask state. */
 extern CGEventFlags GetModifiers();
 
+
+/* Converts an OSX key code and event mask to the appropriate Unicode string 
+ * representation.
+ */
 extern CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers);
+
 #endif

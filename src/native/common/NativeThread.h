@@ -27,10 +27,19 @@ typedef struct {
 	char * message;
 } Exception;
 
-/* Common function stubs */
-extern int StopNativeThread();
+/* Attempt to start the global hook thread. */
 extern int StartNativeThread();
+
+/* Attempt to stop the global hook thread. */
+extern int StopNativeThread();
+
+/* Determine the status of the global hook thread. */
 extern bool IsNativeThreadRunning();
+
+/* Determine if the function was called from within the native dispatch thread. 
+ * The behavior of this function when IsNativeThreadRunning() == false is 
+ * undefined.
+ */
 extern bool IsNativeDispatchThread();
 
 #endif

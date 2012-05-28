@@ -19,9 +19,29 @@
 #ifndef _Included_XInputHelpers
 #define _Included_XInputHelpers
 
+/* Converts an X11 key code and event mask to the appropriate X11 key symbol.
+ * This functions in much the same way as XKeycodeToKeysym() but allows for a
+ * faster and more flexible lookup.
+ */
 extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
+
+/* Converts an X11 key symbol to a single Unicode character.  No direct X11 
+ * functionality exists to provide this information.
+ */
 extern wchar_t KeySymToUnicode(KeySym keysym);
+
+/* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode() 
+ * functionality.  This method is called by OnLibraryLoad() and may need to be 
+ * called in combination with UnloadInputHelper() if the native keyboard layout 
+ * is changed.
+ */
 extern void LoadInputHelper();
+
+/* De-initialize items required for KeyCodeToKeySym() and KeySymToUnicode() 
+ * functionality.  This method is called by OnLibraryUnload() and may need to be 
+ * called in combination with LoadInputHelper() if the native keyboard layout 
+ * is changed.
+ */
 extern void UnloadInputHelper();
 
 #endif

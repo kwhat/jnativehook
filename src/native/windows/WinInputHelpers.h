@@ -62,12 +62,23 @@
 #define MOD_XBUTTON1					2048
 #define MOD_XBUTTON2					4096
 
-/* Helper functions for tracking the modifers  */
+/* Set the native modifier mask for future events. */
 extern void SetModifierMask(unsigned short int mask);
+
+/* Unset the native modifier mask for future events. */
 extern void UnsetModifierMask(unsigned short int mask);
+
+/* Get the current native modifier mask state. */
 extern unsigned short int GetModifiers();
 
+/* Retrieves the mouse wheel scroll type. This function cannot be included as 
+ * part of the NativeHelpers.h due to platform specific calling restrictions.
+ */
 extern unsigned short int GetScrollWheelType();
+
+/* Retrieves the mouse wheel scroll amount. This function cannot be included as 
+ * part of the NativeHelpers.h due to platform specific calling restrictions.
+ */
 extern unsigned short int GetScrollWheelAmount();
 
 #endif

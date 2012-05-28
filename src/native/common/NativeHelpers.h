@@ -19,14 +19,28 @@
 #ifndef _Included_NativeHelpers_h
 #define _Included_NativeHelpers_h
 
-/* Common function stubs */
+/* Retrieves the keyboard auto repeat rate. */
 extern long GetAutoRepeatRate();
+
+/* Retrieves the keyboard auto repeat delay. */
 extern long GetAutoRepeatDelay();
+
+/* Retrieves the mouse acceleration multiplier. */
 extern long GetPointerAccelerationMultiplier();
+
+/* Retrieves the mouse acceleration threshold. */
 extern long GetPointerAccelerationThreshold();
+
+/* Retrieves the mouse sensitivity. */
 extern long GetPointerSensitivity();
+
+/* Retrieves the double/triple click interval. */
 extern long GetMultiClickTime();
+
+/* Native library load callback for platform specific initialization. */
 extern void OnLibraryLoad();
+
+/* Native library unload callback for platform specific de-initialization. */
 extern void OnLibraryUnload();
 
 #endif

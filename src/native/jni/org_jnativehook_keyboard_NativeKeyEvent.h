@@ -16,9 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Reference: org/jnativehook/keyboard/NativeKeyEvent.java */
 #ifndef _Included_org_jnativehook_keyboard_NativeKeyEvent
 #define _Included_org_jnativehook_keyboard_NativeKeyEvent
+
+/* Redefined virtual constants for native use.  This file should be machine 
+ * generated however no tool exists for doing so.
+ * Reference: org/jnativehook/keyboard/NativeKeyEvent.java
+ */
 
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST				2400
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST					2402

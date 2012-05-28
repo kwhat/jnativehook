@@ -42,8 +42,10 @@ extern jmethodID idDispatchEvent;
 extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
-/* Common function stubs */
+/* Create all of the JNI global references used throughout the native library. */
 extern int CreateJNIGlobals();
+
+/* Free all of the JNI globals created by the CreateJNIGlobals() function. */
 extern int DestroyJNIGlobals();
 
 #endif

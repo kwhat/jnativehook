@@ -33,14 +33,6 @@ import org.jnativehook.GlobalScreen;
  * <code>NativeMouseWheelEvent</code> to each listener.
  * <p/>
  *
- * A <code>NativeMouseEvent</code> object is also passed to every
- * <code>NativeMouseMotionListener</code> object which has been registered to
- * receive mouse motion events using the
- * {@link GlobalScreen#addNativeMouseListener(NativeMouseWheelListener)}
- * method. The GlobalScreen object then dispatches a NativeMouseEvent to each
- * listener.
- * <p/>
- *
  * Platforms offer customization of the amount of scrolling that should take
  * place when the mouse wheel is moved. The two most common settings are to
  * scroll a certain number of "units" (commonly lines of text in a text-based
@@ -106,7 +98,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	/**
 	 * Instantiates a new <code>NativeMouseWheelEvent</code> object.
 	 *
-	 * @param an integer that identifies the native event type.
+	 * @param id an integer that identifies the native event type.
 	 * @param when a long integer that gives the time the event occurred
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.

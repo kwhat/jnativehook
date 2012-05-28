@@ -343,7 +343,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * Instantiates a new native key event.
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
-	 * @param an integer that identifies the native event type.
+	 * @param id an integer that identifies the native event type.
 	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
@@ -377,7 +377,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * Instantiates a new native key event.
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
-	 * @param an integer that identifies the native event type.
+	 * @param id an integer that identifies the native event type.
 	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are

@@ -32,13 +32,15 @@ typedef struct {
 	jint location;		/* Key Location */
 } JKeyDatum;
 
-typedef struct {
-	jint button;		/* Btn Code */
-} JButtonDatum;
-
-/* Common function stubs */
+/* Converts the native key symbol to the virtual key code and keyboard location.
+ * The raw code is the platform specific key code. 
+ */
 extern JKeyDatum NativeToJKey(unsigned int keysym);
+
+/* Converts the native button code to its virtual counterpart. */
 extern jint NativeToJButton(unsigned int button);
+
+/* Converts the native modifier mask code to its virtual counterpart. */
 extern jint NativeToJEventMask(unsigned int mask);
 
 #endif

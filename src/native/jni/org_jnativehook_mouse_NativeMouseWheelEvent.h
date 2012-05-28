@@ -16,9 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java */
 #ifndef _Included_org_jnativehook_mouse_NativeMouseWheelEvent
 #define _Included_org_jnativehook_mouse_NativeMouseWheelEvent
+
+/* Redefined virtual constants for native use.  This file should be machine 
+ * generated however no tool exists for doing so.
+ * Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
+ */
 
 #define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL	0
 #define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL	1

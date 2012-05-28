@@ -16,9 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Reference: org/jnativehook/NativeInputEvent.java */
 #ifndef _Included_org_jnativehook_NativeInputEvent
 #define _Included_org_jnativehook_NativeInputEvent
+
+/* Redefined virtual constants for native use.  This file should be machine 
+ * generated however no tool exists for doing so.
+ * Reference: org/jnativehook/NativeInputEvent.java
+ */
 
 #define org_jnativehook_NativeInputEvent_SHIFT_MASK				1
 #define org_jnativehook_NativeInputEvent_CTRL_MASK				2

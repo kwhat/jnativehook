@@ -661,7 +661,7 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
-		if (hookThreadId != pthread_self()) {
+		if (IsNativeDispatchThread() == false) {
 			/* Lock the thread */
 			pthread_mutex_lock(&hookControlMutex);
 
@@ -738,5 +738,5 @@ bool IsNativeThreadRunning() {
 }
 
 bool IsNativeDispatchThread() {
-	return hookThreadId == pthread_self();
+	return pthread_equal(hookThreadId, pthread_self());
 }
