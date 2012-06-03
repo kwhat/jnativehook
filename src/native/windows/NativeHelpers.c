@@ -26,30 +26,30 @@
 /* Global Variables */
 HINSTANCE hInst = NULL;
 
-long GetAutoRepeatRate() {
-	long value = -1;
+long int GetAutoRepeatRate() {
+	long int value = -1;
 	long int rate;
 
 	if (SystemParametersInfo(SPI_GETKEYBOARDSPEED, 0, &rate, 0)) {
 		value = rate;
 	}
 
-	return rate;
+	return value;
 }
 
 long GetAutoRepeatDelay() {
-	long value = -1;
+	long int value = -1;
 	long int delay;
 
 	if (SystemParametersInfo(SPI_GETKEYBOARDDELAY, 0, &delay, 0)) {
 		value = delay;
 	}
 
-	return delay;
+	return value;
 }
 
-long GetPointerAccelerationMultiplier() {
-	long value = -1;
+long int GetPointerAccelerationMultiplier() {
+	long int value = -1;
 	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
@@ -59,8 +59,8 @@ long GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-long GetPointerAccelerationThreshold() {
-	long value = -1;
+long int GetPointerAccelerationThreshold() {
+	long int value = -1;
 	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
@@ -71,8 +71,8 @@ long GetPointerAccelerationThreshold() {
 	return value;
 }
 
-long GetPointerSensitivity() {
-	long value = -1;
+long int GetPointerSensitivity() {
+	long int value = -1;
 	int sensitivity;
 
 	if (SystemParametersInfo(SPI_GETMOUSESPEED, 0, &sensitivity, 0)) {
@@ -82,12 +82,12 @@ long GetPointerSensitivity() {
 	return value;
 }
 
-long GetMultiClickTime() {
-	long value = -1;
+long int GetMultiClickTime() {
+	long int value = -1;
 	UINT clicktime;
 
 	clicktime = GetDoubleClickTime();
-	value = (long) clicktime;
+	value = (long int) clicktime;
 
 	return value;
 }

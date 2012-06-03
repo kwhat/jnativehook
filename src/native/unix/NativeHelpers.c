@@ -37,9 +37,9 @@ static XtAppContext app_context;
 
 Display * disp;
 
-long GetAutoRepeatRate() {
+long int GetAutoRepeatRate() {
 	bool successful = false;
-	long value = -1;
+	long int value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
@@ -73,9 +73,9 @@ long GetAutoRepeatRate() {
 	return value;
 }
 
-long GetAutoRepeatDelay() {
+long int GetAutoRepeatDelay() {
 	bool successful = false;
-	long value = -1;
+	long int value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
@@ -109,8 +109,8 @@ long GetAutoRepeatDelay() {
 	return value;
 }
 
-long GetPointerAccelerationMultiplier() {
-	long value = -1;
+long int GetPointerAccelerationMultiplier() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
@@ -123,8 +123,8 @@ long GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-long GetPointerAccelerationThreshold() {
-	long value = -1;
+long int GetPointerAccelerationThreshold() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
@@ -137,8 +137,8 @@ long GetPointerAccelerationThreshold() {
 	return value;
 }
 
-long GetPointerSensitivity() {
-	long value = -1;
+long int GetPointerSensitivity() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
@@ -151,8 +151,8 @@ long GetPointerSensitivity() {
 	return value;
 }
 
-long GetMultiClickTime() {
-	long value = 200;
+long int GetMultiClickTime() {
+	long int value = 200;
 	int clicktime;
 	bool successful = false;
 

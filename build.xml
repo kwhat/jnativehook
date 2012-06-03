@@ -58,6 +58,7 @@
 			<fileset dir="${dir.dist}" includes="**/*" />
 			<fileset dir="${dir.lib}" includes="**/*" />
 			<fileset dir="${dir.jar}" includes="**/*" />
+			<fileset file="${dir.src.native}/jni/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>
 
@@ -209,6 +210,24 @@
 			</condition>
 		</fail>
 		<echo level="info">Found Java include location: ${java.include}</echo>
+		
+		
+		<!-- Try to locate the rt.jar location for java.bootclasspath -->
+		<condition property="java.bootclasspath" value="${java.home}${file.separator}lib${file.separator}rt.jar">
+			<available file="${java.home}${file.separator}lib${file.separator}rt.jar" type="file" />
+		</condition>
+
+		<fail message="Could not determine java.bootclasspath location.  Please set your JAVA_HOME environment variable or manually set java.bootclasspath to the location of your rt.jar file in the build.properties file.">
+			<condition>
+				<not>
+					<or>
+						<isset property="java.bootclasspath" />
+						<available file="${java.bootclasspath}" type="file" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+		<echo level="info">Found Java lib location: ${java.bootclasspath}</echo>
 
 
 		<!-- Try to locate the env path varaible -->
@@ -676,6 +695,7 @@
 		<javac srcdir="${dir.src.java}"
 			destdir="${dir.bin.class}"
 			classpath="${dir.bin.class}"
+			bootclasspath="${java.bootclasspath}"
 			debug="${project.debug}"
 			optimize="${project.optimize}"
 			deprecation="false"

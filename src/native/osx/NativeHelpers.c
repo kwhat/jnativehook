@@ -59,13 +59,13 @@
  * CharSec = 66 / (MS / 15)
  */
 
-long GetAutoRepeatRate() {
+long int GetAutoRepeatRate() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	SInt64 rate;
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -133,13 +133,13 @@ long GetAutoRepeatRate() {
 	return value;
 }
 
-long GetAutoRepeatDelay() {
+long int GetAutoRepeatDelay() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	SInt64 delay;
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -211,13 +211,13 @@ long GetAutoRepeatDelay() {
 }
 
 
-long GetPointerAccelerationMultiplier() {
+long int GetPointerAccelerationMultiplier() {
 	#if defined IOKIT || defined COREFOUNDATION
 	bool successful = false;
 	double multiplier;
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -267,13 +267,13 @@ long GetPointerAccelerationMultiplier() {
 }
 
 
-long GetPointerAccelerationThreshold() {
+long int GetPointerAccelerationThreshold() {
 	#if defined COREFOUNDATION
 	bool successful = false;
 	SInt32 threshold;
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef COREFOUNDATION
 	if (!successful) {
@@ -290,13 +290,13 @@ long GetPointerAccelerationThreshold() {
 }
 
 
-long GetPointerSensitivity() {
+long int GetPointerSensitivity() {
 	#if defined IOKIT
 	bool successful = false;
 	double sensitivity;
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {
@@ -334,7 +334,7 @@ long GetPointerSensitivity() {
 	return value;
 }
 
-long GetMultiClickTime() {
+long int GetMultiClickTime() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	#if defined IOKIT || defined CARBON_LEGACY
@@ -343,7 +343,7 @@ long GetMultiClickTime() {
 	#endif
 	#endif
 
-	long value = -1;
+	long int value = -1;
 
 	#ifdef IOKIT
 	if (!successful) {

@@ -118,10 +118,12 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_OEM_PERIOD:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PERIOD;
 			return jkey;
-		case VK_OEM_2:					/* TODO Testing Needed */
+		/*
+		case VK_OEM_2:					* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SLASH;
 			return jkey;
-
+		*/
+					
 
 		case 0x30:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_0;
@@ -435,9 +437,11 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case XK_dead_grave:				* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_GRAVE;
 			return jkey;
-		case XK_dead_acute:				* Unknown Microsoft Support *
+		*/
+		case VK_OEM_2:					/* Based on Czech Keyboard Layout */
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_ACUTE;
 			return jkey;
+		/*
 		case XK_dead_circumflex:		* Unknown Microsoft Support *
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_CIRCUMFLEX;
 			return jkey;

@@ -20,6 +20,7 @@
 #define _Included_WinInputHelpers
 
 #include <stdbool.h>
+#include <limits.h>
 
 /* Some versions of MinGW do not include the extended East Asian Input Method
  * virtual keyboard definitions.
