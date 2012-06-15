@@ -136,7 +136,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
 					#endif
 
-					keysym = KeyCodeToKeySym(event_code, LockMask);
+					keysym = KeyCodeToKeySym(event_code, event_mask);
 					jkey = NativeToJKey(keysym);
 					jmodifiers = NativeToJEventMask(event_mask);
 
