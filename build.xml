@@ -537,7 +537,7 @@
 
 
 		<!-- Set compiler optimization flags -->
-		<condition property="native.cc.flags.optimize" value="-O3 -fomit-frame-pointer -frename-registers -fweb -pipe" else="-O0">
+		<condition property="native.cc.flags.optimize" value="-O2 -fomit-frame-pointer -pipe" else="-O0">
 			<istrue value="${project.optimize}" />
 		</condition>
 

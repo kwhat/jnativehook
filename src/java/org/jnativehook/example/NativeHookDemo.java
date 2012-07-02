@@ -351,9 +351,10 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		catch (NativeHookException ex) {
 			ex.printStackTrace();
 		}
-
-		System.runFinalization();
-		System.exit(0);
+		finally {
+			System.runFinalization();
+			System.exit(0);
+		}
 	}
 
 	/**
@@ -362,6 +363,10 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param args unused.
 	 */
 	public static void main(String[] args) {
-		new NativeHookDemo();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new NativeHookDemo();
+			}
+		});
 	}
 }
