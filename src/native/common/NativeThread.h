@@ -21,19 +21,19 @@
 
 #include <stdbool.h>
 
-/* Structure get transport exceptions out of the native thread */
+// Structure get transport exceptions out of the native thread.
 typedef struct {
 	char * class;
 	char * message;
 } Exception;
 
-/* Attempt to start the global hook thread. */
+// Attempt to start the global hook thread.
 extern int StartNativeThread();
 
-/* Attempt to stop the global hook thread. */
+// Attempt to stop the global hook thread.
 extern int StopNativeThread();
 
-/* Determine the status of the global hook thread. */
+// Determine the status of the global hook thread.
 extern bool IsNativeThreadRunning();
 
 /* Determine if the function was called from within the native dispatch thread. 

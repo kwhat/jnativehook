@@ -366,7 +366,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SCROLL_LOCK;
 			return jkey;
 
-		/* Function Keys */
+		// Function Keys
 		case XK_F1:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F1;
 			return jkey;
@@ -404,7 +404,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F12;
 			return jkey;
 
-		/* Extended Function Keys */
+		// Extended Function Keys
 		case XK_F13:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_F13;
 			return jkey;
@@ -475,7 +475,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BACK_QUOTE;
 			return jkey;
 
-		/* For European keyboards */
+		// For European keyboards
 		case XK_dead_grave:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_GRAVE;
 			return jkey;
@@ -525,7 +525,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DEAD_SEMIVOICED_SOUND;
 			return jkey;
 
-		/* Unknown Keyboard Codes */
+		// Unknown Keyboard Codes
 		case XK_ampersand:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AMPERSAND;
 			return jkey;
@@ -548,7 +548,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BRACERIGHT;
 			return jkey;
 
-		/* Unknown Extended Keyboard Codes */
+		// Unknown Extended Keyboard Codes
 		case XK_at:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_AT;
 			return jkey;
@@ -587,76 +587,76 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			return jkey;
 
 
-		/* For input method support on Asian Keyboards */
+		// For input method support on Asian Keyboards.
 		/*
-		case XK_Cancel:					* Unknown X11 Support *
+		case XK_Cancel:					// Unknown X11 Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FINAL;
 			return jkey;
-		case XK_Henkan:					* Unknown X11 Support *
+		case XK_Henkan:					// Unknown X11 Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CONVERT;
 			return jkey;
-		case XK_Muhenkan:				* Unknown X11 Support *
+		case XK_Muhenkan:				// Unknown X11 Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NONCONVERT;
 			return jkey;
-		case XK_VoidSymbol:				* Unknown X11 Support *
+		case XK_VoidSymbol:				// Unknown X11 Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ACCEPT;
 			return jkey;
 		*/
 		#ifndef SUN_KEYBOARD
-		case XK_Mode_switch:			/* TODO Testing Needed */
+		case XK_Mode_switch:			// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MODECHANGE;
 			return jkey;
 		#endif
-		case XK_Kana_Shift:				/* TODO Testing Needed */
+		case XK_Kana_Shift:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA;
 			return jkey;
-		case XK_Kanji:					/* TODO Testing Needed */
+		case XK_Kanji:					// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANJI;
 			return jkey;
-		case XK_Eisu_Shift:				/* TODO Testing Needed */
+		case XK_Eisu_Shift:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALPHANUMERIC;
 			return jkey;
-		case XK_Katakana:				/* TODO Testing Needed */
+		case XK_Katakana:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KATAKANA;
 			return jkey;
-		case XK_Hiragana:				/* TODO Testing Needed */
+		case XK_Hiragana:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HIRAGANA;
 			return jkey;
-		case XK_Zenkaku:				/* TODO Testing Needed */
+		case XK_Zenkaku:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_FULL_WIDTH;
 			return jkey;
-		case XK_Hankaku:				/* TODO Testing Needed */
+		case XK_Hankaku:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HALF_WIDTH;
 			return jkey;
-		case XK_Romaji:					/* TODO Testing Needed */
+		case XK_Romaji:					// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ROMAN_CHARACTERS;
 			return jkey;
-		case XK_MultipleCandidate:		/* TODO Testing Needed */
+		case XK_MultipleCandidate:		// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ALL_CANDIDATES;
 			return jkey;
-		case XK_PreviousCandidate:		/* TODO Testing Needed */
+		case XK_PreviousCandidate:		// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PREVIOUS_CANDIDATE;
 			return jkey;
-		case XK_Codeinput:				/* TODO Testing Needed */
+		case XK_Codeinput:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CODE_INPUT;
 			return jkey;
-		case XK_Hiragana_Katakana:		/* TODO Testing Needed */
+		case XK_Hiragana_Katakana:		// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_KATAKANA;
 			return jkey;
-		case XK_Zenkaku_Hankaku:		/* TODO Testing Needed */
+		case XK_Zenkaku_Hankaku:		// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_HIRAGANA;
 			return jkey;
-		/*case XK_Romaji:				* TODO Testing Needed *
+		/* case XK_Romaji:				// TODO Testing Needed
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_JAPANESE_ROMAN;
 			return jkey; */
-		case XK_Kana_Lock:				/* TODO Testing Needed */
+		case XK_Kana_Lock:				// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_KANA_LOCK;
 			return jkey;
-		case XK_Eisu_toggle:			/* TODO Testing Needed */
+		case XK_Eisu_toggle:			// TODO Testing Needed.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INPUT_METHOD_ON_OFF;
 			return jkey;
 
-		/* For Sun keyboards */
+		// For Sun keyboards.
 		#ifdef SUN_KEYBOARD
 		case SunXK_Cut:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CUT;

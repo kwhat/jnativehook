@@ -16,22 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//*******************************************************************
-// Program: kbdext.c
-// Source files: kbdext.c kbdext.h
-// Author: thetechnofreak.com
-// Last update: December 25th, 2011
-// Description: Replacement API for Microsoft's ToUnicode() function
-// You should load the current keyboard layout with loadKeyboardLayout()
-// before calling convertVirtualKeyToWChar()
-//*******************************************************************
+/***********************************************************************
+ * The bulk of this code came from thetechnofreak.com with a few minor 
+ * adjustments. According to the author some parts were taken directly 
+ * from Microsoft's kbd.h header file that is shipped with the Windows 
+ * Driver Development Kit.
+ ***********************************************************************/
 
 #include "WinUnicodeHelper.h"
 #include "NativeGlobals.h"
 
 typedef PKBDTABLES(CALLBACK *KbdLayerDescriptor) (VOID);
 
-//These are pointers to arrays of their respective structures.
+// These are pointers to arrays of their respective structures.
 PVK_TO_WCHARS1 pVkToWchars1 = NULL;
 PVK_TO_WCHARS2 pVkToWchars2 = NULL;
 PVK_TO_WCHARS3 pVkToWchars3 = NULL;
@@ -46,7 +43,7 @@ PVK_TO_WCHARS10 pVkToWchars10 = NULL;
 PMODIFIERS pCharModifiers;
 PDEADKEY pDeadKey;
 
-//Locate the DLL that contains the current keyboard layout.
+// Locate the DLL that contains the current keyboard layout.
 static int GetKeyboardLayoutFile(char * layoutFile, DWORD bufferSize) {
 	int status = RETURN_FAILURE;
 	HKEY hKey;
@@ -74,7 +71,7 @@ HINSTANCE LoadInputHelper() {
 
 	char layoutFile[MAX_PATH];
 	if(GetKeyboardLayoutFile(layoutFile, sizeof(layoutFile)) == RETURN_SUCCESS) {
-		//Get the path of the system directory.
+		// Get the path of the system directory.
 		char systemDirectory[MAX_PATH];
 		if (GetSystemDirectory(systemDirectory, MAX_PATH) != 0) {
 			char kbdLayoutFilePath[MAX_PATH];
@@ -88,7 +85,7 @@ HINSTANCE LoadInputHelper() {
 				pKbd = pKbdLayerDescriptor();
 				
 				for (int i = 0; pKbd->pVkToWcharTable[i].cbSize != 0; i++) {
-					//Size should be 1 - 10
+					// Size should be 1 - 10
 					switch ((pKbd->pVkToWcharTable[i].cbSize - 2) / 2) {
 						INIT_PVK_TO_WCHARS(i, 1)
 						INIT_PVK_TO_WCHARS(i, 2)
@@ -116,7 +113,7 @@ HINSTANCE LoadInputHelper() {
 	return kbdLibrary;
 }
 
-//Should probably return a boolean
+// Should probably return a boolean
 int UnloadInputHelper(HINSTANCE kbdLibrary) {
 	int status = RETURN_FAILURE;
 	
@@ -160,7 +157,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 	}
 
 	
-	//There really is no way around this.
+	// There really is no way around this.
 	SEARCH_VK_IN_CONVERSION_TABLE(1)
 	SEARCH_VK_IN_CONVERSION_TABLE(2)
 	SEARCH_VK_IN_CONVERSION_TABLE(3)
@@ -173,7 +170,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 	SEARCH_VK_IN_CONVERSION_TABLE(10)
 
 
-	//I see dead characters...
+	// I see dead characters...
 	if( *deadChar != 0) {
 		for (i = 0; pDeadKey[i].dwBoth != 0; i++) {
 			baseChar = (WCHAR) pDeadKey[i].dwBoth;

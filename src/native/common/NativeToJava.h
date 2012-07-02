@@ -27,9 +27,9 @@
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
 typedef struct {
-	jint keycode;		/* Key Code */
-	jint rawcode;		/* Raw Code */
-	jint location;		/* Key Location */
+	jint keycode;		// Key Code
+	jint rawcode;		// Raw Code
+	jint location;		// Key Location
 } JKeyDatum;
 
 /* Converts the native key symbol to the virtual key code and keyboard location.
@@ -37,10 +37,10 @@ typedef struct {
  */
 extern JKeyDatum NativeToJKey(unsigned int keysym);
 
-/* Converts the native button code to its virtual counterpart. */
+// Converts the native button code to its virtual counterpart.
 extern jint NativeToJButton(unsigned int button);
 
-/* Converts the native modifier mask code to its virtual counterpart. */
+// Converts the native modifier mask code to its virtual counterpart.
 extern jint NativeToJEventMask(unsigned int mask);
 
 #endif

@@ -27,15 +27,15 @@
 #include "NativeToJava.h"
 #include "OSXInputHelpers.h"
 
-/* Exception global for thread initialization */
+// Exception global for thread initialization.
 static Exception thread_ex;
 
-/* Click count globals */
+// Click count globals.
 static unsigned short click_count = 0;
 static CGEventTimestamp click_time = 0;
 static bool mouse_dragged = false;
 
-/* Thread and hook handles */
+// Thread and hook handles.
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -48,24 +48,24 @@ static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagM
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void * UNUSED(refcon)) {
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		/* Event Data */
+		// Event data.
 		CGPoint event_point;
-		/* Make sure to convert from nanoseconds to milliseconds */
+		// Make sure to convert from nanoseconds to milliseconds.
 		CGEventTimestamp event_time = CGEventGetTimestamp(event) / 1000000;
 		UInt64	keysym, button;
 		CGEventFlags event_mask = CGEventGetFlags(event);
 
-		/* Java Event Data */
+		// Java event data.
 		JKeyDatum jkey;
 		jint jbutton;
 		jint jscrollType, jscrollAmount, jwheelRotation;
 		jint jmodifiers;
 		CFStringRef keytxt;
 
-		/* Java Event Objects */
+		// Java event objects.
 		jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
-		/* Get the event class */
+		// Get the event class.
 		switch (type) {
 			case kCGEventKeyDown:
 			EVENT_KEYDOWN:
@@ -77,7 +77,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				jkey = NativeToJKey(keysym);
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire key pressed event */
+				// Fire key pressed event.
 				objKeyEvent = (*env)->NewObject(
 										env,
 										clsKeyEvent,
@@ -93,7 +93,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				keytxt = KeyCodeToString(jkey.rawcode, GetModifiers());
 				if (CFStringGetLength(keytxt) == 1) {
-					/* Fire key pressed event */
+					// Fire key pressed event.
 					objKeyEvent = (*env)->NewObject(
 											env,
 											clsKeyEvent,
@@ -119,7 +119,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				jkey = NativeToJKey(keysym);
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire key released event */
+				// Fire key released event.
 				objKeyEvent = (*env)->NewObject(
 										env,
 										clsKeyEvent,
@@ -164,16 +164,16 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				diff_event_mask = prev_event_mask ^ (event_mask & 0xFFFF0000);
 				keyup_event_mask = (event_mask & 0xFFFF0000) & diff_event_mask;
 
-				/* Update the previous event mask */
+				// Update the previous event mask.
 				UnsetModifierMask(prev_event_mask);
 				SetModifierMask(event_mask & 0xFFFF0000);
 
 				if (diff_event_mask & key_event_mask && keyup_event_mask & key_event_mask) {
-					/* Process as a key pressed event */
+					// Process as a key pressed event.
 					goto EVENT_KEYDOWN;
 				}
 				else if (diff_event_mask & key_event_mask && keyup_event_mask ^ key_event_mask) {
-					/* Process as a key released event */
+					// Process as a key released event.
 					goto EVENT_KEYUP;
 				}
 				break;
@@ -206,7 +206,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Button Pressed (%i)\n", (unsigned int) button);
 				#endif
 
-				/* Track the number of clicks */
+				// Track the number of clicks.
 				#ifdef DEBUG
 				fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (event_time - click_time));
 				#endif
@@ -223,7 +223,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				jbutton = NativeToJButton(button);
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire mouse pressed event */
+				// Fire mouse pressed event.
 				objMouseEvent = (*env)->NewObject(
 											env,
 											clsMouseEvent,
@@ -270,7 +270,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				jbutton = NativeToJButton(button);
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire mouse released event */
+				// Fire mouse released event.
 				objMouseEvent = (*env)->NewObject(
 											env,
 											clsMouseEvent,
@@ -285,7 +285,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 
 				if (mouse_dragged != true) {
-					/* Fire mouse clicked event */
+					// Fire mouse clicked event.
 					objMouseEvent = (*env)->NewObject(
 												env,
 												clsMouseEvent,
@@ -311,16 +311,16 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 				#endif
 
-				/* Reset the click count */
+				// Reset the click count.
 				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Set the mouse dragged flag */
+				// Set the mouse dragged flag.
 				mouse_dragged = true;
 
-				/* Fire mouse dragged event */
+				// Fire mouse dragged event.
 				objMouseEvent = (*env)->NewObject(
 											env,
 											clsMouseEvent,
@@ -340,16 +340,16 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Motion Notified (%f, %f)\n", event_point.x, event_point.y);
 				#endif
 
-				/* Reset the click count */
+				// Reset the click count.
 				if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Set the mouse draged flag */
+				// Set the mouse draged flag.
 				mouse_dragged = false;
 
-				/* Fire mouse moved event */
+				// Fire mouse moved event.
 				objMouseEvent = (*env)->NewObject(
 											env,
 											clsMouseEvent,
@@ -366,7 +366,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			case kCGEventScrollWheel:
 				event_point = CGEventGetLocation(event);
 
-				/* TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation. */
+				// TODO Figure out of kCGScrollWheelEventDeltaAxis2 causes mouse events with zero rotation.
 				if (CGEventGetIntegerValueField(event, kCGScrollWheelEventIsContinuous) == 0) {
 					jscrollType = (jint)  org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
 				}
@@ -374,7 +374,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					jscrollType = (jint)  org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL;
 				}
 
-				/* Scrolling data uses a fixed-point 16.16 signed integer format (Ex: 1.0 = 0x00010000) */
+				// Scrolling data uses a fixed-point 16.16 signed integer format (Ex: 1.0 = 0x00010000).
 				jwheelRotation = (jint) CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) * -1;
 
 				/* TODO Figure out the scroll wheel amounts are correct.  I
@@ -387,7 +387,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				fprintf(stdout, "LowLevelProc(): Mouse Wheel Moved (%i, %i, %i)\n", (int) jscrollType, (int) jscrollAmount, (int) jwheelRotation);
 				#endif
 
-				/* Track the number of clicks */
+				// Track the number of clicks.
 				if ((long) (event_time - click_time) <= GetMultiClickTime()) {
 					click_count++;
 				}
@@ -398,7 +398,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				jmodifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire mouse wheel event */
+				// Fire mouse wheel event.
 				objMouseWheelEvent = (*env)->NewObject(
 												env,
 												clsMouseWheelEvent,
@@ -415,9 +415,9 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 				break;
 
-			/*case kCGEventTapDisabledByTimeout:
-			case kCGEventTapDisabledByUserInput: */
-				/* TODO Should manually stop the thread at this point */
+			// case kCGEventTapDisabledByTimeout:
+			// case kCGEventTapDisabledByUserInput:
+				// TODO Should manually stop the thread at this point.
 
 			#ifdef DEBUG
 			default:
@@ -426,7 +426,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			#endif
 		}
 
-		/* Handle any possible JNI issue that may have occured */
+		// Handle any possible JNI issue that may have occured.
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
 			fprintf(stderr, "LowLevelProc(): JNI error occurred!\n");
@@ -498,7 +498,7 @@ static void * ThreadProc(void * arg) {
 					fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 					#endif
 
-					/* Set the exit status */
+					// Set the exit status.
 					*status = RETURN_SUCCESS;
 
 					CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
@@ -506,7 +506,7 @@ static void * ThreadProc(void * arg) {
 
 					CFRunLoopRun();
 
-					/* Lock back up until we are done processing the exit */
+					// Lock back up until we are done processing the exit.
 					pthread_mutex_lock(&hookControlMutex);
 					CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
 				}
@@ -537,7 +537,7 @@ static void * ThreadProc(void * arg) {
 			thread_ex.message = "Failed to create run loop";
 		}
 
-		/* Stop the CFMachPort from receiving any more messages */
+		// Stop the CFMachPort from receiving any more messages.
 		CFMachPortInvalidate(event_port);
 	}
 	else {
@@ -549,7 +549,7 @@ static void * ThreadProc(void * arg) {
 		thread_ex.message = "Failed to create event port";
 	}
 
-	/* Detach this thread from the JVM */
+	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
 
@@ -562,7 +562,7 @@ static void * ThreadProc(void * arg) {
 	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
-	/* Make sure we signal that we have passed any exception throwing code */
+	// Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
@@ -572,14 +572,14 @@ static void * ThreadProc(void * arg) {
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
-	/* Make sure the native thread is not already running */
+	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
-		/* Lock the mutex handle for the thread hook */
+		// Lock the mutex handle for the thread hook.
 		pthread_mutex_init(&hookControlMutex, NULL);
 
-		/* Create all the global references up front to save time in the callback */
+		// Create all the global references up front to save time in the callback.
 		if (CreateJNIGlobals() == RETURN_SUCCESS) {
-			/* Check and make sure assistive devices is enabled */
+			// Check and make sure assistive devices is enabled.
 			if (AXAPIEnabled() == true) {
 				#ifdef DEBUG
 				printf ("Native: Accessibility API is enabled.\n");
@@ -595,12 +595,12 @@ int StartNativeThread() {
 					fprintf(stdout, "StartNativeThread(): start successful.\n");
 					#endif
 
-					/* Wait for the thread to start up */
+					// Wait for the thread to start up.
 					if (pthread_mutex_lock(&hookControlMutex) == 0) {
 						pthread_mutex_unlock(&hookControlMutex);
 					}
 
-					/* Handle any possible JNI issue that may have occurred */
+					// Handle any possible JNI issue that may have occurred.
 					if (IsNativeThreadRunning()) {
 						#ifdef DEBUG
 						fprintf(stdout, "StartNativeThread(): initialization successful.\n");
@@ -613,7 +613,7 @@ int StartNativeThread() {
 						fprintf(stderr, "StartNativeThread(): initialization failure!\n");
 						#endif
 
-						/* Wait for the thread to die */
+						// Wait for the thread to die.
 						void * thread_status;
 						pthread_join(hookThreadId, (void *) &thread_status);
 						status = *(int *) thread_status;
@@ -662,15 +662,15 @@ int StopNativeThread() {
 
 	if (IsNativeThreadRunning() == true) {
 		if (IsNativeDispatchThread() == false) {
-			/* Lock the thread */
+			// Lock the thread.
 			pthread_mutex_lock(&hookControlMutex);
 
 			CFRunLoopStop(event_loop);
 
-			/* Must unlock to allow the thread to finish cleaning up */
+			// Must unlock to allow the thread to finish cleaning up.
 			pthread_mutex_unlock(&hookControlMutex);
 
-			/* Wait for the thread to die */
+			// Wait for the thread to die.
 			void * thread_status;
 			pthread_join(hookThreadId, &thread_status);
 			status = *(int *) thread_status;
@@ -680,7 +680,7 @@ int StopNativeThread() {
 			fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
 			#endif
 
-			/* Destroy all created globals */
+			// Destroy all created globals.
 			#ifdef DEBUG
 			if (DestroyJNIGlobals() == RETURN_FAILURE) {
 				/* Leaving dangling global references will leak a small amout
@@ -693,7 +693,7 @@ int StopNativeThread() {
 			DestroyJNIGlobals();
 			#endif
 
-			/* Clean up the mutex */
+			// Clean up the mutex.
 			pthread_mutex_destroy(&hookControlMutex);
 		}
 		else {
@@ -707,12 +707,12 @@ int StopNativeThread() {
 bool IsNativeThreadRunning() {
 	bool isRunning = false;
 
-	/* Wait for a lock on the thread */
+	// Wait for a lock on the thread.
 	if (pthread_mutex_lock(&hookControlMutex) == 0) {
-		/* Lock Successful */
+		// Lock Successful.
 
 		if (pthread_mutex_trylock(&hookRunningMutex) == 0) {
-			/* Lock Successful, we are not running */
+			// Lock Successful, we are not running.
 			pthread_mutex_unlock(&hookRunningMutex);
 		}
 		else {

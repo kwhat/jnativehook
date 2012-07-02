@@ -29,18 +29,18 @@
 #include "WinInputHelpers.h"
 #include "WinUnicodeHelper.h"
 
-/* Exception global for thread initialization */
+// Exception global for thread initialization.
 static Exception thread_ex;
 
-/* Click count globals */
+// Click count globals.
 static unsigned short click_count = 0;
 static DWORD click_time = 0;
 static bool mouse_dragged = false;
 
-/* The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH */
+// The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
 extern HINSTANCE hInst;
 
-/* Thread and hook handles */
+// Thread and hook handles.
 static DWORD hookThreadId = 0;
 static HANDLE hookThreadHandle = NULL, hookEventHandle = NULL;
 static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
@@ -50,17 +50,17 @@ static WCHAR keytxt = '\0', keydead = 0;
 static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		/* MS Keyboard Event Struct Data */
+		// MS Keyboard event struct data.
 		KBDLLHOOKSTRUCT * kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
-		/* Java Event Data */
+		// Java Event Data.
 		JKeyDatum jkey;
 		jint modifiers;
 		//WCHAR keytxt[4];
 		//BYTE keymap[256];
 		
 
-		/* Java Key Event Object */
+		// Java key event object.
 		jobject objKeyEvent;
 		switch(wParam) {
 			case WM_KEYDOWN:
@@ -69,7 +69,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				fprintf(stdout, "LowLevelKeyboardProc(): Key pressed. (%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
-				/* Check and setup modifiers */
+				// Check and setup modifiers.
 				if (kbhook->vkCode == VK_LSHIFT)		SetModifierMask(MOD_LSHIFT);
 				else if (kbhook->vkCode == VK_RSHIFT)	SetModifierMask(MOD_RSHIFT);
 				else if (kbhook->vkCode == VK_LCONTROL)	SetModifierMask(MOD_LCONTROL);
@@ -82,7 +82,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				jkey = NativeToJKey(kbhook->vkCode);
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire key pressed event */
+				// Fire key pressed event.
 				objKeyEvent = (*env)->NewObject(
 										env, 
 										clsKeyEvent, 
@@ -97,7 +97,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
 				if (ConvertVirtualKeyToWChar(kbhook->vkCode, &keytxt, &keydead) > 0) {
-					/* Fire key typed event */
+					// Fire key typed event.
 					objKeyEvent = (*env)->NewObject(
 											env, 
 											clsKeyEvent, 
@@ -119,7 +119,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				fprintf(stdout, "LowLevelKeyboardProc(): Key released. (%i)\n", (unsigned int) kbhook->vkCode);
 				#endif
 
-				/* Check and setup modifiers */
+				// Check and setup modifiers.
 				if (kbhook->vkCode == VK_LSHIFT)		UnsetModifierMask(MOD_LSHIFT);
 				else if (kbhook->vkCode == VK_RSHIFT)	UnsetModifierMask(MOD_RSHIFT);
 				else if (kbhook->vkCode == VK_LCONTROL)	UnsetModifierMask(MOD_LCONTROL);
@@ -132,7 +132,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				jkey = NativeToJKey(kbhook->vkCode);
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire key released event */
+				// Fire key released event.
 				objKeyEvent = (*env)->NewObject(
 										env, 
 										clsKeyEvent, 
@@ -148,7 +148,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 				break;
 		}
 
-		/* Handle any possible JNI issue that may have occurred */
+		// Handle any possible JNI issue that may have occurred.
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
 			fprintf(stderr, "LowLevelKeyboardProc(): JNI error occurred!\n");
@@ -164,15 +164,15 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		/* MS Mouse Event Struct Data */
+		// MS Mouse event struct data.
 		MSLLHOOKSTRUCT * mshook = (MSLLHOOKSTRUCT *) lParam;
 
-		/* Java Event Data */
+		// Java event data.
 		jint jbutton;
 		jint scrollType, scrollAmount, wheelRotation;
 		jint modifiers;
 
-		/* Java Mouse Event Object */
+		// Java Mouse event object.
 		jobject objMouseEvent, objMouseWheelEvent;
 
 		/* Code to track the click count, It maybe easier to track our own click
@@ -221,7 +221,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): Button pressed. (%i)\n", (int) jbutton);
 				#endif
 
-				/* Track the number of clicks */
+				// Track the number of clicks.
 				if ((long) (mshook->time - click_time) <= GetMultiClickTime()) {
 					click_count++;
 				}
@@ -230,10 +230,10 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				}
 				click_time = mshook->time;
 
-				/* Convert native modifiers to java modifiers */
+				// Convert native modifiers to java modifiers.
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire mouse pressed event */
+				// Fire mouse pressed event.
 				objMouseEvent = (*env)->NewObject(
 											env, 
 											clsMouseEvent, 
@@ -283,7 +283,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Fire mouse released event */
+				// Fire mouse released event.
 				objMouseEvent = (*env)->NewObject(
 											env, 
 											clsMouseEvent, 
@@ -298,7 +298,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 
 				if (mouse_dragged != true) {
-					/* Fire mouse clicked event */
+					// Fire mouse clicked event.
 					objMouseEvent = (*env)->NewObject(
 												env, 
 												clsMouseEvent, 
@@ -319,18 +319,18 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 				#endif
 
-				/* Reset the click count */
+				// Reset the click count.
 				if (click_count != 0 && (long) (mshook->time - click_time) > GetMultiClickTime()) {
 					click_count = 0;
 				}
 				modifiers = NativeToJEventMask(GetModifiers());
 
-				/* Set the mouse dragged flag */
+				// Set the mouse dragged flag.
 				mouse_dragged = modifiers >> 4 > 0;
 
-				/* Check the upper half of java modifiers for non zero value */
+				// Check the upper half of java modifiers for non zero value.
 				if (modifiers >> 4 > 0) {
-					/* Create Mouse Dragged event */
+					// Create Mouse dragged event.
 					objMouseEvent = (*env)->NewObject(
 												env, 
 												clsMouseEvent, 
@@ -342,7 +342,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												(jint) click_count);
 				}
 				else {
-					/* Create a Mouse Moved event */
+					// Create a Mouse Moved event.
 					objMouseEvent = (*env)->NewObject(
 												env, 
 												clsMouseEvent, 
@@ -354,7 +354,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												(jint) click_count);
 				}
 
-				/* Fire mouse moved event */
+				// Fire mouse moved event.
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 				break;
 
@@ -363,7 +363,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				fprintf(stdout, "LowLevelMouseProc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
 				#endif
 
-				/* Track the number of clicks */
+				// Track the number of clicks.
 				if ((long) (mshook->time - click_time) <= GetMultiClickTime()) {
 					click_count++;
 				}
@@ -385,7 +385,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 				scrollAmount = (jint) GetScrollWheelAmount();
 				wheelRotation = (jint) ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
 
-				/* Fire mouse wheel event */
+				// Fire mouse wheel event.
 				objMouseWheelEvent = (*env)->NewObject(
 												env, 
 												clsMouseWheelEvent, 
@@ -404,11 +404,9 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 			/* Settings change message notifies us when change is made
 			 * through the SystemParametersInfo() API
 			 */
-			/*
-			case WM_SETTINGCHANGE:
+			/* case WM_SETTINGCHANGE:
 				* TODO Reset all the system props *
-				return OnSettingChange( (UINT)wParam );
-			*/
+				return OnSettingChange( (UINT)wParam ); */
 
 			#ifdef DEBUG
 			default:
@@ -417,7 +415,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 			#endif
 		}
 
-		/* Handle any possible JNI issue that may have occured */
+		// Handle any possible JNI issue that may have occurred.
 		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 			#ifdef DEBUG
 			fprintf(stderr, "LowLevelMouseProc(): JNI error occurred!\n");
@@ -451,7 +449,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	DWORD status = RETURN_FAILURE;
 	JNIEnv * env = NULL;
 
-	/* Create the native hooks */
+	// Create the native hooks.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
 	if (handleKeyboardHook == NULL) {
 		#ifdef DEBUG
@@ -484,14 +482,14 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	#endif
 
 
-	/* If we did not encounter a problem, start processing events */
+	// If we did not encounter a problem, start processing events.
 	if (handleKeyboardHook != NULL && handleMouseHook != NULL) {
 		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			/* Check and setup modifiers */
+			// Check and setup modifiers.
 			if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
 			if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
 			if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
@@ -501,13 +499,13 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 			if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
 			if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
 
-			/* Set the exit status */
+			// Set the exit status.
 			status = RETURN_SUCCESS;
 
-			/* Signal that we have passed the thread initialization */
+			// Signal that we have passed the thread initialization.
 			SetEvent(hookEventHandle);
 
-			/* Block until the thread receives an WM_QUIT request */
+			// Block until the thread receives an WM_QUIT request.
 			MSG message;
 			while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
 				TranslateMessage(&message);
@@ -525,7 +523,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 	}
 
-	/* Destroy the native hooks */
+	// Destroy the native hooks.
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
 		handleKeyboardHook = NULL;
@@ -540,7 +538,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
-	/* Detach this thread from the JVM */
+	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
 	}
@@ -556,9 +554,9 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
-	/* Make sure the native thread is not already running */
+	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
-		/* Create event handle for the thread hook */
+		// Create event handle for the thread hook.
 		hookEventHandle = CreateEvent(NULL, TRUE, FALSE, "hookEventHandle");
 
 		/* Create all the global references up front to save time in the
@@ -577,7 +575,7 @@ int StartNativeThread() {
 				 */
 				WaitForSingleObject(hookEventHandle, INFINITE);
 
-				/* TODO Set the return status to the thread exit code */
+				// TODO Set the return status to the thread exit code.
 				if (IsNativeThreadRunning()) {
 					#ifdef DEBUG
 					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
@@ -643,7 +641,7 @@ int StopNativeThread() {
 			AttachThreadInput(GetCurrentThreadId(), hookThreadId, false);
 			#endif
 			
-			/* Try to exit the thread naturally */
+			// Try to exit the thread naturally.
 			PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
 			WaitForSingleObject(hookThreadHandle, 5000);
 
@@ -652,7 +650,7 @@ int StopNativeThread() {
 
 			status = RETURN_SUCCESS;
 
-			/* Destroy all created globals */
+			// Destroy all created globals.
 			#ifdef DEBUG
 			if (DestroyJNIGlobals() == RETURN_FAILURE) {
 				fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");

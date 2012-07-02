@@ -27,10 +27,10 @@ static void SetNativeProperties(JNIEnv * env) {
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 	if (clsSystem != NULL && setProperty_ID != NULL) {
-		/* Create a buffer for converting numbers to strings */
+		// Create a buffer for converting numbers to strings.
 		char buffer[16];
 
-		/* Set the native keyboard auto repeat rate */
+		// Set the native keyboard auto repeat rate.
 		long rate = GetAutoRepeatRate();
 		if (rate >= 0) {
 			#ifdef DEBUG
@@ -75,7 +75,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 
-		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
+		// 0-Threshold X, 1-Threshold Y and 2-Speed.
 		long multiplier = GetPointerAccelerationMultiplier();
 		if (multiplier >= 0) {
 			#ifdef DEBUG
@@ -98,7 +98,7 @@ static void SetNativeProperties(JNIEnv * env) {
 		#endif
 
 
-		/* 0-Threshold X, 1-Threshold Y and 2-Speed */
+		// 0-Threshold X, 1-Threshold Y and 2-Speed.
 		long threshold = GetPointerAccelerationThreshold();
 		if (threshold >= 0) {
 			#ifdef DEBUG
@@ -199,7 +199,7 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThr
 }
 
 
-/* JNI entry point, This is executed when the Java virtual machine attaches to the native library. */
+// JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 	/* Grab the currently running virtual machine so we can attach to it in
 	 * functions that are not called from java. ( I.E. ThreadProc )
@@ -211,10 +211,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
 		#endif
 
-		/* Run platform specific load items. */
+		// Run platform specific load items.
 		OnLibraryLoad();
 
-		/* Set java properties from native sources. */
+		// Set java properties from native sources.
 		SetNativeProperties(env);
 		SetNativeProperties(env);
 	}
@@ -233,14 +233,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
     return jni_version;
 }
 
-/* JNI exit point, This is executed when the Java virtual machine detaches from the native library. */
+// JNI exit point, This is executed when the Java virtual machine detaches from the native library.
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
-	/* Stop the native thread if its running. */
+	// Stop the native thread if its running.
 	if (IsNativeThreadRunning()) {
 		StopNativeThread();
 	}
 
-	/* Run platform specific unload items. */
+	// Run platform specific unload items.
 	OnLibraryUnload();
 
 	/* Grab the currently JNI interface pointer so we can cleanup the
@@ -248,7 +248,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	 */
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		/* Clear java properties from native sources. */
+		// Clear java properties from native sources.
 		ClearNativeProperties(env);
 	}
 	#ifdef DEBUG

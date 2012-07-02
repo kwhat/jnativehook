@@ -30,7 +30,7 @@
 #include <limits.h>
 
 #if defined(__LP64__) || defined(_LP64) || defined(_WIN64) || defined(__x86_64__)
-//If the target is 64-bit we need to build for WOW64 keyboards.
+// If the target is 64-bit we need to build for WOW64 keyboards.
 #define KBD_LONG_POINTER __ptr64
 #else
 #define KBD_LONG_POINTER

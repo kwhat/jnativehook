@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_org_jnativehook_mouse_NativeMouseEvent
-#define _Included_org_jnativehook_mouse_NativeMouseEvent
-
 /* Redefined virtual constants for native use.  This file should be machine 
  * generated however no tool exists for doing so.
  * Reference: org/jnativehook/mouse/NativeMouseEvent.java
  */
+
+#ifndef _Included_org_jnativehook_mouse_NativeMouseEvent
+#define _Included_org_jnativehook_mouse_NativeMouseEvent
 
 #define org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST		2500
 #define org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_LAST		2505
@@ -34,11 +34,11 @@
 #define org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL		5 + org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST
 
 
-#define org_jnativehook_mouse_NativeMouseEvent_NOBUTTON					0	/* AnyButton */
+#define org_jnativehook_mouse_NativeMouseEvent_NOBUTTON					0	// AnyButton
 #define org_jnativehook_mouse_NativeMouseEvent_BUTTON1					1
 #define org_jnativehook_mouse_NativeMouseEvent_BUTTON2					2
 #define org_jnativehook_mouse_NativeMouseEvent_BUTTON3					3
-#define org_jnativehook_mouse_NativeMouseEvent_BUTTON4					4	/* Extra Mouse Button */
-#define org_jnativehook_mouse_NativeMouseEvent_BUTTON5					5	/* Extra Mouse Button */
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON4					4	// Extra Mouse Button
+#define org_jnativehook_mouse_NativeMouseEvent_BUTTON5					5	// Extra Mouse Button
 
 #endif

@@ -30,21 +30,21 @@ static int keysyms_per_keycode;
 static Bool is_caps_lock = false, is_shift_lock = false;
 #endif
 
-/* Unicode-Remapse the NativeHelpers display */
+// Unicode-Remapse the NativeHelpers display.
 extern Display * disp;
 
 
-/* Faster more flexible alternative to XKeycodeToKeysym... */
+// Faster more flexible alternative to XKeycodeToKeysym...
 KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 	KeySym keysym = NoSymbol;
 
 	#ifdef XKB
 	if (keyboard_map) {
-		/* What is diff between XkbKeyGroupInfo and XkbKeyNumGroups? */
+		// What is diff between XkbKeyGroupInfo and XkbKeyNumGroups?
 		unsigned char info = XkbKeyGroupInfo(keyboard_map, keycode);
 		unsigned int num_groups = XkbKeyNumGroups(keyboard_map, keycode);
 
-		/* Get the group */
+		// Get the group.
 		unsigned int group = 0x0000;
 		switch (XkbOutOfRangeGroupAction(info)) {
 			case XkbRedirectIntoRange:
@@ -121,11 +121,11 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			  * first KeySym is used, otherwise the second KeySym is used.
 			  */
 			if (event_mask & ShiftMask || (event_mask & LockMask && is_shift_lock)) {
-				/* i = 0; */
+				// i = 0
 				keysym = keyboard_map[keycode * keysyms_per_keycode];
 			}
 			else {
-				/* i = 1; */
+				// i = 1
 				keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
 			}
 		}
@@ -133,7 +133,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			/* The Shift and Lock modifiers are both off. In this case,
 			 * the first KeySym is used.
 			 */
-			/* index = 0; */
+			// index = 0
 			keysym = keyboard_map[keycode * keysyms_per_keycode];
 		}
 		else if (event_mask ^ ShiftMask && event_mask & LockMask && is_caps_lock) {
@@ -143,11 +143,11 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * alphabetic, then the corresponding uppercase KeySym is
 			 * used instead.
 			 */
-			/* index = 0; */
+			// index = 0;
 			keysym = keyboard_map[keycode * keysyms_per_keycode];
 
 			if (keysym >= 'a' && keysym <= 'z') {
-				/* keysym is an alpha char */
+				// keysym is an alpha char.
 				KeySym lower_keysym, upper_keysym;
 				XConvertCase(keysym, &lower_keysym, &upper_keysym);
 				keysym = upper_keysym;
@@ -160,11 +160,11 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * alphabetic, then the corresponding uppercase KeySym is
 			 * used instead.
 			 */
-			/* index = 1; */
+			// index = 1
 			keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
 
 			if (keysym >= 'A' && keysym <= 'Z') {
-				/* keysym is an alpha char */
+				// keysym is an alpha char.
 				KeySym lower_keysym, upper_keysym;
 				XConvertCase(keysym, &lower_keysym, &upper_keysym);
 				keysym = lower_keysym;
@@ -175,7 +175,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * is interpreted as ShiftLock, or both. In this case, the
 			 * second KeySym is used.
 			 */
-			/* index = 1; */
+			// index = 1
 			keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
 		}
 		#ifdef DEBUG
@@ -3294,7 +3294,7 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 
 void LoadInputHelper() {
 	#ifdef XKB
-	/* Get the map */
+	// Get the map.
 	keyboard_map = XkbGetMap(disp, XkbAllClientInfoMask, XkbUseCoreKbd);
 	#else
 	int min_keycode, max_keycode;
@@ -3318,7 +3318,7 @@ void LoadInputHelper() {
 			KeyCode shift_lock = XKeysymToKeycode(disp, XK_Shift_Lock);
 			keysyms_per_keycode--;
 
-			/* Loop over the modfer map to find out if/where shift and caps locks are set */
+			// Loop over the modfer map to find out if/where shift and caps locks are set.
 			for (int i = LockMapIndex; i < LockMapIndex + modifier_map->max_keypermod && !is_caps_lock; i++) {
 				if (caps_lock != 0 && modifier_map->modifiermap[i] == caps_lock) {
 					is_caps_lock = true;

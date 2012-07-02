@@ -19,7 +19,7 @@
 #ifndef _Included_XWheelCodes
 #define _Included_XWheelCodes
 
-/* Virtual button codes that are not defined by X11 */
+// Virtual button codes that are not defined by X11.
 #define WheelUp			4
 #define WheelDown		5
 #define WheelLeft		6

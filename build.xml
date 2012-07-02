@@ -54,10 +54,12 @@
 		<echo>Cleaning all build related items...</echo>
 
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
-			<fileset dir="${dir.doc}" includes="**/*" />
-			<fileset dir="${dir.dist}" includes="**/*" />
-			<fileset dir="${dir.lib}" includes="**/*" />
-			<fileset dir="${dir.jar}" includes="**/*" />
+			<fileset dir="${dir.bin}" />
+			<fileset dir="${dir.dist}" />
+			<fileset dir="${dir.doc}" />
+			<fileset dir="${dir.jar}" />
+			<fileset dir="${dir.lib}" />
+			
 			<fileset file="${dir.src.native}/jni/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>

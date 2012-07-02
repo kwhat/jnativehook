@@ -24,7 +24,7 @@
 #include "NativeErrors.h"
 #include "WinUnicodeHelper.h"
 
-/* Global Variables */
+// Global Variables.
 HINSTANCE hInst = NULL;
 HINSTANCE kbInst = NULL;
 
@@ -52,7 +52,7 @@ long GetAutoRepeatDelay() {
 
 long int GetPointerAccelerationMultiplier() {
 	long int value = -1;
-	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
+	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
 		value = mouse[2];
@@ -63,10 +63,10 @@ long int GetPointerAccelerationMultiplier() {
 
 long int GetPointerAccelerationThreshold() {
 	long int value = -1;
-	int mouse[3]; /* 0-Threshold X, 1-Threshold Y and 2-Speed */
+	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
 	if (SystemParametersInfo(SPI_GETMOUSE, 0, &mouse, 0)) {
-		/* Average the x and y thresholds */
+		// Average the x and y thresholds.
 		value = (mouse[0] + mouse[1]) / 2;
 	}
 
@@ -95,12 +95,12 @@ long int GetMultiClickTime() {
 }
 
 void OnLibraryLoad() {
-	/* Do Nothing */
+	// Do Nothing.
 	kbInst = LoadInputHelper();
 }
 
 void OnLibraryUnload() {
-	/* Do Nothing */
+	// Do Nothing.
 	UnloadInputHelper(kbInst);
 }
 
@@ -108,7 +108,7 @@ BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH:
 			hInst = (HINSTANCE) _hInst;
-			/* hInst = GetModuleHandle(NULL); */
+			// hInst = GetModuleHandle(NULL);
 			break;
 	}
 

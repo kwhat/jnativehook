@@ -106,7 +106,7 @@ long int GetAutoRepeatRate() {
 		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("KeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &rate)) {
-				/* This is the slider value, we must multiply by 15 to convert to milliseconds */
+				// This is the slider value, we must multiply by 15 to convert to milliseconds.
 				value = (long) rate * 15;
 				successful = true;
 			}
@@ -229,11 +229,11 @@ long int GetPointerAccelerationMultiplier() {
 
 			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
 			if (kren_ret == kIOReturnSuccess) {
-				/* IOByteCount size = sizeof(multiplier); */
+				// IOByteCount size = sizeof(multiplier);
 
 				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &multiplier);
 				if (kren_ret == kIOReturnSuccess) {
-					/* Calculate the greatest common factor */
+					// Calculate the greatest common factor.
 
 					unsigned long denominator = 1000000, d = denominator;
 					unsigned long numerator = multiplier * denominator, gcf = numerator;
@@ -308,11 +308,11 @@ long int GetPointerSensitivity() {
 
 			kren_ret = IOServiceOpen(service, mach_task_self(), kIOHIDParamConnectType, &connection);
 			if (kren_ret == kIOReturnSuccess) {
-				/* IOByteCount size = sizeof(multiplier); */
+				// IOByteCount size = sizeof(multiplier);
 
 				kren_ret = IOHIDGetAccelerationWithKey(connection, CFSTR(kIOHIDMouseAccelerationType), &sensitivity);
 				if (kren_ret == kIOReturnSuccess) {
-					/* Calculate the greatest common factor */
+					// Calculate the greatest common factor.
 
 					unsigned long denominator = 1000000, d = denominator;
 					unsigned long numerator = sensitivity * denominator, gcf = numerator;
@@ -338,7 +338,7 @@ long int GetMultiClickTime() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	#if defined IOKIT || defined CARBON_LEGACY
-	/* This needs to be defiend only if we have IOKIT or CARBON_LEGACY */
+	// This needs to be defiend only if we have IOKIT or CARBON_LEGACY.
 	SInt64 time;
 	#endif
 	#endif
@@ -410,9 +410,9 @@ long int GetMultiClickTime() {
 }
 
 void OnLibraryLoad() {
-	/* Do Nothing */
+	// Do Nothing.
 }
 
 void OnLibraryUnload() {
-	/* Do Nothing */
+	// Do Nothing.
 }

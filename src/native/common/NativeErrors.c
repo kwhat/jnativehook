@@ -35,7 +35,7 @@ void ThrowFatalError(const char * message) {
 void ThrowException(const char * classname, const char * message) {
 	JNIEnv * env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		/* Locate our exception class */
+		// Locate our exception class.
 		jclass clsException = (*env)->FindClass(env, classname);
 
 		if (clsException != NULL) {
@@ -56,7 +56,7 @@ void ThrowException(const char * classname, const char * message) {
 				(*env)->DeleteLocalRef(env, clsException);
 			}
 			else {
-				/* Unable to find exception class, Terminate with error. */
+				// Unable to find exception class, Terminate with error.
 				ThrowFatalError("Unable to locate exception class.");
 			}
 		}

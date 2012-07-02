@@ -36,7 +36,7 @@
 #include <jni.h>
 #include <stdlib.h>
 
-/* Exception class definitions. */
+// Exception class definitions.
 #define INTERNAL_ERROR				"java/lang/InternalError"
 #define OUT_OF_MEMORY_ERROR			"java/lang/OutOfMemoryError"
 #define NO_CLASS_DEF_FOUND_ERROR	"java/lang/NoClassDefFoundError"

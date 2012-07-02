@@ -19,7 +19,7 @@
 #include <stdbool.h>
 #include "OSXInputHelpers.h"
 
-/* Keyboard Upper 16 / Mouse Lower 16 */
+// Keyboard Upper 16 / Mouse Lower 16
 static CGEventFlags current_modifiers = 0x00000000;
 
 void SetModifierMask(CGEventFlags mask) {
@@ -78,7 +78,7 @@ CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 									buffer);
 
 			if (buff_len == 0 && deadkey_state) {
-				/* Convert for Dead Key with a space after */
+				// Convert for Dead Key with a space after
 				status = UCKeyTranslate(
 									keyboard_layout,
 									kVK_Space,
@@ -94,8 +94,8 @@ CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 
 
 			if (status == noErr && buff_len > 0) {
-				/* Figure out when buffer > 1 */
-				/* keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, 1); */
+				// Figure out when buffer > 1
+				// keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, 1);
 				keytxt = CFStringCreateWithCharacters(kCFAllocatorDefault, buffer, buff_len);
 			}
 		}

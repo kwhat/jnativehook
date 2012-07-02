@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
- * Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
- * Reference: http://www.mactech.com/macintosh-c/chap02-1.html
- */
+// Reference: http://boredzo.org/blog/wp-content/uploads/2007/05/imtx-virtual-keycodes.png
+// Reference: https://svn.blender.org/svnroot/bf-blender/branches/render25/intern/ghost/intern/GHOST_SystemCocoa.mm
+// Reference: http://www.mactech.com/macintosh-c/chap02-1.html
 
 #ifndef _Included_OSXInputHelpers
 #define _Included_OSXInputHelpers
@@ -27,22 +26,22 @@
 #include <stdbool.h>
 
 #include <ApplicationServices/ApplicationServices.h>
-#include <Carbon/Carbon.h>	/* For HIToolbox kVK_ keycodes and TIS funcitons */
+#include <Carbon/Carbon.h>	// For HIToolbox kVK_ keycodes and TIS funcitons.
 
 
-/* These virtual key codes do not appear to be defined anywhere by Apple */
+// These virtual key codes do not appear to be defined anywhere by Apple.
 #define kVK_RightCommand				0x36
-#define kVK_ContextMenu					0x6E	/* AKA kMenuPowerGlyph */
+#define kVK_ContextMenu					0x6E	// AKA kMenuPowerGlyph
 
 
-/* These button codes do not appear to be defined anywhere by Apple */
+// These button codes do not appear to be defined anywhere by Apple.
 #define kVK_LBUTTON						kCGMouseButtonLeft
 #define kVK_RBUTTON						kCGMouseButtonRight
 #define kVK_MBUTTON						kCGMouseButtonCenter
 #define kVK_XBUTTON1					3
 #define kVK_XBUTTON2					4
 
-/* These button masks do not appear to be defined anywhere by Apple */
+// These button masks do not appear to be defined anywhere by Apple.
 #define kCGEventFlagMaskButtonLeft		1
 #define kCGEventFlagMaskButtonRight		2
 #define kCGEventFlagMaskButtonCenter	4
@@ -50,13 +49,13 @@
 #define kCGEventFlagMaskXButton2		16
 
 
-/* Set the native modifier mask for future events. */
+// Set the native modifier mask for future events.
 extern void SetModifierMask(CGEventFlags mask);
 
-/* Unset the native modifier mask for future events. */
+// Unset the native modifier mask for future events.
 extern void UnsetModifierMask(CGEventFlags mask);
 
-/* Get the current native modifier mask state. */
+// Get the current native modifier mask state.
 extern CGEventFlags GetModifiers();
 
 

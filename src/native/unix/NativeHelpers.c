@@ -43,18 +43,14 @@ long int GetAutoRepeatRate() {
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
-	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension
-	 * if available.
-	 */
+	// Attempt to acquire the keyboard auto repeat rate using the XKB extension.
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
 	}
 	#endif
 
 	#ifdef XF86MISC
-	/* Fallback to the XF86 Misc extension if available and other efforts
-	 * failed.
-	 */
+	// Fallback to the XF86 Misc extension if available and other efforts failed.
 	if (!successful) {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
@@ -79,18 +75,14 @@ long int GetAutoRepeatDelay() {
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
-	/* Attempt to acquire the keyboard auto repeat rate using the XKB extension
-	 * if available.
-	 */
+	// Attempt to acquire the keyboard auto repeat rate using the XKB extension.
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
 	}
 	#endif
 
 	#ifdef XF86MISC
-	/* Fallback to the XF86 Misc extension if available and other efforts
-	 * failed.
-	 */
+	// Fallback to the XF86 Misc extension if available and other efforts failed.
 	if (!successful) {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
@@ -156,7 +148,7 @@ long int GetMultiClickTime() {
 	int clicktime;
 	bool successful = false;
 
-	/* Try and acquire the multi-click time from the user defined X defaults */
+	// Try and acquire the multi-click time from the user defined X defaults.
 	char * xprop = XGetDefault(disp, "*", "multiClickTime");
 	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
 		successful = true;
@@ -171,9 +163,7 @@ long int GetMultiClickTime() {
 	int argc = 0;
 	char ** argv = {NULL};
 
-	/* Fall back to the X Toolkit extension if available and other efforts
-	 * failed.
-	 */
+	// Fall back to the X Toolkit extension if available and other efforts failed.
     XtDisplayInitialize(app_context, disp, "JNativeHook", "JNativeHook", NULL, 0, &argc, argv);
 	if (!successful) {
 		clicktime = XtGetMultiClickTime(disp);
@@ -192,7 +182,7 @@ long int GetMultiClickTime() {
 
 
 void OnLibraryLoad() {
-	/* Tell X Threads are OK */
+	// Tell X Threads are OK.
 	XInitThreads();
 
 	#ifdef XT
@@ -200,7 +190,7 @@ void OnLibraryLoad() {
 	app_context = XtCreateApplicationContext();
 	#endif
 
-	/* Open local display */
+	// Open local display.
 	disp = XOpenDisplay(XDisplayName(NULL));
 	#ifdef DEBUG
 	if (disp != NULL) {
@@ -213,7 +203,7 @@ void OnLibraryLoad() {
 
 	Bool isAutoRepeat = false;
 	#ifdef XKB
-	/* Enable detectable autorepeat */
+	// Enable detectable autorepeat.
 	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
 	#else
 	XAutoRepeatOn(disp);
@@ -239,7 +229,7 @@ void OnLibraryUnload() {
 	XtDestroyApplicationContext(app_context);
 	#endif
 
-	/* Destroy the native displays */
+	// Destroy the native displays.
 	if (disp != NULL) {
 		XCloseDisplay(disp);
 		disp = NULL;
