@@ -22,9 +22,11 @@
 #include <windows.h>
 
 #include "NativeErrors.h"
+#include "WinUnicodeHelper.h"
 
 /* Global Variables */
 HINSTANCE hInst = NULL;
+HINSTANCE kbInst = NULL;
 
 long int GetAutoRepeatRate() {
 	long int value = -1;
@@ -94,10 +96,12 @@ long int GetMultiClickTime() {
 
 void OnLibraryLoad() {
 	/* Do Nothing */
+	kbInst = LoadInputHelper();
 }
 
 void OnLibraryUnload() {
 	/* Do Nothing */
+	UnloadInputHelper(kbInst);
 }
 
 BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {

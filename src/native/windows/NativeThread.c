@@ -27,6 +27,7 @@
 #include "NativeThread.h"
 #include "NativeToJava.h"
 #include "WinInputHelpers.h"
+#include "WinUnicodeHelper.h"
 
 /* Exception global for thread initialization */
 static Exception thread_ex;
@@ -44,6 +45,7 @@ static DWORD hookThreadId = 0;
 static HANDLE hookThreadHandle = NULL, hookEventHandle = NULL;
 static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
+static WCHAR keytxt = '\0', keydead = 0;
 
 static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	JNIEnv * env = NULL;
@@ -54,8 +56,9 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		/* Java Event Data */
 		JKeyDatum jkey;
 		jint modifiers;
-		WCHAR keytxt[4];
-		BYTE keymap[256];
+		//WCHAR keytxt[4];
+		//BYTE keymap[256];
+		
 
 		/* Java Key Event Object */
 		jobject objKeyEvent;
@@ -93,30 +96,20 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 										jkey.location);
 				(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-				
-				/* I don't know why GetKeyState() needs to be called prior to 
-				 * GetKeyboardState() to get an accurate layout, but it does. 
-				 * My best guess is that it forces the thread to wait until the 
-				 * key state has been processed by the message queue.
-				 */
-				GetKeyState(0);
-				if (GetKeyboardState(keymap)) {
-					/* FIXME ToUnicode needs to be replaced because it doesn't work well with dead keys */
-					if (ToUnicode(kbhook->vkCode, kbhook->scanCode, keymap, keytxt, sizeof(keytxt) / sizeof(WCHAR), 0) == 1) {
-						/* Fire key typed event */
-						objKeyEvent = (*env)->NewObject(
-												env, 
-												clsKeyEvent, 
-												idKeyEvent, 
-												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, 
-												(jlong) kbhook->time, 
-												modifiers, 
-												kbhook->vkCode, 
-												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, 
-												(jchar) keytxt[0], 
-												jkey.location);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-					}
+				if (ConvertVirtualKeyToWChar(kbhook->vkCode, &keytxt, &keydead) > 0) {
+					/* Fire key typed event */
+					objKeyEvent = (*env)->NewObject(
+											env, 
+											clsKeyEvent, 
+											idKeyEvent, 
+											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, 
+											(jlong) kbhook->time, 
+											modifiers, 
+											kbhook->vkCode, 
+											org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, 
+											(jchar) keytxt, 
+											jkey.location);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 				}
 				break;
 
