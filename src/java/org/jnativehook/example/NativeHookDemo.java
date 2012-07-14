@@ -17,6 +17,7 @@
  */
 package org.jnativehook.example;
 
+//Imports
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -315,8 +316,8 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowOpened(WindowEvent e) {
 		try {
-			txtEventInfo.setText("Auto Repate Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
-			txtEventInfo.append("\n" + "Auto Repate Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
+			txtEventInfo.setText("Auto Repeat Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
+			txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
 			txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.multiClickInterval"));
 			txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointerSensitivity"));
 			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointerAccelerationMultiplier"));

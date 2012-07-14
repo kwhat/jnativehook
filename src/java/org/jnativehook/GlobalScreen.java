@@ -18,6 +18,7 @@
 package org.jnativehook;
 
 //Imports
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,11 +36,11 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
 /**
  * GlobalScreen is used to represent the native screen area that Java does not
  * usually have access to. This class can be thought of as the source component
- * for native events.
+ * for native input events.
  * <p />
  * This class also handles the loading, unpacking and communication with the
- * native library. That includes registering the native hook with the
- * underlying operating system and adding global keyboard and mouse
+ * native library. That includes registering and unregistering the native hook 
+ * with the underlying operating system and adding global keyboard and mouse
  * listeners.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
@@ -54,8 +55,8 @@ public class GlobalScreen {
 
 	/**
 	 * Private constructor to prevent multiple instances of the global screen.
-	 * The {@link #registerNativeHook} method will be called on construction to unpack
-	 * and load the native library.
+	 * The {@link #registerNativeHook} method will be called on construction to 
+	 * unpack and load the native library.
 	 */
 	private GlobalScreen() {
 		//Setup instance variables.
@@ -76,21 +77,35 @@ public class GlobalScreen {
 	 */
 	@Override
 	protected void finalize() throws Throwable {
-		try {
-			GlobalScreen.unloadNativeLibrary();
+		if (GlobalScreen.isNativeHookRegistered()) {
+			if (GlobalScreen.isNativeDispatchThread()) {
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							GlobalScreen.unloadNativeLibrary();
+						}
+						catch (NativeHookException e) {
+							/* Because we can guaranteed that 
+							 * unloadNativeLibrary() is not executing on the 
+							 * Native Dispatch Thread, this exception should
+							 * neaver get thrown.
+							 */
+						}
+					}
+				});
+			}
+			else {
+				GlobalScreen.unloadNativeLibrary();
+			}
 		}
-		catch(NativeHookException e) {
-			throw e;
-		}
-		finally {
-			super.finalize();
-		}
+		
+		super.finalize();
 	}
 
 	/**
-	 * Gets the single instance of GlobalScreen.
+	 * Returns the singleton instance of <code>GlobalScreen</code>.
 	 *
-	 * @return single instance of GlobalScreen
+	 * @return singleton instance of <code>GlobalScreen</code>
 	 */
 	public static GlobalScreen getInstance() {
 		return GlobalScreen.instance;
@@ -215,7 +230,7 @@ public class GlobalScreen {
 	 * the function has no effect.
 	 * <p />
 	 * <b>Note: </b> This method will throw a <code>NativeHookException</code>
-	 * thrown if specific operating system features are unavailable or disabled.
+	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
 	 * Access section of the System Preferences on Apple's OS X platform or
 	 * <code>Load "record"</code> is missing for the xorg.conf file on
@@ -244,9 +259,9 @@ public class GlobalScreen {
 	public static native void unregisterNativeHook() throws NativeHookException;
 
 	/**
-	 * Gets the current state of the native hook.
+	 * Returns <code>true</code> if the native hook is currently registered.
 	 *
-	 * @return the state of the native hook.
+	 * @return true if the native hook is currently registered.
 	 * @throws NativeHookException the native hook exception
 	 *
 	 * @since 1.1
@@ -254,11 +269,11 @@ public class GlobalScreen {
 	public static native boolean isNativeHookRegistered();
 
 	/**
-	 * Check to determine if code is currently executing on the native event
+	 * Returns <code>true</code> if the current thread is the native event
 	 * dispatching thread.
 	 *
-	 * @return true if the current thread is the native event dispatching
-	 * thread.
+	 * @return true if the current thread is the native event 
+	 * dispatching thread.
 	 *
 	 * @since 1.1
 	 */
