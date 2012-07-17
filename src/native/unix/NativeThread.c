@@ -17,7 +17,7 @@
  */
 
 #include <pthread.h>
-
+#include <sys/time.h>
 #include <X11/Xlibint.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -46,7 +46,7 @@ static Exception thread_ex;
 
 // Mouse globals.
 static unsigned short click_count = 0;
-static Time click_time = 0;
+static long click_time = 0;
 static bool mouse_dragged = false;
 
 // The pointer to the X11 display accessed by the callback.
@@ -61,7 +61,6 @@ static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId;
 
-
 static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		JNIEnv * env = NULL;
@@ -75,7 +74,10 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 			int event_mask = data->event.u.keyButtonPointer.state;
 			int event_root_x = data->event.u.keyButtonPointer.rootX;
 			int event_root_y = data->event.u.keyButtonPointer.rootY;
-			Time event_time = hook->server_time;
+
+			struct timeval  time_val;
+			gettimeofday(&time_val, NULL);
+			long event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
 			KeySym keysym;
 			wchar_t keytxt;
 
@@ -173,8 +175,8 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					jmodifiers = NativeToJEventMask(event_mask);
 
 					/* This information is all static for X11, its up to the WM to
-					 * decide how to interpret the wheel events.
-					 */
+					* decide how to interpret the wheel events.
+					*/
 					// TODO Should use constants and a lookup table for button codes.
 					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 						jbutton = NativeToJButton(event_code);
@@ -195,24 +197,24 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					}
 					else if (event_code == WheelUp || event_code == WheelDown) {
 						/* Scroll wheel release events.
-						 * Scroll type: WHEEL_UNIT_SCROLL
-						 * Scroll amount: 3 unit increments per notch
-						 * Units to scroll: 3 unit increments
-						 * Vertical unit increment: 15 pixels
-						 */
+						* Scroll type: WHEEL_UNIT_SCROLL
+						* Scroll amount: 3 unit increments per notch
+						* Units to scroll: 3 unit increments
+						* Vertical unit increment: 15 pixels
+						*/
 
 						/* X11 does not have an API call for acquiring the mouse scroll type.  This
-						 * maybe part of the XInput2 (XI2) extention but I will wont know until it
-						 * is available on my platform.  For the time being we will just use the
-						 * unit scroll value.
-						 */
+						* maybe part of the XInput2 (XI2) extention but I will wont know until it
+						* is available on my platform.  For the time being we will just use the
+						* unit scroll value.
+						*/
 						jscrollType = (jint) org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
 
 						/* Some scroll wheel properties are available via the new XInput2 (XI2)
-						 * extention.  Unfortunately the extention is not available on my
-						 * development platform at this time.  For the time being we will just
-						 * use the Windows default value of 3.
-						 */
+						* extention.  Unfortunately the extention is not available on my
+						* development platform at this time.  For the time being we will just
+						* use the Windows default value of 3.
+						*/
 						jscrollAmount = (jint) 3;
 
 						if (event_code == WheelUp) {
@@ -337,7 +339,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 					break;
 				#endif
 			}
-
+			
 			// Handle any possible JNI issue that may have occurred.
 			if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 				#ifdef DEBUG
