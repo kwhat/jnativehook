@@ -31,7 +31,7 @@
 #define RETURN_FAILURE 1
 
 // Global Ref to the JVM.
-extern JavaVM * jvm;
+extern JavaVM *jvm;
 extern jint jni_version;
 
 // GlobalScreen object and dispatch id.

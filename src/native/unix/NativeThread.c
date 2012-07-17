@@ -50,7 +50,7 @@ static long click_time = 0;
 static bool mouse_dragged = false;
 
 // The pointer to the X11 display accessed by the callback.
-static Display * disp_ctrl;
+static Display *disp_ctrl;
 static XRecordContext context;
 
 // Thread and hook handles.
@@ -61,221 +61,136 @@ static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex;
 static pthread_t hookThreadId;
 
-static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) {
+static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
-		JNIEnv * env = NULL;
+		JNIEnv *env = NULL;
 		if (disp_ctrl != NULL && (*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-			// Get XRecord data.
-			XRecordDatum * data = (XRecordDatum *) hook->data;
+			// Check and make sure the thread is stull running to avoid the 
+			// potential crash associated with late event arrival.  This code is 
+			// guaranteed to run after all thread start.
+			if (pthread_mutex_trylock(&hookRunningMutex) != 0) {
+				// Get XRecord data.
+				XRecordDatum *data = (XRecordDatum *) hook->data;
 
-			// Native event data.
-			int event_type = data->type;
-			BYTE event_code = data->event.u.u.detail;
-			int event_mask = data->event.u.keyButtonPointer.state;
-			int event_root_x = data->event.u.keyButtonPointer.rootX;
-			int event_root_y = data->event.u.keyButtonPointer.rootY;
+				// Native event data.
+				int event_type = data->type;
+				BYTE event_code = data->event.u.u.detail;
+				int event_mask = data->event.u.keyButtonPointer.state;
+				int event_root_x = data->event.u.keyButtonPointer.rootX;
+				int event_root_y = data->event.u.keyButtonPointer.rootY;
 
-			struct timeval  time_val;
-			gettimeofday(&time_val, NULL);
-			long event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
-			KeySym keysym;
-			wchar_t keytxt;
+				struct timeval  time_val;
+				gettimeofday(&time_val, NULL);
+				long event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
+				KeySym keysym;
+				wchar_t keytxt;
 
-			// Java event data.
-			JKeyDatum jkey;
-			jint jbutton;
-			jint jscrollType, jscrollAmount, jwheelRotation;
-			jint jmodifiers;
+				// Java event data.
+				JKeyDatum jkey;
+				jint jbutton;
+				jint jscrollType, jscrollAmount, jwheelRotation;
+				jint jmodifiers;
 
-			// Java event object.
-			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
+				// Java event object.
+				jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
-			switch (event_type) {
-				case KeyPress:
-					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Key pressed. (%i)\n", event_code);
-					#endif
+				switch (event_type) {
+					case KeyPress:
+						#ifdef DEBUG
+						fprintf(stdout, "LowLevelProc(): Key pressed. (%i)\n", event_code);
+						#endif
 
-					keysym = KeyCodeToKeySym(event_code, event_mask);
-					jkey = NativeToJKey(keysym);
-					jmodifiers = NativeToJEventMask(event_mask);
+						keysym = KeyCodeToKeySym(event_code, event_mask);
+						jkey = NativeToJKey(keysym);
+						jmodifiers = NativeToJEventMask(event_mask);
 
-					// Fire key pressed event.
-					objKeyEvent = (*env)->NewObject(
-											env,
-											clsKeyEvent,
-											idKeyEvent,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
-											(jlong) event_time,
-											jmodifiers,
-											event_code,
-											jkey.keycode,
-											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-
-					// Check to make sure the key is printable.
-					keytxt = KeySymToUnicode(keysym);
-					if (keytxt != 0x0000) {
-						// Fire key typed event.
+						// Fire key pressed event.
 						objKeyEvent = (*env)->NewObject(
 												env,
 												clsKeyEvent,
 												idKeyEvent,
-												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
+												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
 												(jlong) event_time,
 												jmodifiers,
 												event_code,
-												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-												(jchar) keytxt,
+												jkey.keycode,
+												org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-					}
-					break;
 
-				case KeyRelease:
-					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
-					#endif
-
-					keysym = KeyCodeToKeySym(event_code, event_mask);
-					jkey = NativeToJKey(keysym);
-					jmodifiers = NativeToJEventMask(event_mask);
-
-					// Fire key released event.
-					objKeyEvent = (*env)->NewObject(
-											env,
-											clsKeyEvent,
-											idKeyEvent,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-											(jlong) event_time,
-											jmodifiers,
-											event_code,
-											jkey.keycode,
-											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											jkey.location);
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
-					break;
-
-				case ButtonPress:
-					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Button pressed. (%i)\n", event_code);
-					#endif
-
-					// Track the number of clicks.
-					if ((long) (event_time - click_time) <= GetMultiClickTime()) {
-						click_count++;
-					}
-					else {
-						click_count = 1;
-					}
-					click_time = event_time;
-
-					// Convert native modifiers to java modifiers.
-					jmodifiers = NativeToJEventMask(event_mask);
-
-					/* This information is all static for X11, its up to the WM to
-					* decide how to interpret the wheel events.
-					*/
-					// TODO Should use constants and a lookup table for button codes.
-					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-						jbutton = NativeToJButton(event_code);
-
-						// Fire mouse released event.
-						objMouseEvent = (*env)->NewObject(
+						// Check to make sure the key is printable.
+						keytxt = KeySymToUnicode(keysym);
+						if (keytxt != 0x0000) {
+							// Fire key typed event.
+							objKeyEvent = (*env)->NewObject(
 													env,
-													clsMouseEvent,
-													idMouseButtonEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
+													clsKeyEvent,
+													idKeyEvent,
+													org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 													(jlong) event_time,
 													jmodifiers,
-													(jint) event_root_x,
-													(jint) event_root_y,
-													(jint) click_count,
-													jbutton);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-					}
-					else if (event_code == WheelUp || event_code == WheelDown) {
-						/* Scroll wheel release events.
-						* Scroll type: WHEEL_UNIT_SCROLL
-						* Scroll amount: 3 unit increments per notch
-						* Units to scroll: 3 unit increments
-						* Vertical unit increment: 15 pixels
-						*/
-
-						/* X11 does not have an API call for acquiring the mouse scroll type.  This
-						* maybe part of the XInput2 (XI2) extention but I will wont know until it
-						* is available on my platform.  For the time being we will just use the
-						* unit scroll value.
-						*/
-						jscrollType = (jint) org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
-
-						/* Some scroll wheel properties are available via the new XInput2 (XI2)
-						* extention.  Unfortunately the extention is not available on my
-						* development platform at this time.  For the time being we will just
-						* use the Windows default value of 3.
-						*/
-						jscrollAmount = (jint) 3;
-
-						if (event_code == WheelUp) {
-							// Wheel Rotated Up and Away.
-							jwheelRotation = -1;
+													event_code,
+													org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
+													(jchar) keytxt,
+													jkey.location);
+							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 						}
-						else { // event_code == WheelDown
-							// Wheel Rotated Down and Towards.
-							jwheelRotation = 1;
-						}
+						break;
 
-						// Fire mouse wheel event.
-						objMouseWheelEvent = (*env)->NewObject(
-														env,
-														clsMouseWheelEvent,
-														idMouseWheelEvent,
-														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
-														(jlong) event_time,
-														jmodifiers,
-														(jint) event_root_x,
-														(jint) event_root_y,
-														(jint) click_count,
-														jscrollType,
-														jscrollAmount,
-														jwheelRotation);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
-					}
-					break;
+					case KeyRelease:
+						#ifdef DEBUG
+						fprintf(stdout, "LowLevelProc(): Key released. (%i)\n", event_code);
+						#endif
 
-				case ButtonRelease:
-					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
-					#endif
-
-					// TODO Should use constants for button codes.
-					if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-						// Handle button release events.
-						jbutton = NativeToJButton(event_code);
+						keysym = KeyCodeToKeySym(event_code, event_mask);
+						jkey = NativeToJKey(keysym);
 						jmodifiers = NativeToJEventMask(event_mask);
 
-						// Fire mouse released event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseButtonEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
-													(jlong) event_time,
-													jmodifiers,
-													(jint) event_root_x,
-													(jint) event_root_y,
-													(jint) click_count,
-													jbutton);
-						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						// Fire key released event.
+						objKeyEvent = (*env)->NewObject(
+												env,
+												clsKeyEvent,
+												idKeyEvent,
+												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
+												(jlong) event_time,
+												jmodifiers,
+												event_code,
+												jkey.keycode,
+												org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+												jkey.location);
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						break;
 
-						if (mouse_dragged != true) {
-							// Fire mouse clicked event.
+					case ButtonPress:
+						#ifdef DEBUG
+						fprintf(stdout, "LowLevelProc(): Button pressed. (%i)\n", event_code);
+						#endif
+
+						// Track the number of clicks.
+						if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+							click_count++;
+						}
+						else {
+							click_count = 1;
+						}
+						click_time = event_time;
+
+						// Convert native modifiers to java modifiers.
+						jmodifiers = NativeToJEventMask(event_mask);
+
+						/* This information is all static for X11, its up to the WM to
+						* decide how to interpret the wheel events.
+						*/
+						// TODO Should use constants and a lookup table for button codes.
+						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+							jbutton = NativeToJButton(event_code);
+
+							// Fire mouse released event.
 							objMouseEvent = (*env)->NewObject(
 														env,
 														clsMouseEvent,
 														idMouseButtonEvent,
-														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
 														(jlong) event_time,
 														jmodifiers,
 														(jint) event_root_x,
@@ -284,62 +199,156 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 														jbutton);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 						}
-					}
-					break;
+						else if (event_code == WheelUp || event_code == WheelDown) {
+							/* Scroll wheel release events.
+							* Scroll type: WHEEL_UNIT_SCROLL
+							* Scroll amount: 3 unit increments per notch
+							* Units to scroll: 3 unit increments
+							* Vertical unit increment: 15 pixels
+							*/
 
-				case MotionNotify:
+							/* X11 does not have an API call for acquiring the mouse scroll type.  This
+							* maybe part of the XInput2 (XI2) extention but I will wont know until it
+							* is available on my platform.  For the time being we will just use the
+							* unit scroll value.
+							*/
+							jscrollType = (jint) org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
+
+							/* Some scroll wheel properties are available via the new XInput2 (XI2)
+							* extention.  Unfortunately the extention is not available on my
+							* development platform at this time.  For the time being we will just
+							* use the Windows default value of 3.
+							*/
+							jscrollAmount = (jint) 3;
+
+							if (event_code == WheelUp) {
+								// Wheel Rotated Up and Away.
+								jwheelRotation = -1;
+							}
+							else { // event_code == WheelDown
+								// Wheel Rotated Down and Towards.
+								jwheelRotation = 1;
+							}
+
+							// Fire mouse wheel event.
+							objMouseWheelEvent = (*env)->NewObject(
+															env,
+															clsMouseWheelEvent,
+															idMouseWheelEvent,
+															org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
+															(jlong) event_time,
+															jmodifiers,
+															(jint) event_root_x,
+															(jint) event_root_y,
+															(jint) click_count,
+															jscrollType,
+															jscrollAmount,
+															jwheelRotation);
+							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+						}
+						break;
+
+					case ButtonRelease:
+						#ifdef DEBUG
+						fprintf(stdout, "LowLevelProc(): Button released. (%i)\n", event_code);
+						#endif
+
+						// TODO Should use constants for button codes.
+						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+							// Handle button release events.
+							jbutton = NativeToJButton(event_code);
+							jmodifiers = NativeToJEventMask(event_mask);
+
+							// Fire mouse released event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseButtonEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
+														(jlong) event_time,
+														jmodifiers,
+														(jint) event_root_x,
+														(jint) event_root_y,
+														(jint) click_count,
+														jbutton);
+							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+
+							if (mouse_dragged != true) {
+								// Fire mouse clicked event.
+								objMouseEvent = (*env)->NewObject(
+															env,
+															clsMouseEvent,
+															idMouseButtonEvent,
+															org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
+															(jlong) event_time,
+															jmodifiers,
+															(jint) event_root_x,
+															(jint) event_root_y,
+															(jint) click_count,
+															jbutton);
+								(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+							}
+						}
+						break;
+
+					case MotionNotify:
+						#ifdef DEBUG
+						fprintf(stdout, "LowLevelProc(): Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
+						#endif
+
+						// Reset the click count.
+						if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+							click_count = 0;
+						}
+						jmodifiers = NativeToJEventMask(event_mask);
+
+						// Set the mouse dragged flag.
+						mouse_dragged = jmodifiers >> 4 > 0;
+
+						// Check the upper half of java modifiers for non zero value.
+						if (jmodifiers >> 4 > 0) {
+							// Create Mouse Dragged event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
+														(jlong) event_time,
+														jmodifiers,
+														(jint) event_root_x,
+														(jint) event_root_y,
+														(jint) click_count);
+						}
+						else {
+							// Create a Mouse Moved event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
+														(jlong) event_time,
+														jmodifiers,
+														(jint) event_root_x,
+														(jint) event_root_y,
+														(jint) click_count);
+						}
+
+						// Fire mouse moved event.
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						break;
+
 					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Motion Notified. (%i, %i)\n", event_root_x, event_root_y);
+					default:
+						fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
+						break;
 					#endif
-
-					// Reset the click count.
-					if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
-						click_count = 0;
-					}
-					jmodifiers = NativeToJEventMask(event_mask);
-
-					// Set the mouse dragged flag.
-					mouse_dragged = jmodifiers >> 4 > 0;
-
-					// Check the upper half of java modifiers for non zero value.
-					if (jmodifiers >> 4 > 0) {
-						// Create Mouse Dragged event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-													(jlong) event_time,
-													jmodifiers,
-													(jint) event_root_x,
-													(jint) event_root_y,
-													(jint) click_count);
-					}
-					else {
-						// Create a Mouse Moved event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-													(jlong) event_time,
-													jmodifiers,
-													(jint) event_root_x,
-													(jint) event_root_y,
-													(jint) click_count);
-					}
-
-					// Fire mouse moved event.
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
-					break;
-
-				#ifdef DEBUG
-				default:
-					fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
-					break;
-				#endif
+				}
 			}
-			
+			else {
+				// Unlock the mutex incase trylock succeeded.
+				pthread_mutex_unlock(&hookRunningMutex);
+			}
+					
 			// Handle any possible JNI issue that may have occurred.
 			if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 				#ifdef DEBUG
@@ -354,20 +363,20 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData * hook) 
 	XRecordFreeData(hook);
 }
 
-static void * ThreadProc(void * arg) {
+static void *ThreadProc(void *arg) {
 	pthread_mutex_lock(&hookRunningMutex);
 
-	int * status = (int *) arg;
+	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
-	JNIEnv * env = NULL;
+	JNIEnv *env = NULL;
 
 	// XRecord context for use later.
 	context = 0;
 
 	// Grab the default display.
-	char * disp_name = XDisplayName(NULL);
+	char *disp_name = XDisplayName(NULL);
 	disp_ctrl = XOpenDisplay(disp_name);
-	Display * disp_data = XOpenDisplay(disp_name);
+	Display *disp_data = XOpenDisplay(disp_name);
 	if (disp_ctrl != NULL && disp_data != NULL) {
 		#ifdef DEBUG
 		fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
@@ -382,7 +391,7 @@ static void * ThreadProc(void * arg) {
 
 			// Setup XRecord range.
 			XRecordClientSpec clients = XRecordAllClients;
-			XRecordRange * range = XRecordAllocRange();
+			XRecordRange *range = XRecordAllocRange();
 			if (range != NULL) {
 				#ifdef DEBUG
 				fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
@@ -511,9 +520,8 @@ int StartNativeThread() {
 			running = true;
 			#endif
 
-			/* We shall use the default pthread attributes: thread is joinable
-			 * (not detached) and has default (non real-time) scheduling policy
-			 */
+			// We shall use the default pthread attributes: thread is joinable
+			// (not detached) and has default (non real-time) scheduling policy
 			pthread_mutex_lock(&hookControlMutex);
 
 			// Initialize Native Input Functions.
@@ -543,7 +551,7 @@ int StartNativeThread() {
 					#endif
 
 					// Wait for the thread to die.
-					void * thread_status;
+					void *thread_status;
 					pthread_join(hookThreadId, (void *) &thread_status);
 					status = *(int *) thread_status;
 					free(thread_status);
@@ -571,9 +579,8 @@ int StartNativeThread() {
 		}
 		#ifdef DEBUG
 		else {
-			/* We cant do a whole lot of anything if we cant create JNI globals.
-			 * Any exceptions are thrown by CreateJNIGlobals().
-			 */
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
 			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
 		}
 		#endif
@@ -603,7 +610,7 @@ int StopNativeThread() {
 			pthread_mutex_unlock(&hookControlMutex);
 
 			// Wait for the thread to die.
-			void * thread_status;
+			void *thread_status;
 			pthread_join(hookThreadId, &thread_status);
 			status = *(int *) thread_status;
 			free(thread_status);
@@ -658,9 +665,8 @@ bool IsNativeThreadRunning() {
 	}
 	#ifdef DEBUG
 	else {
-		/* Lock Failure. This should always be caused by an invalid pointer
-		 * and/or an uninitialized mutex.
-		 */
+		// Lock Failure. This should always be caused by an invalid pointer
+		// and/or an uninitialized mutex.
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 	}
 	#endif

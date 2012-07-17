@@ -44,7 +44,7 @@ PMODIFIERS pCharModifiers;
 PDEADKEY pDeadKey;
 
 // Locate the DLL that contains the current keyboard layout.
-static int GetKeyboardLayoutFile(char * layoutFile, DWORD bufferSize) {
+static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 	int status = RETURN_FAILURE;
 	HKEY hKey;
 	DWORD varType = REG_SZ;

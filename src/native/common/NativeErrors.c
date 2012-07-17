@@ -19,12 +19,12 @@
 #include "NativeErrors.h"
 #include "NativeGlobals.h"
 
-void ThrowFatalError(const char * message) {
+void ThrowFatalError(const char *message) {
 	#ifdef DEBUG
 	fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
-	JNIEnv * env = NULL;
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*env)->FatalError(env, message);
 	}
@@ -32,8 +32,8 @@ void ThrowFatalError(const char * message) {
 	exit(EXIT_FAILURE);
 }
 
-void ThrowException(const char * classname, const char * message) {
-	JNIEnv * env = NULL;
+void ThrowException(const char *classname, const char *message) {
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Locate our exception class.
 		jclass clsException = (*env)->FindClass(env, classname);

@@ -45,12 +45,12 @@ CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 	if (keyboard_ref) {
 	#endif
 		#ifdef CARBON_LEGACY
-		const void * resource;
+		const void *resource;
 		if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, &resource) == noErr) {
-			const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) resource;
+			const UCKeyboardLayout *keyboard_layout = (const UCKeyboardLayout *) resource;
 		#else
 		CFDataRef data_ref = (CFDataRef) TISGetInputSourceProperty(keyboard_ref, kTISPropertyUnicodeKeyLayoutData);
-		const UCKeyboardLayout * keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
+		const UCKeyboardLayout *keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
 		if (keyboard_layout) {
 		#endif
 			static const CGEventFlags cmd_modifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;

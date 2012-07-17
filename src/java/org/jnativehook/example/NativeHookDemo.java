@@ -261,7 +261,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		 */
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				txtEventInfo.append("\n" + e.paramString());
+				txtEventInfo.append("\n[" + e.getWhen() + "] " + e.paramString());
 
 				try {
 					txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));

@@ -20,7 +20,7 @@
 #include "NativeGlobals.h"
 
 // Global Ref to the JVM
-JavaVM * jvm;
+JavaVM *jvm;
 jint jni_version = JNI_VERSION_1_4;
 
 // GlobalScreen object and dispatch id.
@@ -35,7 +35,7 @@ jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
 
-	JNIEnv * env = NULL;
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Class and getInstance method id for the GlobalScreen Object.
 		jclass clsGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
@@ -206,7 +206,7 @@ int CreateJNIGlobals() {
 int DestroyJNIGlobals() {
 	int status = RETURN_FAILURE;
 
-	JNIEnv * env = NULL;
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*env)->DeleteGlobalRef(env, clsKeyEvent);
 		clsKeyEvent = NULL;

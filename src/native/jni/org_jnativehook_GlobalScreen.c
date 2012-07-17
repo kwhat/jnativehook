@@ -22,7 +22,7 @@
 #include "NativeThread.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-static void SetNativeProperties(JNIEnv * env) {
+static void SetNativeProperties(JNIEnv *env) {
 	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
@@ -167,7 +167,7 @@ static void SetNativeProperties(JNIEnv * env) {
 }
 
 
-static void ClearNativeProperties(JNIEnv * env) {
+static void ClearNativeProperties(JNIEnv *env) {
 	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
 	jmethodID clearProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "clearProperty", "(Ljava/lang/String;)Ljava/lang/String;");
 
@@ -182,30 +182,30 @@ static void ClearNativeProperties(JNIEnv * env) {
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
 	StartNativeThread();
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
 	StopNativeThread();
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
 	return (jboolean) IsNativeThreadRunning();
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThread(JNIEnv * UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThread(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
 	return (jboolean) (IsNativeThreadRunning() && IsNativeDispatchThread());
 }
 
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 	/* Grab the currently running virtual machine so we can attach to it in
 	 * functions that are not called from java. ( I.E. ThreadProc )
 	 */
 	jvm = vm;
-	JNIEnv * env = NULL;
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		#ifdef DEBUG
 		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
@@ -234,7 +234,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void * UNUSED(reserved)) {
 }
 
 // JNI exit point, This is executed when the Java virtual machine detaches from the native library.
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)) {
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) {
 	// Stop the native thread if its running.
 	if (IsNativeThreadRunning()) {
 		StopNativeThread();
@@ -243,19 +243,17 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * UNUSED(vm), void * UNUSED(reserved)
 	// Run platform specific unload items.
 	OnLibraryUnload();
 
-	/* Grab the currently JNI interface pointer so we can cleanup the
-	 * system properties set on load.
-	 */
-	JNIEnv * env = NULL;
+	// Grab the currently JNI interface pointer so we can cleanup the
+	// system properties set on load.
+	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Clear java properties from native sources.
 		ClearNativeProperties(env);
 	}
 	#ifdef DEBUG
 	else {
-		/* It is not critical that these values are cleared so no exception
-		 * will be thrown.
-		 */
+		// It is not critical that these values are cleared so no exception
+		// will be thrown.
 		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
 	}
 	#endif

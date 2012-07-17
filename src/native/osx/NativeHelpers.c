@@ -116,9 +116,8 @@ long int GetAutoRepeatRate() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		/* Apple documentation states that value is in 'ticks'. I am not sure
-		 * what that means, but it looks a lot like the arbitrary slider value.
-		 */
+		// Apple documentation states that value is in 'ticks'. I am not sure
+		// what that means, but it looks a lot like the arbitrary slider value.
 		rate = LMGetKeyRepThresh();
 		if (rate > -1) {
 			/* This is the slider value, we must multiply by 15 to convert to
@@ -180,9 +179,8 @@ long int GetAutoRepeatDelay() {
 		CFTypeRef pref_val = CFPreferencesCopyValue(CFSTR("InitialKeyRepeat"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 		if (pref_val != NULL && CFGetTypeID(pref_val) == CFNumberGetTypeID()) {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
-				/* This is the slider value, we must multiply by 15 to convert to
-				 * milliseconds.
-				 */
+				// This is the slider value, we must multiply by 15 to convert to
+				// milliseconds.
 				printf("Test: %i\n\n", (int) delay);
 				value = (long) delay * 15;
 				successful = true;
@@ -193,14 +191,12 @@ long int GetAutoRepeatDelay() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		/* Apple documentation states that value is in 'ticks'. I am not sure
-		 * what that means, but it looks a lot like the arbitrary slider value.
-		 */
+		// Apple documentation states that value is in 'ticks'. I am not sure
+		// what that means, but it looks a lot like the arbitrary slider value.
 		delay = LMGetKeyThresh();
 		if (delay > -1) {
-			/* This is the slider value, we must multiply by 15 to convert to
-			 * milliseconds.
-			 */
+			// This is the slider value, we must multiply by 15 to convert to
+			// milliseconds.
 			value = (long) delay * 15;
 			successful = true;
 		}
@@ -392,14 +388,12 @@ long int GetMultiClickTime() {
 
 	#ifdef CARBON_LEGACY
 	if (!successful) {
-		/* Apple documentation states that value is in 'ticks'. I am not sure
-		 * what that means, but it looks a lot like the arbitrary slider value.
-		 */
+		// Apple documentation states that value is in 'ticks'. I am not sure
+		// what that means, but it looks a lot like the arbitrary slider value.
 		time = GetDblTime();
 		if (time > -1) {
-			/* This is the slider value, we must multiply by 15 to convert to
-			 * milliseconds.
-			 */
+			// This is the slider value, we must multiply by 15 to convert to
+			// milliseconds.
 			value = (long) time * 15;
 			successful = true;
 		}

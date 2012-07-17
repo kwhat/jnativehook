@@ -35,7 +35,7 @@
 static XtAppContext app_context;
 #endif
 
-Display * disp;
+Display *disp;
 
 long int GetAutoRepeatRate() {
 	bool successful = false;
@@ -149,7 +149,7 @@ long int GetMultiClickTime() {
 	bool successful = false;
 
 	// Try and acquire the multi-click time from the user defined X defaults.
-	char * xprop = XGetDefault(disp, "*", "multiClickTime");
+	char *xprop = XGetDefault(disp, "*", "multiClickTime");
 	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
 		successful = true;
 	}

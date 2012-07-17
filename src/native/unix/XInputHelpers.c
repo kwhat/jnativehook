@@ -25,13 +25,13 @@
 static XkbDescPtr keyboard_map;
 #else
 #include <X11/Xutil.h>
-static KeySym * keyboard_map;
+static KeySym *keyboard_map;
 static int keysyms_per_keycode;
 static Bool is_caps_lock = false, is_shift_lock = false;
 #endif
 
 // Unicode-Remapse the NativeHelpers display.
-extern Display * disp;
+extern Display *disp;
 
 
 // Faster more flexible alternative to XKeycodeToKeysym...
@@ -98,8 +98,8 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 	#else
 	if (keyboard_map) {
 		if (event_mask & Mod2Mask &&
-				((keyboard_map[keycode * keysyms_per_keycode + 1] >= 0xFF80 && keyboard_map[keycode * keysyms_per_keycode + 1] <= 0xFFBD) ||
-				(keyboard_map[keycode * keysyms_per_keycode + 1] >= 0x11000000 && keyboard_map[keycode * keysyms_per_keycode + 1] <= 0x1100FFFF))
+				((keyboard_map[keycode *keysyms_per_keycode + 1] >= 0xFF80 && keyboard_map[keycode *keysyms_per_keycode + 1] <= 0xFFBD) ||
+				(keyboard_map[keycode *keysyms_per_keycode + 1] >= 0x11000000 && keyboard_map[keycode *keysyms_per_keycode + 1] <= 0x1100FFFF))
 			) {
 
 			/* If the numlock modifier is on and the second KeySym is a keypad
@@ -122,11 +122,11 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			  */
 			if (event_mask & ShiftMask || (event_mask & LockMask && is_shift_lock)) {
 				// i = 0
-				keysym = keyboard_map[keycode * keysyms_per_keycode];
+				keysym = keyboard_map[keycode *keysyms_per_keycode];
 			}
 			else {
 				// i = 1
-				keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
+				keysym = keyboard_map[keycode *keysyms_per_keycode + 1];
 			}
 		}
 		else if (event_mask ^ ShiftMask && event_mask ^ LockMask) {
@@ -134,7 +134,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * the first KeySym is used.
 			 */
 			// index = 0
-			keysym = keyboard_map[keycode * keysyms_per_keycode];
+			keysym = keyboard_map[keycode *keysyms_per_keycode];
 		}
 		else if (event_mask ^ ShiftMask && event_mask & LockMask && is_caps_lock) {
 			/* The Shift modifier is off, and the Lock modifier is on
@@ -144,7 +144,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * used instead.
 			 */
 			// index = 0;
-			keysym = keyboard_map[keycode * keysyms_per_keycode];
+			keysym = keyboard_map[keycode *keysyms_per_keycode];
 
 			if (keysym >= 'a' && keysym <= 'z') {
 				// keysym is an alpha char.
@@ -161,7 +161,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * used instead.
 			 */
 			// index = 1
-			keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
+			keysym = keyboard_map[keycode *keysyms_per_keycode + 1];
 
 			if (keysym >= 'A' && keysym <= 'Z') {
 				// keysym is an alpha char.
@@ -176,7 +176,7 @@ KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask) {
 			 * second KeySym is used.
 			 */
 			// index = 1
-			keysym = keyboard_map[keycode * keysyms_per_keycode + 1];
+			keysym = keyboard_map[keycode *keysyms_per_keycode + 1];
 		}
 		#ifdef DEBUG
 		else {
@@ -3302,7 +3302,7 @@ void LoadInputHelper() {
 
 	keyboard_map = XGetKeyboardMapping(disp, min_keycode, (max_keycode - min_keycode + 1), &keysyms_per_keycode);
 	if (keyboard_map) {
-		XModifierKeymap * modifier_map = XGetModifierMapping(disp);
+		XModifierKeymap *modifier_map = XGetModifierMapping(disp);
 
 		if (modifier_map) {
 			/* The Lock modifier is interpreted as CapsLock when the KeySym

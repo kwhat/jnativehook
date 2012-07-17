@@ -23,8 +23,8 @@
 
 // Structure get transport exceptions out of the native thread.
 typedef struct {
-	char * class;
-	char * message;
+	char *class;
+	char *message;
 } Exception;
 
 // Attempt to start the global hook thread.
