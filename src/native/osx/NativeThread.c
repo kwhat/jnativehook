@@ -17,6 +17,7 @@
  */
 
 #include <pthread.h>
+#include <sys/time.h>
 
 #include <ApplicationServices/ApplicationServices.h>
 
@@ -54,8 +55,11 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 		if (pthread_mutex_trylock(&hookRunningMutex) != 0) {
 			// Event data.
 			CGPoint event_point;
-			// Make sure to convert from nanoseconds to milliseconds.
-			CGEventTimestamp event_time = CGEventGetTimestamp(event) / 1000000;
+			
+			struct timeval  time_val;
+			gettimeofday(&time_val, NULL);
+			jlong event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
+			
 			UInt64	keysym, button;
 			CGEventFlags event_mask = CGEventGetFlags(event);
 
@@ -87,7 +91,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											clsKeyEvent,
 											idKeyEvent,
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
-											(jlong) event_time,
+											event_time,
 											jmodifiers,
 											jkey.rawcode,
 											jkey.keycode,
@@ -103,7 +107,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												clsKeyEvent,
 												idKeyEvent,
 												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
-												(jlong) event_time,
+												event_time,
 												jmodifiers,
 												jkey.rawcode,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
@@ -129,7 +133,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											clsKeyEvent,
 											idKeyEvent,
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-											(jlong) event_time,
+											event_time,
 											jmodifiers,
 											jkey.rawcode,
 											jkey.keycode,
@@ -215,13 +219,13 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (event_time - click_time));
 					#endif
 
-					if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+					if ((long) (CGEventGetTimestamp(event) - click_time) / 1000000 <= GetMultiClickTime()) {
 						click_count++;
 					}
 					else {
 						click_count = 1;
 					}
-					click_time = event_time;
+					click_time = CGEventGetTimestamp(event);
 
 					event_point = CGEventGetLocation(event);
 					jbutton = NativeToJButton(button);

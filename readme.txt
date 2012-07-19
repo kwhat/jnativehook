@@ -35,6 +35,7 @@ guarantee that any of these properties will be available.
         x11-libs/libX11 1.0 - 1.5
         x11-libs/libXt 1.0 - 1.3
         x11-libs/libXtst 1.0 - 1.2
+		x11-libs/libxcb 1.8
 
     Mac OS X
         i586, amd64, powerpc or powerpc64

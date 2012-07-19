@@ -59,13 +59,26 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 
 			// Java Event Data.
 			JKeyDatum jkey;
-			jint modifiers;
-			//WCHAR keytxt[4];
-			//BYTE keymap[256];
+			jint jmodifiers;
 
+			// Set the event_time
+			FILETIME ft;
+			GetSystemTimeAsFileTime(&ft);
 
+			__int64 time_val = ft.dwHighDateTime;
+			time_val <<= 32;
+			time_val |= ft.dwLowDateTime;
+
+			// Convert to milliseconds = 100-nanoseconds / 10000
+			time_val /= 10000;
+
+			// Convert Windows epoch to Unix epoch (1970 - 1601 in milliseconds)
+			jlong event_time = time_val - 11644473600000;
+			
+			
 			// Java key event object.
 			jobject objKeyEvent;
+			
 			switch(wParam) {
 				case WM_KEYDOWN:
 				case WM_SYSKEYDOWN:
@@ -84,7 +97,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 					else if (kbhook->vkCode == VK_RWIN)		SetModifierMask(MOD_RWIN);
 
 					jkey = NativeToJKey(kbhook->vkCode);
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire key pressed event.
 					objKeyEvent = (*env)->NewObject(
@@ -92,8 +105,8 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 											clsKeyEvent, 
 											idKeyEvent, 
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED, 
-											(jlong) kbhook->time, 
-											modifiers, 
+											event_time, 
+											jmodifiers, 
 											kbhook->vkCode, 
 											jkey.keycode, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, 
@@ -107,8 +120,8 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 												clsKeyEvent, 
 												idKeyEvent, 
 												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED, 
-												(jlong) kbhook->time, 
-												modifiers, 
+												event_time, 
+												jmodifiers, 
 												kbhook->vkCode, 
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED, 
 												(jchar) keytxt, 
@@ -134,7 +147,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 					else if (kbhook->vkCode == VK_RWIN)		UnsetModifierMask(MOD_RWIN);
 
 					jkey = NativeToJKey(kbhook->vkCode);
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire key released event.
 					objKeyEvent = (*env)->NewObject(
@@ -142,8 +155,8 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 											clsKeyEvent, 
 											idKeyEvent, 
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED, 
-											(jlong) kbhook->time, 
-											modifiers, 
+											event_time, 
+											jmodifiers, 
 											kbhook->vkCode, 
 											jkey.keycode, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED, 
@@ -179,22 +192,25 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 			// Java event data.
 			jint jbutton;
 			jint scrollType, scrollAmount, wheelRotation;
-			jint modifiers;
+			jint jmodifiers;
 
+			// Set the event_time
+			FILETIME ft;
+			GetSystemTimeAsFileTime(&ft);
+
+			__int64 time_val = ft.dwHighDateTime;
+			time_val <<= 32;
+			time_val |= ft.dwLowDateTime;
+
+			// Convert to milliseconds = 100-nanoseconds / 10000
+			time_val /= 10000;
+
+			// Convert Windows epoch to Unix epoch (1970 - 1601 in milliseconds)
+			jlong event_time = time_val - 11644473600000;
+			
 			// Java Mouse event object.
 			jobject objMouseEvent, objMouseWheelEvent;
 
-			/* Code to track the click count, It maybe easier to track our own click
-			* counts to allow for triple click detection.
-			*/
-			/*
-			int clickCount=0;
-			if (button!=MouseButtons.None)
-				if (wParam == WM_LBUTTONDBLCLK || wParam = WM_MBUTTONDBLCLK || wParam == WM_RBUTTONDBLCLK || wParam == WM_XBUTTONDBLCLK)
-					clickCount=2;
-				else
-					clickCount=1;
-			*/
 			switch(wParam) {
 				case WM_LBUTTONDOWN:
 					jbutton = NativeToJButton(VK_LBUTTON);
@@ -240,7 +256,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					click_time = mshook->time;
 
 					// Convert native modifiers to java modifiers.
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire mouse pressed event.
 					objMouseEvent = (*env)->NewObject(
@@ -248,7 +264,8 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												clsMouseEvent, 
 												idMouseButtonEvent, 
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED, 
-												(jlong) mshook->time, modifiers, 
+												event_time, 
+												jmodifiers, 
 												(jint) mshook->pt.x, 
 												(jint) mshook->pt.y, 
 												(jint) click_count, 
@@ -290,7 +307,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					fprintf(stdout, "LowLevelMouseProc(): Button released. (%i)\n", (int) jbutton);
 					#endif
 
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire mouse released event.
 					objMouseEvent = (*env)->NewObject(
@@ -298,8 +315,8 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												clsMouseEvent, 
 												idMouseButtonEvent, 
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED, 
-												(jlong) mshook->time, 
-												modifiers, 
+												event_time, 
+												jmodifiers, 
 												(jint) mshook->pt.x, 
 												(jint) mshook->pt.y, 
 												(jint) click_count, 
@@ -313,8 +330,8 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 													clsMouseEvent, 
 													idMouseButtonEvent, 
 													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED, 
-													(jlong) mshook->time, 
-													modifiers, 
+													event_time, 
+													jmodifiers, 
 													(jint) mshook->pt.x, 
 													(jint) mshook->pt.y, 
 													(jint) click_count, 
@@ -332,20 +349,21 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					if (click_count != 0 && (long) (mshook->time - click_time) > GetMultiClickTime()) {
 						click_count = 0;
 					}
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Set the mouse dragged flag.
-					mouse_dragged = modifiers >> 4 > 0;
+					mouse_dragged = jmodifiers >> 4 > 0;
 
 					// Check the upper half of java modifiers for non zero value.
-					if (modifiers >> 4 > 0) {
+					if (jmodifiers >> 4 > 0) {
 						// Create Mouse dragged event.
 						objMouseEvent = (*env)->NewObject(
 													env, 
 													clsMouseEvent, 
 													idMouseMotionEvent, 
 													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED, 
-													(jlong) mshook->time, modifiers, 
+													event_time, 
+													jmodifiers, 
 													(jint) mshook->pt.x, 
 													(jint) mshook->pt.y, 
 													(jint) click_count);
@@ -357,7 +375,8 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 													clsMouseEvent, 
 													idMouseMotionEvent, 
 													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED, 
-													(jlong) mshook->time, modifiers, 
+													event_time, 
+													jmodifiers, 
 													(jint) mshook->pt.x, 
 													(jint) mshook->pt.y, 
 													(jint) click_count);
@@ -381,14 +400,14 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					}
 					click_time = mshook->time;
 
-					modifiers = NativeToJEventMask(GetModifiers());
+					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					/* Delta HIWORD(mshook->mouseData)
-					* A positive value indicates that the wheel was rotated
-					* forward, away from the user; a negative value indicates that
-					* the wheel was rotated backward, toward the user. One wheel
-					* click is defined as WHEEL_DELTA, which is 120.
-					*/
+					 * A positive value indicates that the wheel was rotated
+					 * forward, away from the user; a negative value indicates that
+					 * the wheel was rotated backward, toward the user. One wheel
+					 * click is defined as WHEEL_DELTA, which is 120.
+					 */
 
 					scrollType = (jint) GetScrollWheelType();
 					scrollAmount = (jint) GetScrollWheelAmount();
@@ -400,7 +419,8 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 													clsMouseWheelEvent, 
 													idMouseWheelEvent, 
 													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL, 
-													(jlong) mshook->time, modifiers, 
+													event_time, 
+													jmodifiers, 
 													(jint) mshook->pt.x, 
 													(jint) mshook->pt.y, 
 													(jint) click_count, 
@@ -410,11 +430,10 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					break;
 
-				/* Settings change message notifies us when change is made
-				* through the SystemParametersInfo() API
-				*/
+				// Settings change message notifies us when change is made
+				// through the SystemParametersInfo() API
 				/* case WM_SETTINGCHANGE:
-					* TODO Reset all the system props *
+					//TODO Reset all the system props
 					return OnSettingChange( (UINT)wParam ); */
 
 				#ifdef DEBUG

@@ -218,6 +218,9 @@
 		<condition property="java.bootclasspath" value="${java.home}${file.separator}lib${file.separator}rt.jar">
 			<available file="${java.home}${file.separator}lib${file.separator}rt.jar" type="file" />
 		</condition>
+		<condition property="java.bootclasspath" value="${java.home}${file.separator}bundle${file.separator}Classes${file.separator}classes.jar">
+			<available file="${java.home}${file.separator}bundle${file.separator}Classes${file.separator}classes.jar" type="file" />
+		</condition>
 
 		<fail message="Could not determine java.bootclasspath location.  Please set your JAVA_HOME environment variable or manually set java.bootclasspath to the location of your rt.jar file in the build.properties file.">
 			<condition>

@@ -18,6 +18,7 @@
 
 #include <pthread.h>
 #include <sys/time.h>
+
 #include <X11/Xlibint.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -81,7 +82,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 
 				struct timeval  time_val;
 				gettimeofday(&time_val, NULL);
-				long event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
+				jlong event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
 				KeySym keysym;
 				wchar_t keytxt;
 
@@ -110,7 +111,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 												clsKeyEvent,
 												idKeyEvent,
 												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
-												(jlong) event_time,
+												event_time,
 												jmodifiers,
 												event_code,
 												jkey.keycode,
@@ -127,7 +128,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 													clsKeyEvent,
 													idKeyEvent,
 													org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
-													(jlong) event_time,
+													event_time,
 													jmodifiers,
 													event_code,
 													org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
@@ -152,7 +153,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 												clsKeyEvent,
 												idKeyEvent,
 												org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-												(jlong) event_time,
+												event_time,
 												jmodifiers,
 												event_code,
 												jkey.keycode,
@@ -191,7 +192,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														clsMouseEvent,
 														idMouseButtonEvent,
 														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
-														(jlong) event_time,
+														event_time,
 														jmodifiers,
 														(jint) event_root_x,
 														(jint) event_root_y,
@@ -236,7 +237,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 															clsMouseWheelEvent,
 															idMouseWheelEvent,
 															org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
-															(jlong) event_time,
+															event_time,
 															jmodifiers,
 															(jint) event_root_x,
 															(jint) event_root_y,
@@ -265,7 +266,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														clsMouseEvent,
 														idMouseButtonEvent,
 														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
-														(jlong) event_time,
+														event_time,
 														jmodifiers,
 														(jint) event_root_x,
 														(jint) event_root_y,
@@ -280,7 +281,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 															clsMouseEvent,
 															idMouseButtonEvent,
 															org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
-															(jlong) event_time,
+															event_time,
 															jmodifiers,
 															(jint) event_root_x,
 															(jint) event_root_y,
@@ -313,7 +314,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														clsMouseEvent,
 														idMouseMotionEvent,
 														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-														(jlong) event_time,
+														event_time,
 														jmodifiers,
 														(jint) event_root_x,
 														(jint) event_root_y,
@@ -326,7 +327,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														clsMouseEvent,
 														idMouseMotionEvent,
 														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-														(jlong) event_time,
+														event_time,
 														jmodifiers,
 														(jint) event_root_x,
 														(jint) event_root_y,
