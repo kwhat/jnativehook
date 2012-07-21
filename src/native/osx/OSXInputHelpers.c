@@ -50,7 +50,11 @@ CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers) {
 			const UCKeyboardLayout *keyboard_layout = (const UCKeyboardLayout *) resource;
 		#else
 		CFDataRef data_ref = (CFDataRef) TISGetInputSourceProperty(keyboard_ref, kTISPropertyUnicodeKeyLayoutData);
-		const UCKeyboardLayout *keyboard_layout = (const UCKeyboardLayout *) CFDataGetBytePtr(data_ref);
+		const UCKeyboardLayout *keyboard_layout = NULL;
+		if (data_ref) {
+			keyboard_layout = (const UCKeyboardLayout*) CFDataGetBytePtr(data_ref);
+		}
+		
 		if (keyboard_layout) {
 		#endif
 			static const CGEventFlags cmd_modifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
