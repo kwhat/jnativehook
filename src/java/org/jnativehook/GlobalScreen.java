@@ -414,20 +414,24 @@ public class GlobalScreen {
 				File libFile = new File(System.getProperty("java.io.tmpdir")
 										+ System.getProperty("file.separator", File.separator)
 										+ System.mapLibraryName(libName));
+				
+				//Check and see if a copy of the native lib already exists.
+				if (libFile.exists() == false) {
+					FileOutputStream libOutputStream = new FileOutputStream(libFile);
+					byte[] buffer = new byte[4 * 1024];
+					InputStream libInputStream = GlobalScreen.class
+										.getResourceAsStream(libResourcePath.toLowerCase()
+											+ System.mapLibraryName(libName));
+					int size;
+					while ((size = libInputStream.read(buffer)) != -1) {
+						libOutputStream.write(buffer, 0, size);
+					}
+					libOutputStream.close();
+					libInputStream.close();
 
-				FileOutputStream libOutputStream = new FileOutputStream(libFile);
-				byte[] buffer = new byte[4 * 1024];
-				InputStream libInputStream = GlobalScreen.class
-									.getResourceAsStream(libResourcePath.toLowerCase()
-										+ System.mapLibraryName(libName));
-				int size;
-				while ((size = libInputStream.read(buffer)) != -1) {
-					libOutputStream.write(buffer, 0, size);
+					libFile.deleteOnExit();
 				}
-				libOutputStream.close();
-				libInputStream.close();
-
-				libFile.deleteOnExit();
+				
 				System.load(libFile.getPath());
 			}
 			catch(IOException e) {
