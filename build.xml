@@ -810,8 +810,20 @@
 			</manifest>
 		</jar>
 	</target>
-
-
+	
+	
+	<target name="run" description="Execute the bundled example.">
+		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
+			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch.name}" />
+			<classpath>
+				<pathelement location="${dir.jar}/${project.name}.jar" />
+				<pathelement path="${dir.bin.class}" />
+				<pathelement path="${java.class.path}" />
+			</classpath>
+		</java>
+	</target>
+	
+	
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documenation...</echo>
 		<mkdir dir="${dir.doc}" />
