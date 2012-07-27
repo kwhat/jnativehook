@@ -654,41 +654,36 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
-		if (IsNativeDispatchThread() == false) {
-			#ifdef DEBUG
-			if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, false)) {
-				fprintf(stdout, "StartNativeThread(): successfully detached thread input.\n");
-			}
-			else {
-				fprintf(stderr, "StartNativeThread(): failed to detach thread input.\n");
-			}
-			#else
-			AttachThreadInput(GetCurrentThreadId(), hookThreadId, false);
-			#endif
-			
-			// Try to exit the thread naturally.
-			PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
-			WaitForSingleObject(hookThreadHandle, 5000);
-
-			CloseHandle(hookThreadHandle);
-			hookThreadHandle = NULL;
-
-			status = RETURN_SUCCESS;
-
-			// Destroy all created globals.
-			#ifdef DEBUG
-			if (DestroyJNIGlobals() == RETURN_FAILURE) {
-				fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
-			}
-			#else
-			DestroyJNIGlobals();
-			#endif
-
-			CloseHandle(hookEventHandle);
+		#ifdef DEBUG
+		if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, false)) {
+			fprintf(stdout, "StartNativeThread(): successfully detached thread input.\n");
 		}
 		else {
-			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread stop failure");
+			fprintf(stderr, "StartNativeThread(): failed to detach thread input.\n");
 		}
+		#else
+		AttachThreadInput(GetCurrentThreadId(), hookThreadId, false);
+		#endif
+
+		// Try to exit the thread naturally.
+		PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
+		WaitForSingleObject(hookThreadHandle, 5000);
+
+		CloseHandle(hookThreadHandle);
+		hookThreadHandle = NULL;
+
+		status = RETURN_SUCCESS;
+
+		// Destroy all created globals.
+		#ifdef DEBUG
+		if (DestroyJNIGlobals() == RETURN_FAILURE) {
+			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
+		}
+		#else
+		DestroyJNIGlobals();
+		#endif
+
+		CloseHandle(hookEventHandle);
 	}
 
 	return status;
@@ -699,8 +694,4 @@ bool IsNativeThreadRunning() {
 	GetExitCodeThread(hookThreadHandle, &status);
 
 	return status == STILL_ACTIVE;
-}
-
-bool IsNativeDispatchThread() {
-	return hookThreadId == GetCurrentThreadId();
 }

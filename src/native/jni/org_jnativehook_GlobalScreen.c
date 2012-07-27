@@ -194,10 +194,6 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 	return (jboolean) IsNativeThreadRunning();
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeDispatchThread(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
-	return (jboolean) (IsNativeThreadRunning() && IsNativeDispatchThread());
-}
-
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {

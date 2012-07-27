@@ -24,6 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.EventListener;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -53,6 +56,9 @@ public class GlobalScreen {
 	/** The list of event listeners to notify. */
 	private EventListenerList eventListeners;
 
+	/** The service to dispatch events. */
+	private ExecutorService eventExecutor;
+	
 	/**
 	 * Private constructor to prevent multiple instances of the global screen.
 	 * The {@link #registerNativeHook} method will be called on construction to 
@@ -61,6 +67,9 @@ public class GlobalScreen {
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
+		
+		//Create a new single thread executor.
+		eventExecutor = Executors.newSingleThreadExecutor();
 
 		//Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
@@ -78,25 +87,7 @@ public class GlobalScreen {
 	@Override
 	protected void finalize() throws Throwable {
 		if (GlobalScreen.isNativeHookRegistered()) {
-			if (GlobalScreen.isNativeDispatchThread()) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							GlobalScreen.unloadNativeLibrary();
-						}
-						catch (NativeHookException e) {
-							/* Because we can guaranteed that 
-							 * unloadNativeLibrary() is not executing on the 
-							 * Native Dispatch Thread, this exception should
-							 * neaver get thrown.
-							 */
-						}
-					}
-				});
-			}
-			else {
-				GlobalScreen.unloadNativeLibrary();
-			}
+			GlobalScreen.unloadNativeLibrary();
 		}
 		
 		super.finalize();
@@ -251,12 +242,9 @@ public class GlobalScreen {
 	 * if it is called from within the native event dispatching thread.  Use
 	 * {@link #isNativeDispatchThread()} to prevent this type of exception.
 	 *
-	 * @throws NativeHookException problem unregistering the native hook from
-	 * the underlying operating system.
-	 *
 	 * @since 1.1
 	 */
-	public static native void unregisterNativeHook() throws NativeHookException;
+	public static native void unregisterNativeHook();
 
 	/**
 	 * Returns <code>true</code> if the native hook is currently registered.
@@ -269,33 +257,26 @@ public class GlobalScreen {
 	public static native boolean isNativeHookRegistered();
 
 	/**
-	 * Returns <code>true</code> if the current thread is the native event
-	 * dispatching thread.
-	 *
-	 * @return true if the current thread is the native event 
-	 * dispatching thread.
-	 *
-	 * @since 1.1
-	 */
-	public static native boolean isNativeDispatchThread();
-
-	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but maybe used to synthesize
 	 * native events from Java.
 	 *
 	 * @param e the <code>NativeInputEvent</code> to dispatch.
 	 */
-	public final void dispatchEvent(NativeInputEvent e) {
-		if (e instanceof NativeKeyEvent) {
-			processKeyEvent((NativeKeyEvent) e);
-		}
-		else if (e instanceof NativeMouseWheelEvent) {
-			processMouseWheelEvent((NativeMouseWheelEvent) e);
-		}
-		else if (e instanceof NativeMouseEvent) {
-			processMouseEvent((NativeMouseEvent) e);
-		}
+	public final void dispatchEvent(final NativeInputEvent e) {
+		eventExecutor.execute(new Runnable() {
+			public void run() {
+				if (e instanceof NativeKeyEvent) {
+					processKeyEvent((NativeKeyEvent) e);
+				}
+				else if (e instanceof NativeMouseWheelEvent) {
+					processMouseWheelEvent((NativeMouseWheelEvent) e);
+				}
+				else if (e instanceof NativeMouseEvent) {
+					processMouseEvent((NativeMouseEvent) e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -410,27 +391,26 @@ public class GlobalScreen {
 				String libResourcePath = "/org/jnativehook/lib/"
 											+ NativeSystem.getFamily() + "/"
 											+ NativeSystem.getArchitecture() + "/";
-
-				File libFile = new File(System.getProperty("java.io.tmpdir")
-										+ System.getProperty("file.separator", File.separator)
-										+ System.mapLibraryName(libName));
+				
+				File libFile = File.createTempFile(libName, ".jni");
 				
 				//Check and see if a copy of the native lib already exists.
-				if (libFile.exists() == false) {
-					FileOutputStream libOutputStream = new FileOutputStream(libFile);
-					byte[] buffer = new byte[4 * 1024];
-					InputStream libInputStream = GlobalScreen.class
-										.getResourceAsStream(libResourcePath.toLowerCase()
-											+ System.mapLibraryName(libName));
-					int size;
-					while ((size = libInputStream.read(buffer)) != -1) {
-						libOutputStream.write(buffer, 0, size);
-					}
-					libOutputStream.close();
-					libInputStream.close();
-
-					libFile.deleteOnExit();
+				FileOutputStream libOutputStream = new FileOutputStream(libFile);
+				byte[] buffer = new byte[4 * 1024];
+				InputStream libInputStream = 
+								GlobalScreen.class.getResourceAsStream(
+									libResourcePath.toLowerCase()
+										+ System.mapLibraryName(libName)
+								);
+				
+				int size;
+				while ((size = libInputStream.read(buffer)) != -1) {
+					libOutputStream.write(buffer, 0, size);
 				}
+				libOutputStream.close();
+				libInputStream.close();
+
+				libFile.deleteOnExit();
 				
 				System.load(libFile.getPath());
 			}

@@ -594,50 +594,45 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
-		if (IsNativeDispatchThread() == false) {
-			// Lock the thread.
-			pthread_mutex_lock(&hookControlMutex);
+		// Lock the thread.
+		pthread_mutex_lock(&hookControlMutex);
 
-			#ifdef XRECORD_ASYNC
-			// Try to exit the thread naturally.
-			running = false;
-			#else
-			// Try to exit the thread naturally.
-			XRecordDisableContext(disp_ctrl, context);
-			XSync(disp_ctrl, true);
-			#endif
+		#ifdef XRECORD_ASYNC
+		// Try to exit the thread naturally.
+		running = false;
+		#else
+		// Try to exit the thread naturally.
+		XRecordDisableContext(disp_ctrl, context);
+		XSync(disp_ctrl, true);
+		#endif
 
-			// Must unlock to allow the thread to finish cleaning up.
-			pthread_mutex_unlock(&hookControlMutex);
+		// Must unlock to allow the thread to finish cleaning up.
+		pthread_mutex_unlock(&hookControlMutex);
 
-			// Wait for the thread to die.
-			void *thread_status;
-			pthread_join(hookThreadId, &thread_status);
-			status = *(int *) thread_status;
-			free(thread_status);
+		// Wait for the thread to die.
+		void *thread_status;
+		pthread_join(hookThreadId, &thread_status);
+		status = *(int *) thread_status;
+		free(thread_status);
 
-			#ifdef DEBUG
-			fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
-			#endif
+		#ifdef DEBUG
+		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
+		#endif
 
-			// Cleanup Native Input Functions.
-			UnloadInputHelper();
+		// Cleanup Native Input Functions.
+		UnloadInputHelper();
 
-			// Destroy all created globals.
-			#ifdef DEBUG
-			if (DestroyJNIGlobals() == RETURN_FAILURE) {
-				fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
-			}
-			#else
-			DestroyJNIGlobals();
-			#endif
-
-			// Clean up the mutex.
-			pthread_mutex_destroy(&hookControlMutex);
+		// Destroy all created globals.
+		#ifdef DEBUG
+		if (DestroyJNIGlobals() == RETURN_FAILURE) {
+			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
 		}
-		else {
-			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread stop failure");
-		}
+		#else
+		DestroyJNIGlobals();
+		#endif
+
+		// Clean up the mutex.
+		pthread_mutex_destroy(&hookControlMutex);
 	}
 
 	return status;
@@ -673,8 +668,4 @@ bool IsNativeThreadRunning() {
 	#endif
 
 	return isRunning;
-}
-
-bool IsNativeDispatchThread() {
-	return pthread_equal(hookThreadId, pthread_self());
 }

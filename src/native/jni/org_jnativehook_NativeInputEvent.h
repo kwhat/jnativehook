@@ -24,10 +24,10 @@
 #ifndef _Included_org_jnativehook_NativeInputEvent
 #define _Included_org_jnativehook_NativeInputEvent
 
-#define org_jnativehook_NativeInputEvent_SHIFT_MASK				1
-#define org_jnativehook_NativeInputEvent_CTRL_MASK				2
-#define org_jnativehook_NativeInputEvent_META_MASK				4
-#define org_jnativehook_NativeInputEvent_ALT_MASK				8
+#define org_jnativehook_NativeInputEvent_SHIFT_MASK			1
+#define org_jnativehook_NativeInputEvent_CTRL_MASK			2
+#define org_jnativehook_NativeInputEvent_META_MASK			4
+#define org_jnativehook_NativeInputEvent_ALT_MASK			8
 
 #define org_jnativehook_NativeInputEvent_BUTTON1_MASK			16
 #define org_jnativehook_NativeInputEvent_BUTTON2_MASK			32
