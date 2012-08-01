@@ -346,16 +346,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 */
 	public void windowClosed(WindowEvent e) {
     	//Clean up the native hook.
-   		try {
-			GlobalScreen.unregisterNativeHook();
-		}
-		catch (NativeHookException ex) {
-			ex.printStackTrace();
-		}
-		finally {
-			System.runFinalization();
-			System.exit(0);
-		}
+		GlobalScreen.unregisterNativeHook();
+		System.runFinalization();
+		System.exit(0);
 	}
 
 	/**
