@@ -18,7 +18,6 @@
 package org.jnativehook;
 
 //Imports
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.io.InputStream;
 import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -42,7 +40,7 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * for native input events.
  * <p />
  * This class also handles the loading, unpacking and communication with the
- * native library. That includes registering and unregistering the native hook 
+ * native library. That includes registering and unregistering the native hook
  * with the underlying operating system and adding global keyboard and mouse
  * listeners.
  *
@@ -58,18 +56,15 @@ public class GlobalScreen {
 
 	/** The service to dispatch events. */
 	private ExecutorService eventExecutor;
-	
+
 	/**
 	 * Private constructor to prevent multiple instances of the global screen.
-	 * The {@link #registerNativeHook} method will be called on construction to 
+	 * The {@link #registerNativeHook} method will be called on construction to
 	 * unpack and load the native library.
 	 */
 	private GlobalScreen() {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
-		
-		//Create a new single thread executor.
-		eventExecutor = Executors.newSingleThreadExecutor();
 
 		//Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
@@ -89,7 +84,7 @@ public class GlobalScreen {
 		if (GlobalScreen.isNativeHookRegistered()) {
 			GlobalScreen.unloadNativeLibrary();
 		}
-		
+
 		super.finalize();
 	}
 
@@ -374,6 +369,30 @@ public class GlobalScreen {
 	}
 
 	/**
+	 * Initialize a local executor service for event delivery.  This method
+	 * should only be called by the native library during the hook registration
+	 * process.
+	 *
+	 * @since 1.1
+	 */
+	protected void StartEventDispatcher() {
+		//Create a new single thread executor.
+		eventExecutor = Executors.newSingleThreadExecutor();
+	}
+
+	/**
+	 * Shutdown the local executor service for event delivery.  Any events
+	 * events pending delivery will be discarded. This method should only be
+	 * called by the native library during the hook deregistration process.
+	 *
+	 * @since 1.1
+	 */
+	protected void StopEventDispatcher() {
+		//Shutdown the current Event executor.
+		eventExecutor.shutdownNow();
+	}
+
+	/**
 	 * Perform procedures to interface with the native library. These procedures
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
@@ -391,18 +410,18 @@ public class GlobalScreen {
 				String libResourcePath = "/org/jnativehook/lib/"
 											+ NativeSystem.getFamily() + "/"
 											+ NativeSystem.getArchitecture() + "/";
-				
+
 				File libFile = File.createTempFile(libName, ".jni");
-				
+
 				//Check and see if a copy of the native lib already exists.
 				FileOutputStream libOutputStream = new FileOutputStream(libFile);
 				byte[] buffer = new byte[4 * 1024];
-				InputStream libInputStream = 
+				InputStream libInputStream =
 								GlobalScreen.class.getResourceAsStream(
 									libResourcePath.toLowerCase()
 										+ System.mapLibraryName(libName)
 								);
-				
+
 				int size;
 				while ((size = libInputStream.read(buffer)) != -1) {
 					libOutputStream.write(buffer, 0, size);
@@ -411,7 +430,7 @@ public class GlobalScreen {
 				libInputStream.close();
 
 				libFile.deleteOnExit();
-				
+
 				System.load(libFile.getPath());
 			}
 			catch(IOException e) {

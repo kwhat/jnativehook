@@ -49,17 +49,17 @@ static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagM
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void *UNUSED(refcon)) {
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		// Check and make sure the thread is stull running to avoid the 
-		// potential crash associated with late event arrival.  This code is 
+		// Check and make sure the thread is stull running to avoid the
+		// potential crash associated with late event arrival.  This code is
 		// guaranteed to run after all thread start.
 		if (pthread_mutex_trylock(&hookRunningMutex) != 0) {
 			// Event data.
 			CGPoint event_point;
-			
+
 			struct timeval  time_val;
 			gettimeofday(&time_val, NULL);
 			jlong event_time = (time_val.tv_sec * 1000) + (time_val.tv_usec / 1000);
-			
+
 			UInt64	keysym, button;
 			CGEventFlags event_mask = CGEventGetFlags(event);
 
@@ -734,8 +734,10 @@ bool IsNativeThreadRunning() {
 	}
 	#ifdef DEBUG
 	else {
-		// Lock Failure. This should always be caused by an invalid pointe
-		// and/or an uninitialized mutex.
+		/* Lock Failure. This should always be caused by an invalid pointe
+		 * and/or an uninitialized mutex.  This message is normal when the
+		 * native thread is not running.
+		 */
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 	}
 	#endif

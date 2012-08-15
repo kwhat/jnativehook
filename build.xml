@@ -59,7 +59,7 @@
 			<fileset dir="${dir.doc}" />
 			<fileset dir="${dir.jar}" />
 			<fileset dir="${dir.lib}" />
-			
+
 			<fileset file="${dir.src.native}/jni/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>
@@ -101,9 +101,6 @@
 				<istrue value="${project.debug}" />
 			</not>
 		</condition>
-		<condition property="project.strip.enabled" value="true">
-			<istrue value="${project.strip}" />
-		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
 
 
@@ -131,18 +128,10 @@
 			<os family="unix" name="Linux" />
 		</condition>
 		<condition property="native.os" value="windows">
-			<or>
-				<os family="winnt" name="Windows 2000" />
-				<os family="winnt" name="Windows XP" />
-				<os family="winnt" name="Windows 2003" />
-				<os family="winnt" name="Windows Vista" />
-				<os family="winnt" name="Windows 2007" />
-				<os family="winnt" name="Windows 7" />
-				<os family="winnt" name="Windows 8" />
-			</or>
+			<os family="winnt" />
 		</condition>
 
-		<!-- Figure out the os family -->
+		<!-- Figure out the source family we are building -->
 		<condition property="native.os.isApple" value="true">
 			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
 		</condition>
@@ -158,7 +147,7 @@
 			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
 		</condition>
 
-		<!-- set system specific lib directory -->
+		<!-- set system specific src/lib directory -->
 		<condition property="dir.src.platform" value="osx">
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -212,8 +201,8 @@
 			</condition>
 		</fail>
 		<echo level="info">Found Java include location: ${java.include}</echo>
-		
-		
+
+
 		<!-- Try to locate the rt.jar location for java.bootclasspath -->
 		<condition property="java.bootclasspath" value="${java.home}${file.separator}lib${file.separator}rt.jar">
 			<available file="${java.home}${file.separator}lib${file.separator}rt.jar" type="file" />
@@ -433,11 +422,6 @@
 			<istrue value="${project.debug}" />
 		</condition>
 
-		<!-- TODO: This is for HIDAPI library which has not been integrated yet. -->
-		<!-- condition property="native.cc.macros.hidapi" value="-DHIDAPI" else="">
-			<istrue value="${project.option.hid}" />
-		</condition -->
-
 
 		<!-- Try to locate a compiler -->
 		<condition property="native.cc" value="${env.CC}">
@@ -446,8 +430,8 @@
 		<condition property="native.cc" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file" />
 		</condition>
-		<condition property="native.cc" value="cc">
-			<available filepath="${native.path}" file="cc" type="file" />
+		<condition property="native.cc" value="clang">
+			<available filepath="${native.path}" file="clang" type="file" />
 		</condition>
 		<condition property="native.cc" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file" />
@@ -458,8 +442,8 @@
 		<condition property="native.cc" value="mingw64-gcc.exe">
 			<available filepath="${native.path}" file="mingw64-gcc.exe" />
 		</condition>
-		<condition property="native.cc" value="cc.exe">
-			<available filepath="${native.path}" file="cc.exe" type="file" />
+		<condition property="native.cc" value="clang.exe">
+			<available filepath="${native.path}" file="clang.exe" type="file" />
 		</condition>
 
 		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
@@ -501,37 +485,6 @@
 		<echo level="info">Native linker: ${native.ld}</echo>
 
 
-		<!-- Try to locate strip -->
-		<condition property="native.strip" value="strip">
-			<available filepath="${native.path}" file="strip" type="file" />
-		</condition>
-		<condition property="native.strip" value="strip.exe">
-			<available filepath="${native.path}" file="strip.exe" type="file" />
-		</condition>
-		<condition property="native.strip" value="mingw32-strip.exe">
-			<available filepath="${native.path}" file="mingw32-strip.exe" type="file" />
-		</condition>
-		<condition property="native.strip" value="mingw64-strip.exe">
-			<available filepath="${native.path}" file="mingw64-strip.exe" type="file" />
-		</condition>
-
-		<fail message="Could not locate strip command.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.strip" />
-						<or>
-							<available filepath="${native.path}" file="${native.strip}" />
-							<available file="${native.strip}" />
-						</or>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Native strip: ${native.strip}</echo>
-
-
-
 		<!-- Set the java compiler -->
 		<property name="java.cc" value="modern" />
 		<echo level="info">Java compiler: ${java.cc}</echo>
@@ -553,12 +506,15 @@
 			</not>
 		</condition>
 
-		<!-- Set compiler optimization flags -->
+		<!-- Set compiler debug flags -->
 		<condition property="native.cc.flags.debug" value="-ggdb" else="">
 			<istrue value="${project.debug}" />
 		</condition>
 
 		<!-- Set the compiler flags. -->
+		<condition property="native.cc.flags" value="${env.CFLAGS}">
+			<isset property="${env.CFLAGS}" />
+		</condition>
 		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
@@ -568,14 +524,6 @@
 		</condition>
 		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<istrue value="${native.os.isWindows}" />
-		</condition>
-
-		<!-- Set system specific cflags -->
-		<condition property="native.cc.flags.pic" value="-fPIC" else="">
-			<not>
-				<!-- Windows does not need pic support -->
-				<istrue value="${native.os.isWindows}" />
-			</not>
 		</condition>
 
 		<!-- Set system specific includes locations -->
@@ -592,19 +540,19 @@
 
 		<!-- Set the compiler arguments for compiling. -->
 		<!-- TODO Test without  -fno-strict-aliasing -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} ${native.cc.flags.pic} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.cc.args2" value="-o" />
 
 
-		<!-- set system specific library name -->
+		<!-- Set system specific library name -->
 		<condition property="native.executable" value="lib${project.name}.jnilib">
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -620,14 +568,22 @@
 			<istrue value="${project.optimize}" />
 		</condition>
 
-		<!-- set system specific ldflags -->
-		<condition property="native.ld.flags" value="-arch ${native.arch} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}">
+		<!-- Set strip flag -->
+		<condition property="native.ld.flags.strip" value=",-s" else="">
+			<istrue value="${project.strip}" />
+		</condition>
+
+		<!-- Set system specific ldflags -->
+		<condition property="native.ld.flags" value="${env.LDFLAGS}">
+			<isset property="${env.LDFLAGS}" />
+		</condition>
+		<condition property="native.ld.flags" value="-arch ${native.arch} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}${native.ld.flags.strip}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname=${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname=${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}${native.ld.flags.strip}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at,${native.ld.flags.optimize}${native.ld.flags.strip}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -642,7 +598,7 @@
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
-		<!-- set system specific linker arguments -->
+		<!-- Set system specific linker arguments -->
 		<condition property="native.ld.args" value="-dynamiclib -m${native.arch.model} ${native.ld.flags}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -656,19 +612,6 @@
 
 
 
-		<!-- set system specific strip arguments -->
-		<condition property="native.strip.args" value="-x -S">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.strip.args" value="-v --strip-unneeded -R .comment">
-			<or>
-				<istrue value="${native.os.isUnix}" />
-				<istrue value="${native.os.isWindows}" />
-			</or>
-		</condition>
-
-
-
 		<!-- Create property file for the descovered values -->
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
 			<entry key="java.cc"				value="${java.cc}" />
@@ -679,8 +622,6 @@
 			<entry key="native.ld"				value="${native.ld}" />
 			<entry key="native.ld.args"			value="${native.ld.args}" />
 			<entry key="native.ld.args2"		value="${native.ld.args2}" />
-			<entry key="native.strip"			value="${native.strip}" />
-			<entry key="native.strip.args"		value="${native.strip.args}" />
 		</propertyfile>
 
 
@@ -689,7 +630,7 @@
 	</target>
 
 
-	<target name="compile" depends="configure,compile-java,compile-native,strip-native" description="Compiles both Java and C source files.">
+	<target name="compile" depends="configure,compile-java,compile-native" description="Compiles both Java and C source files.">
 	</target>
 
 
@@ -776,17 +717,6 @@
 	</target>
 
 
-	<target name="strip-native" if="project.strip.enabled" description="Discard debug symbols from native binaries.">
-		<echo>Stripping native binaries...</echo>
-
-		<!-- Execute strip on native binaries -->
-		<exec executable="${native.strip}" failonerror="true">
-			<arg line="${native.strip.args}" />
-			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}" />
-		</exec>
-	</target>
-
-
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.jar}" />
@@ -810,8 +740,8 @@
 			</manifest>
 		</jar>
 	</target>
-	
-	
+
+
 	<target name="run" description="Execute the bundled example.">
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch.name}" />
@@ -822,8 +752,8 @@
 			</classpath>
 		</java>
 	</target>
-	
-	
+
+
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documenation...</echo>
 		<mkdir dir="${dir.doc}" />

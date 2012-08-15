@@ -66,8 +66,8 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		JNIEnv *env = NULL;
 		if (disp_ctrl != NULL && (*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-			// Check and make sure the thread is stull running to avoid the 
-			// potential crash associated with late event arrival.  This code is 
+			// Check and make sure the thread is stull running to avoid the
+			// potential crash associated with late event arrival.  This code is
 			// guaranteed to run after all thread start.
 			if (pthread_mutex_trylock(&hookRunningMutex) != 0) {
 				// Get XRecord data.
@@ -349,7 +349,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 				// Unlock the mutex incase trylock succeeded.
 				pthread_mutex_unlock(&hookRunningMutex);
 			}
-					
+
 			// Handle any possible JNI issue that may have occurred.
 			if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
 				#ifdef DEBUG
@@ -661,8 +661,10 @@ bool IsNativeThreadRunning() {
 	}
 	#ifdef DEBUG
 	else {
-		// Lock Failure. This should always be caused by an invalid pointer
-		// and/or an uninitialized mutex.
+		/* Lock Failure. This should always be caused by an invalid pointe
+		 * and/or an uninitialized mutex.  This message is normal when the
+		 * native thread is not running.
+		 */
 		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
 	}
 	#endif
