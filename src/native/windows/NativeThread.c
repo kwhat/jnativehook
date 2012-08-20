@@ -517,7 +517,10 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
-
+			
+			// Callback and start native event dispatch thread
+			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+			
 			// Check and setup modifiers.
 			if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
 			if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
@@ -562,6 +565,9 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		UnhookWindowsHookEx(handleMouseHook);
 		handleMouseHook = NULL;
 	}
+	
+	// Callback and stop native event dispatch thread
+	(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
 
 	#ifdef DEBUG
 	fprintf(stdout, "ThreadProc(): complete.\n");
@@ -570,6 +576,10 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
+		#endif
 	}
 
 	// Make sure we signal that we have passed any exception throwing code.

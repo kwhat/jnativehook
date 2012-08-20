@@ -511,6 +511,9 @@ static void *ThreadProc(void *arg) {
 					fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 					#endif
 
+					// Callback and start native event dispatch thread
+					(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
 					// Set the exit status.
 					*status = RETURN_SUCCESS;
 
@@ -562,6 +565,14 @@ static void *ThreadProc(void *arg) {
 		thread_ex.message = "Failed to create event port";
 	}
 
+	
+	// Callback and stop native event dispatch thread
+	(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+	#ifdef DEBUG
+	fprintf(stdout, "ThreadProc(): complete.\n");
+	#endif
+
 	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		(*jvm)->DetachCurrentThread(jvm);
@@ -570,10 +581,6 @@ static void *ThreadProc(void *arg) {
 		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
 		#endif
 	}
-
-	#ifdef DEBUG
-	fprintf(stdout, "ThreadProc(): complete.\n");
-	#endif
 
 	// Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);

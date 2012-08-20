@@ -25,7 +25,7 @@ jint jni_version = JNI_VERSION_1_4;
 
 // GlobalScreen object and dispatch id.
 jobject objGlobalScreen;
-jmethodID idDispatchEvent;
+jmethodID idDispatchEvent, idStartEventDispatcher, idStopEventDispatcher;
 
 // Java callback classes and constructor id's.
 jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
@@ -56,6 +56,26 @@ int CreateJNIGlobals() {
 						#endif
 
 						ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#dispatchEvent()");
+					}
+					
+					// Get the method ID for GlobalScreen.startEventDispatcher().
+					idStartEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "startEventDispatcher", "()V");
+					if (idStartEventDispatcher == NULL) {
+						#ifdef DEBUG
+						fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.startEventDispatcher()!\n");
+						#endif
+
+						ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#startEventDispatcher()");
+					}
+					
+					// Get the method ID for GlobalScreen.stopEventDispatcher().
+					idStopEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "stopEventDispatcher", "()V");
+					if (idStopEventDispatcher == NULL) {
+						#ifdef DEBUG
+						fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.stopEventDispatcher()!\n");
+						#endif
+
+						ThrowException(INTERNAL_ERROR, "Failed to acquire the method ID for org.jnativehook.GlobalScreen#startEventDispatcher()");
 					}
 				}
 				else {
@@ -222,6 +242,8 @@ int DestroyJNIGlobals() {
 
 		// Set all the global method ID's to null.
 		idDispatchEvent = NULL;
+		idStartEventDispatcher = NULL;
+		idStopEventDispatcher = NULL;
 		idKeyEvent = NULL;
 		idMouseButtonEvent = NULL;
 		idMouseMotionEvent = NULL;

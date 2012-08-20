@@ -36,7 +36,7 @@ extern jint jni_version;
 
 // GlobalScreen object and dispatch id.
 extern jobject objGlobalScreen;
-extern jmethodID idDispatchEvent;
+extern jmethodID idDispatchEvent, idStartEventDispatcher, idStopEventDispatcher;
 
 // Java callback classes and constructor id's.
 extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;

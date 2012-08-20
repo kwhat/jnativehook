@@ -375,7 +375,7 @@ public class GlobalScreen {
 	 *
 	 * @since 1.1
 	 */
-	protected void StartEventDispatcher() {
+	protected void startEventDispatcher() {
 		//Create a new single thread executor.
 		eventExecutor = Executors.newSingleThreadExecutor();
 	}
@@ -387,9 +387,12 @@ public class GlobalScreen {
 	 *
 	 * @since 1.1
 	 */
-	protected void StopEventDispatcher() {
-		//Shutdown the current Event executor.
-		eventExecutor.shutdownNow();
+	protected void stopEventDispatcher() {
+		if (eventExecutor != null) {
+			//Shutdown the current Event executor.
+			eventExecutor.shutdownNow();
+			eventExecutor = null;
+		}
 	}
 
 	/**
