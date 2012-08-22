@@ -448,7 +448,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * Unicode character exists for this key event, <code>CHAR_UNDEFINED</code>
 	 * is returned.
 	 */
-	public int getKeyChar() {
+	public char getKeyChar() {
 		return this.keyChar;
 	}
 
