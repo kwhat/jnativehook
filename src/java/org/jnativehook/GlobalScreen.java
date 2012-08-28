@@ -18,7 +18,6 @@
 package org.jnativehook;
 
 //Imports
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.io.InputStream;
 import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -68,9 +66,6 @@ public class GlobalScreen {
 		//Setup instance variables.
 		eventListeners = new EventListenerList();
 		
-		//Create a new single thread executor.
-		eventExecutor = Executors.newSingleThreadExecutor();
-
 		//Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
 	}
@@ -372,6 +367,33 @@ public class GlobalScreen {
 			((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(e);
 		}
 	}
+	
+	/**		
+	 * Initialize a local executor service for event delivery.  This method		
+	 * should only be called by the native library during the hook registration		
+	 * process.		
+	 *		
+	 * @since 1.1		
+	 */		
+	protected void startEventDispatcher() {		
+		//Create a new single thread executor.		
+		eventExecutor = Executors.newSingleThreadExecutor();		
+	}		
+	
+	/**		
+	 * Shutdown the local executor service for event delivery.  Any events		
+	 * events pending delivery will be discarded. This method should only be		
+	 * called by the native library during the hook deregistration process.		
+	 *		
+	 * @since 1.1		
+	 */		
+	protected void stopEventDispatcher() {		
+		if (eventExecutor != null) {		
+			//Shutdown the current Event executor.		
+			eventExecutor.shutdownNow();		
+			eventExecutor = null;		
+		}		
+	}
 
 	/**
 	 * Perform procedures to interface with the native library. These procedures
@@ -399,12 +421,12 @@ public class GlobalScreen {
 				
 				//Slice up the library name.
 				int i = libNativeName.lastIndexOf('.');
-				String libNativePrefix = libNativeName.substring(0, i);
-				String libNativeSuffix = libNativeName.substring(i + 1);
+				String libNativePrefix = libNativeName.substring(0, i) + '_';
+				String libNativeSuffix = libNativeName.substring(i);
 				
 				//Create the temp file for this instance of the library.
 				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
-				
+				System.out.println(libFile);
 				//Check and see if a copy of the native lib already exists.
 				FileOutputStream libOutputStream = new FileOutputStream(libFile);
 				byte[] buffer = new byte[4 * 1024];
