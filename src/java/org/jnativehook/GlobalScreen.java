@@ -426,7 +426,7 @@ public class GlobalScreen {
 				
 				//Create the temp file for this instance of the library.
 				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
-				System.out.println(libFile);
+				
 				//Check and see if a copy of the native lib already exists.
 				FileOutputStream libOutputStream = new FileOutputStream(libFile);
 				byte[] buffer = new byte[4 * 1024];
