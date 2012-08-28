@@ -527,11 +527,11 @@
 		</condition>
 
 		<!-- Set system specific includes locations -->
-		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${dir.src.native}${file.separator}jni -I${file.separator}usr${file.separator}lib -I${java.include}">
+		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${dir.src.native}${file.separator}jni -I${file.separator}usr${file.separator}lib -I${java.include} -I${java.include}${file.separator}darwin">
 			<!-- -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${dir.src.native}${file.separator}jni -I${java.include} -I${java.include}${file.separator}${native.os} -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
+		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${dir.src.native}${file.separator}jni -I${java.include} -I${java.include}${file.separator}linux -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.cc.includes" value="-I${dir.src.native}${file.separator}common -I${dir.src.native}${file.separator}jni -I${java.include} -I${java.include}${file.separator}win32">
