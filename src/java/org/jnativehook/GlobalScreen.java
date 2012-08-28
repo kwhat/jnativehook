@@ -232,11 +232,7 @@ public class GlobalScreen {
 	/**
 	 * Disable the native hook if it is currently registered. If the native
 	 * hook it is not registered the function has no effect.
-	 * <p />
-	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
-	 * if it is called from within the native event dispatching thread.  Use
-	 * {@link #isNativeDispatchThread()} to prevent this type of exception.
-	 *
+	 * 
 	 * @since 1.1
 	 */
 	public static native void unregisterNativeHook();
@@ -373,7 +369,7 @@ public class GlobalScreen {
 	 * should only be called by the native library during the hook registration		
 	 * process.		
 	 *		
-	 * @since 1.1		
+	 * @since 1.1
 	 */		
 	protected void startEventDispatcher() {		
 		//Create a new single thread executor.		
