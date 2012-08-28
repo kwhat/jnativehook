@@ -118,8 +118,7 @@ public class NativeSystem {
 			family = Family.OSX;
 		}
 		else if (osName.equalsIgnoreCase("solaris") ||
-				osName.equalsIgnoreCase("sunos")
-		) {
+				osName.equalsIgnoreCase("sunos")) {
 			family = Family.SOLARIS;
 		}
 		else if (osName.equalsIgnoreCase("linux")) {
@@ -166,27 +165,23 @@ public class NativeSystem {
 			arch = Arch.SPARC64;
 		}
 		else if (osArch.equalsIgnoreCase("ppc") ||
-				osArch.equalsIgnoreCase("powerpc")
-		) {
+				osArch.equalsIgnoreCase("powerpc")) {
 			arch = Arch.PPC;
 		}
 		else if (osArch.equalsIgnoreCase("ppc64") ||
-				osArch.equalsIgnoreCase("powerpc64")
-		) {
+				osArch.equalsIgnoreCase("powerpc64")) {
 			arch = Arch.PPC64;
 		}
 		else if (osArch.equalsIgnoreCase("x86") ||
 			osArch.equalsIgnoreCase("i386") ||
 			osArch.equalsIgnoreCase("i486") ||
 			osArch.equalsIgnoreCase("i586") ||
-			osArch.equalsIgnoreCase("i686")
-		) {
+			osArch.equalsIgnoreCase("i686")) {
 			arch = Arch.x86;
 		}
 		else if (osArch.equalsIgnoreCase("x86_64") ||
 				osArch.equalsIgnoreCase("amd64") ||
-				osArch.equalsIgnoreCase("k8")
-		) {
+				osArch.equalsIgnoreCase("k8")) {
 			arch = Arch.x86_64;
 		}
 

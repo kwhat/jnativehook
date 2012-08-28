@@ -553,7 +553,7 @@
 
 
 		<!-- Set system specific library name -->
-		<condition property="native.executable" value="lib${project.name}.jnilib">
+		<condition property="native.executable" value="lib${project.name}.dylib">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.executable" value="lib${project.name}.so">
