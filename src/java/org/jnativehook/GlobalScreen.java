@@ -372,9 +372,9 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */		
 	protected void startEventDispatcher() {		
-		//Create a new single thread executor.		
-		eventExecutor = Executors.newSingleThreadExecutor();		
-	}		
+		//Create a new single thread executor.
+		eventExecutor = Executors.newSingleThreadExecutor();
+	}
 	
 	/**		
 	 * Shutdown the local executor service for event delivery.  Any events		
@@ -426,11 +426,17 @@ public class GlobalScreen {
 				//Check and see if a copy of the native lib already exists.
 				FileOutputStream libOutputStream = new FileOutputStream(libFile);
 				byte[] buffer = new byte[4 * 1024];
+				
+				//This may return null in some circumstances.
 				InputStream libInputStream = 
 								GlobalScreen.class.getResourceAsStream(
 									libResourcePath.toLowerCase()
 										+ libNativeName
 								);
+				
+				if (libInputStream == null) {
+					throw new IOException("Unable to locate the native library.");
+				}
 				
 				int size;
 				while ((size = libInputStream.read(buffer)) != -1) {

@@ -702,7 +702,7 @@
 			<include name="**/*.o" />
 		</fileset>
 
-		<property name="file.obj.txt" refid='file.obj'/>
+		<property name="file.obj.txt" refid="file.obj" />
 		<echo>Applying ${native.ld} on the following files: ${file.obj.txt}</echo>
 
 		<!-- Execute the native linker on the object files -->
@@ -742,7 +742,7 @@
 	</target>
 
 
-	<target name="run" description="Execute the bundled example.">
+	<target name="run" depends="configure" description="Execute the bundled example.">
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch.name}" />
 			<classpath>

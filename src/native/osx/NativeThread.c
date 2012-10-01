@@ -320,7 +320,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Reset the click count.
-					if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) > GetMultiClickTime()) {
 						click_count = 0;
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
@@ -349,7 +349,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Reset the click count.
-					if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) > GetMultiClickTime()) {
 						click_count = 0;
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
@@ -386,8 +386,8 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					jwheelRotation = (jint) CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1) * -1;
 
 					/* TODO Figure out the scroll wheel amounts are correct.  I
-					* suspect that Apples Java implementaion maybe reporting a
-					* static "1" inaccuratly.
+					* suspect that Apples Java implementation maybe reporting a
+					* static "1" inaccurately.
 					*/
 					jscrollAmount = (jint) CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1) * -1;
 
@@ -396,13 +396,13 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Track the number of clicks.
-					if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+					if ((long) (CGEventGetTimestamp(event) - click_time) <= GetMultiClickTime()) {
 						click_count++;
 					}
 					else {
 						click_count = 1;
 					}
-					click_time = event_time;
+					click_time = CGEventGetTimestamp(event);
 
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
@@ -429,7 +429,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 				#ifdef DEBUG
 				default:
-					fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
+					fprintf(stderr, "LowLevelProc(): Unhandled Event Type: 0x%X\n", type);
 				break;
 				#endif
 			}
