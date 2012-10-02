@@ -216,7 +216,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 					// Track the number of clicks.
 					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (event_time - click_time));
+					fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (CGEventGetTimestamp(event) - click_time));
 					#endif
 
 					if ((long) (CGEventGetTimestamp(event) - click_time) / 1000000 <= GetMultiClickTime()) {
@@ -478,10 +478,15 @@ static void *ThreadProc(void *arg) {
 								CGEventMaskBit(kCGEventMouseMoved) |
 								CGEventMaskBit(kCGEventScrollWheel);
 
+	#ifdef DEBUG
+	event_mask |=	CGEventMaskBit(kCGEventNull) |
+					CGEventMaskBit(kCGEventTapDisabledByTimeout) |
+					CGEventMaskBit(kCGEventTapDisabledByUserInput);
+	#endif
 
 	CFMachPortRef event_port = CGEventTapCreate(
 									kCGSessionEventTap,
-									kCGHeadInsertEventTap,
+									kCGHeadInsertEventTap, // kCGTailAppendEventTap
 									kCGEventTapOptionListenOnly,
 									event_mask,
 									LowLevelProc,
@@ -565,7 +570,7 @@ static void *ThreadProc(void *arg) {
 		thread_ex.message = "Failed to create event port";
 	}
 
-	
+
 	// Callback and stop native event dispatch thread
 	(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
 
