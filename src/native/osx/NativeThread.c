@@ -487,7 +487,7 @@ static void *ThreadProc(void *arg) {
 	CFMachPortRef event_port = CGEventTapCreate(
 									kCGSessionEventTap,
 									kCGHeadInsertEventTap, // kCGTailAppendEventTap
-									kCGEventTapOptionListenOnly,
+									kCGEventTapOptionListenOnly, // kCGEventTapOptionDefault See Bug #22
 									event_mask,
 									LowLevelProc,
 									NULL
