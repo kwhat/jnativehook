@@ -23,8 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.ItemSelectable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -59,7 +57,7 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * @see GlobalScreen
  * @see NativeKeyListener
  */
-public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, ActionListener, WindowListener, ItemListener {
+public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener, ItemListener {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1865350670081087993L;
 
@@ -171,17 +169,6 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				GlobalScreen.getInstance().removeNativeMouseWheelListener(this);
 			}
 		}
-	}
-
-	/**
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {
-		//Clear the text components.
-		txtEventInfo.setText("");
-
-		//Return the focus to the window.
-		this.requestFocusInWindow();
 	}
 
 	/**
@@ -315,6 +302,9 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
+		//Return the focus to the window.
+		this.requestFocusInWindow();
+
 		try {
 			txtEventInfo.setText("Auto Repeat Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
 			txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));

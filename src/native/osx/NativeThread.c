@@ -485,9 +485,9 @@ static void *ThreadProc(void *arg) {
 	#endif
 
 	CFMachPortRef event_port = CGEventTapCreate(
-									kCGSessionEventTap,
-									kCGHeadInsertEventTap, // kCGTailAppendEventTap
-									kCGEventTapOptionListenOnly, // kCGEventTapOptionDefault See Bug #22
+									kCGSessionEventTap,				// kCGHIDEventTap
+									kCGHeadInsertEventTap,			// kCGTailAppendEventTap
+									kCGEventTapOptionListenOnly,	// kCGEventTapOptionDefault See Bug #22
 									event_mask,
 									LowLevelProc,
 									NULL
@@ -499,7 +499,7 @@ static void *ThreadProc(void *arg) {
 		fprintf(stdout, "ThreadProc(): Event tap created successfully.\n");
 		#endif
 
-		event_source = CFMachPortCreateRunLoopSource(NULL, event_port, 0);
+		event_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, event_port, 0);
 		if (event_source != NULL) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): CFMachPortCreateRunLoopSource() success.\n");
@@ -548,6 +548,9 @@ static void *ThreadProc(void *arg) {
 				thread_ex.class = NATIVE_HOOK_EXCEPTION;
 				thread_ex.message = "Failed to attach to the run loop";
 			}
+
+			// Clean up the event source.
+			CFRelease(event_source);
 		}
 		else {
 			#ifdef DEBUG
@@ -560,6 +563,7 @@ static void *ThreadProc(void *arg) {
 
 		// Stop the CFMachPort from receiving any more messages.
 		CFMachPortInvalidate(event_port);
+		CFRelease(event_port);
 	}
 	else {
 		#ifdef DEBUG

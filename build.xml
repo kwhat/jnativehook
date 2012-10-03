@@ -186,6 +186,9 @@
 		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}Headers">
 			<available file="${java.home}${file.separator}..${file.separator}Headers" type="dir" />
 		</condition>
+		<condition property="java.include" value="/System/Library/Frameworks/JavaVM.framework/Headers">
+			<available file="/System/Library/Frameworks/JavaVM.framework/Headers" type="dir" />
+		</condition>
 		<condition property="java.include" value="${java.home}${file.separator}Headers">
 			<available file="${java.home}${file.separator}Headers" type="dir" />
 		</condition>
