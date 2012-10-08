@@ -27,7 +27,7 @@ static XkbDescPtr keyboard_map;
 #include <X11/Xutil.h>
 static KeySym *keyboard_map;
 static int keysyms_per_keycode;
-static Bool is_caps_lock = false, is_shift_lock = false;
+static bool is_caps_lock = false, is_shift_lock = false;
 #endif
 
 // Unicode-Remapse the NativeHelpers display.
@@ -398,7 +398,7 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_ydiaeresis:
 			return keysym;
 		#endif
-			
+
 
 		#ifdef XK_LATIN2
 		case XK_Aogonek:
@@ -1590,7 +1590,7 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_endash:
 			return 0x2013;
 		case XK_signifblank:
-			return 0xOPEN;
+			return 0x2423;
 		case XK_ellipsis:
 			return 0x2026;
 		case XK_doubbaselinedot:
@@ -1616,11 +1616,11 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_figdash:
 			return 0x2012;
 		case XK_leftanglebracket:
-			return 0xICAL;
+			return 0x27E8;
 		case XK_decimalpoint:
-			return 0xFULL;
+			return 0x002E;
 		case XK_rightanglebracket:
-			return 0xICAL;
+			return 0x27E9;
 		case XK_oneeighth:
 			return 0x215B;
 		case XK_threeeighths:
@@ -1632,15 +1632,15 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_trademark:
 			return 0x2122;
 		case XK_signaturemark:
-			return 0xE)*/;
+			return 0x2613;
 		case XK_leftopentriangle:
-			return 0xHITE;
+			return 0x25C1;
 		case XK_rightopentriangle:
-			return 0xHITE;
+			return 0x25B7;
 		case XK_emopencircle:
-			return 0xHITE;
+			return 0x25CB;
 		case XK_emopenrectangle:
-			return 0xHITE;
+			return 0x25AF;
 		case XK_leftsinglequotemark:
 			return 0x2018;
 		case XK_rightsinglequotemark:
@@ -1658,39 +1658,39 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_latincross:
 			return 0x271D;
 		case XK_filledrectbullet:
-			return 0xLACK;
+			return 0x25AC;
 		case XK_filledlefttribullet:
-			return 0xLACK;
+			return 0x25C0;
 		case XK_filledrighttribullet:
-			return 0xLACK;
+			return 0x25B6;
 		case XK_emfilledcircle:
-			return 0xLACK;
+			return 0x25CF;
 		case XK_emfilledrect:
-			return 0xLACK;
-		case XK_enopencircbullet:
-			return 0xHITE;
+			return 0x25AE;
+;		case XK_enopencircbullet:
+			return 0x25E6;
 		case XK_enopensquarebullet:
-			return 0xHITE;
+			return 0x25AB;
 		case XK_openrectbullet:
-			return 0xHITE;
+			return 0x25AD;
 		case XK_opentribulletup:
-			return 0xHITE;
+			return 0x25B3;
 		case XK_opentribulletdown:
-			return 0xHITE;
+			return 0x25BD;
 		case XK_openstar:
-			return 0xHITE;
+			return 0x2606;
 		case XK_enfilledcircbullet:
-			return 0xT)*/;
+			return 0x2022;
 		case XK_enfilledsqbullet:
-			return 0xLACK;
+			return 0x25AA;
 		case XK_filledtribulletup:
-			return 0xLACK;
+			return 0x25B2;
 		case XK_filledtribulletdown:
-			return 0xLACK;
+			return 0x25BC;
 		case XK_leftpointer:
-			return 0xHITE;
+			return 0x261C;
 		case XK_rightpointer:
-			return 0xHITE;
+			return 0x261E;
 		case XK_club:
 			return 0x2663;
 		case XK_diamond:
@@ -1732,43 +1732,43 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 
 		#ifdef XK_APL
 		case XK_leftcaret:
-			return 0xTHAN;
+			return 0x003C;
 		case XK_rightcaret:
-			return 0xTHAN;
+			return 0x003E;
 		case XK_downcaret:
-			return 0xICAL;
+			return 0x2228;
 		case XK_upcaret:
-			return 0xICAL;
+			return 0x2227;
 		case XK_overbar:
-			return 0xN)*/;
+			return 0xAF;
 		case XK_downtack:
-			return 0x22A4;
+			return 0x22A5;
 		case XK_upshoe:
-			return 0xN)*/;
+			return 0x2229;
 		case XK_downstile:
 			return 0x230A;
 		case XK_underbar:
-			return 0xXLOW;
+			return 0x005F;
 		case XK_jot:
 			return 0x2218;
 		case XK_quad:
 			return 0x2395;
 		case XK_uptack:
-			return 0x22A5;
+			return 0x22A4;
 		case XK_circle:
 			return 0x25CB;
 		case XK_upstile:
 			return 0x2308;
 		case XK_downshoe:
-			return 0xN)*/;
+			return 0x222A;
 		case XK_rightshoe:
-			return 0xRSET;
+			return 0x2283;
 		case XK_leftshoe:
-			return 0xBSET;
+			return 0x2282;
 		case XK_lefttack:
-			return 0x22A3;
-		case XK_righttack:
 			return 0x22A2;
+		case XK_righttack:
+			return 0x22A3;
 		#endif
 
 
@@ -3318,7 +3318,7 @@ void LoadInputHelper() {
 			KeyCode shift_lock = XKeysymToKeycode(disp, XK_Shift_Lock);
 			keysyms_per_keycode--;
 
-			// Loop over the modfer map to find out if/where shift and caps locks are set.
+			// Loop over the modifier map to find out if/where shift and caps locks are set.
 			for (int i = LockMapIndex; i < LockMapIndex + modifier_map->max_keypermod && !is_caps_lock; i++) {
 				if (caps_lock != 0 && modifier_map->modifiermap[i] == caps_lock) {
 					is_caps_lock = true;

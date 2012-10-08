@@ -150,12 +150,12 @@ long int GetMultiClickTime() {
 
 	// Try and acquire the multi-click time from the user defined X defaults.
 	char *xprop = XGetDefault(disp, "*", "multiClickTime");
-	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
+	if (xprop != NULL && sscanf(xprop, "%4i", &clicktime) != EOF) {
 		successful = true;
 	}
 
 	xprop = XGetDefault(disp, "OpenWindows", "MultiClickTimeout");
-	if (xprop != NULL && sscanf(xprop, "%i", &clicktime) != EOF) {
+	if (xprop != NULL && sscanf(xprop, "%4i", &clicktime) != EOF) {
 		successful = true;
 	}
 
@@ -201,10 +201,10 @@ void OnLibraryLoad() {
 	}
 	#endif
 
-	Bool isAutoRepeat = false;
+	bool isAutoRepeat = false;
 	#ifdef XKB
 	// Enable detectable autorepeat.
-	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
+	XkbSetDetectableAutoRepeat(disp, true, &isAutoRepeat);
 	#else
 	XAutoRepeatOn(disp);
 
