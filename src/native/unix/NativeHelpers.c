@@ -201,10 +201,10 @@ void OnLibraryLoad() {
 	}
 	#endif
 
-	bool isAutoRepeat = false;
+	Bool isAutoRepeat = False;
 	#ifdef XKB
 	// Enable detectable autorepeat.
-	XkbSetDetectableAutoRepeat(disp, true, &isAutoRepeat);
+	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
 	#else
 	XAutoRepeatOn(disp);
 

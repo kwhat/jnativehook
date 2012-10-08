@@ -493,21 +493,21 @@ static void *ThreadProc(void *arg) {
 		disp_data = NULL;
 	}
 
-	// Callback and stop native event dispatch thread
-	(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-	#ifdef DEBUG
-	fprintf(stdout, "ThreadProc(): complete.\n");
-	#endif
-
-	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		// Callback and stop native event dispatch thread
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+		// Detach this thread from the JVM.
 		(*jvm)->DetachCurrentThread(jvm);
 
 		#ifdef DEBUG
 		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
 		#endif
 	}
+
+	#ifdef DEBUG
+	fprintf(stdout, "ThreadProc(): complete.\n");
+	#endif
 
 	// Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
@@ -565,7 +565,6 @@ int StartNativeThread() {
 					void *thread_status;
 					pthread_join(hookThreadId, (void *) &thread_status);
 					status = *(int *) thread_status;
-					free(thread_status);
 
 					#ifdef DEBUG
 					fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
@@ -623,7 +622,6 @@ int StopNativeThread() {
 		void *thread_status;
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
-		free(thread_status);
 
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);

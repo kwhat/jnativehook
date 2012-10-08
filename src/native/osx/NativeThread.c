@@ -574,22 +574,21 @@ static void *ThreadProc(void *arg) {
 		thread_ex.message = "Failed to create event port";
 	}
 
-
-	// Callback and stop native event dispatch thread
-	(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-	#ifdef DEBUG
-	fprintf(stdout, "ThreadProc(): complete.\n");
-	#endif
-
-	// Detach this thread from the JVM.
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		// Callback and stop native event dispatch thread
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+		// Detach this thread from the JVM.
 		(*jvm)->DetachCurrentThread(jvm);
 
 		#ifdef DEBUG
 		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
 		#endif
 	}
+
+	#ifdef DEBUG
+	fprintf(stdout, "ThreadProc(): complete.\n");
+	#endif
 
 	// Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hookRunningMutex);
@@ -646,7 +645,6 @@ int StartNativeThread() {
 						void *thread_status;
 						pthread_join(hookThreadId, (void *) &thread_status);
 						status = *(int *) thread_status;
-						free(thread_status);
 
 						#ifdef DEBUG
 						fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
@@ -701,19 +699,18 @@ int StopNativeThread() {
 		void *thread_status;
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
-		free(thread_status);
 
 		#ifdef DEBUG
-		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) thread_status);
+		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) status);
 		#endif
 
 		// Destroy all created globals.
 		#ifdef DEBUG
 		if (DestroyJNIGlobals() == RETURN_FAILURE) {
-			/* Leaving dangling global references will leak a small amout
-				* of memory but because there is nothing that can be done
-				* about it at this point an exception will not be thrown.
-				*/
+			/* Leaving dangling global references will leak a small amount
+			 * of memory but because there is nothing that can be done
+			 * about it at this point an exception will not be thrown.
+			 */
 			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
 		}
 		#else
