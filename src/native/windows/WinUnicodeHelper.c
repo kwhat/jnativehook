@@ -52,11 +52,13 @@ static BOOL IsWow64() {
 
 	if(pIsWow64Process != NULL) {
 		if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64)) {
-			// FIXME Handle Error
-			//DWORD WINAPI GetLastError(void);
+			bIsWow64 = FALSE;
+			#ifdef DEBUG
+			fprintf(stderr, "IsWow64(): pIsWow64Process(GetCurrentProcess(), &bIsWow64) failed!\n");
+			#endif
 		}
 	}
-	
+
 	return bIsWow64;
 }
 #endif

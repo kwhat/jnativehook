@@ -430,11 +430,25 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					break;
 
-				// Settings change message notifies us when change is made
-				// through the SystemParametersInfo() API
-				/* case WM_SETTINGCHANGE:
+				// Handle the WM_SETTINGCHANGE message notifications for setting
+				// change events.
+				/*
+				case WM_SETTINGCHANGE:
 					//TODO Reset all the system props
-					return OnSettingChange( (UINT)wParam ); */
+					switch ((UINT)wParam) {
+						case SPI_SETWHEELSCROLLLINES:
+						case SPI_SETWHEELSCROLLCHARS:
+							SetNativeProperties(env);
+							break;
+							
+						#ifdef DEBUG
+						default:
+							fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
+							break;
+						#endif
+					}
+					break;
+				*/
 
 				#ifdef DEBUG
 				default:
@@ -456,23 +470,6 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
-
-/* Handle the WM_SETTINGCHANGE message and cache changes to
- * SPI_GETWHEELSCROLLLINES and SPI_GETWHEELSCROLLCHARS which indicate
- * the amount to scroll when a scrolling message is handled.
- */
-/*
-static LRESULT CALLBACK SettingChangeProc(UINT setting) {
-	if (setting == SPI_SETWHEELSCROLLLINES) {
-		linesToScrollUserSetting = GetLinesToScrollUserSetting();
-	}
-	else if (setting == SPI_SETWHEELSCROLLCHARS) {
-		charsToScrollUserSetting = GetCharsToScrollUserSetting();
-	}
-
-	return 0;
-}
-*/
 
 static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	DWORD status = RETURN_FAILURE;

@@ -212,7 +212,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 
 		// Set java properties from native sources.
 		SetNativeProperties(env);
-		SetNativeProperties(env);
 	}
 	else {
 		#ifdef DEBUG

@@ -88,13 +88,13 @@ typedef struct _VK_TO_WCHAR_TABLE {
 	BYTE cbSize;
 } VK_TO_WCHAR_TABLE, *PVK_TO_WCHAR_TABLE;
 
-typedef struct {
+typedef struct _DEADKEY {
 	DWORD dwBoth;
 	WCHAR wchComposed;
 	USHORT uFlags;
 } DEADKEY, *PDEADKEY;
 
-typedef struct {
+typedef struct _VSC_LPWSTR {
 	BYTE vsc;
 	WCHAR *pwsz; // __ptr64
 } VSC_LPWSTR, *PVSC_LPWSTR;
