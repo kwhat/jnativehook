@@ -43,7 +43,7 @@ extern HINSTANCE hInst;
 // Thread and hook handles.
 static DWORD hookThreadId = 0;
 static HANDLE hookThreadHandle = NULL, hookEventHandle = NULL;
-static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
+static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL, handleSettingsHook = NULL;
 
 static WCHAR keytxt = '\0', keydead = 0;
 
@@ -430,26 +430,6 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
 					break;
 
-				// Handle the WM_SETTINGCHANGE message notifications for setting
-				// change events.
-				/*
-				case WM_SETTINGCHANGE:
-					//TODO Reset all the system props
-					switch ((UINT)wParam) {
-						case SPI_SETWHEELSCROLLLINES:
-						case SPI_SETWHEELSCROLLCHARS:
-							SetNativeProperties(env);
-							break;
-
-						#ifdef DEBUG
-						default:
-							fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
-							break;
-						#endif
-					}
-					break;
-				*/
-
 				#ifdef DEBUG
 				default:
 					fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (%X)\n", (unsigned int) wParam);
@@ -469,6 +449,49 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 	}
 
 	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
+}
+
+static LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	JNIEnv *env = NULL;
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		// Check and make sure the thread is stull running to avoid the
+		// potential crash associated with late event arrival.  This code is
+		// guaranteed to run after all thread start.
+		if (IsNativeThreadRunning() == true) {
+			switch(wParam) {
+				// Handle the WM_SETTINGCHANGE message notifications for setting
+				// change events.
+				/*
+				case WM_SETTINGCHANGE:
+					#ifdef DEBUG
+					fprintf(stdout, "CallWndRetProc(): Setting change. (%i)\n", (int) jbutton);
+					#endif
+					SetNativeProperties(env);
+					UnloadInputHelper();
+					LoadInputHelper();
+					break;
+				*/
+
+				#ifdef DEBUG
+				default:
+					fprintf(stdout, "CallWndRetProc(): Unhandled setting change event. (%X)\n", (unsigned int) wParam);
+					break;
+				#endif
+			}
+		}
+					
+		// Handle any possible JNI issue that may have occurred.
+		if ((*env)->ExceptionCheck(env) == JNI_TRUE) {
+			#ifdef DEBUG
+			fprintf(stderr, "LowLevelMouseProc(): JNI error occurred!\n");
+			(*env)->ExceptionDescribe(env);
+			#endif
+			(*env)->ExceptionClear(env);
+		}
+	}
+
+	return CallNextHookEx(handleSettingsHook, nCode, wParam, lParam);
+	
 }
 
 static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
@@ -507,9 +530,25 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	}
 	#endif
 
+	handleSettingsHook = SetWindowsHookEx(WH_CALLWNDPROCRET, CallWndRetProc, hInst, 0);
+	if (handleMouseHook == NULL) {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_CALLWNDPROCRET, CallWndRetProc, hInst, 0) failed!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to hook setting events";
+
+	}
+	#ifdef DEBUG
+	else {
+		fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_CALLWNDPROCRET, CallWndRetProc, hInst, 0) successful.\n");
+	}
+	#endif
+
 
 	// If we did not encounter a problem, start processing events.
-	if (handleKeyboardHook != NULL && handleMouseHook != NULL) {
+	if (handleKeyboardHook != NULL && handleMouseHook != NULL && handleSettingsHook != NULL) {
 		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
@@ -561,6 +600,11 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	if (handleMouseHook != NULL) {
 		UnhookWindowsHookEx(handleMouseHook);
 		handleMouseHook = NULL;
+	}
+	
+	if (handleSettingsHook != NULL) {
+		UnhookWindowsHookEx(handleSettingsHook);
+		handleSettingsHook = NULL;
 	}
 
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
