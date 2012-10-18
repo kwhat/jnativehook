@@ -119,8 +119,8 @@ typedef struct tagKbdLayer {
 	DWORD dwSubType;
 } KBDTABLES, *PKBDTABLES; // __ptr64
 
-HINSTANCE LoadInputHelper();
-int UnloadInputHelper(HINSTANCE kbdLibrary);
+int LoadUnicodeHelper();
+int UnloadUnicodeHelper();
 int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR out, PWCHAR buffer);
 
 #endif

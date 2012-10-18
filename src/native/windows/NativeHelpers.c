@@ -26,7 +26,6 @@
 
 // Global Variables.
 HINSTANCE hInst = NULL;
-HINSTANCE kbInst = NULL;
 
 long int GetAutoRepeatRate() {
 	long int value = -1;
@@ -95,13 +94,13 @@ long int GetMultiClickTime() {
 }
 
 void OnLibraryLoad() {
-	// Do Nothing.
-	kbInst = LoadInputHelper();
+	// Load the unicode conversion helper.
+	LoadUnicodeHelper();
 }
 
 void OnLibraryUnload() {
-	// Do Nothing.
-	UnloadInputHelper(kbInst);
+	// Unload the unicode conversion helper.
+	UnloadUnicodeHelper();
 }
 
 BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {

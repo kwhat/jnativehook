@@ -41,7 +41,11 @@ static PVK_TO_BIT pVkToBit;
 static PVK_TO_WCHAR_TABLE pVkToWcharTable;
 static PDEADKEY pDeadKey;
 
+// Amount of pointer padding to apply for Wow64 instances.
 static short int ptrPadding = 0;
+
+// Keyboard DLL instance.
+HINSTANCE kbdLibrary = NULL;
 
 #if defined(_WIN32) && !defined(_WIN64)
 // Small function to check and see if we are executing under Wow64.
@@ -58,7 +62,7 @@ static BOOL IsWow64() {
 			#endif
 		}
 	}
-
+	
 	return bIsWow64;
 }
 #endif
@@ -85,9 +89,9 @@ static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 	return status;
 }
 
-HINSTANCE LoadInputHelper() {
-	HINSTANCE kbdLibrary = NULL;
-
+int LoadUnicodeHelper() {
+	int status = RETURN_FAILURE;
+	
 	#if defined(_WIN32) && !defined(_WIN64)
 	if (IsWow64()) {
 		ptrPadding = sizeof(void *);
@@ -112,9 +116,16 @@ HINSTANCE LoadInputHelper() {
 				// Store the memory address of the following 3 structures.
 				BYTE *base = (BYTE *) pKbd;
 
-				pVkToBit = pKbd->pCharModifiers->pVkToBit;	// First element of each structure, no offset adjustment needed.
-				pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding)); // Second element of pKbd, +4 byte offset on wow64
-				pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2))); // Third element of pKbd, +8 byte offset on wow64
+				// First element of each structure, no offset adjustment needed.
+				pVkToBit = pKbd->pCharModifiers->pVkToBit;
+				
+				// Second element of pKbd, +4 byte offset on wow64.
+				pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding));
+				
+				// Third element of pKbd, +8 byte offset on wow64.
+				pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2)));
+				
+				status = RETURN_SUCCESS;
 			}
 			else {
 				FreeLibrary(kbdLibrary);
@@ -123,14 +134,15 @@ HINSTANCE LoadInputHelper() {
 		}
 	}
 
-	return kbdLibrary;
+	return status;
 }
 
 // Should probably return a boolean
-int UnloadInputHelper(HINSTANCE kbdLibrary) {
+int UnloadUnicodeHelper() {
 	int status = RETURN_FAILURE;
 
-	if(kbdLibrary != 0 && FreeLibrary(kbdLibrary) != 0) {
+	if(kbdLibrary != NULL && FreeLibrary(kbdLibrary)) {
+		kbdLibrary = NULL;
 		status = RETURN_SUCCESS;
 	}
 
@@ -138,105 +150,110 @@ int UnloadInputHelper(HINSTANCE kbdLibrary) {
 }
 
 int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
-	short state = 0;
-	int shift = -1;
-	int mod = 0;
 	int charCount = 0;
-
-	WCHAR baseChar;
-	WCHAR diacritic;
 	*outputChar = 0;
-
-	int capsLock = (GetKeyState(VK_CAPITAL) & 0x01);
-
-	/* Because this is only a structure of two bytes, we don't need to worry 
-	 * about the structure padding of __ptr64 offsets on Wow64.
-	 */
-	for (int i = 0; pVkToBit[i].Vk != 0; i++) {
-		state = GetAsyncKeyState(pVkToBit[i].Vk);
-
-		if(pVkToBit[i].Vk == VK_SHIFT) {
-			shift = i + 1; // Get modification number for Shift key
-		}
-
-		if(state & ~SHRT_MAX) {
-			if (mod == 0) {
-				mod = i + 1;
-			}
-			else {
-				mod = 0; // Two modifiers at the same time!
-			}
-		}
-
-	}
-
-	// Default 32 bit structure size should be 6 bytes (4 for the pointer and 2
-	// additional byte fields) that are padded out to 8 bytes by the compiler.
-	unsigned short sizeVkToWcharTable = sizeof(VK_TO_WCHAR_TABLE);
-	#if defined(_WIN32) && !defined(_WIN64)
-	if (IsWow64()) {
-		// If we are running under Wow64 the size of the first pointer will be
-		// 8 bringing the total size to 10 bytes padded out to 16.
-		sizeVkToWcharTable = (sizeVkToWcharTable + ptrPadding + 7) & -8;
-	}
-	#endif
-
-	BYTE *ptrCurrentVkToWcharTable = (BYTE *) pVkToWcharTable;
+	*deadChar = 0;
 	
-	int cbSize, n;
-	do {
-		// cbSize is used to calculate n, and n is used for the size of pVkToWchars[j].wch[n]
-		cbSize = *(ptrCurrentVkToWcharTable + offsetof(VK_TO_WCHAR_TABLE, cbSize) + ptrPadding);
-		n = (cbSize - 2) / 2;
-		
-		// Same as VK_TO_WCHARS pVkToWchars[] = pVkToWcharTable[i].pVkToWchars
-		PVK_TO_WCHARS pVkToWchars = (PVK_TO_WCHARS) ((PVK_TO_WCHAR_TABLE) ptrCurrentVkToWcharTable)->pVkToWchars;
+	//Check and make sure the unicode helper was loaded.
+	if (kbdLibrary != NULL) {
+		short state = 0;
+		int shift = -1;
+		int mod = 0;
 
-		if(pVkToWchars != NULL && mod < n) {
-			// pVkToWchars[j].VirtualKey
-			BYTE *pCurrentVkToWchars = (BYTE *) pVkToWchars;
-			
-			do {
-				if (((PVK_TO_WCHARS) pCurrentVkToWchars)->VirtualKey == virtualKey) {
-					if ((((PVK_TO_WCHARS) pCurrentVkToWchars)->Attributes == CAPLOK) && capsLock) {
-						if(mod == shift) mod = 0; else mod = shift;
-					}
-					*outputChar = ((PVK_TO_WCHARS) pCurrentVkToWchars)->wch[mod];
-					charCount = 1;
-					
-					// Increment the pCurrentVkToWchars by the size of wch[n].
-					pCurrentVkToWchars += sizeof(VK_TO_WCHARS) + (sizeof(WCHAR) * n);
-					
-					if(*outputChar == WCH_NONE) {
-						charCount = 0;
-					}
-					else if(*outputChar == WCH_DEAD) {
-						*deadChar = ((PVK_TO_WCHARS) pCurrentVkToWchars)->wch[mod];
-						charCount = 0;
-					}
-					break;
+		WCHAR baseChar;
+		WCHAR diacritic;
+
+		int capsLock = (GetKeyState(VK_CAPITAL) & 0x01);
+
+		/* Because this is only a structure of two bytes, we don't need to worry 
+		* about the structure padding of __ptr64 offsets on Wow64.
+		*/
+		for (int i = 0; pVkToBit[i].Vk != 0; i++) {
+			state = GetAsyncKeyState(pVkToBit[i].Vk);
+
+			if(pVkToBit[i].Vk == VK_SHIFT) {
+				shift = i + 1; // Get modification number for Shift key
+			}
+
+			if(state & ~SHRT_MAX) {
+				if (mod == 0) {
+					mod = i + 1;
 				}
 				else {
-					// Add sizeof WCHAR because we are really an array of WCHAR[n] not WCHAR[]
-					pCurrentVkToWchars += sizeof(VK_TO_WCHARS) + (sizeof(WCHAR) * n);
+					mod = 0; // Two modifiers at the same time!
 				}
-			} while ( ((PVK_TO_WCHARS) pCurrentVkToWchars)->VirtualKey != 0 );
+			}
+
 		}
 
-		// This is effectively the same as: ptrCurrentVkToWcharTable = pVkToWcharTable[++i];
-		ptrCurrentVkToWcharTable += sizeVkToWcharTable;
-	} while (cbSize != 0);
-	
-	
-	// Code to check for dead characters...
-	if( *deadChar != 0) {
-		for (int i = 0; pDeadKey[i].dwBoth != 0; i++) {
-			baseChar = (WCHAR) pDeadKey[i].dwBoth;
-			diacritic = (WCHAR) (pDeadKey[i].dwBoth >> 16);
+		// Default 32 bit structure size should be 6 bytes (4 for the pointer and 2
+		// additional byte fields) that are padded out to 8 bytes by the compiler.
+		unsigned short sizeVkToWcharTable = sizeof(VK_TO_WCHAR_TABLE);
+		#if defined(_WIN32) && !defined(_WIN64)
+		if (IsWow64()) {
+			// If we are running under Wow64 the size of the first pointer will be
+			// 8 bringing the total size to 10 bytes padded out to 16.
+			sizeVkToWcharTable = (sizeVkToWcharTable + ptrPadding + 7) & -8;
+		}
+		#endif
 
-			if((baseChar == *outputChar) && (diacritic == *deadChar)) {
-				*deadChar = 0;
-				*outputChar = (WCHAR) pDeadKey[i].wchComposed;
+		BYTE *ptrCurrentVkToWcharTable = (BYTE *) pVkToWcharTable;
+
+		int cbSize, n;
+		do {
+			// cbSize is used to calculate n, and n is used for the size of pVkToWchars[j].wch[n]
+			cbSize = *(ptrCurrentVkToWcharTable + offsetof(VK_TO_WCHAR_TABLE, cbSize) + ptrPadding);
+			n = (cbSize - 2) / 2;
+
+			// Same as VK_TO_WCHARS pVkToWchars[] = pVkToWcharTable[i].pVkToWchars
+			PVK_TO_WCHARS pVkToWchars = (PVK_TO_WCHARS) ((PVK_TO_WCHAR_TABLE) ptrCurrentVkToWcharTable)->pVkToWchars;
+
+			if(pVkToWchars != NULL && mod < n) {
+				// pVkToWchars[j].VirtualKey
+				BYTE *pCurrentVkToWchars = (BYTE *) pVkToWchars;
+
+				do {
+					if (((PVK_TO_WCHARS) pCurrentVkToWchars)->VirtualKey == virtualKey) {
+						if ((((PVK_TO_WCHARS) pCurrentVkToWchars)->Attributes == CAPLOK) && capsLock) {
+							if(mod == shift) mod = 0; else mod = shift;
+						}
+						*outputChar = ((PVK_TO_WCHARS) pCurrentVkToWchars)->wch[mod];
+						charCount = 1;
+
+						// Increment the pCurrentVkToWchars by the size of wch[n].
+						pCurrentVkToWchars += sizeof(VK_TO_WCHARS) + (sizeof(WCHAR) * n);
+
+						if(*outputChar == WCH_NONE) {
+							charCount = 0;
+						}
+						else if(*outputChar == WCH_DEAD) {
+							*deadChar = ((PVK_TO_WCHARS) pCurrentVkToWchars)->wch[mod];
+							charCount = 0;
+						}
+						break;
+					}
+					else {
+						// Add sizeof WCHAR because we are really an array of WCHAR[n] not WCHAR[]
+						pCurrentVkToWchars += sizeof(VK_TO_WCHARS) + (sizeof(WCHAR) * n);
+					}
+				} while ( ((PVK_TO_WCHARS) pCurrentVkToWchars)->VirtualKey != 0 );
+			}
+
+			// This is effectively the same as: ptrCurrentVkToWcharTable = pVkToWcharTable[++i];
+			ptrCurrentVkToWcharTable += sizeVkToWcharTable;
+		} while (cbSize != 0);
+
+
+		// Code to check for dead characters...
+		if( *deadChar != 0) {
+			for (int i = 0; pDeadKey[i].dwBoth != 0; i++) {
+				baseChar = (WCHAR) pDeadKey[i].dwBoth;
+				diacritic = (WCHAR) (pDeadKey[i].dwBoth >> 16);
+
+				if((baseChar == *outputChar) && (diacritic == *deadChar)) {
+					*deadChar = 0;
+					*outputChar = (WCHAR) pDeadKey[i].wchComposed;
+				}
 			}
 		}
 	}
