@@ -11,7 +11,7 @@ The following events are available via their respective listeners.
   * Key Release Events
   * Key Typed Events
   * Mouse Down Events
-  * Moues Up Events
+  * Mouse Up Events
   * Mouse Click Events
   * Mouse Move Events
   * Mouse Drag Events
