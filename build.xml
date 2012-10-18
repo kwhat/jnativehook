@@ -24,7 +24,7 @@
 	<!-- Project Settings -->
 	<property file="build.num" />
 	<property name="project.name"		value="${ant.project.name}" />
-	<property name="project.vendor" 	value="Alexander Barker" />
+	<property name="project.vendor" 	value="Alexander Barker (alex@1stleg.com)" />
 	<property name="project.version"	value="${build.major}.${build.minor}.${build.revision}" />
 
 	<!-- Path Settings -->

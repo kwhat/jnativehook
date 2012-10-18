@@ -41,7 +41,7 @@ guarantee that any of these properties will be available.
         i586, amd64, powerpc or powerpc64
         256 MB of RAM
         Java 1.5 - 1.7
-        Apple Mac OS X 10.5 - 10.7
+        Apple Mac OS X 10.5 - 10.8
 
     Windows
         i586 or amd64

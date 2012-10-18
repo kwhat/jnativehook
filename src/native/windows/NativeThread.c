@@ -163,6 +163,12 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					break;
+					
+				#ifdef DEBUG
+				default:
+					fprintf(stdout, "LowLevelKeyboardProc(): Unhandled keyboard event: 0x%X\n", (unsigned int) wParam);
+					break;
+				#endif
 			}
 		}
 
@@ -432,7 +438,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 
 				#ifdef DEBUG
 				default:
-					fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event. (0x%X)\n", (unsigned int) wParam);
+					fprintf(stdout, "LowLevelMouseProc(): Unhandled mouse event: 0x%X\n", (unsigned int) wParam);
 					break;
 				#endif
 			}

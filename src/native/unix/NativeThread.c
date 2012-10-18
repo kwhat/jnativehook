@@ -340,7 +340,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 
 					#ifdef DEBUG
 					default:
-						fprintf(stderr, "LowLevelProc(): Unhandled Event Type!\n");
+						fprintf(stderr, "LowLevelProc(): Unhandled Event Type: 0x%X\n", event_type);
 						break;
 					#endif
 				}
