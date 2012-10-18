@@ -1,6 +1,5 @@
 #Build Number for ANT. Do not edit!
-#Wed, 15 Feb 2012 16:14:44 -0800
 
 build.major=1
 build.minor=1
-build.revision=0
+build.revision=1

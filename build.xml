@@ -608,7 +608,7 @@
 		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.ld.args" value="-shared -m${native.arch.model} -mno-cygwin ${native.ld.flags}">
+		<condition property="native.ld.args" value="-shared -m${native.arch.model} ${native.ld.flags}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.ld.args2" value="${native.ld.libs} -o" />
