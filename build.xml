@@ -451,7 +451,7 @@
 		</condition>
 		
 		<!-- guess what system specific libraries to use -->
-		<condition property="native.libs" value="-lcrtdll -luser32 -lkernel32">
+		<condition property="native.libs" value="-lmsvcrt -luser32 -lkernel32">
 			<isset property="native.os.isWindows"/>
 		</condition>
 		<condition property="native.libs" value="-lX11 -lXtst">
