@@ -324,7 +324,7 @@ int main(int argc, const char * argv[]) {
 	clock_end = clock();
 
 	clock_diff = clock_end - clock_start;
-	printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
+	//printf("Initialized!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
 	//Init random number generator with one.
 	//srand(1);
@@ -333,16 +333,19 @@ int main(int argc, const char * argv[]) {
 	long i;
 	for (i = 0; i < 200000000; i++) {
 		//Generate a random KeyCode between 8 and 255
-		int rand_code = rand() % (255 - 8); //i % (255 - 20);
+		//int rand_code = rand() % (255 - 8);
+		int rand_code = i % (255 - 8);
 		rand_code += 8;
 
 		//Run the KeySym lookup and translation.
-		//lookup(rand_code);
+		JKeyDatum test = lookup(rand_code);
+		(void) test;
 	}
 	clock_end = clock();
 
 	clock_diff = clock_end - clock_start;
-	printf("Complete!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
+	printf("%.2lf\n", (double) clock_diff / CLOCKS_PER_SEC);
+	//printf("Complete!  Time: %.2lf, Clocks: %.0lf\n", (double) clock_diff / CLOCKS_PER_SEC, (double) clock_diff);
 
 	XCloseDisplay(disp);
 	return EXIT_SUCCESS;

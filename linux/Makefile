@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O1
 
-PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord XRecordThreads
+PROGRAMS = XEvIE XGrabButton XGrabKey XGrabPointer XRecord XRecordThreads XSendEvent
 
 all: $(PROGRAMS)
 
@@ -23,6 +23,9 @@ XRecord: XRecord.c
 	
 XRecordThreads: XRecordThreads.c
 	$(CC) $(CFLAGS) -pthread -lXtst $(LDFLAGS) -DASYNC $< -o $@
+
+XSendEvent: XSendEvent.c
+	$(CC) $(CFLAGS) -lXtst $(LDFLAGS) $< -o $@
 
 clean:
 	-rm -f $(PROGRAMS)
