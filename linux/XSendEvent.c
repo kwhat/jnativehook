@@ -32,6 +32,9 @@ int main(int argc, const char * argv[]) {
 		return 1;
 	}
 
+	KeyCode code = XKeysymToKeycode(display, XStringToKeysym("b"));
+	printf("Test Scan Code: %d\n", code);
+
 	XKeyEvent events[2];
 	events[0].type = KeyPress;
 	//events[0].serial = Filled in by the server

@@ -22,6 +22,9 @@
 #include <stdio.h>
 
 int main(int argc, const char* argv[]) {
+	SHORT code = VkKeyScanEx((TCHAR) 'B', GetKeyboardLayout(0));
+	printf("Test Scan Code: %d\n", code);
+
 	unsigned int vk_code = 0x42; //'B' Key
 
 	//Create the key press and typed input
@@ -45,7 +48,7 @@ int main(int argc, const char* argv[]) {
 		Sleep(1000) ;
 
 		if (! SendInput(2, key_events, sizeof(INPUT)) ) {
-			printf("Error 0x%X\n", GetLastError());
+			printf("Error 0x%X\n", (unsigned int) GetLastError());
 		}
 	}
 

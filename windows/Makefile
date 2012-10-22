@@ -2,11 +2,14 @@ CC := gcc
 CFLAGS := -O0 -g2 -ggdb -pipe -Wall
 LDFLAGS := -Wl,--as-needed,-O0
 
-PROGRAMS = RegisterHotKey.exe SetWindowsHookEx.exe PostMessage.exe
+PROGRAMS = RegisterHotKey.exe SendInput.exe SetWindowsHookEx.exe PostMessage.exe
 
 all: $(PROGRAMS)
 
 RegisterHotKey.exe: RegisterHotKey.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+SendInput.exe: SendInput.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 SetWindowsHookEx.exe: SetWindowsHookEx.c
