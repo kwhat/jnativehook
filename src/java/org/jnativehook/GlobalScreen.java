@@ -96,6 +96,17 @@ public class GlobalScreen {
 	public static GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
+	
+	/**
+	 * Attempts to post a <code>NativeInputEvent</code> to the host operating 
+	 * system.  
+	 * 
+	 * FIXME Write a better description.
+	 *
+	 * @param event a native event to post
+	 */
+	public static native void postNativeEvent(NativeInputEvent event);
+	
 
 	/**
 	 * Adds the specified native key listener to receive key events from the
@@ -254,7 +265,7 @@ public class GlobalScreen {
 	 *
 	 * @param e the <code>NativeInputEvent</code> to dispatch.
 	 */
-	public final void dispatchEvent(final NativeInputEvent e) {
+	public final void dispatchNativeEvent(final NativeInputEvent e) {
 		eventExecutor.execute(new Runnable() {
 			public void run() {
 				if (e instanceof NativeKeyEvent) {
@@ -371,7 +382,7 @@ public class GlobalScreen {
 	 *		
 	 * @since 1.1
 	 */		
-	protected void startEventDispatcher() {		
+	protected void startNativeEventDispatcher() {		
 		//Create a new single thread executor.
 		eventExecutor = Executors.newSingleThreadExecutor();
 	}
@@ -383,7 +394,7 @@ public class GlobalScreen {
 	 *		
 	 * @since 1.1		
 	 */		
-	protected void stopEventDispatcher() {		
+	protected void stopNativeEventDispatcher() {		
 		if (eventExecutor != null) {		
 			//Shutdown the current Event executor.		
 			eventExecutor.shutdownNow();		
