@@ -182,14 +182,42 @@ static void ClearNativeProperties(JNIEnv *env) {
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass UNUSED(cls), jobject obj) {
-	jclass clsNativeInputEvent = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
-	jmethodID idGetID = (*env)->GetMethodID(env, clsNativeInputEvent, "getID", "()I");
+	//TODO Look into use the native globals.
+	//jclass clsNativeInputEvent = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
+	jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+	jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+	jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 	
-	jnit id = (*env)->CallIntMethod(env, obj, idGetID);
+		
+	if ((*env)->IsInstanceOf(env, obj, clsNativeKeyEvent)) {
+		jmethodID idGetID = (*env)->GetMethodID(env, clsNativeKeyEvent, "getID", "()I");
+		jmethodID idGetModifiers = (*env)->GetMethodID(env, clsNativeKeyEvent, "getModifiers", "()I");
+		
+		jnit id = (*env)->CallIntMethod(env, obj, idGetID);
+		jnit modifiers = (*env)->CallIntMethod(env, obj, idGetModifiers);
 	
-	switch (id) {
-		default:
-			break;
+		switch (id) {
+			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
+				
+				break;
+			
+			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
+				
+				break;
+				
+			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
+				
+				break;
+				
+			default:
+				break;
+		}
+	}
+	else if ((*env)->IsInstanceOf(env, obj, clsNativeMouseEvent)) {
+		//TODO Implement
+	}
+	else if ((*env)->IsInstanceOf(env, obj, clsNativeMouseWheelEvent)) {
+		//TODO Implement
 	}
 }
 
