@@ -49,18 +49,35 @@
 #define kCGEventFlagMaskXButton2		16
 
 
-// Set the native modifier mask for future events.
+/* Set the native modifier mask for future events.
+ */
 extern void SetModifierMask(CGEventFlags mask);
 
-// Unset the native modifier mask for future events.
+/* Unset the native modifier mask for future events.
+ */
 extern void UnsetModifierMask(CGEventFlags mask);
 
-// Get the current native modifier mask state.
+/* Get the current native modifier mask state.
+ */
 extern CGEventFlags GetModifiers();
 
-
-// Converts an OSX key code and event mask to the appropriate Unicode character
-// representation.
+/* Converts an OSX key code and event mask to the appropriate Unicode character
+ * representation.
+ */
 extern void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, UniChar *buffer);
+
+/* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
+ * functionality.  This method is called by OnLibraryLoad() and may need to be
+ * called in combination with UnloadInputHelper() if the native keyboard layout
+ * is changed.
+ */
+extern void LoadInputHelper();
+
+/* De-initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
+ * functionality.  This method is called by OnLibraryUnload() and may need to be
+ * called in combination with LoadInputHelper() if the native keyboard layout
+ * is changed.
+ */
+extern void UnloadInputHelper();
 
 #endif

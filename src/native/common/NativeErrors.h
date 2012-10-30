@@ -43,12 +43,12 @@
 
 #define NATIVE_HOOK_EXCEPTION		"org/jnativehook/NativeHookException"
 
-/* Produces a hard error in the virtual machine.  This error is unrecoveralbe 
- * and Program execution will terminate immediatly.
+/* Produces a hard error in the virtual machine.  This error is unrecoverable
+ * and Program execution will terminate immediately.
  */
 extern void ThrowFatalError(const char *message);
 
-/* Produces a recoverable error in the virtual machine.  This error should be 
+/* Produces a recoverable error in the virtual machine.  This error should be
  * recoverable outside of the native library.
  */
 extern void ThrowException(const char *classname, const char *message);

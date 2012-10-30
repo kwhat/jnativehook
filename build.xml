@@ -804,6 +804,8 @@
 
 		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${basedir}" prefix="${project.name}">
+				<exclude name="**/.*" />
+
 				<include name="*.txt" />
 				<include name="build.*" />
 				<exclude name="build.properties*" />
@@ -811,7 +813,8 @@
 
 			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
 				<exclude name="**/.*" />
-				<exclude name="org/jnativehook/lib/**" />
+
+				<exclude name="native/jni/org_jnativehook_GlobalScreen.h" />
 			</zipfileset>
 		</zip>
 

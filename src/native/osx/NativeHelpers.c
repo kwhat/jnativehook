@@ -239,7 +239,7 @@ long int GetPointerAccelerationMultiplier() {
 						gcf = d;
 						d = i;
 					}
-					
+
 					value = denominator / gcf;
 					successful = true;
 				}
@@ -334,7 +334,7 @@ long int GetMultiClickTime() {
 	#if defined IOKIT || defined COREFOUNDATION || defined CARBON_LEGACY
 	bool successful = false;
 	#if defined IOKIT || defined CARBON_LEGACY
-	// This needs to be defiend only if we have IOKIT or CARBON_LEGACY.
+	// This needs to be defined only if we have IOKIT or CARBON_LEGACY.
 	SInt64 time;
 	#endif
 	#endif

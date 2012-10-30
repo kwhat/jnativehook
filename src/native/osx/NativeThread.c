@@ -103,10 +103,10 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-					// IDK... See Bug #25
+					// Lookup the unicode representation for this event.
 					KeyCodeToString(event, buff_size, &buff_len, buffer);
 					if (buff_len == 1) {
-						// Fire key pressed event.
+						// Fire key typed event.
 						objKeyEvent = (*env)->NewObject(
 												env,
 												clsKeyEvent,
@@ -360,7 +360,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
-					// Set the mouse draged flag.
+					// Set the mouse dragged flag.
 					mouse_dragged = false;
 
 					// Fire mouse moved event.
@@ -624,6 +624,10 @@ int StartNativeThread() {
 				 * scheduling policy.
 				 */
 				pthread_mutex_lock(&hookControlMutex);
+
+				// Initialize Native Input Functions.
+				LoadInputHelper();
+
 				if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 					#ifdef DEBUG
 					fprintf(stdout, "StartNativeThread(): start successful.\n");
@@ -709,6 +713,9 @@ int StopNativeThread() {
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", *(int *) status);
 		#endif
+
+		// Cleanup Native Input Functions.
+		UnloadInputHelper();
 
 		// Destroy all created globals.
 		#ifdef DEBUG

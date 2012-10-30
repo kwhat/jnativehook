@@ -20,71 +20,69 @@
 #include "OSXInputHelpers.h"
 
 // Keyboard Upper 16 / Mouse Lower 16
-static CGEventFlags current_modifiers = 0x00000000;
-static UInt32 deadkey_state = 0;
+static CGEventFlags currModifierMask = 0x00000000;
+#ifdef CARBON_LEGACY
+static void *inputData = NULL;
+#else
+static CFDataRef inputData = NULL;
+#endif
+static UInt32 currDeadkeyState = 0;
 
 void SetModifierMask(CGEventFlags mask) {
-	current_modifiers |= mask;
+	currModifierMask |= mask;
 }
 
 void UnsetModifierMask(CGEventFlags mask) {
-	current_modifiers ^= mask;
+	currModifierMask ^= mask;
 }
 
 CGEventFlags GetModifiers() {
-	return current_modifiers;
+	return currModifierMask;
 }
 
-//#define CFObjectIsType(object, type) ((NULL!=object) && type ## GetTypeID()==CFGetTypeID(object))
-
 void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, UniChar *buffer) {
-	#ifdef CARBON_LEGACY
-	KeyboardLayoutRef currentKeyboardLayout;
-	if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
-	#else
-	TISInputSourceRef keyboard_ref = TISCopyCurrentKeyboardLayoutInputSource();
-	if (keyboard_ref) {
-	#endif
-		#ifdef CARBON_LEGACY
-		const void *resource;
-		if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, &resource) == noErr) {
-			const UCKeyboardLayout *keyboard_layout = (const UCKeyboardLayout *) resource;
-		#else
-		CFDataRef data_ref = (CFDataRef) TISGetInputSourceProperty(keyboard_ref, kTISPropertyUnicodeKeyLayoutData);
-		const UCKeyboardLayout *keyboard_layout = NULL;
-		if (data_ref && CFDataGetLength(data_ref) > 0) {
-			keyboard_layout = (const UCKeyboardLayout*) CFDataGetBytePtr(data_ref);
-		}
+	// Data was not loaded, try to reload.
+	if (inputData == NULL) {
+		LoadInputHelper();
+	}
 
-		if (keyboard_layout) {
+	if (inputData != NULL) {
+		#ifdef CARBON_LEGACY
+		const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout *) inputData;
+		#else
+		const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*) CFDataGetBytePtr(inputData);
 		#endif
+
+		if (keyboardLayout != NULL) {
+			//Extract keycode and modifier information.
 			CGKeyCode keycode = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 			CGEventFlags modifiers = CGEventGetFlags(event);
 
-			// Disable all command modifiers for translation.
-			/*
-			static const CGEventFlags cmd_modifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
-			bool isCommand = ((modifiers & cmd_modifiers) != 0);
-			modifiers &= ~cmd_modifiers;
-			if (isCommand) {
-				modifiers &= ~kCGEventFlagMaskAlternate;
-			}
-			*/
+			// If the caps lock is set, make sure the shift mask is present.
+			if (modifiers & kCGEventFlagMaskAlphaShift) {
+				// Turn off the caps lock mask.
+				modifiers &= ~kCGEventFlagMaskAlphaShift;
 
-			printf("Modifiers: 0x%X\n", (unsigned int) (modifiers >> 16) & 0xFF);
-			printf("Deadkey: 0x%X\n\n", (unsigned int) deadkey_state);
+				// Turn on the shift mask.
+				modifiers |= kCGEventFlagMaskShift;
+			}
+
+			// Disable all command modifiers for translation.  This is required
+			// so UCKeyTranslate will provide a keysym for the separate event.
+			static const CGEventFlags cmdModifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
+			modifiers &= ~cmdModifiers;
 
 			OSStatus status = noErr;
-			if (deadkey_state == 0) {
+			if (currDeadkeyState == 0) {
 				// No previous deadkey, attempt a lookup.
 				status = UCKeyTranslate(
-									keyboard_layout,
+									keyboardLayout,
 									keycode,
 									kUCKeyActionDown,
-									0x00, //(modifiers >> 16) & 0xFF, || (modifiers >> 8) & 0xFF,
+									(modifiers >> 16) & 0xFF, //(modifiers >> 16) & 0xFF, || (modifiers >> 8) & 0xFF,
 									LMGetKbdType(),
-									kUCKeyTranslateNoDeadKeysBit, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
-									&deadkey_state,
+									kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
+									&currDeadkeyState,
 									size,
 									length,
 									buffer);
@@ -92,19 +90,16 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 			else {
 				// The previous key was a deadkey, lookup what it should be.
 				status = UCKeyTranslate(
-									keyboard_layout,
+									keyboardLayout,
 									keycode,
 									kUCKeyActionDown,
-									0x00, //No Modifier
+									(modifiers >> 16) & 0xFF, //No Modifier
 									LMGetKbdType(),
 									kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
-									&deadkey_state,
+									&currDeadkeyState,
 									size,
 									length,
 									buffer);
-
-				// TODO Determine if or when we should reset the state. 
-				//deadkey_state = 0;
 			}
 
 			if (status != noErr) {
@@ -112,12 +107,49 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 				*length = 0;
 			}
 		}
-
-		CFRelease(keyboard_ref);
 	}
 
-	// Fallback to CGEventKeyboardGetUnicodeString
+	// Fallback to CGEventKeyboardGetUnicodeString if we were unable to use UCKeyTranslate().
 	if (*length == 0) {
 		CGEventKeyboardGetUnicodeString(event, size, length, buffer);
 	}
+}
+
+void LoadInputHelper() {
+	if (inputData == NULL) {
+		#ifdef CARBON_LEGACY
+		KeyboardLayoutRef currentKeyboardLayout;
+		if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
+		#else
+		TISInputSourceRef currentKeyboardLayout = TISCopyCurrentKeyboardLayoutInputSource();
+		if (currentKeyboardLayout != NULL && CFGetTypeID(currentKeyboardLayout) == TISInputSourceGetTypeID()) {
+		#endif
+			#ifdef CARBON_LEGACY
+			if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, (const void **) &inputData) != noErr) {
+				inputData = NULL;
+			}
+			#else
+			CFDataRef data = (CFDataRef) TISGetInputSourceProperty(currentKeyboardLayout, kTISPropertyUnicodeKeyLayoutData);
+			if (data != NULL && CFGetTypeID(data) == CFDataGetTypeID() && CFDataGetLength(data) > 0) {
+				inputData = (CFDataRef) CFRetain(data);
+			}
+			#endif
+		}
+
+		#ifndef CARBON_LEGACY
+		if (currentKeyboardLayout != NULL) {
+			CFRelease(currentKeyboardLayout);
+		}
+		#endif
+	}
+}
+
+void UnloadInputHelper() {
+	#ifdef CARBON_LEGACY
+	inputData = NULL;
+	#else
+	if (inputData != NULL) {
+		CFRelease(inputData);
+	}
+	#endif
 }
