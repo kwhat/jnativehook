@@ -59,8 +59,8 @@ extern void UnsetModifierMask(CGEventFlags mask);
 extern CGEventFlags GetModifiers();
 
 
-// Converts an OSX key code and event mask to the appropriate Unicode string 
+// Converts an OSX key code and event mask to the appropriate Unicode character
 // representation.
-extern CFStringRef KeyCodeToString(CGKeyCode keycode, CGEventFlags modifiers);
+extern void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, UniChar *buffer);
 
 #endif

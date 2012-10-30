@@ -68,7 +68,11 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			jint jbutton;
 			jint jscrollType, jscrollAmount, jwheelRotation;
 			jint jmodifiers;
-			CFStringRef keytxt;
+
+			// Buffer for Unicode char lookup.
+			const UniCharCount buff_size = 8;
+			UniChar buffer[buff_size];
+			UniCharCount buff_len = 0;
 
 			// Java event objects.
 			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
@@ -99,8 +103,9 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
-					keytxt = KeyCodeToString(jkey.rawcode, GetModifiers());
-					if (CFStringGetLength(keytxt) == 1) {
+					// IDK... See Bug #25
+					KeyCodeToString(event, buff_size, &buff_len, buffer);
+					if (buff_len == 1) {
 						// Fire key pressed event.
 						objKeyEvent = (*env)->NewObject(
 												env,
@@ -111,7 +116,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												jmodifiers,
 												jkey.rawcode,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-												(jchar) CFStringGetCharacterAtIndex(keytxt, 0),
+												(jchar) buffer[0],
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
@@ -137,6 +142,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											jmodifiers,
 											jkey.rawcode,
 											jkey.keycode,
+											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					break;
