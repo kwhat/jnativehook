@@ -149,6 +149,9 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 void LoadInputHelper() {
 	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
 	if (inputData == NULL) {
+		// Reinitialize dead key state each time we need to load the input helper.
+		currDeadkeyState = 0;
+
 		#if defined(CARBON_LEGACY)
 		KeyboardLayoutRef currentKeyboardLayout;
 		if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
