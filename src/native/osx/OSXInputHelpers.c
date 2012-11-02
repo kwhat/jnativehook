@@ -182,6 +182,7 @@ void UnloadInputHelper() {
 	#elif defined(COREFOUNDATION)
 	if (inputData != NULL) {
 		CFRelease(inputData);
+		inputData = NULL;
 	}
 	#endif
 }
