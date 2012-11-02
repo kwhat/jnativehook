@@ -54,9 +54,6 @@ static bool mouse_dragged = false;
 static Display *disp_ctrl;
 static XRecordContext context;
 
-// Something is broken with the XRecordEnableContext function.  We MUST use XRecordEnableContextAsync!
-#define XRECORD_ASYNC
-
 // Thread and hook handles.
 #ifdef XRECORD_ASYNC
 static volatile bool running;
@@ -388,7 +385,7 @@ static void *ThreadProc(void *arg) {
 
 		// Check to make sure XRecord is installed and enabled.
 		int major, minor;
-		if (XRecordQueryVersion(disp_ctrl, &major, &minor) != false) {
+		if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
 			#endif
@@ -450,22 +447,33 @@ static void *ThreadProc(void *arg) {
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			// Set the exit status.
-			*status = RETURN_SUCCESS;
-
 			// Callback and start native event dispatch thread
 			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+			// Set the exit status.
+			*status = RETURN_SUCCESS;
 
 			// Unlock the control mutex right before we begin the thread loop.
 			pthread_mutex_unlock(&hookControlMutex);
 
 			#ifdef XRECORD_ASYNC
 			// Async requires that we loop so that our thread does not return.
-			XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL);
-			while (running) {
-				XRecordProcessReplies(disp_data);
+			if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
+				while (running) {
+					XRecordProcessReplies(disp_data);
+				}
+				XRecordDisableContext(disp_ctrl, context);
 			}
-			XRecordDisableContext(disp_ctrl, context);
+			else {
+				#ifdef DEBUG
+				fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
+				#endif
+
+				*status = RETURN_FAILURE;
+
+				thread_ex.class = NATIVE_HOOK_EXCEPTION;
+				thread_ex.message = "Failed to enable XRecord context";
+			}
 			#else
 			// Sync blocks until XRecordDisableContext() is called.
 			XRecordEnableContext(disp_data, context, LowLevelProc, NULL);
@@ -487,8 +495,6 @@ static void *ThreadProc(void *arg) {
 			*/
 			#endif
 
-			printf("Stopping!!!!\n");
-
 			// Lock back up until we are done processing the exit.
 			pthread_mutex_lock(&hookControlMutex);
 
@@ -497,7 +503,6 @@ static void *ThreadProc(void *arg) {
 			//XSync(disp_data, true);
 
 			// Free up the context after the run loop terminates.
-			printf("XRecordFreeContext\n");
 			XRecordFreeContext(disp_ctrl, context);
 
 			// Callback and stop native event dispatch thread
