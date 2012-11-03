@@ -42,7 +42,7 @@ extern HINSTANCE hInst;
 
 // Thread and hook handles.
 static DWORD hookThreadId = 0;
-static HANDLE hookThreadHandle = NULL, hookEventHandle = NULL;
+static HANDLE hookThreadHandle = NULL, hookCtrlHandle = NULL;
 static HHOOK handleKeyboardHook = NULL, handleMouseHook = NULL;
 
 static WCHAR keytxt = '\0', keydead = 0;
@@ -495,7 +495,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 				status = RETURN_SUCCESS;
 
 				// Signal that we have passed the thread initialization.
-				SetEvent(hookEventHandle);
+				SetEvent(hookCtrlHandle);
 
 				// Block until the thread receives an WM_QUIT request.
 				MSG message;
@@ -571,7 +571,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 	// Make sure we signal that we have passed any exception throwing code.
 	// This should only make a difference if we had an initialization exception.
-	SetEvent(hookEventHandle);
+	SetEvent(hookCtrlHandle);
 
 	ExitThread(status);
 }
@@ -582,7 +582,7 @@ int StartNativeThread() {
 	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
 		// Create event handle for the thread hook.
-		hookEventHandle = CreateEvent(NULL, TRUE, FALSE, "hookEventHandle");
+		hookCtrlHandle = CreateEvent(NULL, TRUE, FALSE, "hookEventHandle");
 
 		LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
 		hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
@@ -593,7 +593,7 @@ int StartNativeThread() {
 
 			// Wait for any possible thread exceptions to get thrown into
 			// the queue
-			WaitForSingleObject(hookEventHandle, INFINITE);
+			WaitForSingleObject(hookCtrlHandle, INFINITE);
 
 			// TODO Set the return status to the thread exit code.
 			if (IsNativeThreadRunning()) {
@@ -606,6 +606,17 @@ int StartNativeThread() {
 			else {
 				#ifdef DEBUG
 				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+				#endif
+
+				// Wait for the thread to die.
+				WaitForSingleObject(hookThreadHandle,  INFINITE);
+				
+				DWORD thread_status;
+				GetExitCodeThread(hookThreadHandle, &thread_status);
+				status = (int) thread_status;
+
+				#ifdef DEBUG
+				fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
 				#endif
 
 				if (thread_ex.class != NULL && thread_ex.message != NULL)  {
@@ -631,14 +642,21 @@ int StopNativeThread() {
 	if (IsNativeThreadRunning() == true) {
 		// Try to exit the thread naturally.
 		PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
-		WaitForSingleObject(hookThreadHandle, 5000);
+		WaitForSingleObject(hookThreadHandle,  INFINITE);
 
+		DWORD thread_status;
+		GetExitCodeThread(hookThreadHandle, &thread_status);
+		status = (int) thread_status;
+		
 		CloseHandle(hookThreadHandle);
 		hookThreadHandle = NULL;
 
-		status = RETURN_SUCCESS;
-
-		CloseHandle(hookEventHandle);
+		CloseHandle(hookCtrlHandle);
+		hookCtrlHandle = NULL;
+		
+		#ifdef DEBUG
+		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
+		#endif
 	}
 
 	return status;
@@ -648,5 +666,11 @@ bool IsNativeThreadRunning() {
 	DWORD status;
 	GetExitCodeThread(hookThreadHandle, &status);
 
-	return status == STILL_ACTIVE;
+	bool isRunning = status == STILL_ACTIVE;
+	
+	#ifdef DEBUG
+	fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
+	#endif
+
+	return isRunning;
 }
