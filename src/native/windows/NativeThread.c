@@ -463,68 +463,77 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 	// Create the native hooks.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
-	if (handleKeyboardHook == NULL) {
-		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) failed!\n");
-		#endif
-
-		thread_ex.class = NATIVE_HOOK_EXCEPTION;
-		thread_ex.message = "Failed to hook low level keyboard events";
-	}
-	#ifdef DEBUG
-	else {
-		fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0) successful.\n");
-	}
-	#endif
-
 	handleMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0);
-	if (handleMouseHook == NULL) {
-		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) failed!\n");
-		#endif
-
-		thread_ex.class = NATIVE_HOOK_EXCEPTION;
-		thread_ex.message = "Failed to hook low level mouse events";
-
-	}
-	#ifdef DEBUG
-	else {
-		fprintf(stdout, "ThreadProc(): SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, hInst, 0) successful.\n");
-	}
-	#endif
 
 	// If we did not encounter a problem, start processing events.
 	if (handleKeyboardHook != NULL && handleMouseHook != NULL) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadProc(): SetWindowsHookEx() successful.\n");
+		#endif
+
 		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			// Callback and start native event dispatch thread
-			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+			// Create all the global references up front to save time in the callback.
+			if (CreateJNIGlobals() == RETURN_SUCCESS) {
+				// Callback and start native event dispatch thread
+				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
 
-			// Check and setup modifiers.
-			if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
-			if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
-			if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
-			if (GetKeyState(VK_RCONTROL) < 0)	SetModifierMask(MOD_RCONTROL);
-			if (GetKeyState(VK_LMENU)    < 0)	SetModifierMask(MOD_LALT);
-			if (GetKeyState(VK_RMENU)    < 0)	SetModifierMask(MOD_RALT);
-			if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
-			if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
+				// Check and setup modifiers.
+				if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
+				if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
+				if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
+				if (GetKeyState(VK_RCONTROL) < 0)	SetModifierMask(MOD_RCONTROL);
+				if (GetKeyState(VK_LMENU)    < 0)	SetModifierMask(MOD_LALT);
+				if (GetKeyState(VK_RMENU)    < 0)	SetModifierMask(MOD_RALT);
+				if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
+				if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
 
-			// Set the exit status.
-			status = RETURN_SUCCESS;
+				// Set the exit status.
+				status = RETURN_SUCCESS;
 
-			// Signal that we have passed the thread initialization.
-			SetEvent(hookEventHandle);
+				// Signal that we have passed the thread initialization.
+				SetEvent(hookEventHandle);
 
-			// Block until the thread receives an WM_QUIT request.
-			MSG message;
-			while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
-				TranslateMessage(&message);
-				DispatchMessage(&message);
+				// Block until the thread receives an WM_QUIT request.
+				MSG message;
+				while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
+					TranslateMessage(&message);
+					DispatchMessage(&message);
+				}
+
+				// Callback and stop native event dispatch thread
+				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
 			}
+			else {
+				// We cant do a whole lot of anything if we cant create JNI globals.
+				// Any exceptions are thrown by CreateJNIGlobals().
+
+				#ifdef DEBUG
+				fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
+				#endif
+
+				thread_ex.class = NATIVE_HOOK_EXCEPTION;
+				thread_ex.message = "Failed to create JNI global references";
+			}
+
+			// Destroy all created globals.
+			#ifdef DEBUG
+			if (DestroyJNIGlobals() == RETURN_FAILURE) {
+				fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
+			}
+			#else
+			DestroyJNIGlobals();
+			#endif
+			
+			// Detach this thread from the JVM.
+			(*jvm)->DetachCurrentThread(jvm);
+
+			#ifdef DEBUG
+			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
+			#endif
 		}
 		else {
 			#ifdef DEBUG
@@ -536,7 +545,15 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		}
 
 	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadProc(): SetWindowsHookEx() failed!\n");
+		#endif
 
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to create low level event hook";
+	}
+	
 	// Destroy the native hooks.
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
@@ -546,18 +563,6 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	if (handleMouseHook != NULL) {
 		UnhookWindowsHookEx(handleMouseHook);
 		handleMouseHook = NULL;
-	}
-
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		// Callback and stop native event dispatch thread
-		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-		// Detach this thread from the JVM.
-		(*jvm)->DetachCurrentThread(jvm);
-
-		#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-		#endif
 	}
 
 	#ifdef DEBUG
@@ -579,66 +584,42 @@ int StartNativeThread() {
 		// Create event handle for the thread hook.
 		hookEventHandle = CreateEvent(NULL, TRUE, FALSE, "hookEventHandle");
 
-		// Create all the global references up front to save time in the
-		// callbacks.
-		if (CreateJNIGlobals() == RETURN_SUCCESS) {
-			LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
-			hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
-			if (hookThreadHandle != INVALID_HANDLE_VALUE) {
+		LPTHREAD_START_ROUTINE lpStartAddress = &ThreadProc;
+		hookThreadHandle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hookThreadId);
+		if (hookThreadHandle != INVALID_HANDLE_VALUE) {
+			#ifdef DEBUG
+			fprintf(stdout, "StartNativeThread(): start successful.\n");
+			#endif
+
+			// Wait for any possible thread exceptions to get thrown into
+			// the queue
+			WaitForSingleObject(hookEventHandle, INFINITE);
+
+			// TODO Set the return status to the thread exit code.
+			if (IsNativeThreadRunning()) {
 				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): start successful.\n");
+				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 				#endif
 
-				// Wait for any possible thread exceptions to get thrown into
-				// the queue
-				WaitForSingleObject(hookEventHandle, INFINITE);
-
-				// TODO Set the return status to the thread exit code.
-				if (IsNativeThreadRunning()) {
-					#ifdef DEBUG
-					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
-					#endif
-
-					/* I highly doubt this is needed.
-					#ifdef DEBUG
-					if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, true)) {
-						fprintf(stdout, "StartNativeThread(): successfully attached thread input.\n");
-					}
-					else {
-						fprintf(stderr, "StartNativeThread(): failed to attach thread input.\n");
-					}
-					#else
-					AttachThreadInput(GetCurrentThreadId(), hookThreadId, true);
-					#endif
-					*/
-
-					status = RETURN_SUCCESS;
-				}
-				else {
-					#ifdef DEBUG
-					fprintf(stderr, "StartNativeThread(): initialization failure!\n");
-					#endif
-
-					if (thread_ex.class != NULL && thread_ex.message != NULL)  {
-						ThrowException(thread_ex.class, thread_ex.message);
-					}
-				}
+				status = RETURN_SUCCESS;
 			}
 			else {
 				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): start failure!\n");
+				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
 				#endif
 
-				ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+				if (thread_ex.class != NULL && thread_ex.message != NULL)  {
+					ThrowException(thread_ex.class, thread_ex.message);
+				}
 			}
 		}
-		#ifdef DEBUG
 		else {
-			// We cant do a whole lot of anything if we cant create JNI globals.
-			// Any exceptions are thrown by CreateJNIGlobals().
-			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
+			#ifdef DEBUG
+			fprintf(stderr, "StartNativeThread(): start failure!\n");
+			#endif
+
+			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
 		}
-		#endif
 	}
 
 	return status;
@@ -648,19 +629,6 @@ int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
 	if (IsNativeThreadRunning() == true) {
-		/* I highly doubt this is needed.
-		#ifdef DEBUG
-		if (AttachThreadInput(GetCurrentThreadId(), hookThreadId, false)) {
-			fprintf(stdout, "StopNativeThread(): successfully attached to thread input.\n");
-		}
-		else {
-			fprintf(stderr, "StopNativeThread(): failed to attach to thread input.\n");
-		}
-		#else
-		AttachThreadInput(GetCurrentThreadId(), hookThreadId, false);
-		#endif
-		*/
-
 		// Try to exit the thread naturally.
 		PostThreadMessage(hookThreadId, WM_QUIT, (WPARAM) NULL, (LPARAM) NULL);
 		WaitForSingleObject(hookThreadHandle, 5000);
@@ -669,15 +637,6 @@ int StopNativeThread() {
 		hookThreadHandle = NULL;
 
 		status = RETURN_SUCCESS;
-
-		// Destroy all created globals.
-		#ifdef DEBUG
-		if (DestroyJNIGlobals() == RETURN_FAILURE) {
-			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
-		}
-		#else
-		DestroyJNIGlobals();
-		#endif
 
 		CloseHandle(hookEventHandle);
 	}
