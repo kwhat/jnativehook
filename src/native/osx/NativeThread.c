@@ -242,7 +242,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 					// Track the number of clicks.
 					#ifdef DEBUG
-					fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (CGEventGetTimestamp(event) - click_time));
+					fprintf(stdout, "LowLevelProc(): Click Time (%lli)\n", (CGEventGetTimestamp(event) - click_time)  / 1000000);
 					#endif
 
 					if ((long) (CGEventGetTimestamp(event) - click_time) / 1000000 <= GetMultiClickTime()) {
@@ -346,7 +346,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Reset the click count.
-					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) > GetMultiClickTime()) {
+					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) / 1000000 > GetMultiClickTime()) {
 						click_count = 0;
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
@@ -375,7 +375,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Reset the click count.
-					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) > GetMultiClickTime()) {
+					if (click_count != 0 && (long) (CGEventGetTimestamp(event) - click_time) / 1000000 > GetMultiClickTime()) {
 						click_count = 0;
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
@@ -422,7 +422,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 					#endif
 
 					// Track the number of clicks.
-					if ((long) (CGEventGetTimestamp(event) - click_time) <= GetMultiClickTime()) {
+					if ((long) (CGEventGetTimestamp(event) - click_time) / 1000000 <= GetMultiClickTime()) {
 						click_count++;
 					}
 					else {

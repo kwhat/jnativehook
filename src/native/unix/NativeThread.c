@@ -464,15 +464,15 @@ static void *ThreadProc(void *arg) {
 				// Callback and start native event dispatch thread
 				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
 
-				// Set the exit status.
-				*status = RETURN_SUCCESS;
-
 				#ifdef XRECORD_ASYNC
 				// Allow the thread loop to block.
 				running = true;
 
 				// Async requires that we loop so that our thread does not return.
 				if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
+					// Set the exit status.
+					*status = RETURN_SUCCESS;
+
 					while (running) {
 						XRecordProcessReplies(disp_data);
 					}
@@ -486,26 +486,26 @@ static void *ThreadProc(void *arg) {
 					// Reset the running state.
 					running = false;
 
-					*status = RETURN_FAILURE;
-
 					thread_ex.class = NATIVE_HOOK_EXCEPTION;
 					thread_ex.message = "Failed to enable XRecord context";
 				}
 				#else
 				// Sync blocks until XRecordDisableContext() is called.
-				if (XRecordEnableContext(disp_data, context, LowLevelProc, NULL) == 0) {
+				if (XRecordEnableContext(disp_data, context, LowLevelProc, NULL) != 0) {
+					// Set the exit status.
+					*status = RETURN_SUCCESS;
+				}
+				else {
 					#ifdef DEBUG
 					fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
 					#endif
-
-					*status = RETURN_FAILURE;
 
 					thread_ex.class = NATIVE_HOOK_EXCEPTION;
 					thread_ex.message = "Failed to enable XRecord context";
 				}
 				#endif
 
-				// Callback and stop native event dispatch thread
+				// Callback and stop native event dispatch thread.
 				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
 			}
 			else {
@@ -660,16 +660,23 @@ int StopNativeThread() {
 		// Try to exit the thread naturally.
 		#ifdef XRECORD_ASYNC
 		running = false;
-		#else
-		XRecordDisableContext(disp_ctrl, context);
-		//XSync(disp_ctrl, false);
-		#endif
 
 		// Wait for the thread to die.
 		void *thread_status;
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
 		free(thread_status);
+		#else
+		if (XRecordDisableContext(disp_ctrl, context) != 0) {
+			XSync(disp_ctrl, false);
+
+			// Wait for the thread to die.
+			void *thread_status;
+			pthread_join(hookThreadId, &thread_status);
+			status = *(int *) thread_status;
+			free(thread_status);
+		}
+		#endif
 
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
