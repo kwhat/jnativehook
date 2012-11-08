@@ -32,9 +32,9 @@ static UInt32 currDeadkeyState = 0;
 
 // Input source data for the keyboard.
 #if defined(CARBON_LEGACY)
-static KeyboardLayoutRef previousKeyboardLayout = NULL;
+static void *inputData = NULL;
 #elif defined(COREFOUNDATION)
-static TISInputSourceRef previousKeyboardLayout = NULL;
+static CFDataRef inputData = NULL;
 #endif
 
 void SetModifierMask(CGEventFlags mask) {
@@ -51,39 +51,8 @@ CGEventFlags GetModifiers() {
 
 void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, UniChar *buffer) {
 	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
-	#if defined(CARBON_LEGACY)
-	KeyboardLayoutRef currentKeyboardLayout;
-	void *inputData = NULL;
-	if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
-		if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, (const void **) &inputData) != noErr) {
-			inputData = NULL;
-		}
-	}
-	#elif defined(COREFOUNDATION)
-	TISInputSourceRef currentKeyboardLayout = TISCopyCurrentKeyboardLayoutInputSource();
-	CFDataRef inputData = NULL;
-	if (currentKeyboardLayout != NULL && CFGetTypeID(currentKeyboardLayout) == TISInputSourceGetTypeID()) {
-		CFDataRef data = (CFDataRef) TISGetInputSourceProperty(currentKeyboardLayout, kTISPropertyUnicodeKeyLayoutData);
-		if (data != NULL && CFGetTypeID(data) == CFDataGetTypeID() && CFDataGetLength(data) > 0) {
-			inputData = (CFDataRef) data;
-		}
-	}
-	
-	// Check if the keyboard layout has changed to see if the dead key state needs to be discarded.
-	if (previousKeyboardLayout != NULL && currentKeyboardLayout != NULL && CFEqual(currentKeyboardLayout, previousKeyboardLayout) == false) {
-		currDeadkeyState = 0;
-	}
-
-	// Release the previous keyboard layout.
-	if (previousKeyboardLayout != NULL) {
-		CFRelease(previousKeyboardLayout);
-	}
-	
-	// Set the previous keyboard layout to the current layout.
-	if (currentKeyboardLayout != NULL) {
-		previousKeyboardLayout = currentKeyboardLayout;
-	}
-	#endif
+	// Initialze the length to zero.
+	*length = 0;
 
 	if (inputData != NULL) {
 		#ifdef CARBON_LEGACY
@@ -177,16 +146,41 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 
 void LoadInputHelper() {
 	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
-	// Start with a fresh dead key state.
-	currDeadkeyState = 0;
+	if (inputData == NULL) {
+		// Reinitialize dead key state each time we need to load the input helper.
+		currDeadkeyState = 0;
+
+		#if defined(CARBON_LEGACY)
+		KeyboardLayoutRef currentKeyboardLayout;
+		if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
+			if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, (const void **) &inputData) != noErr) {
+				inputData = NULL;
+			}
+		}
+		#elif defined(COREFOUNDATION)
+		TISInputSourceRef currentKeyboardLayout = TISCopyCurrentKeyboardLayoutInputSource();
+		if (currentKeyboardLayout != NULL && CFGetTypeID(currentKeyboardLayout) == TISInputSourceGetTypeID()) {
+			CFDataRef data = (CFDataRef) TISGetInputSourceProperty(currentKeyboardLayout, kTISPropertyUnicodeKeyLayoutData);
+			if (data != NULL && CFGetTypeID(data) == CFDataGetTypeID() && CFDataGetLength(data) > 0) {
+				inputData = (CFDataRef) CFRetain(data);
+			}
+		}
+
+		if (currentKeyboardLayout != NULL) {
+			CFRelease(currentKeyboardLayout);
+		}
+		#endif
+	}
 	#endif
 }
 
 void UnloadInputHelper() {
-	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
-	if (previousKeyboardLayout != NULL) {
-		// Cleanup tracking of the previous layout.
-		CFRelease(previousKeyboardLayout);
+	#if defined(CARBON_LEGACY)
+	inputData = NULL;
+	#elif defined(COREFOUNDATION)
+	if (inputData != NULL) {
+		CFRelease(inputData);
+		inputData = NULL;
 	}
 	#endif
 }
