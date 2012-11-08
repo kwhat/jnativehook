@@ -59,11 +59,19 @@ static XRecordContext context;
 static volatile bool running;
 #endif
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t hookControlMutex;
+static pthread_mutex_t hookControlMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId;
 
 static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
-	if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
+	if (hook->category == XRecordStartOfData) {
+		pthread_mutex_lock(&hookRunningMutex);
+		pthread_mutex_unlock(&hookControlMutex);
+	}
+	else if (hook->category == XRecordEndOfData) {
+		//pthread_mutex_lock(&hookControlMutex);
+		pthread_mutex_unlock(&hookRunningMutex);
+	}
+	else if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
 		JNIEnv *env = NULL;
 		if (disp_ctrl != NULL && (*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 			// Check and make sure the thread is stull running to avoid the
@@ -365,8 +373,6 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 }
 
 static void *ThreadProc(void *arg) {
-	pthread_mutex_lock(&hookRunningMutex);
-
 	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
 	JNIEnv *env = NULL;
@@ -385,7 +391,7 @@ static void *ThreadProc(void *arg) {
 
 		// Check to make sure XRecord is installed and enabled.
 		int major, minor;
-		if (XRecordQueryVersion(disp_data, &major, &minor) != false) {
+		if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
 			#endif
@@ -398,9 +404,18 @@ static void *ThreadProc(void *arg) {
 				fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
 				#endif
 
+				// Sync events on the queue.
+				//XSync(disp_ctrl, false);
+				//XSync(disp_data, false);
+
 				// Create XRecord Context.
 				range->device_events.first = KeyPress;
 				range->device_events.last = MotionNotify;
+
+				/* Note that the documentation for this function is incorrect,
+				 * disp_data should be used!
+				 * See: http://www.x.org/releases/X11R7.6/doc/libXtst/recordlib.txt
+				 */
 				context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 				XFree(range);
 			}
@@ -431,41 +446,105 @@ static void *ThreadProc(void *arg) {
 		thread_ex.message = "Failed to open X display";
 	}
 
-
 	if (context != 0) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
+		#endif
+
 		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 			#ifdef DEBUG
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			// Callback and start native event dispatch thread
-			(*env)->CallVoidMethod(env, objGlobalScreen, idStartNativeEventDispatcher);
+			// Initialize Native Input Functions.
+			LoadInputHelper();
 
-			// Set the exit status.
-			*status = RETURN_SUCCESS;
+			// Create all the global references up front to save time in the callback.
+			if (CreateJNIGlobals() == RETURN_SUCCESS) {
+				// Callback and start native event dispatch thread
+				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+				#ifdef XRECORD_ASYNC
+				// Allow the thread loop to block.
+				running = true;
+
+				// Async requires that we loop so that our thread does not return.
+				if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
+					// Set the exit status.
+					*status = RETURN_SUCCESS;
+
+					while (running) {
+						XRecordProcessReplies(disp_data);
+					}
+					XRecordDisableContext(disp_ctrl, context);
+				}
+				else {
+					#ifdef DEBUG
+					fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
+					#endif
+
+					// Reset the running state.
+					running = false;
+
+					thread_ex.class = NATIVE_HOOK_EXCEPTION;
+					thread_ex.message = "Failed to enable XRecord context";
+				}
+				#else
+				// Sync blocks until XRecordDisableContext() is called.
+				if (XRecordEnableContext(disp_data, context, LowLevelProc, NULL) != 0) {
+					// Set the exit status.
+					*status = RETURN_SUCCESS;
+				}
+				else {
+					#ifdef DEBUG
+					fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
+					#endif
+
+					thread_ex.class = NATIVE_HOOK_EXCEPTION;
+					thread_ex.message = "Failed to enable XRecord context";
+				}
+				#endif
+
+				// Callback and stop native event dispatch thread.
+				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+			}
+			else {
+				// We cant do a whole lot of anything if we cant create JNI globals.
+				// Any exceptions are thrown by CreateJNIGlobals().
+
+				#ifdef DEBUG
+				fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
+				#endif
+
+				thread_ex.class = NATIVE_HOOK_EXCEPTION;
+				thread_ex.message = "Failed to create JNI global references";
+			}
+
+			// Sync events on the queue.
+			//XSync(disp_ctrl, true);
+			//XSync(disp_data, true);
+
+			// Free up the context after the run loop terminates.
+			XRecordFreeContext(disp_ctrl, context);
+
+			// Cleanup Native Input Functions.
+			UnloadInputHelper();
+
+			// Destroy all created globals.
+			#ifdef DEBUG
+			if (DestroyJNIGlobals() == RETURN_FAILURE) {
+				fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
+			}
+			#else
+			DestroyJNIGlobals();
+			#endif
+
+			// Detach this thread from the JVM.
+			(*jvm)->DetachCurrentThread(jvm);
 
 			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
+			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
 			#endif
-
-			pthread_mutex_unlock(&hookControlMutex);
-
-			#ifdef XRECORD_ASYNC
-			// Async requires that we loop so that our thread does not return.
-			XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL);
-			while (running) {
-				XRecordProcessReplies(disp_data);
-			}
-			XRecordDisableContext(disp_ctrl, context);
-			XSync(disp_ctrl, true);
-			#else
-			// We should be using this but its broken upstream.
-			XRecordEnableContext(disp_data, context, LowLevelProc, NULL);
-			#endif
-
-			// Lock back up until we are done processing the exit.
-			pthread_mutex_lock(&hookControlMutex);
-			XRecordFreeContext(disp_ctrl, context);
 		}
 		else {
 			#ifdef DEBUG
@@ -493,24 +572,11 @@ static void *ThreadProc(void *arg) {
 		disp_data = NULL;
 	}
 
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		// Callback and stop native event dispatch thread
-		(*env)->CallVoidMethod(env, objGlobalScreen, idStopNativeEventDispatcher);
-
-		// Detach this thread from the JVM.
-		(*jvm)->DetachCurrentThread(jvm);
-
-		#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-		#endif
-	}
-
 	#ifdef DEBUG
 	fprintf(stdout, "ThreadProc(): complete.\n");
 	#endif
 
 	// Make sure we signal that we have passed any exception throwing code.
-	pthread_mutex_unlock(&hookRunningMutex);
 	pthread_mutex_unlock(&hookControlMutex);
 
 	pthread_exit(status);
@@ -519,82 +585,66 @@ static void *ThreadProc(void *arg) {
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
+	// We shall use the default pthread attributes: thread is joinable
+	// (not detached) and has default (non real-time) scheduling policy.
+	//pthread_mutex_init(&hookControlMutex, NULL);
+
+	// Lock the thread control mutex.  This will be unlocked when the
+	// thread has finished starting, or when it has fully stopped.
+	pthread_mutex_lock(&hookControlMutex);
+
 	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
-		// Lock the mutex handle for the thread hook.
-		pthread_mutex_init(&hookControlMutex, NULL);
-
-		// Create all the global references up front to save time in the callback.
-		if (CreateJNIGlobals() == RETURN_SUCCESS) {
-			#ifdef XRECORD_ASYNC
-			// Allow the thread loop to block.
-			running = true;
+		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
+			#ifdef DEBUG
+			fprintf(stdout, "StartNativeThread(): start successful.\n");
 			#endif
 
-			// We shall use the default pthread attributes: thread is joinable
-			// (not detached) and has default (non real-time) scheduling policy
-			pthread_mutex_lock(&hookControlMutex);
+			// Wait for the thread to unlock the control mutex indicating
+			// that it has started or failed.
+			if (pthread_mutex_lock(&hookControlMutex) == 0) {
+				pthread_mutex_unlock(&hookControlMutex);
+			}
 
-			// Initialize Native Input Functions.
-			LoadInputHelper();
-
-			if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
+			// Handle any possible JNI issue that may have occurred.
+			if (IsNativeThreadRunning()) {
 				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): start successful.\n");
+				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 				#endif
 
-				// Wait for the thread to start up.
-				if (pthread_mutex_lock(&hookControlMutex) == 0) {
-					pthread_mutex_unlock(&hookControlMutex);
-				}
-
-				// Handle any possible JNI issue that may have occurred.
-				if (IsNativeThreadRunning()) {
-					#ifdef DEBUG
-					fprintf(stdout, "StartNativeThread(): initialization successful.\n");
-					#endif
-
-					status = RETURN_SUCCESS;
-				}
-				else {
-					#ifdef DEBUG
-					fprintf(stderr, "StartNativeThread(): initialization failure!\n");
-					#endif
-
-					// Wait for the thread to die.
-					void *thread_status;
-					pthread_join(hookThreadId, (void *) &thread_status);
-					status = *(int *) thread_status;
-
-					#ifdef DEBUG
-					fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
-					#endif
-
-					if (thread_ex.class != NULL && thread_ex.message != NULL)  {
-						ThrowException(thread_ex.class, thread_ex.message);
-					}
-				}
+				status = RETURN_SUCCESS;
 			}
 			else {
-				#ifdef XRECORD_ASYNC
-				running = false;
+				#ifdef DEBUG
+				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
 				#endif
+
+				// Wait for the thread to die.
+				void *thread_status;
+				pthread_join(hookThreadId, (void *) &thread_status);
+				status = *(int *) thread_status;
+				free(thread_status);
 
 				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): start failure!\n");
+				fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
 				#endif
 
-				ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+				if (thread_ex.class != NULL && thread_ex.message != NULL)  {
+					ThrowException(thread_ex.class, thread_ex.message);
+				}
 			}
 		}
-		#ifdef DEBUG
 		else {
-			// We cant do a whole lot of anything if we cant create JNI globals.
-			// Any exceptions are thrown by CreateJNIGlobals().
-			fprintf(stderr, "StartNativeThread(): CreateJNIGlobals() failed!\n");
+			#ifdef DEBUG
+			fprintf(stderr, "StartNativeThread(): start failure!\n");
+			#endif
+
+			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
 		}
-		#endif
 	}
+
+	// Make sure the control mutex is unlocked.
+	pthread_mutex_unlock(&hookControlMutex);
 
 	return status;
 }
@@ -602,46 +652,42 @@ int StartNativeThread() {
 int StopNativeThread() {
 	int status = RETURN_FAILURE;
 
+	// Lock the thread control mutex.  This will be unlocked when the
+	// thread has fully stopped.
+	pthread_mutex_lock(&hookControlMutex);
+
 	if (IsNativeThreadRunning() == true) {
-		// Lock the thread.
-		pthread_mutex_lock(&hookControlMutex);
-
+		// Try to exit the thread naturally.
 		#ifdef XRECORD_ASYNC
-		// Try to exit the thread naturally.
 		running = false;
-		#else
-		// Try to exit the thread naturally.
-		XRecordDisableContext(disp_ctrl, context);
-		XSync(disp_ctrl, true);
-		#endif
-
-		// Must unlock to allow the thread to finish cleaning up.
-		pthread_mutex_unlock(&hookControlMutex);
 
 		// Wait for the thread to die.
 		void *thread_status;
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
+		free(thread_status);
+		#else
+		if (XRecordDisableContext(disp_ctrl, context) != 0) {
+			XSync(disp_ctrl, false);
+
+			// Wait for the thread to die.
+			void *thread_status;
+			pthread_join(hookThreadId, &thread_status);
+			status = *(int *) thread_status;
+			free(thread_status);
+		}
+		#endif
 
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
-
-		// Cleanup Native Input Functions.
-		UnloadInputHelper();
-
-		// Destroy all created globals.
-		#ifdef DEBUG
-		if (DestroyJNIGlobals() == RETURN_FAILURE) {
-			fprintf(stderr, "StopNativeThread(): DestroyJNIGlobals() failed!\n");
-		}
-		#else
-		DestroyJNIGlobals();
-		#endif
-
-		// Clean up the mutex.
-		pthread_mutex_destroy(&hookControlMutex);
 	}
+
+	// Clean up the mutex.
+	//pthread_mutex_destroy(&hookControlMutex);
+
+	// Make sure the mutex gets unlocked.
+	pthread_mutex_unlock(&hookControlMutex);
 
 	return status;
 }
@@ -649,32 +695,17 @@ int StopNativeThread() {
 bool IsNativeThreadRunning() {
 	bool isRunning = false;
 
-	// Wait for a lock on the thread.
-	if (pthread_mutex_lock(&hookControlMutex) == 0) {
-		// Lock Successful.
-
-		if (pthread_mutex_trylock(&hookRunningMutex) == 0) {
-			// Lock Successful, we are not running.
-			pthread_mutex_unlock(&hookRunningMutex);
-		}
-		else {
-			isRunning = true;
-		}
-
-		#ifdef DEBUG
-		fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
-		#endif
-
-		pthread_mutex_unlock(&hookControlMutex);
+	// Try to aquire a lock on the running mutex.
+	if (pthread_mutex_trylock(&hookRunningMutex) == 0) {
+		// Lock Successful, thread is not running.
+		pthread_mutex_unlock(&hookRunningMutex);
 	}
-	#ifdef DEBUG
 	else {
-		/* Lock Failure. This should always be caused by an invalid pointe
-		 * and/or an uninitialized mutex.  This message is normal when the
-		 * native thread is not running.
-		 */
-		fprintf(stderr, "IsNativeThreadRunning(): Failed to acquire control mutex lock!\n");
+		isRunning = true;
 	}
+
+	#ifdef DEBUG
+	fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
 	#endif
 
 	return isRunning;

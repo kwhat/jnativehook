@@ -375,6 +375,7 @@
 		<property name="project.option.xf86misc" value="false" />
 		<property name="project.option.xkb" value="true" />
 		<property name="project.option.xt" value="true" />
+		<property name="project.option.xrecord_async" value="true" />
 
 
 		<!-- Set Apple configuration options to their default values -->
@@ -414,6 +415,12 @@
 			<and>
 				<istrue value="${native.os.isUnix}" />
 				<istrue value="${project.option.xt}" />
+			</and>
+		</condition>
+		<condition property="native.cc.macros.xrecord_async" value="-DXRECORD_ASYNC" else="">
+			<and>
+				<istrue value="${native.os.isUnix}" />
+				<istrue value="${project.option.xrecord_async}" />
 			</and>
 		</condition>
 
@@ -546,7 +553,7 @@
 		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.macros.xrecord_async} ${native.cc.includes}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
@@ -804,6 +811,8 @@
 
 		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
 			<zipfileset dir="${basedir}" prefix="${project.name}">
+				<exclude name="**/.*" />
+
 				<include name="*.txt" />
 				<include name="build.*" />
 				<exclude name="build.properties*" />
@@ -811,7 +820,8 @@
 
 			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
 				<exclude name="**/.*" />
-				<exclude name="org/jnativehook/lib/**" />
+
+				<exclude name="native/jni/org_jnativehook_GlobalScreen.h" />
 			</zipfileset>
 		</zip>
 
