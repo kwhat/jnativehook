@@ -135,6 +135,13 @@
 		<condition property="native.os.isApple" value="true">
 			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
 		</condition>
+		<!-- TODO Testing Needed.
+		<condition property="native.os.isSolaris" value="true">
+			<or>
+				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
+			</or>
+		</condition>
+		-->
 		<condition property="native.os.isUnix" value="true">
 			<or>
 				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
@@ -170,7 +177,6 @@
 			</condition>
 		</fail>
 		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.src.platform} compatible)</echo>
-
 
 
 		<!-- Try to locate the include folder for java headers -->
@@ -248,60 +254,23 @@
 		<echo level="info">Found environment path: ${native.path}</echo>
 
 
-		<!-- Figure out of the system arch to pass to the compiler -->
-		<condition property="native.arch" value="i586">
-			<and>
-				<or>
-					<os arch="x86" />
-					<os arch="i386" />
-					<os arch="i486" />
-					<os arch="i586" />
-					<os arch="i686" />
-				</or>
-
-				<not>
-					<istrue value="${native.os.isApple}" />
-				</not>
-			</and>
-		</condition>
-		<condition property="native.arch" value="i386">
-			<and>
-				<or>
-					<os arch="x86" />
-					<os arch="i386" />
-					<os arch="i486" />
-					<os arch="i586" />
-					<os arch="i686" />
-				</or>
-
-				<istrue value="${native.os.isApple}" />
-			</and>
-		</condition>
-		<condition property="native.arch" value="k8">
-			<and>
-				<or>
-					<os arch="x86-64" />
-					<os arch="x86_64" />
-					<os arch="amd64" />
-					<os arch="k8" />
-				</or>
-
-				<not>
-					<istrue value="${native.os.isApple}" />
-				</not>
-			</and>
+		<!-- Set the system arch name used for orginizing native libraries -->
+		<condition property="native.arch" value="x86">
+			<or>
+				<os arch="x86" />
+				<os arch="i386" />
+				<os arch="i486" />
+				<os arch="i586" />
+				<os arch="i686" />
+			</or>
 		</condition>
 		<condition property="native.arch" value="x86_64">
-			<and>
-				<or>
-					<os arch="x86-64" />
-					<os arch="x86_64" />
-					<os arch="amd64" />
-					<os arch="k8" />
-				</or>
-
-				<istrue value="${native.os.isApple}" />
-			</and>
+			<or>
+				<os arch="x86-64" />
+				<os arch="x86_64" />
+				<os arch="amd64" />
+				<os arch="k8" />
+			</or>
 		</condition>
 		<condition property="native.arch" value="ppc">
 			<or>
@@ -315,44 +284,83 @@
 				<os arch="PowerPC64" />
 			</or>
 		</condition>
-
-
-		<!-- Set the system arch name used for orginizing native libraries -->
-		<condition property="native.arch.name" value="x86">
-			<equals arg1="${native.arch}" arg2="i586" casesensitive="false" trim="true" />
+		<property name="native.arch" value="${os.arch}" />
+		<!-- TODO Testing Needed
+		<condition property="native.arch" value="sparc">
+			<os arch="sparc" />
 		</condition>
-		<condition property="native.arch.name" value="x86_64">
-			<or>
-				<equals arg1="${native.arch}" arg2="k8" casesensitive="false" trim="true" />
+		-->
+
+		<!-- Figure out of the system arch to pass to the compiler -->
+		<condition property="native.arch.target" value="i586">
+			<and>
+				<equals arg1="native.arch" arg2="x86" casesensitive="false" trim="true" />
+
+				<not>
+					<istrue value="${native.os.isApple}" />
+				</not>
+			</and>
+		</condition>
+		<condition property="native.arch.target" value="i386">
+			<and>
+				<equals arg1="native.arch" arg2="x86" casesensitive="false" trim="true" />
+
+				<istrue value="${native.os.isApple}" />
+			</and>
+		</condition>
+		<condition property="native.arch.target" value="k8">
+			<and>
 				<equals arg1="${native.arch}" arg2="x86_64" casesensitive="false" trim="true" />
-			</or>
+
+				<not>
+					<istrue value="${native.os.isApple}" />
+				</not>
+			</and>
 		</condition>
-		<condition property="native.arch.name" value="${native.arch}">
+		<condition property="native.arch.target" value="x86_64">
+			<and>
+				<equals arg1="${native.arch}" arg2="x86_64" casesensitive="false" trim="true" />
+
+				<istrue value="${native.os.isApple}" />
+			</and>
+		</condition>
+		<condition property="native.arch.target" value="${native.arch}">
 			<or>
 				<equals arg1="${native.arch}" arg2="ppc" casesensitive="false" trim="true" />
 				<equals arg1="${native.arch}" arg2="ppc64" casesensitive="false" trim="true" />
 			</or>
 		</condition>
+		<!-- TODO Testing Needed
+		<condition property="native.arch.target" value="cypress">
+			<equals arg1="${native.arch}" arg2="sparc" casesensitive="false" trim="true" />
+		</condition>
+		<condition property="native.arch.target" value="ultrasparc">
+			<equals arg1="${native.arch}" arg2="sparcv9" casesensitive="false" trim="true" />
+		</condition>
+		-->
+		
 
 		<!-- Set the arch tune value -->
 		<condition property="native.arch.tune" value="i586">
-			<equals arg1="${native.arch}" arg2="i386" casesensitive="false" trim="true" />
+			<equals arg1="${native.arch.target}" arg2="i386" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.tune" value="powerpc">
-			<equals arg1="${native.arch}" arg2="ppc" casesensitive="false" trim="true" />
+			<equals arg1="${native.arch.target}" arg2="ppc" casesensitive="false" trim="true" />
 		</condition>
 		<condition property="native.arch.tune" value="powerpc64">
-			<equals arg1="${native.arch}" arg2="ppc64" casesensitive="false" trim="true" />
+			<equals arg1="${native.arch.target}" arg2="ppc64" casesensitive="false" trim="true" />
 		</condition>
 		<property name="native.arch.tune" value="generic" />
-		<fail message="The ${os.arch} architecture is not currently supported.">
+		
+		<fail message="The ${native.arch} architecture is not currently supported.">
 			<condition>
 				<not>
-					<isset property="native.arch.name" />
+					<isset property="native.arch.target" />
 				</not>
 			</condition>
 		</fail>
-		<echo level="info">Compatible system architecture: ${native.arch.name}</echo>
+		<echo level="info">Compatible system architecture: ${native.arch}</echo>
+
 
 		<!-- Set 32 or 64 bit flag -->
 		<property name="native.arch.model" value="${sun.arch.data.model}" />
@@ -525,14 +533,14 @@
 		<condition property="native.cc.flags" value="${env.CFLAGS}">
 			<isset property="${env.CFLAGS}" />
 		</condition>
-		<condition property="native.cc.flags" value="-arch ${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
+		<condition property="native.cc.flags" value="-arch ${native.arch.target} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
+		<condition property="native.cc.flags" value="-march=${native.arch.target} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.flags" value="-march=${native.arch} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
+		<condition property="native.cc.flags" value="-march=${native.arch.target} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -587,7 +595,7 @@
 		<condition property="native.ld.flags" value="${env.LDFLAGS}">
 			<isset property="${env.LDFLAGS}" />
 		</condition>
-		<condition property="native.ld.flags" value="-arch ${native.arch} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}${native.ld.flags.strip}">
+		<condition property="native.ld.flags" value="-arch ${native.arch.target} -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}${native.ld.flags.strip}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname=${native.executable}.${build.major}.${build.minor},${native.ld.flags.optimize}${native.ld.flags.strip}">
@@ -706,7 +714,7 @@
 
 		<echo>Linking C objects...</echo>
 		<!-- Create required directory for linking -->
-		<mkdir dir="${dir.lib}/${native.os}/${native.arch.name}" />
+		<mkdir dir="${dir.lib}/${native.os}/${native.arch}" />
 
 		<fileset dir="${dir.bin.obj}" id="file.obj">
 			<include name="**/*.o" />
@@ -722,7 +730,7 @@
 			<arg line="${native.ld.args}" />
 			<srcfile />
 			<arg line="${native.ld.args2}" />
-			<arg file="${dir.lib}/${native.os}/${native.arch.name}/${native.executable}" />
+			<arg file="${dir.lib}/${native.os}/${native.arch}/${native.executable}" />
 		</apply>
 	</target>
 
@@ -754,7 +762,7 @@
 
 	<target name="run" depends="configure" description="Execute the bundled example.">
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
-			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch.name}" />
+			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch}" />
 			<classpath>
 				<pathelement location="${dir.jar}/${project.name}.jar" />
 				<pathelement path="${dir.bin.class}" />
