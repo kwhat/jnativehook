@@ -675,10 +675,11 @@ static void *ThreadProc(void *arg) {
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: Accessibility API is not enabled.\n");
+		fprintf(stderr, "ThreadProc(): Accessibility API is not enabled.\n");
 		#endif
 
-		ThrowException(NATIVE_HOOK_EXCEPTION, "Access for assistive devices disabled");
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Access for assistive devices disabled";
 	}
 
 	#ifdef DEBUG
