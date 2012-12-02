@@ -35,7 +35,7 @@ static Exception thread_ex;
 // Click count globals.
 static unsigned short click_count = 0;
 static DWORD click_time = 0;
-static bool mouse_dragged = false;
+static POINT last_click;
 
 // The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
 extern HINSTANCE hInst;
@@ -264,6 +264,10 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					// Convert native modifiers to java modifiers.
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
+					// Store the last click point.
+					last_click.x = mshook->pt.x;
+					last_click.y = mshook->pt.y;
+
 					// Fire mouse pressed event.
 					objMouseEvent = (*env)->NewObject(
 												env,
@@ -329,7 +333,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 
-					if (mouse_dragged != true) {
+					if (last_click.x == mshook->pt.x && last_click.y == mshook->pt.y) {
 						// Fire mouse clicked event.
 						objMouseEvent = (*env)->NewObject(
 													env,
@@ -357,39 +361,41 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
-					// Set the mouse dragged flag.
-					mouse_dragged = jmodifiers >> 4 > 0;
-
-					// Check the upper half of java modifiers for non zero value.
-					if (jmodifiers >> 4 > 0) {
-						// Create Mouse dragged event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-													event_time,
-													jmodifiers,
-													(jint) mshook->pt.x,
-													(jint) mshook->pt.y,
-													(jint) click_count);
+					// We received a mouse move event with the mouse actually moving.
+					// This verifies that the mouse was moved after being depressed.
+					if (last_click.x != mshook->pt.x || last_click.y != mshook->pt.y) {
+						// Check the upper half of java modifiers for non zero value.
+						// This indicates the presence of a button down mask.
+						if (jmodifiers >> 4 > 0) {
+							// Create Mouse dragged event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
+														event_time,
+														jmodifiers,
+														(jint) mshook->pt.x,
+														(jint) mshook->pt.y,
+														(jint) click_count);
+						}
+						else {
+							// Create a Mouse Moved event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
+														event_time,
+														jmodifiers,
+														(jint) mshook->pt.x,
+														(jint) mshook->pt.y,
+														(jint) click_count);
+						}
+						
+						// Fire mouse moved event.
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
-					else {
-						// Create a Mouse Moved event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-													event_time,
-													jmodifiers,
-													(jint) mshook->pt.x,
-													(jint) mshook->pt.y,
-													(jint) click_count);
-					}
-
-					// Fire mouse moved event.
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					break;
 
 				case WM_MOUSEWHEEL:
