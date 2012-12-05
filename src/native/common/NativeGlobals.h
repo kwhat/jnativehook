@@ -35,11 +35,10 @@ extern JavaVM *jvm;
 extern jint jni_version;
 
 // GlobalScreen object and dispatch id.
-extern jobject objGlobalScreen;
-extern jmethodID idDispatchEvent, idStartEventDispatcher, idStopEventDispatcher;
+extern jmethodID idGetInstance, idDispatchEvent, idStartEventDispatcher, idStopEventDispatcher;
 
 // Java callback classes and constructor id's.
-extern jclass clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
+extern jclass clsGlobalScreen, clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
 // Create all of the JNI global references used throughout the native library.

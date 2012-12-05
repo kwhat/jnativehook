@@ -207,6 +207,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
 		#endif
 
+		// Create all the global class references onload to prevent class loader
+		// issues with JNLP and some IDE's.
+		if (CreateJNIGlobals() == RETURN_FAILURE) {
+			#ifdef DEBUG
+			fprintf(stderr, "JNI_OnLoad(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			ThrowFatalError("Failed to locate one or more required classes.");
+		}
+
 		// Run platform specific load items.
 		OnLibraryLoad();
 
@@ -252,6 +262,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) 
 		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
 	}
 	#endif
+
+	DestroyJNIGlobals();
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");
