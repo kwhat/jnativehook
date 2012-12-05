@@ -294,7 +294,7 @@
 		<!-- Figure out of the system arch to pass to the compiler -->
 		<condition property="native.arch.target" value="i586">
 			<and>
-				<equals arg1="native.arch" arg2="x86" casesensitive="false" trim="true" />
+				<equals arg1="${native.arch}" arg2="x86" casesensitive="false" trim="true" />
 
 				<not>
 					<istrue value="${native.os.isApple}" />
@@ -303,7 +303,7 @@
 		</condition>
 		<condition property="native.arch.target" value="i386">
 			<and>
-				<equals arg1="native.arch" arg2="x86" casesensitive="false" trim="true" />
+				<equals arg1="${native.arch}" arg2="x86" casesensitive="false" trim="true" />
 
 				<istrue value="${native.os.isApple}" />
 			</and>
@@ -338,7 +338,7 @@
 			<equals arg1="${native.arch}" arg2="sparcv9" casesensitive="false" trim="true" />
 		</condition>
 		-->
-		
+
 
 		<!-- Set the arch tune value -->
 		<condition property="native.arch.tune" value="i586">
@@ -351,7 +351,7 @@
 			<equals arg1="${native.arch.target}" arg2="ppc64" casesensitive="false" trim="true" />
 		</condition>
 		<property name="native.arch.tune" value="generic" />
-		
+
 		<fail message="The ${native.arch} architecture is not currently supported.">
 			<condition>
 				<not>
