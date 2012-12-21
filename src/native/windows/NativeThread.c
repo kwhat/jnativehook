@@ -32,10 +32,13 @@
 // Exception global for thread initialization.
 static Exception thread_ex;
 
+// GlobalScreen object.
+static jobject objGlobalScreen;
+
 // Click count globals.
 static unsigned short click_count = 0;
 static DWORD click_time = 0;
-static bool mouse_dragged = false;
+static POINT last_click;
 
 // The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
 extern HINSTANCE hInst;
@@ -264,6 +267,10 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					// Convert native modifiers to java modifiers.
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
+					// Store the last click point.
+					last_click.x = mshook->pt.x;
+					last_click.y = mshook->pt.y;
+
 					// Fire mouse pressed event.
 					objMouseEvent = (*env)->NewObject(
 												env,
@@ -329,7 +336,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 
-					if (mouse_dragged != true) {
+					if (last_click.x == mshook->pt.x && last_click.y == mshook->pt.y) {
 						// Fire mouse clicked event.
 						objMouseEvent = (*env)->NewObject(
 													env,
@@ -357,39 +364,41 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
-					// Set the mouse dragged flag.
-					mouse_dragged = jmodifiers >> 4 > 0;
+					// We received a mouse move event with the mouse actually moving.
+					// This verifies that the mouse was moved after being depressed.
+					if (last_click.x != mshook->pt.x || last_click.y != mshook->pt.y) {
+						// Check the upper half of java modifiers for non zero value.
+						// This indicates the presence of a button down mask.
+						if (jmodifiers >> 4 > 0) {
+							// Create Mouse dragged event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
+														event_time,
+														jmodifiers,
+														(jint) mshook->pt.x,
+														(jint) mshook->pt.y,
+														(jint) click_count);
+						}
+						else {
+							// Create a Mouse Moved event.
+							objMouseEvent = (*env)->NewObject(
+														env,
+														clsMouseEvent,
+														idMouseMotionEvent,
+														org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
+														event_time,
+														jmodifiers,
+														(jint) mshook->pt.x,
+														(jint) mshook->pt.y,
+														(jint) click_count);
+						}
 
-					// Check the upper half of java modifiers for non zero value.
-					if (jmodifiers >> 4 > 0) {
-						// Create Mouse dragged event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-													event_time,
-													jmodifiers,
-													(jint) mshook->pt.x,
-													(jint) mshook->pt.y,
-													(jint) click_count);
+						// Fire mouse moved event.
+						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					}
-					else {
-						// Create a Mouse Moved event.
-						objMouseEvent = (*env)->NewObject(
-													env,
-													clsMouseEvent,
-													idMouseMotionEvent,
-													org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-													event_time,
-													jmodifiers,
-													(jint) mshook->pt.x,
-													(jint) mshook->pt.y,
-													(jint) click_count);
-					}
-
-					// Fire mouse moved event.
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 					break;
 
 				case WM_MOUSEWHEEL:
@@ -476,8 +485,11 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
 			#endif
 
-			// Create all the global references up front to save time in the callback.
-			if (CreateJNIGlobals() == RETURN_SUCCESS) {
+			// Create the global screen references up front to save time in the callback.
+			jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+			if (objLocalScreen != NULL) {
+				objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
 				// Callback and start native event dispatch thread
 				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
 
@@ -506,6 +518,9 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 
 				// Callback and stop native event dispatch thread
 				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+				// Remove the global reference to the GlobalScren object.
+				(*env)->DeleteGlobalRef(env, objGlobalScreen);
 			}
 			else {
 				// We cant do a whole lot of anything if we cant create JNI globals.
@@ -527,7 +542,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 			#else
 			DestroyJNIGlobals();
 			#endif
-			
+
 			// Detach this thread from the JVM.
 			(*jvm)->DetachCurrentThread(jvm);
 
@@ -553,7 +568,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		thread_ex.class = NATIVE_HOOK_EXCEPTION;
 		thread_ex.message = "Failed to create low level event hook";
 	}
-	
+
 	// Destroy the native hooks.
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
@@ -610,7 +625,7 @@ int StartNativeThread() {
 
 				// Wait for the thread to die.
 				WaitForSingleObject(hookThreadHandle,  INFINITE);
-				
+
 				DWORD thread_status;
 				GetExitCodeThread(hookThreadHandle, &thread_status);
 				status = (int) thread_status;
@@ -647,13 +662,13 @@ int StopNativeThread() {
 		DWORD thread_status;
 		GetExitCodeThread(hookThreadHandle, &thread_status);
 		status = (int) thread_status;
-		
+
 		CloseHandle(hookThreadHandle);
 		hookThreadHandle = NULL;
 
 		CloseHandle(hookCtrlHandle);
 		hookCtrlHandle = NULL;
-		
+
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
@@ -667,7 +682,7 @@ bool IsNativeThreadRunning() {
 	GetExitCodeThread(hookThreadHandle, &status);
 
 	bool isRunning = status == STILL_ACTIVE;
-	
+
 	#ifdef DEBUG
 	fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
 	#endif

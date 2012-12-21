@@ -31,6 +31,9 @@
 // Exception global for thread initialization.
 static Exception thread_ex;
 
+// GlobalScreen object.
+static jobject objGlobalScreen;
+
 // Click count globals.
 static unsigned short click_count = 0;
 static CGEventTimestamp click_time = 0;
@@ -544,8 +547,11 @@ static void *ThreadProc(void *arg) {
 						// Initialize Native Input Functions.
 						LoadInputHelper();
 
-						// Create all the global references up front to save time in the callback.
-						if (CreateJNIGlobals() == RETURN_SUCCESS) {
+						// Create the global screen references up front to save time in the callback.
+						jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+						if (objLocalScreen != NULL) {
+							objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
 							// Callback and start native event dispatch thread
 							(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
 
@@ -586,6 +592,9 @@ static void *ThreadProc(void *arg) {
 
 							// Callback and stop native event dispatch thread
 							(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+							// Remove the global reference to the GlobalScren object.
+							(*env)->DeleteGlobalRef(env, objGlobalScreen);
 						}
 						else {
 							// We cant do a whole lot of anything if we cant create JNI globals.
@@ -675,10 +684,11 @@ static void *ThreadProc(void *arg) {
 	}
 	else {
 		#ifdef DEBUG
-		printf("Native: Accessibility API is not enabled.\n");
+		fprintf(stderr, "ThreadProc(): Accessibility API is not enabled.\n");
 		#endif
 
-		ThrowException(NATIVE_HOOK_EXCEPTION, "Access for assistive devices disabled");
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Access for assistive devices disabled";
 	}
 
 	#ifdef DEBUG

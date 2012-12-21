@@ -187,28 +187,28 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
-	
-		
+
+
 	if ((*env)->IsInstanceOf(env, obj, clsNativeKeyEvent)) {
 		jmethodID idGetID = (*env)->GetMethodID(env, clsNativeKeyEvent, "getID", "()I");
 		jmethodID idGetModifiers = (*env)->GetMethodID(env, clsNativeKeyEvent, "getModifiers", "()I");
-		
+
 		jnit id = (*env)->CallIntMethod(env, obj, idGetID);
 		jnit modifiers = (*env)->CallIntMethod(env, obj, idGetModifiers);
-	
+
 		switch (id) {
 			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
-				
+
 				break;
-			
+
 			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-				
+
 				break;
-				
+
 			case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-				
+
 				break;
-				
+
 			default:
 				break;
 		}
@@ -245,6 +245,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 		#ifdef DEBUG
 		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
 		#endif
+
+		// Create all the global class references onload to prevent class loader
+		// issues with JNLP and some IDE's.
+		if (CreateJNIGlobals() == RETURN_FAILURE) {
+			#ifdef DEBUG
+			fprintf(stderr, "JNI_OnLoad(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			ThrowFatalError("Failed to locate one or more required classes.");
+		}
 
 		// Run platform specific load items.
 		OnLibraryLoad();
@@ -291,6 +301,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) 
 		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
 	}
 	#endif
+
+	DestroyJNIGlobals();
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");
