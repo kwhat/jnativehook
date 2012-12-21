@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
 #include <stdbool.h>
 #include "OSXInputHelpers.h"
 #ifdef COREFOUNDATION
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+
+static pthread_mutex_t runWaitMutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Keyboard Upper 16 / Mouse Lower 16
 static CGEventFlags currModifierMask = 0x00000000;
@@ -55,81 +58,94 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 	*length = 0;
 
 	if (inputData != NULL) {
-		#ifdef CARBON_LEGACY
-		const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout *) inputData;
-		#else
-		const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*) CFDataGetBytePtr(inputData);
-		#endif
+		pthread_mutex_lock(&runWaitMutex);
 
-		if (keyboardLayout != NULL) {
-			//Extract keycode and modifier information.
-			CGKeyCode keycode = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
-			CGEventFlags modifiers = CGEventGetFlags(event);
+		CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
+			#ifdef CARBON_LEGACY
+			const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout *) inputData;
+			#else
+			const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*) CFDataGetBytePtr(inputData);
+			#endif
 
-			// Disable all command modifiers for translation.  This is required
-			// so UCKeyTranslate will provide a keysym for the separate event.
-			static const CGEventFlags cmdModifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
-			modifiers &= ~cmdModifiers;
+			if (keyboardLayout != NULL) {
+				//Extract keycode and modifier information.
+				CGKeyCode keycode = CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+				CGEventFlags modifiers = CGEventGetFlags(event);
 
-			// I don't know why but UCKeyTranslate does not process the
-			// kCGEventFlagMaskAlphaShift (A.K.A. Caps Lock Mask) correctly.
-			// We need to basically turn off the mask and process the capital
-			// letters after UCKeyTranslate().  Think Different, not because it
-			// makes sense but because you want to be a hipster.
-			bool isCapsLock = modifiers & kCGEventFlagMaskAlphaShift;
-			modifiers &= ~kCGEventFlagMaskAlphaShift;
+				// Disable all command modifiers for translation.  This is required
+				// so UCKeyTranslate will provide a keysym for the separate event.
+				static const CGEventFlags cmdModifiers = kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate;
+				modifiers &= ~cmdModifiers;
+
+				// I don't know why but UCKeyTranslate does not process the
+				// kCGEventFlagMaskAlphaShift (A.K.A. Caps Lock Mask) correctly.
+				// We need to basically turn off the mask and process the capital
+				// letters after UCKeyTranslate().  Think Different, not because it
+				// makes sense but because you want to be a hipster.
+				bool isCapsLock = modifiers & kCGEventFlagMaskAlphaShift;
+				modifiers &= ~kCGEventFlagMaskAlphaShift;
 
 
-			OSStatus status = noErr;
-			if (currDeadkeyState == 0) {
-				// No previous deadkey, attempt a lookup.
-				status = UCKeyTranslate(
-									keyboardLayout,
-									keycode,
-									kUCKeyActionDown,
-									(modifiers >> 16) & 0xFF, //(modifiers >> 16) & 0xFF, || (modifiers >> 8) & 0xFF,
-									LMGetKbdType(),
-									kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
-									&currDeadkeyState,
-									size,
-									length,
-									buffer);
-			}
-			else {
-				// The previous key was a deadkey, lookup what it should be.
-				status = UCKeyTranslate(
-									keyboardLayout,
-									keycode,
-									kUCKeyActionDown,
-									(modifiers >> 16) & 0xFF, //No Modifier
-									LMGetKbdType(),
-									kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
-									&currDeadkeyState,
-									size,
-									length,
-									buffer);
-			}
+				OSStatus status = noErr;
+				if (currDeadkeyState == 0) {
+					// No previous deadkey, attempt a lookup.
+					status = UCKeyTranslate(
+										keyboardLayout,
+										keycode,
+										kUCKeyActionDown,
+										(modifiers >> 16) & 0xFF, //(modifiers >> 16) & 0xFF, || (modifiers >> 8) & 0xFF,
+										LMGetKbdType(),
+										kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
+										&currDeadkeyState,
+										size,
+										length,
+										buffer);
+				}
+				else {
+					// The previous key was a deadkey, lookup what it should be.
+					status = UCKeyTranslate(
+										keyboardLayout,
+										keycode,
+										kUCKeyActionDown,
+										(modifiers >> 16) & 0xFF, //No Modifier
+										LMGetKbdType(),
+										kNilOptions, //kNilOptions, //kUCKeyTranslateNoDeadKeysMask
+										&currDeadkeyState,
+										size,
+										length,
+										buffer);
+				}
 
-			if (status == noErr && *length > 0) {
-				if (isCapsLock) {
-					// We *had* a caps lock mask so we need to convert to uppercase.
-					CFMutableStringRef keytxt = CFStringCreateMutableWithExternalCharactersNoCopy(kCFAllocatorDefault, buffer, *length, size, kCFAllocatorNull);
-					if (keytxt != NULL) {
-						CFLocaleRef locale = CFLocaleCopyCurrent();
-						CFStringUppercase(keytxt, locale);
-						CFRelease(locale);
-						CFRelease(keytxt);
-					}
-					else {
-						// There was an problem creating the CFMutableStringRef.
-						*length = 0;
+				if (status == noErr && *length > 0) {
+					if (isCapsLock) {
+						// We *had* a caps lock mask so we need to convert to uppercase.
+						CFMutableStringRef keytxt = CFStringCreateMutableWithExternalCharactersNoCopy(kCFAllocatorDefault, buffer, *length, size, kCFAllocatorNull);
+						if (keytxt != NULL) {
+							CFLocaleRef locale = CFLocaleCopyCurrent();
+							CFStringUppercase(keytxt, locale);
+							CFRelease(locale);
+							CFRelease(keytxt);
+						}
+						else {
+							// There was an problem creating the CFMutableStringRef.
+							*length = 0;
+						}
 					}
 				}
+				else {
+					// Make sure the buffer length is zero if an error occurred.
+					*length = 0;
+				}
 			}
-			else {
-				// Make sure the buffer length is zero if an error occurred.
-				*length = 0;
-			}
+
+			pthread_mutex_unlock(&runWaitMutex);
+		});
+
+		CFRunLoopWakeUp(CFRunLoopGetMain());
+
+		// Wait for the thread to start up.
+		if (pthread_mutex_lock(&runWaitMutex) == 0) {
+			pthread_mutex_unlock(&runWaitMutex);
 		}
 	}
 	#endif
