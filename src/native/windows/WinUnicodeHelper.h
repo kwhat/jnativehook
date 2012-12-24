@@ -17,7 +17,7 @@
  */
 
 /***********************************************************************
- * The following code is based on code provided by thetechnofreak.com 
+ * The following code is based on code provided by Marc-André Moreau 
  * to work around a failure to support dead keys in the ToUnicode() API.
  * According to the author some parts were taken directly from 
  * Microsoft's  kbd.h header file that is shipped with the Windows 
@@ -28,8 +28,16 @@
  *   2) Support for compilers that do not implement _ptr64 (GCC / LLVM).
  *   3) Support for Wow64 at runtime via 32-bit binary.
  * 
+ * I have contacted Marc-André Moreau who has granted permission for 
+ * his original source code to be used under the Public Domain.  Although 
+ * the JNativeHook library as a whole is currently covered under the GPLv3, 
+ * please feel free to use and learn from the source code contained in this 
+ * file under the terms of the Public Domain.
+ * 
  * For further reading and the original code, please visit:
- *   http://thetechnofreak.com/technofreak/keylogger-visual-c/
+ *   http://legacy.docdroppers.org/wiki/index.php?title=Writing_Keyloggers
+ *   http://www.techmantras.com/content/writing-keyloggers-full-length-tutorial
+ * 
  ***********************************************************************/
 
 #ifndef _Included_WinUnicodeHelper
