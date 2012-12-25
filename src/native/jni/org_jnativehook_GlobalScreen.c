@@ -182,15 +182,15 @@ static void ClearNativeProperties(JNIEnv *env) {
 }
 
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
 	StartNativeThread();
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
 	StopNativeThread();
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jobject UNUSED(obj)) {
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
 	return (jboolean) IsNativeThreadRunning();
 }
 
