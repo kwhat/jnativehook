@@ -661,6 +661,7 @@
 			classpath="${dir.bin.class}"
 			bootclasspath="${java.bootclasspath}"
 			debug="${project.debug}"
+			debuglevel="lines,vars,source"
 			optimize="${project.optimize}"
 			deprecation="false"
 			includeantruntime="false"

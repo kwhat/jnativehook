@@ -24,11 +24,11 @@ JavaVM *jvm;
 jint jni_version = JNI_VERSION_1_4;
 
 // GlobalScreen object and dispatch id.
-jmethodID idGetInstance, idDispatchEvent, idStartEventDispatcher, idStopEventDispatcher;
+jmethodID idGetInstance, idDispatchNativeEvent, idStartNativeEventDispatcher, idStopNativeEventDispatcher;
 
 // Java callback classes and constructor id's.
-jclass clsGlobalScreen, clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
-jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
+jclass clsGlobalScreen, clsNativeKeyEvent, clsNativeMouseEvent, clsNativeMouseWheelEvent;
+jmethodID idNativeKeyEvent, idNativeMouseButtonEvent, idNativeMouseMotionEvent, idNativeMouseWheelEvent;
 
 
 int CreateJNIGlobals() {
@@ -50,25 +50,25 @@ int CreateJNIGlobals() {
 			#endif
 
 			// Get the method ID for GlobalScreen.dispatchEvent().
-			idDispatchEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+			idDispatchNativeEvent = (*env)->GetMethodID(env, clsGlobalScreen, "dispatchNativeEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 			#ifdef DEBUG
-			if (idDispatchEvent == NULL) {
+			if (idDispatchNativeEvent == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
 			}
 			#endif
 
 			// Get the method ID for GlobalScreen.startEventDispatcher().
-			idStartEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "startEventDispatcher", "()V");
+			idStartNativeEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "startNativeEventDispatcher", "()V");
 			#ifdef DEBUG
-			if (idStartEventDispatcher == NULL) {
+			if (idStartNativeEventDispatcher == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.startEventDispatcher()!\n");
 			}
 			#endif
 
 			// Get the method ID for GlobalScreen.stopEventDispatcher().
-			idStopEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "stopEventDispatcher", "()V");
+			idStopNativeEventDispatcher = (*env)->GetMethodID(env, clsGlobalScreen, "stopNativeEventDispatcher", "()V");
 			#ifdef DEBUG
-			if (idStopEventDispatcher == NULL) {
+			if (idStopNativeEventDispatcher == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.stopEventDispatcher()!\n");
 			}
 			#endif
@@ -82,11 +82,11 @@ int CreateJNIGlobals() {
 		// Class and Constructor for the NativeKeyEvent Object.
 		jclass clsLocalKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 		if (clsLocalKeyEvent != NULL) {
-			clsKeyEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalKeyEvent);
+			clsNativeKeyEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalKeyEvent);
 
-			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
+			idNativeKeyEvent = (*env)->GetMethodID(env, clsNativeKeyEvent, "<init>", "(IJIIICI)V");
 			#ifdef DEBUG
-			if (idKeyEvent == NULL) {
+			if (idNativeKeyEvent == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.NativeKeyEvent(int, long, int, int, int, int)!\n");
 			}
 			#endif
@@ -101,18 +101,18 @@ int CreateJNIGlobals() {
 		// Class and Constructor for the NativeMouseEvent Object.
 		jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 		if (clsLocalMouseEvent != NULL) {
-			clsMouseEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseEvent);
+			clsNativeMouseEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseEvent);
 
-			idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIIII)V");
+			idNativeMouseButtonEvent = (*env)->GetMethodID(env, clsNativeMouseEvent, "<init>", "(IJIIIII)V");
 			#ifdef DEBUG
-			if (idMouseButtonEvent == NULL) {
+			if (idNativeMouseButtonEvent == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int, int)!\n");
 			}
 			#endif
 
-			idMouseMotionEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIII)V");
+			idNativeMouseMotionEvent = (*env)->GetMethodID(env, clsNativeMouseEvent, "<init>", "(IJIIII)V");
 			#ifdef DEBUG
-			if (idMouseMotionEvent == NULL) {
+			if (idNativeMouseMotionEvent == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int)!\n");
 			}
 			#endif
@@ -127,11 +127,11 @@ int CreateJNIGlobals() {
 		// Class and Constructor for the NativeMouseWheelEvent Object.
 		jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 		if (clsLocalMouseWheelEvent != NULL) {
-			clsMouseWheelEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
+			clsNativeMouseWheelEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
 
-			idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIIII)V");
+			idNativeMouseWheelEvent = (*env)->GetMethodID(env, clsNativeMouseWheelEvent, "<init>", "(IJIIIIIII)V");
 			#ifdef DEBUG
-			if (idMouseWheelEvent == NULL) {
+			if (idNativeMouseWheelEvent == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseWheelEvent.NativeMouseWheelEvent(int, long, int, int, int, int, int, int)!\n");
 			}
 			#endif
@@ -164,27 +164,27 @@ int DestroyJNIGlobals() {
 
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		(*env)->DeleteGlobalRef(env, clsKeyEvent);
-		clsKeyEvent = NULL;
+		(*env)->DeleteGlobalRef(env, clsNativeKeyEvent);
+		clsNativeKeyEvent = NULL;
 
-		(*env)->DeleteGlobalRef(env, clsMouseEvent);
-		clsMouseEvent = NULL;
+		(*env)->DeleteGlobalRef(env, clsNativeMouseEvent);
+		clsNativeMouseEvent = NULL;
 
-		(*env)->DeleteGlobalRef(env, clsMouseWheelEvent);
-		clsMouseWheelEvent = NULL;
+		(*env)->DeleteGlobalRef(env, clsNativeMouseWheelEvent);
+		clsNativeMouseWheelEvent = NULL;
 
 		(*env)->DeleteGlobalRef(env, clsGlobalScreen);
 		clsGlobalScreen = NULL;
 
 		// Set all the global method ID's to null.
 		idGetInstance = NULL;
-		idDispatchEvent = NULL;
-		idStartEventDispatcher = NULL;
-		idStopEventDispatcher = NULL;
-		idKeyEvent = NULL;
-		idMouseButtonEvent = NULL;
-		idMouseMotionEvent = NULL;
-		idMouseWheelEvent = NULL;
+		idDispatchNativeEvent = NULL;
+		idStartNativeEventDispatcher = NULL;
+		idStopNativeEventDispatcher = NULL;
+		idNativeKeyEvent = NULL;
+		idNativeMouseButtonEvent = NULL;
+		idNativeMouseMotionEvent = NULL;
+		idNativeMouseWheelEvent = NULL;
 
 		status = RETURN_SUCCESS;
 	}

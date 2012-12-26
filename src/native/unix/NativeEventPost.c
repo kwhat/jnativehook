@@ -16,13 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
+
+extern Display *disp;
 
 void PostKeyDownEvent(KeySym keysym, unsigned int state, Time time) {
 	int root_x, root_y, win_x, win_y;
 	
-	if (!XQueryPointer(disp, DefaultRootWindow(disp), null, null, &root_x, &root_y, &win_x, &win_y, null)) {
+	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
 		root_x = 0;
 		root_y = 0;
 		win_x = 0;
@@ -54,7 +57,7 @@ void PostKeyDownEvent(KeySym keysym, unsigned int state, Time time) {
 void PostKeyUpEvent(KeySym keysym, unsigned int state, Time time) {
 	int root_x, root_y, win_x, win_y;
 	
-	if (!XQueryPointer(disp, DefaultRootWindow(disp), null, null, &root_x, &root_y, &win_x, &win_y, null)) {
+	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
 		root_x = 0;
 		root_y = 0;
 		win_x = 0;

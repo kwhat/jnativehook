@@ -40,6 +40,8 @@ static CGEventTimestamp click_time = 0;
 static bool mouse_dragged = false;
 
 // Thread and hook handles.
+static CFMessagePortRef localMsgPort;
+static CFRunLoopSourceRef sourceMsgPort;
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -69,6 +71,14 @@ static void CallbackProc(CFRunLoopObserverRef UNUSED(observer), CFRunLoopActivit
 	}
 }
 
+
+CFDataRef MessagePortProc(CFMessagePortRef UNUSED(msgport), SInt32 UNUSED(msgid), CFDataRef data, void *UNUSED(info)) {
+	//TODO UniChar to CFData
+	printf("MessagePortProc: Testing\n");
+
+	return data;
+}
+
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void *UNUSED(refcon)) {
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
@@ -93,9 +103,9 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			jint jmodifiers;
 
 			// Buffer for Unicode char lookup.
-			const UniCharCount buff_size = 8;
-			UniChar buffer[buff_size];
-			UniCharCount buff_len = 0;
+			//const UniCharCount buff_size = 8;
+			//UniChar buffer[buff_size];
+			//UniCharCount buff_len = 0;
 
 			// Java event objects.
 			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
@@ -126,6 +136,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 
+					/*
 					// Lookup the unicode representation for this event.
 					KeyCodeToString(event, buff_size, &buff_len, buffer);
 					if (buff_len == 1) {
@@ -143,6 +154,18 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 					}
+					*/
+					
+					UInt8 bytes[] = { 0 };
+					
+					CFDataRef sndData = CFDataCreate(kCFAllocatorDefault, bytes, 1);
+					//CFDataRef sndData = CFDataCreateCopy(kCFAllocatorDefault, CFDataRef theData);
+					CFDataRef rtnData;
+					
+					CFTimeInterval timeout = CFAbsoluteTimeGetCurrent();
+					SInt32 resp = CFMessagePortSendRequest(localMsgPort, 0, sndData, timeout + 5, timeout + 10, kCFRunLoopDefaultMode, &rtnData);
+					printf("CFMessagePortSendRequest: %i\n", resp);
+					CFRelease(sndData);
 					break;
 
 				case kCGEventKeyUp:
@@ -701,6 +724,34 @@ static void *ThreadProc(void *arg) {
 	pthread_exit(status);
 }
 
+static int StartMessagePortRunLoop() {
+	int status = RETURN_FAILURE;
+	Boolean shouldFreeInfo;
+	
+	CFMessagePortContext context = {
+		.version = 0,
+		.info = NULL,
+		.retain = NULL,
+		.release = NULL,
+		.copyDescription = NULL
+	};
+
+	localMsgPort = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("TextServiceMessagePort"), MessagePortProc, &context, &shouldFreeInfo);
+	if (shouldFreeInfo != true) {
+		sourceMsgPort = CFMessagePortCreateRunLoopSource(kCFAllocatorDefault, localMsgPort, 0);
+		CFRunLoopAddSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+		status = RETURN_SUCCESS;
+	}
+	
+	return status;
+}
+
+static void StopMessagePortRunLoop() {
+	CFRunLoopRemoveSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+	CFRelease(sourceMsgPort);
+	CFRelease(localMsgPort);
+}
+
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
@@ -714,6 +765,8 @@ int StartNativeThread() {
 
 	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
+		StartMessagePortRunLoop();
+		
 		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "StartNativeThread(): start successful.\n");
@@ -783,6 +836,8 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
 		free(thread_status);
+
+		StopMessagePortRunLoop();
 
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
