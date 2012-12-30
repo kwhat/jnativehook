@@ -533,7 +533,7 @@
 		<condition property="native.cc.flags" value="${env.CFLAGS}">
 			<isset property="${env.CFLAGS}" />
 		</condition>
-		<condition property="native.cc.flags" value="-arch ${native.arch.target} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug} -fblocks -mmacosx-version-min=10.6">
+		<condition property="native.cc.flags" value="-arch ${native.arch.target} -mtune=${native.arch.tune} ${native.cc.flags.optimize} ${native.cc.flags.debug}">
 			<!-- -isysroot=/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -->
 			<istrue value="${native.os.isApple}" />
 		</condition>

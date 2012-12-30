@@ -115,6 +115,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 
 					if (ConvertVirtualKeyToWChar(kbhook->vkCode, &keytxt, &keydead) > 0) {
 						// Fire key typed event.
@@ -130,6 +131,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 												(jchar) keytxt,
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						(*env)->DeleteLocalRef(env, objKeyEvent);
 					}
 					break;
 
@@ -165,6 +167,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 					break;
 
 				#ifdef DEBUG
@@ -284,6 +287,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case WM_LBUTTONUP:
@@ -335,6 +339,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 
 					if (last_click.x == mshook->pt.x && last_click.y == mshook->pt.y) {
 						// Fire mouse clicked event.
@@ -350,6 +355,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 													(jint) click_count,
 													jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						(*env)->DeleteLocalRef(env, objMouseEvent);
 					}
 					break;
 
@@ -398,6 +404,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 						
 						// Fire mouse moved event.
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						(*env)->DeleteLocalRef(env, objMouseEvent);
 					}
 					break;
 
@@ -443,6 +450,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 													scrollAmount,
 													wheelRotation);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+					(*env)->DeleteLocalRef(env, objMouseWheelEvent);
 					break;
 
 				#ifdef DEBUG

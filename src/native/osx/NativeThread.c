@@ -40,14 +40,83 @@ static CGEventTimestamp click_time = 0;
 static bool mouse_dragged = false;
 
 // Thread and hook handles.
+static CFRunLoopSourceRef sourceMsgPort;
+
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
+
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
 
 static CGEventFlags prev_event_mask, diff_event_mask, keyup_event_mask;
 static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagMaskControl + kCGEventFlagMaskAlternate + kCGEventFlagMaskCommand;
+
+
+
+typedef struct {
+	CGEventRef event;
+	UniChar buffer[8];
+	UniCharCount length;
+} TISMessage;
+
+static TISMessage data = {
+	.event = NULL,
+	.buffer = { 0x00 },
+	.length = 0
+};
+
+void MessagePortProc(void *info) {
+	TISMessage *data = (TISMessage *) info;
+	
+	if (data->event != NULL) {
+		// Preform Unicode lookup.
+		KeyCodeToString(data->event, sizeof(data->buffer), &(data->length), data->buffer);
+	}
+	
+	pthread_mutex_lock(&lock);
+	pthread_cond_signal(&cond);
+	pthread_mutex_unlock(&lock);
+}
+
+static void StartMessagePortRunLoop() {
+	CFRunLoopSourceContext context = {
+		.version = 0,
+		.info = &data,
+		.retain = NULL,
+		.release = NULL,
+		.copyDescription = NULL,
+		.equal = NULL,
+		.hash = NULL,
+		.schedule = NULL,
+		.cancel = NULL,
+		 
+		.perform = MessagePortProc
+	};
+
+	sourceMsgPort = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context);
+	CFRunLoopAddSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+
+	#ifdef DEBUG
+	fprintf(stdout, "StartMessagePortRunLoop(): start successful.\n");
+	#endif
+}
+
+static void StopMessagePortRunLoop() {
+	if (CFRunLoopContainsSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode)) {
+		CFRunLoopRemoveSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+		CFRelease(sourceMsgPort);
+	}
+	
+	sourceMsgPort = NULL;
+	
+	#ifdef DEBUG
+	fprintf(stderr, "StopMessagePortRunLoop(): completed.\n");
+	#endif
+}
 
 static void CallbackProc(CFRunLoopObserverRef UNUSED(observer), CFRunLoopActivity activity, void *UNUSED(info)) {
 	switch (activity) {
@@ -92,11 +161,6 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			jint jscrollType, jscrollAmount, jwheelRotation;
 			jint jmodifiers;
 
-			// Buffer for Unicode char lookup.
-			const UniCharCount buff_size = 8;
-			UniChar buffer[buff_size];
-			UniCharCount buff_len = 0;
-
 			// Java event objects.
 			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
 
@@ -125,10 +189,29 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 
-					// Lookup the unicode representation for this event.
-					KeyCodeToString(event, buff_size, &buff_len, buffer);
-					if (buff_len == 1) {
+
+					// Lookup the Unicode representation for this event.
+					CFRunLoopSourceContext context = { .version = 0 };
+					CFRunLoopSourceGetContext(sourceMsgPort, &context);
+
+					// Get the run loop context info pointer.
+					TISMessage *info = (TISMessage *) context.info;
+					
+					// Set the event pointer.
+					info->event = event;
+
+					// Signal the custom source and wakeup the main run loop.
+					CFRunLoopSourceSignal(sourceMsgPort);
+					CFRunLoopWakeUp(CFRunLoopGetMain());
+
+					// Pause thread execution until the main runloop completes.
+					pthread_mutex_lock(&lock);
+					pthread_cond_wait(&cond, &lock);
+					pthread_mutex_unlock(&lock);
+
+					if (info->length == 1) {
 						// Fire key typed event.
 						objKeyEvent = (*env)->NewObject(
 												env,
@@ -139,10 +222,14 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												jmodifiers,
 												jkey.rawcode,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-												(jchar) buffer[0],
+												(jchar)info->buffer[0],
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						(*env)->DeleteLocalRef(env, objKeyEvent);
 					}
+
+					info->event = NULL;
+					info->length = 0;
 					break;
 
 				case kCGEventKeyUp:
@@ -168,6 +255,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 					break;
 
 				case kCGEventFlagsChanged:
@@ -273,6 +361,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventLeftMouseUp:
@@ -320,6 +409,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 
 					if (mouse_dragged != true) {
 						// Fire mouse clicked event.
@@ -335,6 +425,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 													(jint) click_count,
 													jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						(*env)->DeleteLocalRef(env, objMouseEvent);
 					}
 					break;
 
@@ -369,6 +460,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) event_point.y,
 												(jint) click_count);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventMouseMoved:
@@ -398,6 +490,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) event_point.y,
 												(jint) click_count);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventScrollWheel:
@@ -450,6 +543,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 													jscrollAmount,
 													jwheelRotation);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+					(*env)->DeleteLocalRef(env, objMouseWheelEvent);
 					break;
 
 				#ifdef DEBUG
@@ -567,6 +661,8 @@ static void *ThreadProc(void *arg) {
 								// Set the exit status.
 								*status = RETURN_SUCCESS;
 
+								StartMessagePortRunLoop();
+
 								CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
 								CFRunLoopAddObserver(event_loop, observer, kCFRunLoopDefaultMode);
 
@@ -576,6 +672,8 @@ static void *ThreadProc(void *arg) {
 								CFRunLoopRemoveObserver(event_loop, observer, kCFRunLoopDefaultMode);
 								CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
 								CFRunLoopObserverInvalidate(observer);
+
+								StopMessagePortRunLoop();
 							}
 							else {
 								// We cant do a whole lot of anything if we cant create JNI globals.
@@ -783,7 +881,7 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
 		free(thread_status);
-
+		
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif

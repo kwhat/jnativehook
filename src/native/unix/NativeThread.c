@@ -129,6 +129,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 												org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						(*env)->DeleteLocalRef(env, objKeyEvent);
 
 						// Check to make sure the key is printable.
 						keytxt = KeySymToUnicode(keysym);
@@ -146,6 +147,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 													(jchar) keytxt,
 													jkey.location);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+							(*env)->DeleteLocalRef(env, objKeyEvent);
 						}
 						break;
 
@@ -171,6 +173,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 												org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						(*env)->DeleteLocalRef(env, objKeyEvent);
 						break;
 
 					case ButtonPress:
@@ -210,6 +213,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														(jint) click_count,
 														jbutton);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+							(*env)->DeleteLocalRef(env, objMouseEvent);
 						}
 						else if (event_code == WheelUp || event_code == WheelDown) {
 							/* Scroll wheel release events.
@@ -257,6 +261,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 															jscrollAmount,
 															jwheelRotation);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+							(*env)->DeleteLocalRef(env, objMouseWheelEvent);
 						}
 						break;
 
@@ -284,6 +289,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 														(jint) click_count,
 														jbutton);
 							(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+							(*env)->DeleteLocalRef(env, objMouseEvent);
 
 							if (mouse_dragged != true) {
 								// Fire mouse clicked event.
@@ -299,6 +305,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 															(jint) click_count,
 															jbutton);
 								(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+								(*env)->DeleteLocalRef(env, objMouseEvent);
 							}
 						}
 						break;
@@ -347,6 +354,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 
 						// Fire mouse moved event.
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						(*env)->DeleteLocalRef(env, objMouseEvent);
 						break;
 
 					#ifdef DEBUG
