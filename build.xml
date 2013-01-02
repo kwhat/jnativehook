@@ -2,7 +2,7 @@
 
 <!--
 	JNativeHook: Global keyboard and mouse hooking for Java.
-	Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+	Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -784,7 +784,7 @@
 			</packageset>
 
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2012 ${project.vendor}. All Rights Received.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2013 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<!--
 			<tag name="to.do" scope="all" description="To Do:" />

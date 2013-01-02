@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -25,21 +25,21 @@
  */
 extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
 
-/* Converts an X11 key symbol to a single Unicode character.  No direct X11 
+/* Converts an X11 key symbol to a single Unicode character.  No direct X11
  * functionality exists to provide this information.
  */
 extern wchar_t KeySymToUnicode(KeySym keysym);
 
-/* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode() 
- * functionality.  This method is called by OnLibraryLoad() and may need to be 
- * called in combination with UnloadInputHelper() if the native keyboard layout 
+/* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
+ * functionality.  This method is called by OnLibraryLoad() and may need to be
+ * called in combination with UnloadInputHelper() if the native keyboard layout
  * is changed.
  */
 extern void LoadInputHelper();
 
-/* De-initialize items required for KeyCodeToKeySym() and KeySymToUnicode() 
- * functionality.  This method is called by OnLibraryUnload() and may need to be 
- * called in combination with LoadInputHelper() if the native keyboard layout 
+/* De-initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
+ * functionality.  This method is called by OnLibraryUnload() and may need to be
+ * called in combination with LoadInputHelper() if the native keyboard layout
  * is changed.
  */
 extern void UnloadInputHelper();

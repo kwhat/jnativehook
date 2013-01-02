@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,27 +17,27 @@
  */
 
 /***********************************************************************
- * The following code is based on code provided by Marc-André Moreau 
+ * The following code is based on code provided by Marc-André Moreau
  * to work around a failure to support dead keys in the ToUnicode() API.
- * According to the author some parts were taken directly from 
- * Microsoft's  kbd.h header file that is shipped with the Windows 
+ * According to the author some parts were taken directly from
+ * Microsoft's  kbd.h header file that is shipped with the Windows
  * Driver Development Kit.
- * 
+ *
  * The original code was substantially modified to provide the following:
  *   1) More dynamic code structure.
  *   2) Support for compilers that do not implement _ptr64 (GCC / LLVM).
  *   3) Support for Wow64 at runtime via 32-bit binary.
- * 
- * I have contacted Marc-André Moreau who has granted permission for 
- * his original source code to be used under the Public Domain.  Although 
- * the JNativeHook library as a whole is currently covered under the GPLv3, 
- * please feel free to use and learn from the source code contained in this 
+ *
+ * I have contacted Marc-André Moreau who has granted permission for
+ * his original source code to be used under the Public Domain.  Although
+ * the JNativeHook library as a whole is currently covered under the GPLv3,
+ * please feel free to use and learn from the source code contained in this
  * file under the terms of the Public Domain.
- * 
+ *
  * For further reading and the original code, please visit:
  *   http://legacy.docdroppers.org/wiki/index.php?title=Writing_Keyloggers
  *   http://www.techmantras.com/content/writing-keyloggers-full-length-tutorial
- * 
+ *
  ***********************************************************************/
 
 #include <stddef.h>
@@ -70,7 +70,7 @@ static BOOL IsWow64() {
 			#endif
 		}
 	}
-	
+
 	return bIsWow64;
 }
 #endif
@@ -99,7 +99,7 @@ static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 
 int LoadUnicodeHelper() {
 	int status = RETURN_FAILURE;
-	
+
 	#if defined(_WIN32) && !defined(_WIN64)
 	if (IsWow64()) {
 		ptrPadding = sizeof(void *);
@@ -126,13 +126,13 @@ int LoadUnicodeHelper() {
 
 				// First element of each structure, no offset adjustment needed.
 				pVkToBit = pKbd->pCharModifiers->pVkToBit;
-				
+
 				// Second element of pKbd, +4 byte offset on wow64.
 				pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding));
-				
+
 				// Third element of pKbd, +8 byte offset on wow64.
 				pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2)));
-				
+
 				status = RETURN_SUCCESS;
 			}
 			else {
@@ -161,7 +161,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 	int charCount = 0;
 	*outputChar = 0;
 	*deadChar = 0;
-	
+
 	//Check and make sure the unicode helper was loaded.
 	if (kbdLibrary != NULL) {
 		short state = 0;
@@ -173,7 +173,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 
 		int capsLock = (GetKeyState(VK_CAPITAL) & 0x01);
 
-		/* Because this is only a structure of two bytes, we don't need to worry 
+		/* Because this is only a structure of two bytes, we don't need to worry
 		* about the structure padding of __ptr64 offsets on Wow64.
 		*/
 		for (int i = 0; pVkToBit[i].Vk != 0; i++) {

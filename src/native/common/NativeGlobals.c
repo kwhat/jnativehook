@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ int CreateJNIGlobals() {
 		jclass clsLocalGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 		if (clsLocalGlobalScreen != NULL) {
 			clsGlobalScreen = (jclass) (*env)->NewGlobalRef(env, clsLocalGlobalScreen);
-			
+
 			// Get the method ID for GlobalScreen.getInstance()
 			idGetInstance = (*env)->GetStaticMethodID(env, clsGlobalScreen, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
 			#ifdef DEBUG
@@ -83,7 +83,7 @@ int CreateJNIGlobals() {
 		jclass clsLocalKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 		if (clsLocalKeyEvent != NULL) {
 			clsKeyEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalKeyEvent);
-			
+
 			idKeyEvent = (*env)->GetMethodID(env, clsKeyEvent, "<init>", "(IJIIICI)V");
 			#ifdef DEBUG
 			if (idKeyEvent == NULL) {
@@ -102,7 +102,7 @@ int CreateJNIGlobals() {
 		jclass clsLocalMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 		if (clsLocalMouseEvent != NULL) {
 			clsMouseEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseEvent);
-			
+
 			idMouseButtonEvent = (*env)->GetMethodID(env, clsMouseEvent, "<init>", "(IJIIIII)V");
 			#ifdef DEBUG
 			if (idMouseButtonEvent == NULL) {
@@ -128,7 +128,7 @@ int CreateJNIGlobals() {
 		jclass clsLocalMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 		if (clsLocalMouseWheelEvent != NULL) {
 			clsMouseWheelEvent = (jclass) (*env)->NewGlobalRef(env, clsLocalMouseWheelEvent);
-			
+
 			idMouseWheelEvent = (*env)->GetMethodID(env, clsMouseWheelEvent, "<init>", "(IJIIIIIII)V");
 			#ifdef DEBUG
 			if (idMouseWheelEvent == NULL) {
@@ -191,7 +191,7 @@ int DestroyJNIGlobals() {
 	#ifdef DEBUG
 	else {
 		/* Leaving dangling global references will leak a small amount of memory
-		 * but because this function is only called on JNI unload, that memory 
+		 * but because this function is only called on JNI unload, that memory
 		 * should be freed by the JVM after the unload compleats.
 		 */
 		fprintf(stderr, "DestroyJNIGlobals(): GetEnv() failed!\n");

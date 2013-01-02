@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 
 
-/* Redefined virtual constants for native use.  This file should be machine 
+/* Redefined virtual constants for native use.  This file should be machine
  * generated however no tool exists for doing so.
  * Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
  */

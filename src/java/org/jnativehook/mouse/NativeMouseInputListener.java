@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,14 +18,14 @@
 package org.jnativehook.mouse;
 
 /**
- * A listener implementing all the methods in both the NativeMouseListener and 
+ * A listener implementing all the methods in both the NativeMouseListener and
  * NativeMouseMotionListener interfaces.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * 
+ *
  * @see NativeMouseEvent
  */
 public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {
-	
+
 }

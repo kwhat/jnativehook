@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -36,8 +36,8 @@ extern int StopNativeThread();
 // Determine the status of the global hook thread.
 extern bool IsNativeThreadRunning();
 
-/* Determine if the function was called from within the native dispatch thread. 
- * The behavior of this function when IsNativeThreadRunning() == false is 
+/* Determine if the function was called from within the native dispatch thread.
+ * The behavior of this function when IsNativeThreadRunning() == false is
  * undefined.
  */
 extern bool IsNativeDispatchThread();

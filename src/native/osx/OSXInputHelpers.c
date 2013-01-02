@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -71,7 +71,7 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 			inputData = (CFDataRef) data;
 		}
 	}
-	
+
 	// Check if the keyboard layout has changed to see if the dead key state needs to be discarded.
 	if (previousKeyboardLayout != NULL && currentKeyboardLayout != NULL && CFEqual(currentKeyboardLayout, previousKeyboardLayout) == false) {
 		currDeadkeyState = 0;
@@ -81,7 +81,7 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 	if (previousKeyboardLayout != NULL) {
 		CFRelease(previousKeyboardLayout);
 	}
-	
+
 	// Set the previous keyboard layout to the current layout.
 	if (currentKeyboardLayout != NULL) {
 		previousKeyboardLayout = currentKeyboardLayout;

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -72,12 +72,12 @@ extern void UnsetModifierMask(unsigned short int mask);
 // Get the current native modifier mask state.
 extern unsigned short int GetModifiers();
 
-/* Retrieves the mouse wheel scroll type. This function cannot be included as 
+/* Retrieves the mouse wheel scroll type. This function cannot be included as
  * part of the NativeHelpers.h due to platform specific calling restrictions.
  */
 extern unsigned short int GetScrollWheelType();
 
-/* Retrieves the mouse wheel scroll amount. This function cannot be included as 
+/* Retrieves the mouse wheel scroll amount. This function cannot be included as
  * part of the NativeHelpers.h due to platform specific calling restrictions.
  */
 extern unsigned short int GetScrollWheelAmount();

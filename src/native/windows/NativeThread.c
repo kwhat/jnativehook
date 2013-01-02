@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -401,7 +401,7 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 														(jint) mshook->pt.y,
 														(jint) click_count);
 						}
-						
+
 						// Fire mouse moved event.
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
 						(*env)->DeleteLocalRef(env, objMouseEvent);
@@ -550,7 +550,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 			#else
 			DestroyJNIGlobals();
 			#endif
-			
+
 			// Detach this thread from the JVM.
 			(*jvm)->DetachCurrentThread(jvm);
 
@@ -576,7 +576,7 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		thread_ex.class = NATIVE_HOOK_EXCEPTION;
 		thread_ex.message = "Failed to create low level event hook";
 	}
-	
+
 	// Destroy the native hooks.
 	if (handleKeyboardHook != NULL) {
 		UnhookWindowsHookEx(handleKeyboardHook);
@@ -633,7 +633,7 @@ int StartNativeThread() {
 
 				// Wait for the thread to die.
 				WaitForSingleObject(hookThreadHandle,  INFINITE);
-				
+
 				DWORD thread_status;
 				GetExitCodeThread(hookThreadHandle, &thread_status);
 				status = (int) thread_status;
@@ -670,13 +670,13 @@ int StopNativeThread() {
 		DWORD thread_status;
 		GetExitCodeThread(hookThreadHandle, &thread_status);
 		status = (int) thread_status;
-		
+
 		CloseHandle(hookThreadHandle);
 		hookThreadHandle = NULL;
 
 		CloseHandle(hookCtrlHandle);
 		hookCtrlHandle = NULL;
-		
+
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
@@ -690,7 +690,7 @@ bool IsNativeThreadRunning() {
 	GetExitCodeThread(hookThreadHandle, &status);
 
 	bool isRunning = status == STILL_ACTIVE;
-	
+
 	#ifdef DEBUG
 	fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", isRunning);
 	#endif

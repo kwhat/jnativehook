@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,27 +17,27 @@
  */
 
 /***********************************************************************
- * The following code is based on code provided by Marc-André Moreau 
+ * The following code is based on code provided by Marc-André Moreau
  * to work around a failure to support dead keys in the ToUnicode() API.
- * According to the author some parts were taken directly from 
- * Microsoft's  kbd.h header file that is shipped with the Windows 
+ * According to the author some parts were taken directly from
+ * Microsoft's  kbd.h header file that is shipped with the Windows
  * Driver Development Kit.
- * 
+ *
  * The original code was substantially modified to provide the following:
  *   1) More dynamic code structure.
  *   2) Support for compilers that do not implement _ptr64 (GCC / LLVM).
  *   3) Support for Wow64 at runtime via 32-bit binary.
- * 
- * I have contacted Marc-André Moreau who has granted permission for 
- * his original source code to be used under the Public Domain.  Although 
- * the JNativeHook library as a whole is currently covered under the GPLv3, 
- * please feel free to use and learn from the source code contained in this 
+ *
+ * I have contacted Marc-André Moreau who has granted permission for
+ * his original source code to be used under the Public Domain.  Although
+ * the JNativeHook library as a whole is currently covered under the GPLv3,
+ * please feel free to use and learn from the source code contained in this
  * file under the terms of the Public Domain.
- * 
+ *
  * For further reading and the original code, please visit:
  *   http://legacy.docdroppers.org/wiki/index.php?title=Writing_Keyloggers
  *   http://www.techmantras.com/content/writing-keyloggers-full-length-tutorial
- * 
+ *
  ***********************************************************************/
 
 #ifndef _Included_WinUnicodeHelper
@@ -47,8 +47,8 @@
 #include <limits.h>
 
 /* Assume that any compiler defining _MSC_VER knows about LPFN_ISWOW64PROCESS.
- * This assertion has not been tested.  If you are using a compiler that 
- * defines _MSC_VER but does not define LPFN_ISWOW64PROCESS, such as ICC for 
+ * This assertion has not been tested.  If you are using a compiler that
+ * defines _MSC_VER but does not define LPFN_ISWOW64PROCESS, such as ICC for
  * windows, please file a bug report.
  */
 #ifndef _MSC_VER

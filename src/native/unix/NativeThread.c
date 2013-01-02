@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -521,7 +521,7 @@ static void *ThreadProc(void *arg) {
 
 				// Callback and stop native event dispatch thread.
 				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-				
+
 				// Remove the global reference to the GlobalScren object.
 				(*env)->DeleteGlobalRef(env, objGlobalScreen);
 			}

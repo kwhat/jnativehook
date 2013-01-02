@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ typedef struct {
 } JKeyDatum;
 
 /* Converts the native key symbol to the virtual key code and keyboard location.
- * The raw code is the platform specific key code. 
+ * The raw code is the platform specific key code.
  */
 extern JKeyDatum NativeToJKey(unsigned int keysym);
 
