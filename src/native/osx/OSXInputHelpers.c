@@ -176,6 +176,20 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 	#else
 	CGEventKeyboardGetUnicodeString(event, size, length, buffer);
 	#endif
+
+	// The following codes should not be processed because they are invalid.
+	// FIXME This entire function is ugly, hard to follow and needs to be reworked.
+	if (*length == 1) {
+		switch (buffer[0]) {
+			case 0x01:		// Home
+			case 0x04:		// End
+			case 0x05:		// Help Key
+			case 0x10:		// Function Keys
+			case 0x0B:		// Page Up
+			case 0x0C:		// Page Down
+				*length = 0;
+		}
+	}
 }
 
 void LoadInputHelper() {

@@ -398,16 +398,16 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_ydiaeresis:
 			return keysym;
 		case XK_Tab:
-		#if defined XK_MISCELLANY
+		#ifdef XK_MISCELLANY
 		case XK_KP_Tab:
 		#endif
 			return '\t';
 		case XK_Return:
-		#if defined XK_MISCELLANY
+		#ifdef XK_MISCELLANY
 		case XK_KP_Enter:
 		#endif
 			return '\n';
-		#if defined XK_MISCELLANY
+		#ifdef XK_MISCELLANY
 		case XK_KP_0:
 		case XK_KP_1:
 		case XK_KP_2:

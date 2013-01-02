@@ -56,7 +56,7 @@ static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagM
 
 typedef struct {
 	CGEventRef event;
-	UniChar buffer[8];
+	UniChar buffer[4];
 	UniCharCount length;
 } TISMessage;
 
@@ -221,7 +221,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												jmodifiers,
 												jkey.rawcode,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-												(jchar)info->buffer[0],
+												(jchar) info->buffer[0],
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
 						(*env)->DeleteLocalRef(env, objKeyEvent);
