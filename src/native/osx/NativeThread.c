@@ -45,9 +45,6 @@ static CFRunLoopSourceRef sourceMsgPort;
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
 
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
@@ -71,15 +68,14 @@ static TISMessage data = {
 
 void MessagePortProc(void *info) {
 	TISMessage *data = (TISMessage *) info;
-	
+
 	if (data->event != NULL) {
 		// Preform Unicode lookup.
 		KeyCodeToString(data->event, sizeof(data->buffer), &(data->length), data->buffer);
 	}
-	
-	pthread_mutex_lock(&lock);
-	pthread_cond_signal(&cond);
-	pthread_mutex_unlock(&lock);
+
+	// Unlock the control mutex to signal that we have finished on the main run loop.
+	pthread_mutex_unlock(&hookControlMutex);
 }
 
 static void StartMessagePortRunLoop() {
@@ -93,7 +89,7 @@ static void StartMessagePortRunLoop() {
 		.hash = NULL,
 		.schedule = NULL,
 		.cancel = NULL,
-		 
+
 		.perform = MessagePortProc
 	};
 
@@ -110,9 +106,9 @@ static void StopMessagePortRunLoop() {
 		CFRunLoopRemoveSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
 		CFRelease(sourceMsgPort);
 	}
-	
+
 	sourceMsgPort = NULL;
-	
+
 	#ifdef DEBUG
 	fprintf(stderr, "StopMessagePortRunLoop(): completed.\n");
 	#endif
@@ -198,18 +194,21 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 
 					// Get the run loop context info pointer.
 					TISMessage *info = (TISMessage *) context.info;
-					
+
 					// Set the event pointer.
 					info->event = event;
+
+					// Lock the control mutex as we enter the main run loop.
+					pthread_mutex_lock(&hookControlMutex);
 
 					// Signal the custom source and wakeup the main run loop.
 					CFRunLoopSourceSignal(sourceMsgPort);
 					CFRunLoopWakeUp(CFRunLoopGetMain());
 
-					// Pause thread execution until the main runloop completes.
-					pthread_mutex_lock(&lock);
-					pthread_cond_wait(&cond, &lock);
-					pthread_mutex_unlock(&lock);
+					// Wait for a lock while the main run loop processes they key typed event.
+					if (pthread_mutex_lock(&hookControlMutex) == 0) {
+						pthread_mutex_unlock(&hookControlMutex);
+					}
 
 					if (info->length == 1) {
 						// Fire key typed event.
@@ -881,7 +880,7 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
 		free(thread_status);
-		
+
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
