@@ -16,31 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_NativeHelpers_h
-#define _Included_NativeHelpers_h
+#ifndef _Included_JConvertFromNative
+#define _Included_JConvertFromNative
 
-// Retrieves the keyboard auto repeat rate.
-extern long int GetAutoRepeatRate();
+#include <stdint.h>
 
-// Retrieves the keyboard auto repeat delay.
-extern long int GetAutoRepeatDelay();
+/* Converts the native key symbol to the virtual key code and keyboard location.
+ * The raw code is the platform specific key code. 
+ */
+extern uint_fast16_t convert_to_native_keycode(uint_fast16_t virtual_keycode);
 
-// Retrieves the mouse acceleration multiplier.
-extern long int GetPointerAccelerationMultiplier();
+// Converts the native button code to its virtual counterpart.
+extern uint_fast8_t convert_to_native_button(uint_fast8_t virtual_button);
 
-// Retrieves the mouse acceleration threshold.
-extern long int GetPointerAccelerationThreshold();
-
-// Retrieves the mouse sensitivity.
-extern long int GetPointerSensitivity();
-
-// Retrieves the double/triple click interval.
-extern long int GetMultiClickTime();
-
-// Native library load callback for platform specific initialization.
-extern void OnLibraryLoad();
-
-// Native library unload callback for platform specific de-initialization.
-extern void OnLibraryUnload();
+// Converts the native modifier mask to its virtual counterpart.
+extern uint_fast16_t convert_to_native_mask(uint_fast16_t virtual_mask);
 
 #endif
