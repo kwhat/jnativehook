@@ -16,6 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef XRECORD_ASYNC
+#define _POSIX_C_SOURCE 199309L
+#include <time.h>
+#endif
+
 #include <pthread.h>
 #include <sys/time.h>
 
@@ -489,9 +494,9 @@ static void *ThreadProc(void *arg) {
 
 					while (running) {
 						XRecordProcessReplies(disp_data);
-						
+
 						// Prevent 100% CPU utilization.
-						XSync(disp_data, false);
+						nanosleep((struct timespec[]){{0, 100 * 1000000}}, NULL);
 					}
 					XRecordDisableContext(disp_ctrl, context);
 				}
