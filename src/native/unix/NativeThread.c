@@ -489,6 +489,9 @@ static void *ThreadProc(void *arg) {
 
 					while (running) {
 						XRecordProcessReplies(disp_data);
+						
+						// Prevent 100% CPU utilization.
+						XSync(disp_data, false);
 					}
 					XRecordDisableContext(disp_ctrl, context);
 				}
