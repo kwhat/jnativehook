@@ -59,7 +59,7 @@ static long click_time = 0;
 static bool mouse_dragged = false;
 
 // The pointer to the X11 display accessed by the callback.
-static Display *disp_ctrl;
+static Display *disp_ctrl, *disp_data;
 static XRecordContext context;
 
 // Thread and hook handles.
@@ -388,101 +388,128 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 	XRecordFreeData(hook);
 }
 
+// This method will be externalized with 1.2
+static bool ThreadStartCallback() {
+	bool status = false;
+	
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Attached to JVM successful.\n");
+		#endif
+
+		// Create the global screen references up front to save time in the callback.
+		jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+		if (objLocalScreen != NULL) {
+			objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
+			// Callback and start native event dispatch thread
+			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+			status = true;
+		}
+		else {
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
+
+			#ifdef DEBUG
+			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			thread_ex.message = "Failed to create JNI global references";
+		}
+
+
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Detach from JVM successful.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to attach the native thread to the virtual machine";
+	}
+	
+	return status;
+}
+
+// This method will be externalized with 1.2
+static bool ThreadStopCallback() {
+	bool status = false;
+	
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		// Calling AttachCurrentThread() should result in a no-op.
+		
+		// Callback and stop native event dispatch thread.
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+		
+		// Remove the global reference to the GlobalScren object.
+		(*env)->DeleteGlobalRef(env, objGlobalScreen);
+		
+		// Detach this thread from the JVM.
+		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+			status = true;
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "ThreadStopCallback(): DetachCurrentThread() failed!\n");
+		}
+		#endif
+	}
+	#ifdef DEBUG
+	else {
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+	}
+	#endif
+	
+	return status;
+}
+
 static void *ThreadProc(void *arg) {
 	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
-	JNIEnv *env = NULL;
+	
 
 	// XRecord context for use later.
 	context = 0;
 
-	// Grab the default display.
-	char *disp_name = XDisplayName(NULL);
-	disp_ctrl = XOpenDisplay(disp_name);
-	Display *disp_data = XOpenDisplay(disp_name);
-	if (disp_ctrl != NULL && disp_data != NULL) {
+	#ifdef DEBUG
+	fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
+	#endif
+
+	// Setup XRecord range.
+	XRecordClientSpec clients = XRecordAllClients;
+	XRecordRange *range = XRecordAllocRange();
+	if (range != NULL) {
 		#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
+		fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
 		#endif
 
-		// Check to make sure XRecord is installed and enabled.
-		int major, minor;
-		if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
+		// Create XRecord Context.
+		range->device_events.first = KeyPress;
+		range->device_events.last = MotionNotify;
+
+		/* Note that the documentation for this function is incorrect,
+		 * disp_data should be used!
+		 * See: http://www.x.org/releases/X11R7.6/doc/libXtst/recordlib.txt
+		 */
+		context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
+		if (context != 0) {
 			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
-			#endif
-
-			// Setup XRecord range.
-			XRecordClientSpec clients = XRecordAllClients;
-			XRecordRange *range = XRecordAllocRange();
-			if (range != NULL) {
-				#ifdef DEBUG
-				fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
-				#endif
-
-				// Sync events on the queue.
-				//XSync(disp_ctrl, false);
-				//XSync(disp_data, false);
-
-				// Create XRecord Context.
-				range->device_events.first = KeyPress;
-				range->device_events.last = MotionNotify;
-
-				/* Note that the documentation for this function is incorrect,
-				 * disp_data should be used!
-				 * See: http://www.x.org/releases/X11R7.6/doc/libXtst/recordlib.txt
-				 */
-				context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
-				XFree(range);
-			}
-			else {
-				#ifdef DEBUG
-				fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
-				#endif
-
-				thread_ex.class = NATIVE_HOOK_EXCEPTION;
-				thread_ex.message = "Failed to allocate XRecord range";
-			}
-		}
-		else {
-			#ifdef DEBUG
-			fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
-			#endif
-
-			thread_ex.class = NATIVE_HOOK_EXCEPTION;
-			thread_ex.message = "Failed to locate the X record extension";
-		}
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
-		#endif
-
-		thread_ex.class = NATIVE_HOOK_EXCEPTION;
-		thread_ex.message = "Failed to open X display";
-	}
-
-	if (context != 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
-		#endif
-
-		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
+			fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
 			#endif
 
 			// Initialize Native Input Functions.
 			LoadInputHelper();
 
-			// Create the global screen references up front to save time in the callback.
-			jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
-			if (objLocalScreen != NULL) {
-				objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
-
-				// Callback and start native event dispatch thread
-				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
-
+			// Callback for additional thread initialization.
+			if (ThreadStartCallback()) {
 				#ifdef XRECORD_ASYNC
 				// Allow the thread loop to block.
 				running = true;
@@ -496,8 +523,9 @@ static void *ThreadProc(void *arg) {
 						XRecordProcessReplies(disp_data);
 
 						// Prevent 100% CPU utilization.
-						nanosleep((struct timespec[]){{0, 100 * 1000000}}, NULL);
+						nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
 					}
+
 					XRecordDisableContext(disp_ctrl, context);
 				}
 				else {
@@ -527,74 +555,35 @@ static void *ThreadProc(void *arg) {
 				}
 				#endif
 
-				// Callback and stop native event dispatch thread.
-				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-				// Remove the global reference to the GlobalScren object.
-				(*env)->DeleteGlobalRef(env, objGlobalScreen);
+				// Callback for additional thread cleanup.
+				ThreadStopCallback();
 			}
-			else {
-				// We cant do a whole lot of anything if we cant create JNI globals.
-				// Any exceptions are thrown by CreateJNIGlobals().
-
-				#ifdef DEBUG
-				fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
-				#endif
-
-				thread_ex.class = NATIVE_HOOK_EXCEPTION;
-				thread_ex.message = "Failed to create JNI global references";
-			}
-
-			// Sync events on the queue.
-			//XSync(disp_ctrl, true);
-			//XSync(disp_data, true);
 
 			// Free up the context after the run loop terminates.
-			XRecordFreeContext(disp_ctrl, context);
+			XRecordFreeContext(disp_data, context);
 
 			// Cleanup Native Input Functions.
 			UnloadInputHelper();
-
-			// Destroy all created globals.
-			#ifdef DEBUG
-			if (DestroyJNIGlobals() == RETURN_FAILURE) {
-				fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
-			}
-			#else
-			DestroyJNIGlobals();
-			#endif
-
-			// Detach this thread from the JVM.
-			(*jvm)->DetachCurrentThread(jvm);
-
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-			#endif
 		}
 		else {
 			#ifdef DEBUG
-			fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
+			fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
 			#endif
 
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
 			thread_ex.message = "Failed to attach the native thread to the virtual machine";
 		}
+
+		// Free the XRecordRange.
+		XFree(range);
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
-	}
-	#endif
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
+		#endif
 
-	// Close down any open displays.
-	if (disp_ctrl != NULL) {
-		XCloseDisplay(disp_ctrl);
-		disp_ctrl = NULL;
-	}
-
-	if (disp_data != NULL) {
-		XCloseDisplay(disp_data);
-		disp_data = NULL;
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to allocate XRecord range";
 	}
 
 	#ifdef DEBUG
@@ -620,51 +609,90 @@ int StartNativeThread() {
 
 	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
-		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "StartNativeThread(): start successful.\n");
-			#endif
-
-			// Wait for the thread to unlock the control mutex indicating
-			// that it has started or failed.
-			if (pthread_mutex_lock(&hookControlMutex) == 0) {
-				pthread_mutex_unlock(&hookControlMutex);
-			}
-
-			// Handle any possible JNI issue that may have occurred.
-			if (IsNativeThreadRunning()) {
+		// Open the control and data displays.
+		disp_ctrl = XOpenDisplay(NULL);
+		disp_data = XOpenDisplay(NULL);
+	
+		if (disp_ctrl != NULL && disp_data != NULL) {
+			// Check to make sure XRecord is installed and enabled.
+			int major, minor;
+			if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
 				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
+				fprintf(stdout, "ThreadProc(): XRecord version: %d.%d.\n", major, minor);
 				#endif
 
-				status = RETURN_SUCCESS;
+				if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
+					#ifdef DEBUG
+					fprintf(stdout, "StartNativeThread(): start successful.\n");
+					#endif
+
+					// Wait for the thread to unlock the control mutex indicating
+					// that it has started or failed.
+					if (pthread_mutex_lock(&hookControlMutex) == 0) {
+						pthread_mutex_unlock(&hookControlMutex);
+					}
+
+					// Handle any possible JNI issue that may have occurred.
+					if (IsNativeThreadRunning()) {
+						#ifdef DEBUG
+						fprintf(stdout, "StartNativeThread(): initialization successful.\n");
+						#endif
+
+						status = RETURN_SUCCESS;
+					}
+					else {
+						#ifdef DEBUG
+						fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+						#endif
+
+						// Wait for the thread to die.
+						void *thread_status;
+						pthread_join(hookThreadId, (void *) &thread_status);
+						status = *(int *) thread_status;
+						free(thread_status);
+
+						#ifdef DEBUG
+						fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
+						#endif
+
+						if (thread_ex.class != NULL && thread_ex.message != NULL)  {
+							ThrowException(thread_ex.class, thread_ex.message);
+						}
+					}
+				}
+				else {
+					#ifdef DEBUG
+					fprintf(stderr, "StartNativeThread(): start failure!\n");
+					#endif
+
+					ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+				}
 			}
 			else {
 				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+				fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
 				#endif
 
-				// Wait for the thread to die.
-				void *thread_status;
-				pthread_join(hookThreadId, (void *) &thread_status);
-				status = *(int *) thread_status;
-				free(thread_status);
-
-				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
-				#endif
-
-				if (thread_ex.class != NULL && thread_ex.message != NULL)  {
-					ThrowException(thread_ex.class, thread_ex.message);
-				}
+				ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to locate the X record extension");
 			}
 		}
 		else {
 			#ifdef DEBUG
-			fprintf(stderr, "StartNativeThread(): start failure!\n");
+			fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
 			#endif
 
-			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+			// Close down any open displays.
+			if (disp_ctrl != NULL) {
+				XCloseDisplay(disp_ctrl);
+				disp_ctrl = NULL;
+			}
+
+			if (disp_data != NULL) {
+				XCloseDisplay(disp_data);
+				disp_data = NULL;
+			}
+
+			ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to open X displays");
 		}
 	}
 
@@ -693,7 +721,7 @@ int StopNativeThread() {
 		free(thread_status);
 		#else
 		if (XRecordDisableContext(disp_ctrl, context) != 0) {
-			XSync(disp_ctrl, false);
+			XSync(disp_ctrl, true);
 
 			// Wait for the thread to die.
 			void *thread_status;
@@ -702,7 +730,14 @@ int StopNativeThread() {
 			free(thread_status);
 		}
 		#endif
+		
+		// Close down any open displays.
+		XCloseDisplay(disp_ctrl);
+		disp_ctrl = NULL;
 
+		XCloseDisplay(disp_data);
+		disp_data = NULL;
+		
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif

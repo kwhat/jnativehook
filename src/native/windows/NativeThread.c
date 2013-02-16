@@ -542,15 +542,6 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 				thread_ex.message = "Failed to create JNI global references";
 			}
 
-			// Destroy all created globals.
-			#ifdef DEBUG
-			if (DestroyJNIGlobals() == RETURN_FAILURE) {
-				fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
-			}
-			#else
-			DestroyJNIGlobals();
-			#endif
-
 			// Detach this thread from the JVM.
 			(*jvm)->DetachCurrentThread(jvm);
 

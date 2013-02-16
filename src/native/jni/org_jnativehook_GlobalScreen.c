@@ -263,7 +263,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) 
 	}
 	#endif
 
+	// Destroy all created globals.
+	#ifdef DEBUG
+	if (DestroyJNIGlobals() == RETURN_FAILURE) {
+		fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
+	}
+	#else
 	DestroyJNIGlobals();
+	#endif
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");
