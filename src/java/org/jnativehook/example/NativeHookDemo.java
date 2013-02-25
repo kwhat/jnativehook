@@ -241,7 +241,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e the native input event to display.
 	 */
 	private void displayEventInfo(final NativeInputEvent e) {
-		/* Note: JNativeHook does *NOT* operate on the event dispatch thread.
+		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
 		 * Because Swing components must be accessed on the event dispatching
 		 * thread, you *MUST* wrap access to Swing components using the
 		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
@@ -251,6 +251,11 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				txtEventInfo.append("\n" + e.paramString());
 
 				try {
+					// Clean up the history to reduce memory consumption.
+					if (txtEventInfo.getLineCount() > 100) {
+						txtEventInfo.replaceRange("", 0, txtEventInfo.getLineEndOffset(txtEventInfo.getLineCount() - 1 - 100));
+					}
+
 					txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
 				}
 				catch (BadLocationException ex) {
