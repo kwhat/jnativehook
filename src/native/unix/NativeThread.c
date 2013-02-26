@@ -405,6 +405,11 @@ static bool ThreadStartCallback() {
 
 			// Callback and start native event dispatch thread
 			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+			
+			// Call Thread.currentThread().setName("JNativeHook Native Hook");
+			jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
+			(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
+			(*env)->DeleteLocalRef(env, objCurrentThread);
 
 			status = true;
 		}

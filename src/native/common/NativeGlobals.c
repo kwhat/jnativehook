@@ -30,12 +30,42 @@ jmethodID idGetInstance, idDispatchEvent, idStartEventDispatcher, idStopEventDis
 jclass clsGlobalScreen, clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
+// Thread class and methods to set the name.
+jclass clsThread;
+jmethodID idCurrentThread, idSetName;
 
 int CreateJNIGlobals() {
 	int status = RETURN_FAILURE;
 
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+		// Class and getInstance method id for the GlobalScreen Object.
+		jclass clsLocalThread = (*env)->FindClass(env, "java/lang/Thread");
+		if (clsLocalThread != NULL) {
+			clsThread = (jclass) (*env)->NewGlobalRef(env, clsLocalThread);
+
+			// Get the method ID for GlobalScreen.getInstance()
+			idCurrentThread = (*env)->GetStaticMethodID(env, clsThread, "currentThread", "()Ljava/lang/Thread;");
+			#ifdef DEBUG
+			if (idCurrentThread == NULL) {
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Thread.currentThread()!\n");
+			}
+			#endif
+
+			// Get the method ID for GlobalScreen.dispatchEvent().
+			idSetName = (*env)->GetMethodID(env, clsThread, "setName", "(Ljava/lang/String;)V");
+			#ifdef DEBUG
+			if (idSetName == NULL) {
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Thread.setName(String)!\n");
+			}
+			#endif
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the Thread class!\n");
+		}
+		#endif
+		
 		// Class and getInstance method id for the GlobalScreen Object.
 		jclass clsLocalGlobalScreen = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 		if (clsLocalGlobalScreen != NULL) {
@@ -175,8 +205,13 @@ int DestroyJNIGlobals() {
 
 		(*env)->DeleteGlobalRef(env, clsGlobalScreen);
 		clsGlobalScreen = NULL;
+		
+		(*env)->DeleteGlobalRef(env, clsThread);
+		clsThread = NULL;
 
 		// Set all the global method ID's to null.
+		idCurrentThread = NULL;
+		idSetName = NULL;
 		idGetInstance = NULL;
 		idDispatchEvent = NULL;
 		idStartEventDispatcher = NULL;

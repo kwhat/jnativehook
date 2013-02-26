@@ -41,6 +41,10 @@ extern jmethodID idGetInstance, idDispatchEvent, idStartEventDispatcher, idStopE
 extern jclass clsGlobalScreen, clsKeyEvent, clsMouseEvent, clsMouseWheelEvent;
 extern jmethodID idKeyEvent, idMouseButtonEvent, idMouseMotionEvent, idMouseWheelEvent;
 
+// Thread class and methods to set the name.
+extern jclass clsThread;
+extern jmethodID idCurrentThread, idSetName;
+
 // Create all of the JNI global references used throughout the native library.
 extern int CreateJNIGlobals();
 

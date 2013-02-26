@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import javax.swing.event.EventListenerList;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -71,7 +72,7 @@ public class GlobalScreen {
 	}
 
 	/**
-	 * A deconstructor that will perform native cleanup by calling the
+	 * A destructor that will perform native cleanup by calling the
 	 * {@link #unregisterNativeHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 *
@@ -246,7 +247,7 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static native boolean isNativeHookRegistered();
-
+	
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but maybe used to synthesize
@@ -372,8 +373,15 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	protected void startEventDispatcher() {
-		//Create a new single thread executor.
-		eventExecutor = Executors.newSingleThreadExecutor();
+		// Create a new single thread executor.
+		eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setName("JNativeHook Native Dispatch");
+				
+				return t;
+			}
+		});
 	}
 
 	/**
@@ -385,7 +393,7 @@ public class GlobalScreen {
 	 */
 	protected void stopEventDispatcher() {
 		if (eventExecutor != null) {
-			//Shutdown the current Event executor.
+			// Shutdown the current Event executor.
 			eventExecutor.shutdownNow();
 			eventExecutor = null;
 		}
