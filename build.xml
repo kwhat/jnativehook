@@ -383,7 +383,7 @@
 		<property name="project.option.xf86misc" value="false" />
 		<property name="project.option.xkb" value="true" />
 		<property name="project.option.xt" value="true" />
-		<property name="project.option.xrecord_async" value="true" />
+		<property name="project.option.xrecord_async" value="false" />
 
 
 		<!-- Set Apple configuration options to their default values -->

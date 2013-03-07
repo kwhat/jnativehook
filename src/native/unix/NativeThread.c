@@ -59,7 +59,7 @@ static long click_time = 0;
 static bool mouse_dragged = false;
 
 // The pointer to the X11 display accessed by the callback.
-static Display *disp_ctrl, *disp_data;
+static Display *disp_ctrl;
 static XRecordContext context;
 
 // Thread and hook handles.
@@ -391,7 +391,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 // This method will be externalized with 1.2
 static bool ThreadStartCallback() {
 	bool status = false;
-	
+
 	JNIEnv *env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		#ifdef DEBUG
@@ -405,7 +405,7 @@ static bool ThreadStartCallback() {
 
 			// Callback and start native event dispatch thread
 			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
-			
+
 			// Call Thread.currentThread().setName("JNativeHook Native Hook");
 			jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
 			(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
@@ -439,24 +439,24 @@ static bool ThreadStartCallback() {
 		thread_ex.class = NATIVE_HOOK_EXCEPTION;
 		thread_ex.message = "Failed to attach the native thread to the virtual machine";
 	}
-	
+
 	return status;
 }
 
 // This method will be externalized with 1.2
 static bool ThreadStopCallback() {
 	bool status = false;
-	
+
 	JNIEnv *env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
 		// Calling AttachCurrentThread() should result in a no-op.
-		
+
 		// Callback and stop native event dispatch thread.
 		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-		
+
 		// Remove the global reference to the GlobalScren object.
 		(*env)->DeleteGlobalRef(env, objGlobalScreen);
-		
+
 		// Detach this thread from the JVM.
 		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
 			status = true;
@@ -472,123 +472,136 @@ static bool ThreadStopCallback() {
 		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
 	}
 	#endif
-	
+
 	return status;
 }
 
 static void *ThreadProc(void *arg) {
 	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
-	
 
 	// XRecord context for use later.
 	context = 0;
 
-	#ifdef DEBUG
-	fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
-	#endif
-
-	// Setup XRecord range.
-	XRecordClientSpec clients = XRecordAllClients;
-	XRecordRange *range = XRecordAllocRange();
-	if (range != NULL) {
+	Display *disp_data = XOpenDisplay(NULL);
+	if (disp_data != NULL) {
 		#ifdef DEBUG
-		fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
+		fprintf(stdout, "ThreadProc(): XOpenDisplay successful.\n");
 		#endif
 
-		// Create XRecord Context.
-		range->device_events.first = KeyPress;
-		range->device_events.last = MotionNotify;
-
-		/* Note that the documentation for this function is incorrect,
-		 * disp_data should be used!
-		 * See: http://www.x.org/releases/X11R7.6/doc/libXtst/recordlib.txt
-		 */
-		context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
-		if (context != 0) {
+		// Setup XRecord range.
+		XRecordClientSpec clients = XRecordAllClients;
+		XRecordRange *range = XRecordAllocRange();
+		if (range != NULL) {
 			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
+			fprintf(stdout, "ThreadProc(): XRecordAllocRange successful.\n");
 			#endif
 
-			// Initialize Native Input Functions.
-			LoadInputHelper();
+			// Create XRecord Context.
+			range->device_events.first = KeyPress;
+			range->device_events.last = MotionNotify;
 
-			// Callback for additional thread initialization.
-			if (ThreadStartCallback()) {
-				#ifdef XRECORD_ASYNC
-				// Allow the thread loop to block.
-				running = true;
-
-				// Async requires that we loop so that our thread does not return.
-				if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
-					// Set the exit status.
-					*status = RETURN_SUCCESS;
-
-					while (running) {
-						XRecordProcessReplies(disp_data);
-
-						// Prevent 100% CPU utilization.
-						nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
-					}
-
-					XRecordDisableContext(disp_ctrl, context);
-				}
-				else {
-					#ifdef DEBUG
-					fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
-					#endif
-
-					// Reset the running state.
-					running = false;
-
-					thread_ex.class = NATIVE_HOOK_EXCEPTION;
-					thread_ex.message = "Failed to enable XRecord context";
-				}
-				#else
-				// Sync blocks until XRecordDisableContext() is called.
-				if (XRecordEnableContext(disp_data, context, LowLevelProc, NULL) != 0) {
-					// Set the exit status.
-					*status = RETURN_SUCCESS;
-				}
-				else {
-					#ifdef DEBUG
-					fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
-					#endif
-
-					thread_ex.class = NATIVE_HOOK_EXCEPTION;
-					thread_ex.message = "Failed to enable XRecord context";
-				}
+			/* Note that the documentation for this function is incorrect,
+			 * disp_data should be used!
+			 * See: http://www.x.org/releases/X11R7.6/doc/libXtst/recordlib.txt
+			 */
+			context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
+			if (context != 0) {
+				#ifdef DEBUG
+				fprintf(stdout, "ThreadProc(): XRecordCreateContext successful.\n");
 				#endif
 
-				// Callback for additional thread cleanup.
-				ThreadStopCallback();
+				// Initialize Native Input Functions.
+				LoadInputHelper();
+
+				// Callback for additional thread initialization.
+				if (ThreadStartCallback()) {
+					#ifdef XRECORD_ASYNC
+					// Allow the thread loop to block.
+					running = true;
+
+					// Async requires that we loop so that our thread does not return.
+					if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
+						// Set the exit status.
+						*status = RETURN_SUCCESS;
+
+						while (running) {
+							XRecordProcessReplies(disp_data);
+
+							// Prevent 100% CPU utilization.
+							nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
+						}
+
+						XRecordDisableContext(disp_ctrl, context);
+					}
+					else {
+						#ifdef DEBUG
+						fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
+						#endif
+
+						// Reset the running state.
+						running = false;
+
+						thread_ex.class = NATIVE_HOOK_EXCEPTION;
+						thread_ex.message = "Failed to enable XRecord context";
+					}
+					#else
+					// Sync blocks until XRecordDisableContext() is called.
+					if (XRecordEnableContext(disp_data, context, LowLevelProc, NULL) != 0) {
+						// Set the exit status.
+						*status = RETURN_SUCCESS;
+					}
+					else {
+						#ifdef DEBUG
+						fprintf (stderr, "ThreadProc(): XRecordEnableContext failure!\n");
+						#endif
+
+						thread_ex.class = NATIVE_HOOK_EXCEPTION;
+						thread_ex.message = "Failed to enable XRecord context";
+					}
+					#endif
+
+					// Callback for additional thread cleanup.
+					ThreadStopCallback();
+				}
+
+				// Free up the context after the run loop terminates.
+				XRecordFreeContext(disp_data, context);
+
+				// Cleanup Native Input Functions.
+				UnloadInputHelper();
+			}
+			else {
+				#ifdef DEBUG
+				fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
+				#endif
+
+				thread_ex.class = NATIVE_HOOK_EXCEPTION;
+				thread_ex.message = "Failed to create XRecord context";
 			}
 
-			// Free up the context after the run loop terminates.
-			XRecordFreeContext(disp_data, context);
-
-			// Cleanup Native Input Functions.
-			UnloadInputHelper();
+			// Free the XRecordRange.
+			XFree(range);
 		}
 		else {
 			#ifdef DEBUG
-			fprintf(stderr, "ThreadProc(): XRecordCreateContext failure!\n");
+			fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
 			#endif
 
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
-			thread_ex.message = "Failed to attach the native thread to the virtual machine";
+			thread_ex.message = "Failed to allocate XRecord range";
 		}
 
-		// Free the XRecordRange.
-		XFree(range);
+		XCloseDisplay(disp_data);
+		disp_data = NULL;
 	}
 	else {
 		#ifdef DEBUG
-		fprintf(stderr, "ThreadProc(): XRecordAllocRange failure!\n");
+		fprintf(stderr, "ThreadProc(): XOpenDisplay failure!\n");
 		#endif
 
 		thread_ex.class = NATIVE_HOOK_EXCEPTION;
-		thread_ex.message = "Failed to allocate XRecord range";
+		thread_ex.message = "Failed to open X display";
 	}
 
 	#ifdef DEBUG
@@ -616,9 +629,8 @@ int StartNativeThread() {
 	if (IsNativeThreadRunning() != true) {
 		// Open the control and data displays.
 		disp_ctrl = XOpenDisplay(NULL);
-		disp_data = XOpenDisplay(NULL);
-	
-		if (disp_ctrl != NULL && disp_data != NULL) {
+
+		if (disp_ctrl != NULL) {
 			// Check to make sure XRecord is installed and enabled.
 			int major, minor;
 			if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
@@ -692,11 +704,6 @@ int StartNativeThread() {
 				disp_ctrl = NULL;
 			}
 
-			if (disp_data != NULL) {
-				XCloseDisplay(disp_data);
-				disp_data = NULL;
-			}
-
 			ThrowException(NATIVE_HOOK_EXCEPTION, "Failed to open X displays");
 		}
 	}
@@ -726,7 +733,8 @@ int StopNativeThread() {
 		free(thread_status);
 		#else
 		if (XRecordDisableContext(disp_ctrl, context) != 0) {
-			XSync(disp_ctrl, true);
+			XFlush(disp_ctrl);
+			//XSync(disp_ctrl, true);
 
 			// Wait for the thread to die.
 			void *thread_status;
@@ -735,14 +743,11 @@ int StopNativeThread() {
 			free(thread_status);
 		}
 		#endif
-		
+
 		// Close down any open displays.
 		XCloseDisplay(disp_ctrl);
 		disp_ctrl = NULL;
 
-		XCloseDisplay(disp_data);
-		disp_data = NULL;
-		
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
 		#endif
