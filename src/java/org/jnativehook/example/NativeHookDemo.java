@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -30,10 +31,15 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
@@ -78,8 +84,68 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setSize(600, 300);
 		addWindowListener(this);
 
+		JMenuBar menuBar = new JMenuBar();
+
+		//Build the first menu.
+		JMenu menuFile = new JMenu("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menuFile);
+
+		//a group of JMenuItems
+		JMenuItem menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		menuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
+		menuItemQuit.getAccessibleContext().setAccessibleDescription("Exit the program");
+		menuFile.add(menuItemQuit);
+		menuBar.add(menuFile);
+
+		//Build the first menu.`
+		JMenu menuView = new JMenu("View");
+		menuView.setMnemonic(KeyEvent.VK_V);
+		menuBar.add(menuView);
+
+		//a group of JMenuItems
+		JMenuItem menuItemClear = new JMenuItem("Clear", KeyEvent.VK_C);
+		menuItemClear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuItemClear.getAccessibleContext().setAccessibleDescription("Clear the screen");
+		menuView.add(menuItemClear);
+
+		menuView.addSeparator();
+
+		JMenuItem menuItemEnable = new JCheckBoxMenuItem("Enable Native Hook");
+		menuItemEnable.setMnemonic(KeyEvent.VK_H);
+		menuItemEnable.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuView.add(menuItemEnable);
+
+		JMenu menuSubListeners = new JMenu("Listeners");
+		menuSubListeners.setMnemonic(KeyEvent.VK_L);
+		menuView.add(menuSubListeners);
+
+		//a group of check box menu items
+		JMenuItem menuItemKeyboardEvents = new JCheckBoxMenuItem("Keyboard Events");
+		menuItemKeyboardEvents.setMnemonic(KeyEvent.VK_K);
+		menuItemKeyboardEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemKeyboardEvents);
+
+		JMenuItem menuItemButtonEvents = new JCheckBoxMenuItem("Button Events");
+		menuItemButtonEvents.setMnemonic(KeyEvent.VK_B);
+		menuItemButtonEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemButtonEvents);
+
+		JMenuItem menuItemMotionEvents = new JCheckBoxMenuItem("Motion Events");
+		menuItemMotionEvents.setMnemonic(KeyEvent.VK_M);
+		menuItemMotionEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemMotionEvents);
+
+		JMenuItem menuItemWheelEvents  = new JCheckBoxMenuItem("Wheel Events");
+		menuItemWheelEvents.setMnemonic(KeyEvent.VK_W);
+		menuItemWheelEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK & ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemWheelEvents);
+
+		setJMenuBar(menuBar);
+
 		//Create options panel
 		JPanel grpOptions = new JPanel();
+
 		grpOptions.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		grpOptions.setLayout(new FlowLayout(FlowLayout.LEADING));
 		add(grpOptions, BorderLayout.NORTH);
