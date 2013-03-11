@@ -733,9 +733,11 @@ int StopNativeThread() {
 		free(thread_status);
 		#else
 		if (XRecordDisableContext(disp_ctrl, context) != 0) {
+			// See Bug 42356 for more information.
+			// https://bugs.freedesktop.org/show_bug.cgi?id=42356#c4
 			XFlush(disp_ctrl);
 			//XSync(disp_ctrl, true);
-
+			
 			// Wait for the thread to die.
 			void *thread_status;
 			pthread_join(hookThreadId, &thread_status);

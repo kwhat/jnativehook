@@ -570,10 +570,97 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 	return noErr;
 }
 
+// This method will be externalized with 1.2
+static bool ThreadStartCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Attached to JVM successful.\n");
+		#endif
+
+		// Create the global screen references up front to save time in the callback.
+		jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+		if (objLocalScreen != NULL) {
+			objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
+			// Callback and start native event dispatch thread
+			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+			// Call Thread.currentThread().setName("JNativeHook Native Hook");
+			jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
+			(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
+			(*env)->DeleteLocalRef(env, objCurrentThread);
+
+			status = true;
+		}
+		else {
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
+
+			#ifdef DEBUG
+			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			thread_ex.message = "Failed to create JNI global references";
+		}
+
+
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Detach from JVM successful.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to attach the native thread to the virtual machine";
+	}
+
+	return status;
+}
+
+// This method will be externalized with 1.2
+static bool ThreadStopCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		// Calling AttachCurrentThread() should result in a no-op.
+
+		// Callback and stop native event dispatch thread.
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+		// Remove the global reference to the GlobalScren object.
+		(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
+		// Detach this thread from the JVM.
+		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+			status = true;
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "ThreadStopCallback(): DetachCurrentThread() failed!\n");
+		}
+		#endif
+	}
+	#ifdef DEBUG
+	else {
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+	}
+	#endif
+
+	return status;
+}
+
 static void *ThreadProc(void *arg) {
 	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
-	JNIEnv *env = NULL;
 
 	// Check and make sure assistive devices is enabled.
 	if (AXAPIEnabled() == true) {
@@ -632,96 +719,53 @@ static void *ThreadProc(void *arg) {
 					fprintf(stdout, "ThreadProc(): CFRunLoopGetCurrent() success.\n");
 					#endif
 
-					if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-						#ifdef DEBUG
-						fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
-						#endif
+					// Initialize Native Input Functions.
+					LoadInputHelper();
 
-						// Initialize Native Input Functions.
-						LoadInputHelper();
+					// Callback for additional thread initialization.
+					if (ThreadStartCallback()) {
+						// Create run loop observers.
+						CFRunLoopObserverRef observer = CFRunLoopObserverCreate(
+															kCFAllocatorDefault,
+															kCFRunLoopEntry | kCFRunLoopExit, //kCFRunLoopAllActivities,
+															true,
+															0,
+															CallbackProc,
+															NULL
+														);
 
-						// Create the global screen references up front to save time in the callback.
-						jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
-						if (objLocalScreen != NULL) {
-							objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+						if (observer != NULL) {
+							// Set the exit status.
+							*status = RETURN_SUCCESS;
 
-							// Callback and start native event dispatch thread
-							(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+							StartMessagePortRunLoop();
 
-							CFRunLoopObserverRef observer = CFRunLoopObserverCreate(
-																kCFAllocatorDefault,
-																kCFRunLoopEntry | kCFRunLoopExit, //kCFRunLoopAllActivities,
-																true,
-																0,
-																CallbackProc,
-																NULL
-															);
-							if (observer != NULL) {
-								// Set the exit status.
-								*status = RETURN_SUCCESS;
+							CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
+							CFRunLoopAddObserver(event_loop, observer, kCFRunLoopDefaultMode);
 
-								StartMessagePortRunLoop();
+							CFRunLoopRun();
 
-								CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
-								CFRunLoopAddObserver(event_loop, observer, kCFRunLoopDefaultMode);
+							// Lock back up until we are done processing the exit.
+							CFRunLoopRemoveObserver(event_loop, observer, kCFRunLoopDefaultMode);
+							CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
+							CFRunLoopObserverInvalidate(observer);
 
-								CFRunLoopRun();
-
-								// Lock back up until we are done processing the exit.
-								CFRunLoopRemoveObserver(event_loop, observer, kCFRunLoopDefaultMode);
-								CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
-								CFRunLoopObserverInvalidate(observer);
-
-								StopMessagePortRunLoop();
-							}
-							else {
-								// We cant do a whole lot of anything if we cant create JNI globals.
-								// Any exceptions are thrown by CreateJNIGlobals().
-
-								#ifdef DEBUG
-								fprintf(stderr, "ThreadProc(): CFRunLoopObserverRef() failed!\n");
-								#endif
-
-								thread_ex.class = NATIVE_HOOK_EXCEPTION;
-								thread_ex.message = "Failed to create the run loop observer";
-							}
-
-
-							// Callback and stop native event dispatch thread
-							(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-							// Remove the global reference to the GlobalScren object.
-							(*env)->DeleteGlobalRef(env, objGlobalScreen);
+							StopMessagePortRunLoop();
 						}
 						else {
-							// We cant do a whole lot of anything if we cant create JNI globals.
-							// Any exceptions are thrown by CreateJNIGlobals().
+							// We cant do a whole lot of anything if we cant
+							// create run loop observer.
 
 							#ifdef DEBUG
-							fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
+							fprintf(stderr, "ThreadProc(): CFRunLoopObserverRef() failed!\n");
 							#endif
 
 							thread_ex.class = NATIVE_HOOK_EXCEPTION;
-							thread_ex.message = "Failed to create JNI global references";
+							thread_ex.message = "Failed to create the run loop observer";
 						}
 
-						// Cleanup Native Input Functions.
-						UnloadInputHelper();
-
-						// Detach this thread from the JVM.
-						(*jvm)->DetachCurrentThread(jvm);
-
-						#ifdef DEBUG
-						fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-						#endif
-					}
-					else {
-						#ifdef DEBUG
-						fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
-						#endif
-
-						thread_ex.class = NATIVE_HOOK_EXCEPTION;
-						thread_ex.message = "Failed to attach the native thread to the virtual machine";
+						// Callback for additional thread cleanup.
+						ThreadStopCallback();
 					}
 				}
 				else {
@@ -756,18 +800,6 @@ static void *ThreadProc(void *arg) {
 
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
 			thread_ex.message = "Failed to create event port";
-		}
-
-		if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-			// Callback and stop native event dispatch thread
-			(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-			// Detach this thread from the JVM.
-			(*jvm)->DetachCurrentThread(jvm);
-
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-			#endif
 		}
 	}
 	else {

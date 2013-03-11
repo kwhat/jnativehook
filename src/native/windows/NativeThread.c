@@ -474,9 +474,98 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 	return CallNextHookEx(handleMouseHook, nCode, wParam, lParam);
 }
 
+// This method will be externalized with 1.2
+static bool ThreadStartCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Attached to JVM successful.\n");
+		#endif
+
+		// Create the global screen references up front to save time in the callback.
+		jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+		if (objLocalScreen != NULL) {
+			objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
+			// Callback and start native event dispatch thread
+			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+			// Call Thread.currentThread().setName("JNativeHook Native Hook");
+			jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
+			(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
+			(*env)->DeleteLocalRef(env, objCurrentThread);
+
+			status = true;
+		}
+		else {
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
+
+			#ifdef DEBUG
+			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			thread_ex.message = "Failed to create JNI global references";
+		}
+
+
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Detach from JVM successful.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to attach the native thread to the virtual machine";
+	}
+
+	return status;
+}
+
+// This method will be externalized with 1.2
+static bool ThreadStopCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		// Calling AttachCurrentThread() should result in a no-op.
+
+		// Callback and stop native event dispatch thread.
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+		// Remove the global reference to the GlobalScren object.
+		(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
+		// Detach this thread from the JVM.
+		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+			status = true;
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "ThreadStopCallback(): DetachCurrentThread() failed!\n");
+		}
+		#endif
+	}
+	#ifdef DEBUG
+	else {
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+	}
+	#endif
+
+	return status;
+}
+
+
+
 static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 	DWORD status = RETURN_FAILURE;
-	JNIEnv *env = NULL;
 
 	// Create the native hooks.
 	handleKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
@@ -488,76 +577,34 @@ static DWORD WINAPI ThreadProc(LPVOID UNUSED(lpParameter)) {
 		fprintf(stdout, "ThreadProc(): SetWindowsHookEx() successful.\n");
 		#endif
 
-		if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
-			#endif
+		// Callback for additional thread initialization.
+		if (ThreadStartCallback()) {
+			// Check and setup modifiers.
+			if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
+			if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
+			if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
+			if (GetKeyState(VK_RCONTROL) < 0)	SetModifierMask(MOD_RCONTROL);
+			if (GetKeyState(VK_LMENU)    < 0)	SetModifierMask(MOD_LALT);
+			if (GetKeyState(VK_RMENU)    < 0)	SetModifierMask(MOD_RALT);
+			if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
+			if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
 
-			// Create the global screen references up front to save time in the callback.
-			jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
-			if (objLocalScreen != NULL) {
-				objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+			// Set the exit status.
+			status = RETURN_SUCCESS;
 
-				// Callback and start native event dispatch thread
-				(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+			// Signal that we have passed the thread initialization.
+			SetEvent(hookCtrlHandle);
 
-				// Check and setup modifiers.
-				if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
-				if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
-				if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
-				if (GetKeyState(VK_RCONTROL) < 0)	SetModifierMask(MOD_RCONTROL);
-				if (GetKeyState(VK_LMENU)    < 0)	SetModifierMask(MOD_LALT);
-				if (GetKeyState(VK_RMENU)    < 0)	SetModifierMask(MOD_RALT);
-				if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
-				if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
-
-				// Set the exit status.
-				status = RETURN_SUCCESS;
-
-				// Signal that we have passed the thread initialization.
-				SetEvent(hookCtrlHandle);
-
-				// Block until the thread receives an WM_QUIT request.
-				MSG message;
-				while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
-					TranslateMessage(&message);
-					DispatchMessage(&message);
-				}
-
-				// Callback and stop native event dispatch thread
-				(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-				// Remove the global reference to the GlobalScren object.
-				(*env)->DeleteGlobalRef(env, objGlobalScreen);
-			}
-			else {
-				// We cant do a whole lot of anything if we cant create JNI globals.
-				// Any exceptions are thrown by CreateJNIGlobals().
-
-				#ifdef DEBUG
-				fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
-				#endif
-
-				thread_ex.class = NATIVE_HOOK_EXCEPTION;
-				thread_ex.message = "Failed to create JNI global references";
+			// Block until the thread receives an WM_QUIT request.
+			MSG message;
+			while (GetMessage(&message, (HWND) -1, 0, 0 ) > 0) {
+				TranslateMessage(&message);
+				DispatchMessage(&message);
 			}
 
-			// Detach this thread from the JVM.
-			(*jvm)->DetachCurrentThread(jvm);
-
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-			#endif
+			// Callback for additional thread cleanup.
+			ThreadStopCallback();
 		}
-		else {
-			#ifdef DEBUG
-			fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
-			#endif
-
-			thread_ex.class = NATIVE_HOOK_EXCEPTION;
-			thread_ex.message = "Failed to attach the native thread to the virtual machine";
-		}
-
 	}
 	else {
 		#ifdef DEBUG
