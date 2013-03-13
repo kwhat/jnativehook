@@ -181,7 +181,6 @@ long int GetAutoRepeatDelay() {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
 				// This is the slider value, we must multiply by 15 to convert to
 				// milliseconds.
-				printf("Test: %i\n\n", (int) delay);
 				value = (long) delay * 15;
 				successful = true;
 			}

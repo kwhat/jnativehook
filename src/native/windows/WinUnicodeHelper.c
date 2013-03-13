@@ -27,6 +27,7 @@
  *   1) More dynamic code structure.
  *   2) Support for compilers that do not implement _ptr64 (GCC / LLVM).
  *   3) Support for Wow64 at runtime via 32-bit binary.
+ *   4) Support for contextual language switching.
  *
  * I have contacted Marc-André Moreau who has granted permission for
  * his original source code to be used under the Public Domain.  Although
@@ -83,8 +84,22 @@ static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 
 	char kbdName[KL_NAMELENGTH];
 	if (GetKeyboardLayoutName(kbdName)) {
+		printf("Default Locale %s\n", kbdName);
+
 		char kbdKeyPath[51 + KL_NAMELENGTH];
 		snprintf(kbdKeyPath, 51 + KL_NAMELENGTH, "SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\%s", kbdName);
+
+		//
+		// RegEnumKeyEx() and RegEnumValue()
+/*  Words cannot express how stupid this is.
+   DWORD index = 0;
+  while ( ERROR_SUCCESS == RegEnumKeyEx(currentKey, index, name, &dwSize, NULL, NULL, NULL, NULL) ) {
+    // name buffer is already contains key name here
+    // ...
+    dwSize = 1024; // restore dwSize after is is set to key's length by RegEnumKeyEx
+    ++index; // increment subkey index
+  }
+ */
 
 		if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, (LPCTSTR) kbdKeyPath, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
 			if(RegQueryValueEx(hKey, "Layout File", NULL, &varType, (LPBYTE) layoutFile, &bufferSize) == ERROR_SUCCESS) {
@@ -157,7 +172,125 @@ int UnloadUnicodeHelper() {
 	return status;
 }
 
+/*
+typedef struct {
+	HKL id;
+	HINSTANCE library;
+} KeyboardLocale;
+
+static KeyboardLocale *locales_loaded = NULL;
+static unsigned short locale_size = 0;
+static unsigned short locale_index = 0;
+
+HINSTANCE GetKeyboardLibrary(HKL locale_id) {
+	KeyboardLocale curr_locale = locales_loaded[locale_index];
+	HINSTANCE keyboard = NULL;
+
+	if (curr_locale.id == locale_id) {
+		keyboard = curr_locale.library;
+	}
+	else {
+		for (int i = 0; i < locale_size; i++) {
+			if (locales_loaded[i].id == locale_id) {
+				keyboard = curr_locale.library;
+			}
+		}
+	}
+
+	if (keyboard == NULL) {
+		realloc(locales_loaded, sizeof(KeyboardLocale) * (++locale_size));
+
+		char layoutFile[MAX_PATH];
+		if(GetKeyboardLayoutFile(layoutFile, sizeof(layoutFile)) == RETURN_SUCCESS) {
+			// Get the path of the system directory.
+			char systemDirectory[MAX_PATH];
+			if (GetSystemDirectory(systemDirectory, MAX_PATH) != 0) {
+				char kbdLayoutFilePath[MAX_PATH];
+				snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
+
+				kbdLibrary = LoadLibrary(layoutFile);
+
+				KbdLayerDescriptor pKbdLayerDescriptor = (KbdLayerDescriptor) GetProcAddress(kbdLibrary, "KbdLayerDescriptor");
+
+				if(pKbdLayerDescriptor != NULL) {
+					PKBDTABLES pKbd = pKbdLayerDescriptor();
+
+					// Store the memory address of the following 3 structures.
+					BYTE *base = (BYTE *) pKbd;
+
+					// First element of each structure, no offset adjustment needed.
+					pVkToBit = pKbd->pCharModifiers->pVkToBit;
+
+					// Second element of pKbd, +4 byte offset on wow64.
+					pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding));
+
+					// Third element of pKbd, +8 byte offset on wow64.
+					pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2)));
+
+					status = RETURN_SUCCESS;
+				}
+				else {
+					FreeLibrary(kbdLibrary);
+					kbdLibrary = NULL;
+				}
+			}
+		}
+	}
+
+
+	return keyboard;
+}
+
+static void GetCurrentLayoutName() {
+	char layout_name[KL_NAMELENGTH];
+
+	// Get the LCID from the HKL.
+	LCID lcid = MAKELCID(LOWORD(locale_id), SORT_DEFAULT);
+
+	// Convert LCID to HEX, don't forget to add 1 for the null terminator.
+	int i = snprintf(kbdName, sizeof(layout_name), "%X", (unsigned int) lcid) + 1;
+
+	// Move the string to the right part of the buffer and zero fill the front.
+	memmove(layout_name + (sizeof(layout_name) - i), layout_name, i);
+	memset(layout_name, '0', sizeof(layout_name) - i);
+}
+*/
+
 int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
+	// Get the thread id that currently has focus and
+	DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+	HKL locale_id = GetKeyboardLayout(focus_pid);
+
+	// So at this point a check with a static locale_id should be done to see if
+	// a new keyboard dll should be loaded.  We should probably keep these
+	// layouts in memory so we dont have to keep loading and unloading dll
+	// every time app focus changes.  I am thinking some kind of struct[] and
+	// an index static variable.
+//*
+	char kbdName[KL_NAMELENGTH];
+
+	//SORT_DEFAULT
+	printf("%X\n", (unsigned int) locale_id);
+	LCID lcid = MAKELCID(LOWORD(locale_id), (HIWORD(locale_id) & 0x0F) >> 1);
+
+	// Convert LCID to HEX, don't forget to add 1 for the null terminator.
+	int i = snprintf(kbdName, sizeof(kbdName), "%X", (unsigned int) lcid) + 1;
+
+	// Move the string to the right part of the buffer and zero fill the front.
+	memmove(kbdName + (sizeof(kbdName) - i), kbdName, i);
+	memset(kbdName, '0', sizeof(kbdName) - i);
+
+	printf("Locale Name: %s\n", kbdName);
+
+	// This list should be used to pre-load layouts.
+	HKL lpList[10];
+	int j = GetKeyboardLayoutList(sizeof(lpList), lpList);
+	for (int i = 0; i < j; i++) {
+		printf("List: 0x%X\n", (unsigned int) lpList[i]);
+	}
+
+//*/
+
 	int charCount = 0;
 	*outputChar = 0;
 	*deadChar = 0;

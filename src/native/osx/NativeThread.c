@@ -665,7 +665,7 @@ static void *ThreadProc(void *arg) {
 	// Check and make sure assistive devices is enabled.
 	if (AXAPIEnabled() == true) {
 		#ifdef DEBUG
-		printf ("Native: Accessibility API is enabled.\n");
+		fprintf(stdout, "ThreadProc(): Accessibility API is enabled.\n");
 		#endif
 
 		// Setup the event mask to listen for.
