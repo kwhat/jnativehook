@@ -56,7 +56,10 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		// Check and make sure the thread is stull running to avoid the
 		// potential crash associated with late event arrival.  This code is
 		// guaranteed to run after all thread start.
-		if (IsNativeThreadRunning() == true) {
+		DWORD status;
+		GetExitCodeThread(hookThreadHandle, &status);
+
+		if (status == STILL_ACTIVE) {
 			// MS Keyboard event struct data.
 			KBDLLHOOKSTRUCT *kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
@@ -197,7 +200,10 @@ static LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lPara
 		// Check and make sure the thread is stull running to avoid the
 		// potential crash associated with late event arrival.  This code is
 		// guaranteed to run after all thread start.
-		if (IsNativeThreadRunning() == true) {
+		DWORD status;
+		GetExitCodeThread(hookThreadHandle, &status);
+
+		if (status == STILL_ACTIVE) {
 			// MS Mouse event struct data.
 			MSLLHOOKSTRUCT *mshook = (MSLLHOOKSTRUCT *) lParam;
 
