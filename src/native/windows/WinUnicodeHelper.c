@@ -41,12 +41,23 @@
  *
  ***********************************************************************/
 
-#define DEBUG
-
 #include <stdbool.h>
 #include <stddef.h>
 #include "WinUnicodeHelper.h"
 #include "NativeGlobals.h"
+
+// Structure and pointers for the keyboard locale cache.
+typedef struct _KeyboardLocale {
+	HKL id;									// Locale ID
+	HINSTANCE library;						// Keyboard DLL instance.
+	PVK_TO_BIT pVkToBit;					// Pointers struct arrays.
+	PVK_TO_WCHAR_TABLE pVkToWcharTable;
+	PDEADKEY pDeadKey;
+	struct _KeyboardLocale* next;
+} KeyboardLocale;
+
+static KeyboardLocale* locale_first = NULL;
+static KeyboardLocale* locale_current = NULL;
 
 // Amount of pointer padding to apply for Wow64 instances.
 static short int ptrPadding = 0;
@@ -72,7 +83,6 @@ static BOOL IsWow64() {
 #endif
 
 // Locate the DLL that contains the current keyboard layout.
-//HKL locale,
 static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 	int status = RETURN_FAILURE;
 	HKEY hKey;
@@ -94,18 +104,6 @@ static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 	return status;
 }
 
-typedef struct _KeyboardLocale {
-	HKL id;									// Locale ID
-	HINSTANCE library;						// Keyboard DLL instance.
-	PVK_TO_BIT pVkToBit;					// Pointers struct arrays.
-	PVK_TO_WCHAR_TABLE pVkToWcharTable;
-	PDEADKEY pDeadKey;
-	struct _KeyboardLocale* next;
-} KeyboardLocale;
-
-static KeyboardLocale* locale_first = NULL;
-static KeyboardLocale* locale_current = NULL;
-
 static int RefreshLocaleList() {
 	int count = 0;
 
@@ -115,7 +113,7 @@ static int RefreshLocaleList() {
 		#ifdef DEBUG
 		fprintf(stderr, "RefreshLocaleList(): GetKeyboardLayoutList() found %d.\n", hkl_size);
 		#endif
-		
+
 		// Get the thread id that currently has focus and
 		HKL hlk_default = GetKeyboardLayout(0);
 		HKL *hkl_list = malloc(sizeof(HKL) * hkl_size);
@@ -146,10 +144,10 @@ static int RefreshLocaleList() {
 					}
 				}
 
-				
+
 				if (is_loaded) {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Found loacle ID %p in the cache..\n", locale_item->id);
+					fprintf(stdout, "RefreshLocaleList(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
 					#endif
 
 					// Set the previous local to the current locale.
@@ -164,7 +162,7 @@ static int RefreshLocaleList() {
 				}
 				else {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Removing loacle ID %p from the cache.\n", locale_item->id);
+					fprintf(stdout, "RefreshLocaleList(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
 					#endif
 
 					// If the old id is not in the new list, remove it.
@@ -185,8 +183,8 @@ static int RefreshLocaleList() {
 				// Iterate to the next linked list item.
 				locale_item = locale_item->next;
 			}
-			
-			
+
+
 			// Insert anything new into the linked list.
 			for (int i = 0; i < new_size; i++) {
 				// Check to see if the item was already in the list.
@@ -202,16 +200,16 @@ static int RefreshLocaleList() {
 						if (GetSystemDirectory(systemDirectory, MAX_PATH) != 0) {
 							char kbdLayoutFilePath[MAX_PATH];
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
-							
+
 							#ifdef DEBUG
 							fprintf(stdout, "RefreshLocaleList(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
 							#endif
-							
+
 							// Create the new locale item.
 							locale_item = malloc(sizeof(KeyboardLocale));
 							locale_item->id = hkl_list[i];
 							locale_item->library = LoadLibrary(kbdLayoutFilePath);
-							
+
 							// Get the function pointer from the library to get the keyboard layer descriptor.
 							KbdLayerDescriptor pKbdLayerDescriptor = (KbdLayerDescriptor) GetProcAddress(locale_item->library, "KbdLayerDescriptor");
 							if(pKbdLayerDescriptor != NULL) {
@@ -219,17 +217,17 @@ static int RefreshLocaleList() {
 
 								// Store the memory address of the following 3 structures.
 								BYTE *base = (BYTE *) pKbd;
-								
+
 								// First element of each structure, no offset adjustment needed.
 								locale_item->pVkToBit = pKbd->pCharModifiers->pVkToBit;
 
 								// Second element of pKbd, +4 byte offset on wow64.
 								locale_item->pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding));
-										
+
 								// Third element of pKbd, +8 byte offset on wow64.
 								locale_item->pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2)));
-								
-								
+
+
 								// This will always be added to the end of the list.
 								locale_item->next = NULL;
 
@@ -271,7 +269,7 @@ static int RefreshLocaleList() {
 					}
 					#ifdef DEBUG
 					else {
-						fprintf(stderr, "RefreshLocaleList(): Could not find keyboard map for locale 0x%X!\n", hkl_list[i]);
+						fprintf(stderr, "RefreshLocaleList(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
 					}
 					#endif
 				}
@@ -307,7 +305,7 @@ int LoadUnicodeHelper() {
 	#ifdef DEBUG
 	fprintf(stdout, "LoadUnicodeHelper(): RefreshLocaleList found %d.\n", count);
 	#endif
-	
+
 	return count;
 }
 
@@ -334,52 +332,52 @@ int UnloadUnicodeHelper() {
 }
 
 int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
-	if (locale_current != NULL) {
-		// Get the thread id that currently has focus and
-		DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
-		HKL locale_id = GetKeyboardLayout(focus_pid);
-		
-		// If the current Locale is not the new locale, search the linked list.
-		if (locale_current->id != locale_id) {
-			locale_current = NULL;
-			KeyboardLocale* locale_item = locale_first;
-			while (locale_item != NULL) {
-				printf("%p == %p\n", (void *) locale_item->id, (void *) locale_id);
-				
-				// Search the linked list.
-				if (locale_item->id == locale_id) {
-					locale_current = locale_item;
-					locale_item = NULL;
-				}
-				else {
-					locale_item = locale_item->next;
-				}
+	// Get the thread id that currently has focus and
+	DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+	HKL locale_id = GetKeyboardLayout(focus_pid);
+
+	// If the current Locale is not the new locale, search the linked list.
+	if (locale_current == NULL || locale_current->id != locale_id) {
+		locale_current = NULL;
+		KeyboardLocale* locale_item = locale_first;
+		while (locale_item != NULL) {
+			// Search the linked list.
+			if (locale_item->id == locale_id) {
+				#ifdef DEBUG
+				fprintf(stdout, "ConvertVirtualKeyToWChar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
+				#endif
+
+				// If they layout changes the dead key state needs to be reset.
+				// This is consistent with the way Windows handles locale changes.
+				*deadChar = 0;
+				locale_current = locale_item;
+				locale_item = NULL;
+			}
+			else {
+				locale_item = locale_item->next;
 			}
 		}
 
 		// If we were unable to find the locale in the list, refresh the list.
-		if (locale_current != NULL) {
-			#ifdef DEBUG
-			fprintf(stdout, "ConvertVirtualKeyToWChar(): Activating keyboard layout for 0x%X.\n", (unsigned int) locale_current->id);
-			#endif
-			
-			ActivateKeyboardLayout(locale_current->id, 0x00);
-		}
-		else {
+		if (locale_current == NULL) {
 			#ifdef DEBUG
 			fprintf(stdout, "ConvertVirtualKeyToWChar(): Refreshing locale cache.\n");
 			#endif
-			
+
 			RefreshLocaleList();
 		}
 	}
 
+
 	int charCount = 0;
 	*outputChar = 0;
-	*deadChar = 0;
 
 	// Check and make sure the unicode helper was loaded.
 	if (locale_current != NULL) {
+		#ifdef DEBUG
+		fprintf(stdout, "ConvertVirtualKeyToWChar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
+		#endif
+
 		short state = 0;
 		int shift = -1;
 		int mod = 0;
@@ -411,7 +409,6 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 					mod = 0; // Two modifiers at the same time!
 				}
 			}
-
 		}
 
 		// Default 32 bit structure size should be 6 bytes (4 for the pointer and 2
