@@ -41,6 +41,8 @@
  *
  ***********************************************************************/
 
+#define DEBUG
+
 #include <stdbool.h>
 #include <stddef.h>
 #include "WinUnicodeHelper.h"

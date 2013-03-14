@@ -558,13 +558,13 @@
 
 		<!-- Set the compiler arguments for compiling. -->
 		<!-- TODO Test without  -fno-strict-aliasing -->
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -fno-strict-aliasing -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.carbon_legacy} ${native.cc.macros.corefoundation} ${native.cc.macros.iokit} ${native.cc.includes}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.macros.xrecord_async} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fPIC -fno-strict-aliasing -Wall -Wextra ${native.cc.flags.standard} -pthread ${native.cc.macros.debug} ${native.cc.macros.xf86misc} ${native.cc.macros.xkb} ${native.cc.macros.xt} ${native.cc.macros.xrecord_async} ${native.cc.includes}">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
+		<condition property="native.cc.args" value="-c -m${native.arch.model} ${native.cc.flags} -fno-strict-aliasing -Wall -Wextra ${native.cc.macros.debug} ${native.cc.flags.standard} ${native.cc.includes}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 		<property name="native.cc.args2" value="-o" />
