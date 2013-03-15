@@ -116,7 +116,8 @@ static int RefreshLocaleList() {
 
 		// Get the thread id that currently has focus for our default.
 		DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
-		HKL hlk_default = GetKeyboardLayout(focus_pid);
+		HKL hlk_focus = GetKeyboardLayout(focus_pid);
+		HKL hlk_default = GetKeyboardLayout(0);
 		HKL *hkl_list = malloc(sizeof(HKL) * hkl_size);
 
 		int new_size = GetKeyboardLayoutList(hkl_size, hkl_list);
@@ -155,7 +156,7 @@ static int RefreshLocaleList() {
 					locale_previous = locale_item;
 
 					// Check and see if the locale is our current active locale.
-					if (locale_item->id == hlk_default) {
+					if (locale_item->id == hlk_focus) {
 						locale_current = locale_item;
 					}
 
@@ -243,7 +244,7 @@ static int RefreshLocaleList() {
 								}
 
 								// Check and see if the locale is our current active locale.
-								if (locale_item->id == hlk_default) {
+								if (locale_item->id == hlk_focus) {
 									locale_current = locale_item;
 								}
 
