@@ -114,8 +114,9 @@ static int RefreshLocaleList() {
 		fprintf(stderr, "RefreshLocaleList(): GetKeyboardLayoutList() found %d.\n", hkl_size);
 		#endif
 
-		// Get the thread id that currently has focus and
-		HKL hlk_default = GetKeyboardLayout(0);
+		// Get the thread id that currently has focus for our default.
+		DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+		HKL hlk_default = GetKeyboardLayout(focus_pid);
 		HKL *hkl_list = malloc(sizeof(HKL) * hkl_size);
 
 		int new_size = GetKeyboardLayoutList(hkl_size, hkl_list);
@@ -133,7 +134,7 @@ static int RefreshLocaleList() {
 			KeyboardLocale* locale_item = locale_first;
 
 			// Go though the linked list and remove KeyboardLocale's that are no longer loaded.
-			while (false &&locale_item != NULL) {
+			while (locale_item != NULL) {
 				// Check to see if the old HKL is in the new list.
 				bool is_loaded = false;
 				for (int i = 0; i < new_size && !is_loaded; i++) {
