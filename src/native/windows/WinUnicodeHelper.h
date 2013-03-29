@@ -27,6 +27,7 @@
  *   1) More dynamic code structure.
  *   2) Support for compilers that do not implement _ptr64 (GCC / LLVM).
  *   3) Support for Wow64 at runtime via 32-bit binary.
+ *   4) Support for contextual language switching.
  *
  * I have contacted Marc-André Moreau who has granted permission for
  * his original source code to be used under the Public Domain.  Although
