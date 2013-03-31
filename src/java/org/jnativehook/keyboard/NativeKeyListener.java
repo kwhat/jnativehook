@@ -18,8 +18,8 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import org.jnativehook.GlobalScreen;
 import java.util.EventListener;
+import org.jnativehook.GlobalScreen;
 
 /**
  * The listener interface for receiving global <code>NativeKeyEvents</code>.
