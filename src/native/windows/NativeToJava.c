@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -59,7 +59,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		LOCATION_L:
 			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
 			return jkey;
-			
+
 		case VK_RSHIFT:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SHIFT;
 			goto LOCATION_R;
@@ -121,7 +121,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		/* case VK_OEM_2:					// Unknown Microsoft Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SLASH;
 			return jkey; */
-					
+
 
 		case 0x30:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_0;
@@ -656,7 +656,7 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		/* case XK_Begin:					// No Microsoft Support
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN;
 			return jkey; */
-		
+
 		default:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED;
 			return jkey;
@@ -689,10 +689,10 @@ jint NativeToJEventMask(unsigned int mask) {
 
 	if (mask & MOD_LCONTROL || mask & MOD_RCONTROL)
 		java_mask |= org_jnativehook_NativeInputEvent_CTRL_MASK;
-	
+
 	if (mask & MOD_LWIN || mask & MOD_RWIN)
 		java_mask |= org_jnativehook_NativeInputEvent_META_MASK;
-		
+
 	if (mask & MOD_LALT || mask & MOD_RALT)
 		java_mask |= org_jnativehook_NativeInputEvent_ALT_MASK;
 
@@ -712,6 +712,6 @@ jint NativeToJEventMask(unsigned int mask) {
 	if (mask & MOD_XBUTTON2)
 		java_mask |= org_jnativehook_NativeInputEvent_BUTTON5_MASK;
 
-	
+
 	return java_mask;
 }

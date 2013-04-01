@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -135,28 +135,28 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_LEFT							= 0x25;
 	public static final int VK_RIGHT						= 0x27;
 
-	public static final int VK_COMMA						= 0x2C;
+	public static final int VK_COMMA							= 0x2C;
 	public static final int VK_MINUS						= 0x2D;
 	public static final int VK_PERIOD						= 0x2E;
 	public static final int VK_SLASH						= 0x2F;
 
 	/** VK_0 thru VK_9 are the same as ASCII '0' thru '9' (0x30 - 0x39). */
-	public static final int VK_0							= 0x30;
+	public static final int VK_0								= 0x30;
 	public static final int VK_1							= 0x31;
-	public static final int VK_2							= 0x32;
+	public static final int VK_2								= 0x32;
 	public static final int VK_3							= 0x33;
 	public static final int VK_4							= 0x34;
 	public static final int VK_5							= 0x35;
 	public static final int VK_6							= 0x36;
 	public static final int VK_7							= 0x37;
-	public static final int VK_8							= 0x38;
+	public static final int VK_8								= 0x38;
 	public static final int VK_9							= 0x39;
 
 	public static final int VK_EQUALS						= 0x3D;
 	public static final int VK_SEMICOLON					= 0x3B;
 
 	/** VK_A thru VK_Z are the same as ASCII 'A' thru 'Z' (0x41 - 0x5A). */
-	public static final int VK_A							= 0x41;
+	public static final int VK_A								= 0x41;
 	public static final int VK_B							= 0x42;
 	public static final int VK_C							= 0x43;
 	public static final int VK_D							= 0x44;
@@ -164,13 +164,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_F							= 0x46;
 	public static final int VK_G							= 0x47;
 	public static final int VK_H							= 0x48;
-	public static final int VK_I							= 0x49;
+	public static final int VK_I								= 0x49;
 	public static final int VK_J							= 0x4A;
 	public static final int VK_K							= 0x4B;
-	public static final int VK_L							= 0x4C;
+	public static final int VK_L								= 0x4C;
 	public static final int VK_M							= 0x4D;
 	public static final int VK_N							= 0x4E;
-	public static final int VK_O							= 0x4F;
+	public static final int VK_O								= 0x4F;
 	public static final int VK_P							= 0x50;
 	public static final int VK_Q							= 0x51;
 	public static final int VK_R							= 0x52;
@@ -268,7 +268,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_DEAD_CARON					= 0x8A;
 	public static final int VK_DEAD_CEDILLA					= 0x8B;
 	public static final int VK_DEAD_OGONEK					= 0x8C;
-	public static final int VK_DEAD_IOTA					= 0x8D;
+	public static final int VK_DEAD_IOTA						= 0x8D;
 	public static final int VK_DEAD_VOICED_SOUND			= 0x8E;
 	public static final int VK_DEAD_SEMIVOICED_SOUND		= 0x8F;
 
@@ -297,13 +297,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_UNDERSCORE					= 0x020B;
 
 	/* For input method support on Asian Keyboards */
-	public static final int VK_FINAL						= 0x0018;
+	public static final int VK_FINAL							= 0x0018;
 	public static final int VK_CONVERT						= 0x001C;
 	public static final int VK_NONCONVERT					= 0x001D;
 	public static final int VK_ACCEPT						= 0x001E;
 	public static final int VK_MODECHANGE					= 0x001F;
 	public static final int VK_KANA							= 0x0015;
-	public static final int VK_KANJI						= 0x0019;
+	public static final int VK_KANJI							= 0x0019;
 	public static final int VK_ALPHANUMERIC					= 0x00F0;
 	public static final int VK_KATAKANA						= 0x00F1;
 	public static final int VK_HIRAGANA						= 0x00F2;
@@ -313,8 +313,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_ALL_CANDIDATES				= 0x0100;
 	public static final int VK_PREVIOUS_CANDIDATE			= 0x0101;
 	public static final int VK_CODE_INPUT					= 0x0102;
-	public static final int VK_JAPANESE_KATAKANA			= 0x0103;
-	public static final int VK_JAPANESE_HIRAGANA			= 0x0104;
+	public static final int VK_JAPANESE_KATAKANA				= 0x0103;
+	public static final int VK_JAPANESE_HIRAGANA				= 0x0104;
 	public static final int VK_JAPANESE_ROMAN				= 0x0105;
 	public static final int VK_KANA_LOCK					= 0x0106;
 	public static final int VK_INPUT_METHOD_ON_OFF			= 0x0107;

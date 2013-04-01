@@ -37,7 +37,7 @@ static XtAppContext app_context;
 
 Display *disp;
 
-int_fast32_t get_auto_repeat_rate() {
+int_fast32_t GetAutoRepeatRate() {
 	bool successful = false;
 	int_fast32_t value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
@@ -69,7 +69,7 @@ int_fast32_t get_auto_repeat_rate() {
 	return value;
 }
 
-int_fast32_t get_auto_repeat_delay() {
+int_fast32_t GetAutoRepeatDelay() {
 	bool successful = false;
 	int_fast32_t value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
@@ -101,7 +101,7 @@ int_fast32_t get_auto_repeat_delay() {
 	return value;
 }
 
-int_fast32_t get_pointer_acceleration_multiplier() {
+int_fast32_t GetPointerAccelerationMultiplier() {
 	int_fast32_t value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -115,7 +115,7 @@ int_fast32_t get_pointer_acceleration_multiplier() {
 	return value;
 }
 
-int_fast32_t get_pointer_acceleration_threshold() {
+int_fast32_t GetPointerAccelerationThreshold() {
 	int_fast32_t value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -129,7 +129,7 @@ int_fast32_t get_pointer_acceleration_threshold() {
 	return value;
 }
 
-int_fast32_t get_pointer_sensitivity() {
+int_fast32_t GetPointerSensitivity() {
 	int_fast32_t value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -143,7 +143,7 @@ int_fast32_t get_pointer_sensitivity() {
 	return value;
 }
 
-int_fast32_t get_multi_click_time() {
+int_fast32_t GetMultiClickTime() {
 	int_fast32_t value = 200;
 	int clicktime;
 	bool successful = false;

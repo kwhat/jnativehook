@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -22,16 +22,16 @@ import java.awt.Toolkit;
 import java.util.EventObject;
 
 /**
- * The root event class for all native-level input events.  Input events are 
- * delivered to listeners as they are received by the native source. There is 
- * no method for listeners or subclasses to prevent delivery of the event to 
- * the native system. There is no guarantee that the events will be received by 
+ * The root event class for all native-level input events.  Input events are
+ * delivered to listeners as they are received by the native source. There is
+ * no method for listeners or subclasses to prevent delivery of the event to
+ * the native system. There is no guarantee that the events will be received by
  * Java before they are delivered natively.
  * <p/>
- * 
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
- * 
+ *
  * @see org.jnativehook.keyboard.NativeKeyListener
  * @see org.jnativehook.mouse.NativeMouseListener
  * @see org.jnativehook.mouse.NativeMouseMotionListener
@@ -40,63 +40,63 @@ import java.util.EventObject;
 public class NativeInputEvent extends EventObject {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -4115869356455095225L;
-	
+
 	/** The type of event. */
 	private int id;
-	
+
 	/** The time the event occurred. */
 	private long when;
-	
+
 	/** The modifier keys down during event. */
 	private int modifiers;
-	
+
 	/** The Shift key modifier constant. */
 	public static final int SHIFT_MASK		= 1;
-	
+
 	/** The Ctrl key modifier constant. */
 	public static final int CTRL_MASK		= 2;
-	
+
 	/** The Meta key modifier constant. */
 	public static final int META_MASK		= 4;
-	
+
 	/** The Alt key modifier constant. */
-	public static final int ALT_MASK		= 8; 
-	
+	public static final int ALT_MASK		= 8;
+
 	/** The Button1 modifier constant. */
 	public static final int BUTTON1_MASK	= 16;
 
 	/** The Button2 modifier constant. */
 	public static final int BUTTON2_MASK	= 32;
-	
+
 	/** The Button3 modifier constant. */
 	public static final int BUTTON3_MASK	= 64;
-	
+
 	/** The Button4 modifier constant. */
 	public static final int BUTTON4_MASK	= 128;
-	
+
 	/** The Button5 modifier constant. */
 	public static final int BUTTON5_MASK	= 256;
-	
-	
+
+
 	/**
 	 * Instantiates a new native input event.
 	 *
 	 * @param source The source of the event.
 	 * @param id The type of event.
 	 * @param when The timestamp for the event.
-	 * @param modifiers the modifier keys down during event. 
-	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are 
-	 * not compatible with the extended _DOWN_MASK or the old _MASK 
+	 * @param modifiers the modifier keys down during event.
+	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
+	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
 	 */
 	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
 		super(source);
-		
+
 		this.id = id;
 		this.when = when;
 		this.modifiers = modifiers;
 	}
-	
+
 	/**
 	 * Gets the event type.
 	 *
@@ -105,7 +105,7 @@ public class NativeInputEvent extends EventObject {
 	public int getID() {
 		return id;
 	}
-	
+
 	/**
 	 * Gets the timestamp for when this event occurred.
 	 *
@@ -114,8 +114,8 @@ public class NativeInputEvent extends EventObject {
 	public long getWhen() {
 		return when;
 	}
-	
-	
+
+
 	/**
 	 * Gets the modifier flags for this event.
 	 *
@@ -124,7 +124,7 @@ public class NativeInputEvent extends EventObject {
 	public int getModifiers() {
 		return this.modifiers;
 	}
-	
+
 	/**
 	 * Sets the modifier flags for this event.
 	 *
@@ -133,97 +133,97 @@ public class NativeInputEvent extends EventObject {
 	public void setModifiers(int modifiers) {
 		this.modifiers = modifiers;
 	}
-	
+
 	/**
-	 * Gets a <code>String</code> describing the modifier flags, such as 
-	 * "Button1", or "Ctrl+Alt". These strings can be localized by changing the 
+	 * Gets a <code>String</code> describing the modifier flags, such as
+	 * "Button1", or "Ctrl+Alt". These strings can be localized by changing the
 	 * awt.properties file.
 	 *
-	 * @param modifiers a modifier mask describing the modifier keys and mouse 
+	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons of an event.
 	 * @return the modifier mask's textual representation
 	 */
 	public static String getModifiersText(int modifiers) {
-		StringBuilder param = new StringBuilder(255); 
-		
+		StringBuilder param = new StringBuilder(255);
+
 		if ((modifiers & NativeInputEvent.SHIFT_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.shift", "Shift"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.CTRL_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.control", "Ctrl"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.META_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.meta", "Meta"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.ALT_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.alt", "Alt"));
 			param.append('+');
 		}
-		
-		
+
+
 		if ((modifiers & NativeInputEvent.BUTTON1_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button1", "Button1"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.BUTTON2_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button2", "Button2"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.BUTTON3_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button3", "Button3"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.BUTTON4_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button4", "Button4"));
 			param.append('+');
 		}
-		
+
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button5", "Button5"));
 			param.append('+');
 		}
-		
+
 		if (param.length() > 0) {
 			//Remove the trailing '+'
 			param.deleteCharAt(param.length() - 1);
 		}
-		
+
 		return param.toString();
 	}
-	
+
 	/**
-	 * Gets a <code>String</code> representation of this event. This method is 
+	 * Gets a <code>String</code> representation of this event. This method is
 	 * useful for event-logging and debugging.
 	 *
 	 * @return a string identifying the event and its attributes
 	 */
 	public String paramString() {
-		StringBuilder param = new StringBuilder(255); 
-		
+		StringBuilder param = new StringBuilder(255);
+
 		param.append("id=");
 		param.append(getID());
 		param.append(',');
-		
+
 		param.append("when=");
 		param.append(getWhen());
 		param.append(',');
-		
+
 		param.append("mask=");
 		param.append(Integer.toBinaryString(getModifiers()));
 		param.append(',');
-		
+
 		param.append("modifiers=");
 		param.append(getModifiersText(getModifiers()));
-		
+
 		return param.toString();
 	}
 }

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -21,22 +21,24 @@ package org.jnativehook.example;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -57,12 +59,14 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
  * @see GlobalScreen
  * @see NativeKeyListener
  */
-public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener, ItemListener {
+public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1865350670081087993L;
 
-	/** Checkbox's for event delivery options. */
-	private JCheckBox chkKeyboard, chkButton, chkMotion, chkWheel;
+	/** Menu Items */
+	private JMenu menuSubListeners;
+	private JMenuItem menuItemQuit, menuItemClear;
+	private JCheckBoxMenuItem menuItemEnable, menuItemKeyboardEvents, menuItemButtonEvents, menuItemMotionEvents, menuItemWheelEvents;
 
 	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
@@ -78,39 +82,68 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setSize(600, 300);
 		addWindowListener(this);
 
-		//Create options panel
-		JPanel grpOptions = new JPanel();
-		grpOptions.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		grpOptions.setLayout(new FlowLayout(FlowLayout.LEADING));
-		add(grpOptions, BorderLayout.NORTH);
+		JMenuBar menuBar = new JMenuBar();
 
-		//Create keyboard checkbox
-		chkKeyboard = new JCheckBox("Keyboard Events");
-		chkKeyboard.setMnemonic(KeyEvent.VK_K);
-		chkKeyboard.addItemListener(this);
-		chkKeyboard.setSelected(true);
-		grpOptions.add(chkKeyboard);
+		//Create the file menu.
+		JMenu menuFile = new JMenu("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menuFile);
 
-		//Create button checkbox
-		chkButton = new JCheckBox("Button Events");
-		chkButton.setMnemonic(KeyEvent.VK_B);
-		chkButton.addItemListener(this);
-		chkButton.setSelected(true);
-		grpOptions.add(chkButton);
+		menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		menuItemQuit.addActionListener(this);
+		menuItemQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
+		menuItemQuit.getAccessibleContext().setAccessibleDescription("Exit the program");
+		menuFile.add(menuItemQuit);
 
-		//Create motion checkbox
-		chkMotion = new JCheckBox("Motion Events");
-		chkMotion.setMnemonic(KeyEvent.VK_M);
-		chkMotion.addItemListener(this);
-		chkMotion.setSelected(true);
-		grpOptions.add(chkMotion);
+		//Create the view.
+		JMenu menuView = new JMenu("View");
+		menuView.setMnemonic(KeyEvent.VK_V);
+		menuBar.add(menuView);
 
-		//Create wheel checkbox
-		chkWheel = new JCheckBox("Wheel Events");
-		chkWheel.setMnemonic(KeyEvent.VK_W);
-		chkWheel.addItemListener(this);
-		chkWheel.setSelected(true);
-		grpOptions.add(chkWheel);
+		menuItemClear = new JMenuItem("Clear", KeyEvent.VK_C);
+		menuItemClear.addActionListener(this);
+		menuItemClear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuItemClear.getAccessibleContext().setAccessibleDescription("Clear the screen");
+		menuView.add(menuItemClear);
+
+		menuView.addSeparator();
+
+		menuItemEnable = new JCheckBoxMenuItem("Enable Native Hook");
+		menuItemEnable.addItemListener(this);
+		menuItemEnable.setMnemonic(KeyEvent.VK_H);
+		menuItemEnable.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuView.add(menuItemEnable);
+
+		//Create the listeners sub menu.
+		menuSubListeners = new JMenu("Listeners");
+		menuSubListeners.setMnemonic(KeyEvent.VK_L);
+		menuView.add(menuSubListeners);
+
+		menuItemKeyboardEvents = new JCheckBoxMenuItem("Keyboard Events");
+		menuItemKeyboardEvents.addItemListener(this);
+		menuItemKeyboardEvents.setMnemonic(KeyEvent.VK_K);
+		menuItemKeyboardEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemKeyboardEvents);
+
+		menuItemButtonEvents = new JCheckBoxMenuItem("Button Events");
+		menuItemButtonEvents.addItemListener(this);
+		menuItemButtonEvents.setMnemonic(KeyEvent.VK_B);
+		menuItemButtonEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemButtonEvents);
+
+		menuItemMotionEvents = new JCheckBoxMenuItem("Motion Events");
+		menuItemMotionEvents.addItemListener(this);
+		menuItemMotionEvents.setMnemonic(KeyEvent.VK_M);
+		menuItemMotionEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemMotionEvents);
+
+		menuItemWheelEvents = new JCheckBoxMenuItem("Wheel Events");
+		menuItemWheelEvents.addItemListener(this);
+		menuItemWheelEvents.setMnemonic(KeyEvent.VK_W);
+		menuItemWheelEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+		menuSubListeners.add(menuItemWheelEvents);
+
+		setJMenuBar(menuBar);
 
 		//Create feedback area
 		txtEventInfo = new JTextArea();
@@ -126,6 +159,17 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		setVisible(true);
 	}
 
+	/**
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == menuItemQuit) {
+			this.dispose();
+		}
+		else if (e.getSource() == menuItemClear) {
+			txtEventInfo.setText("");
+		}
+	}
 
 	/**
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
@@ -133,7 +177,25 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	public void itemStateChanged(ItemEvent e) {
 		ItemSelectable item = e.getItemSelectable();
 
-		if (item == chkKeyboard) {
+		if (item == menuItemEnable) {
+			//Keyboard checkbox was changed, adjust listeners accordingly
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				try {
+					//Initialze native hook.  This is done on window open because the
+					//listener requires the txtEventInfo object to be constructed.
+					GlobalScreen.registerNativeHook();
+				}
+				catch (NativeHookException ex) {
+					txtEventInfo.append("\n" + "Error: " + ex.toString());
+				}
+			}
+			else {
+				GlobalScreen.unregisterNativeHook();
+			}
+
+			menuSubListeners.setEnabled(GlobalScreen.isNativeHookRegistered());
+		}
+		else if (item == menuItemKeyboardEvents) {
 			//Keyboard checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				GlobalScreen.getInstance().addNativeKeyListener(this);
@@ -142,7 +204,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				GlobalScreen.getInstance().removeNativeKeyListener(this);
 			}
 		}
-		else if (item == chkButton) {
+		else if (item == menuItemButtonEvents) {
 			//Button checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				GlobalScreen.getInstance().addNativeMouseListener(this);
@@ -151,7 +213,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				GlobalScreen.getInstance().removeNativeMouseListener(this);
 			}
 		}
-		else if (item == chkMotion) {
+		else if (item == menuItemMotionEvents) {
 			//Motion checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				GlobalScreen.getInstance().addNativeMouseMotionListener(this);
@@ -160,7 +222,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
 			}
 		}
-		else if (item == chkWheel) {
+		else if (item == menuItemWheelEvents) {
 			//Motion checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				GlobalScreen.getInstance().addNativeMouseWheelListener(this);
@@ -241,7 +303,7 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 	 * @param e the native input event to display.
 	 */
 	private void displayEventInfo(final NativeInputEvent e) {
-		/* Note: JNativeHook does *NOT* operate on the event dispatch thread.
+		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
 		 * Because Swing components must be accessed on the event dispatching
 		 * thread, you *MUST* wrap access to Swing components using the
 		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
@@ -251,6 +313,11 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 				txtEventInfo.append("\n" + e.paramString());
 
 				try {
+					//Clean up the history to reduce memory consumption.
+					if (txtEventInfo.getLineCount() > 100) {
+						txtEventInfo.replaceRange("", 0, txtEventInfo.getLineEndOffset(txtEventInfo.getLineCount() - 1 - 100));
+					}
+
 					txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
 				}
 				catch (BadLocationException ex) {
@@ -305,21 +372,17 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		//Return the focus to the window.
 		this.requestFocusInWindow();
 
-		try {
-			txtEventInfo.setText("Auto Repeat Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
-			txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
-			txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.multiClickInterval"));
-			txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointerSensitivity"));
-			txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointerAccelerationMultiplier"));
-			txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + System.getProperty("jnativehook.pointerAccelerationThreshold"));
+		//Enable the hook, this will cause the GlobalScreen to be initilized.
+		menuItemEnable.setSelected(true);
 
-			//Initialze native hook.  This is done on window open because the
-			//listener requires the txtEventInfo object to be constructed.
-			GlobalScreen.registerNativeHook();
-		}
-		catch (NativeHookException ex) {
-			txtEventInfo.append("\n" + "Error: " + ex.toString());
-		}
+		//Please note that these properties are not avaiable until after the
+		//GlobalScreen class is initialized.
+		txtEventInfo.setText("Auto Repeat Rate: " + System.getProperty("jnativehook.autoRepeatRate"));
+		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.autoRepeatDelay"));
+		txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.multiClickInterval"));
+		txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointerSensitivity"));
+		txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointerAccelerationMultiplier"));
+		txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + System.getProperty("jnativehook.pointerAccelerationThreshold"));
 
 		try {
 			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
@@ -327,6 +390,12 @@ public class NativeHookDemo extends JFrame implements NativeKeyListener, NativeM
 		catch (BadLocationException ex) {
 			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 		}
+
+		//Enable all of the listeners.
+		menuItemKeyboardEvents.setSelected(true);
+		menuItemButtonEvents.setSelected(true);
+		menuItemMotionEvents.setSelected(true);
+		menuItemWheelEvents.setSelected(true);
 	}
 
 	/**

@@ -35,17 +35,17 @@ uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode) {
 	switch (native_keycode) {
 		case XK_Return:
 			event.keycode = VC_ENTER;
-			return event;
+			break;
 		case XK_BackSpace:
 			event.keycode = VC_BACK_SPACE;
-			return event;
+			break;
 		case XK_Tab:
 			event.keycode = VC_TAB;
-			return event;
+			break;
 		#ifndef SUN_KEYBOARD
 		case XK_Cancel:
 			event.keycode = VC_CANCEL;
-			return event;
+			break;
 		#endif
 
 
@@ -66,7 +66,7 @@ uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode) {
 			goto LOCATION_L;
 		LOCATION_L:
 			event.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
-			return event;
+			break;
 
 		case XK_Shift_R:
 			event.keycode = VC_SHIFT;
@@ -85,209 +85,209 @@ uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode) {
 			goto LOCATION_R;
 		LOCATION_R:
 			event.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
-			return event;
+			break;
 
 
 		case XK_Menu:
 			event.keycode = VC_CONTEXT_MENU;
-			return event;
+			break;
 
 
 		case XK_Pause:
 			event.keycode = VC_PAUSE;
-			return event;
+			break;
 		case XK_Caps_Lock:
 			event.keycode = VC_CAPS_LOCK;
-			return event;
+			break;
 		case XK_Escape:
 			event.keycode = VC_ESCAPE;
-			return event;
+			break;
 		case XK_space:
 			event.keycode = VC_SPACE;
-			return event;
+			break;
 
 
 		case XK_Up:
 			event.keycode = VC_UP;
-			return event;
+			break;
 		case XK_Down:
 			event.keycode = VC_DOWN;
-			return event;
+			break;
 		case XK_Left:
 			event.keycode = VC_LEFT;
-			return event;
+			break;
 		case XK_Right:
 			event.keycode = VC_RIGHT;
-			return event;
+			break;
 
 
 		case XK_comma:
 			event.keycode = VC_COMMA;
-			return event;
+			break;
 		case XK_minus:
 			event.keycode = VC_MINUS;
-			return event;
+			break;
 		case XK_period:
 			event.keycode = VC_PERIOD;
-			return event;
+			break;
 		case XK_slash:
 			event.keycode = VC_SLASH;
-			return event;
+			break;
 
 
 		case XK_0:
 			event.keycode = VC_0;
-			return event;
+			break;
 		case XK_1:
 			event.keycode = VC_1;
-			return event;
+			break;
 		case XK_2:
 			event.keycode = VC_2;
-			return event;
+			break;
 		case XK_3:
 			event.keycode = VC_3;
-			return event;
+			break;
 		case XK_4:
 			event.keycode = VC_4;
-			return event;
+			break;
 		case XK_5:
 			event.keycode = VC_5;
-			return event;
+			break;
 		case XK_6:
 			event.keycode = VC_6;
-			return event;
+			break;
 		case XK_7:
 			event.keycode = VC_7;
-			return event;
+			break;
 		case XK_8:
 			event.keycode = VC_8;
-			return event;
+			break;
 		case XK_9:
 			event.keycode = VC_9;
-			return event;
+			break;
 
 
 		case XK_semicolon:
 			event.keycode = VC_SEMICOLON;
-			return event;
+			break;
 		case XK_equal:
 			event.keycode = VC_EQUALS;
-			return event;
+			break;
 
 		case XK_a:
 		case XK_A:
 			event.keycode = VC_A;
-			return event;
+			break;
 		case XK_b:
 		case XK_B:
 			event.keycode = VC_B;
-			return event;
+			break;
 		case XK_c:
 		case XK_C:
 			event.keycode = VC_C;
-			return event;
+			break;
 		case XK_d:
 		case XK_D:
 			event.keycode = VC_D;
-			return event;
+			break;
 		case XK_e:
 		case XK_E:
 			event.keycode = VC_E;
-			return event;
+			break;
 		case XK_f:
 		case XK_F:
 			event.keycode = VC_F;
-			return event;
+			break;
 		case XK_g:
 		case XK_G:
 			event.keycode = VC_G;
-			return event;
+			break;
 		case XK_h:
 		case XK_H:
 			event.keycode = VC_H;
-			return event;
+			break;
 		case XK_i:
 		case XK_I:
 			event.keycode = VC_I;
-			return event;
+			break;
 		case XK_j:
 		case XK_J:
 			event.keycode = VC_J;
-			return event;
+			break;
 		case XK_k:
 		case XK_K:
 			event.keycode = VC_K;
-			return event;
+			break;
 		case XK_l:
 		case XK_L:
 			event.keycode = VC_L;
-			return event;
+			break;
 		case XK_m:
 		case XK_M:
 			event.keycode = VC_M;
-			return event;
+			break;
 		case XK_n:
 		case XK_N:
 			event.keycode = VC_N;
-			return event;
+			break;
 		case XK_o:
 		case XK_O:
 			event.keycode = VC_O;
-			return event;
+			break;
 		case XK_p:
 		case XK_P:
 			event.keycode = VC_P;
-			return event;
+			break;
 		case XK_q:
 		case XK_Q:
 			event.keycode = VC_Q;
-			return event;
+			break;
 		case XK_r:
 		case XK_R:
 			event.keycode = VC_R;
-			return event;
+			break;
 		case XK_s:
 		case XK_S:
 			event.keycode = VC_S;
-			return event;
+			break;
 		case XK_t:
 		case XK_T:
 			event.keycode = VC_T;
-			return event;
+			break;
 		case XK_u:
 		case XK_U:
 			event.keycode = VC_U;
-			return event;
+			break;
 		case XK_v:
 		case XK_V:
 			event.keycode = VC_V;
-			return event;
+			break;
 		case XK_w:
 		case XK_W:
 			event.keycode = VC_W;
-			return event;
+			break;
 		case XK_x:
 		case XK_X:
 			event.keycode = VC_X;
-			return event;
+			break;
 		case XK_y:
 		case XK_Y:
 			event.keycode = VC_Y;
-			return event;
+			break;
 		case XK_z:
 		case XK_Z:
 			event.keycode = VC_Z;
-			return event;
+			break;
 
 		case XK_bracketleft:
 			event.keycode = VC_OPEN_BRACKET;
-			return event;
+			break;
 		case XK_backslash:
 			event.keycode = VC_BACK_SLASH;
-			return event;
+			break;
 		case XK_bracketright:
 			event.keycode = VC_CLOSE_BRACKET;
-			return event;
+			break;
 
 		case XK_KP_0:
 		case XK_KP_Insert:
@@ -362,231 +362,231 @@ uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode) {
 			goto LOCATION_NP;
 		LOCATION_NP:
 			event.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
-			return event;
+			break;
 
 		case XK_Scroll_Lock:
 			event.keycode = VC_SCROLL_LOCK;
-			return event;
+			break;
 
 		// Function Keys
 		case XK_F1:
 			event.keycode = VC_F1;
-			return event;
+			break;
 		case XK_F2:
 			event.keycode = VC_F2;
-			return event;
+			break;
 		case XK_F3:
 			event.keycode = VC_F3;
-			return event;
+			break;
 		case XK_F4:
 			event.keycode = VC_F4;
-			return event;
+			break;
 		case XK_F5:
 			event.keycode = VC_F5;
-			return event;
+			break;
 		case XK_F6:
 			event.keycode = VC_F6;
-			return event;
+			break;
 		case XK_F7:
 			event.keycode = VC_F7;
-			return event;
+			break;
 		case XK_F8:
 			event.keycode = VC_F8;
-			return event;
+			break;
 		case XK_F9:
 			event.keycode = VC_F9;
-			return event;
+			break;
 		case XK_F10:
 			event.keycode = VC_F10;
-			return event;
+			break;
 		case XK_F11:
 			event.keycode = VC_F11;
-			return event;
+			break;
 		case XK_F12:
 			event.keycode = VC_F12;
-			return event;
+			break;
 
 		// Extended Function Keys
 		case XK_F13:
 			event.keycode = VC_F13;
-			return event;
+			break;
 		case XK_F14:
 			event.keycode = VC_F14;
-			return event;
+			break;
 		case XK_F15:
 			event.keycode = VC_F15;
-			return event;
+			break;
 		case XK_F16:
 			event.keycode = VC_F16;
-			return event;
+			break;
 		case XK_F17:
 			event.keycode = VC_F17;
-			return event;
+			break;
 		case XK_F18:
 			event.keycode = VC_F18;
-			return event;
+			break;
 		case XK_F19:
 			event.keycode = VC_F19;
-			return event;
+			break;
 		case XK_F20:
 			event.keycode = VC_F20;
-			return event;
+			break;
 		case XK_F21:
 			event.keycode = VC_F21;
-			return event;
+			break;
 		case XK_F22:
 			event.keycode = VC_F22;
-			return event;
+			break;
 		case XK_F23:
 			event.keycode = VC_F23;
-			return event;
+			break;
 		case XK_F24:
 			event.keycode = VC_F24;
-			return event;
+			break;
 
 		case XK_Print:
 			event.keycode = VC_PRINTSCREEN;
-			return event;
+			break;
 		case XK_Insert:
 			event.keycode = VC_INSERT;
-			return event;
+			break;
 		case XK_Delete:
 			event.keycode = VC_DELETE;
-			return event;
+			break;
 		case XK_Help:
 			event.keycode = VC_HELP;
-			return event;
+			break;
 
 		case XK_Page_Up:
 			event.keycode = VC_PAGE_UP;
-			return event;
+			break;
 		case XK_Page_Down:
 			event.keycode = VC_PAGE_DOWN;
-			return event;
+			break;
 		case XK_Home:
 			event.keycode = VC_HOME;
-			return event;
+			break;
 		case XK_End:
 			event.keycode = VC_END;
-			return event;
+			break;
 
 		case XK_apostrophe:
 			event.keycode = VC_QUOTE;
-			return event;
+			break;
 		case XK_grave:
 			event.keycode = VC_BACK_QUOTE;
-			return event;
+			break;
 
 		// For European keyboards
 		case XK_dead_grave:
 			event.keycode = VC_DEAD_GRAVE;
-			return event;
+			break;
 		case XK_dead_acute:
 			event.keycode = VC_DEAD_ACUTE;
-			return event;
+			break;
 		case XK_dead_circumflex:
 			event.keycode = VC_DEAD_CIRCUMFLEX;
-			return event;
+			break;
 		case XK_dead_tilde:
 			event.keycode = VC_DEAD_TILDE;
-			return event;
+			break;
 		case XK_dead_macron:
 			event.keycode = VC_DEAD_MACRON;
-			return event;
+			break;
 		case XK_dead_breve:
 			event.keycode = VC_DEAD_BREVE;
-			return event;
+			break;
 		case XK_dead_abovedot:
 			event.keycode = VC_DEAD_ABOVEDOT;
-			return event;
+			break;
 		case XK_dead_diaeresis:
 			event.keycode = VC_DEAD_DIAERESIS;
-			return event;
+			break;
 		case XK_dead_abovering:
 			event.keycode = VC_DEAD_ABOVERING;
-			return event;
+			break;
 		case XK_dead_doubleacute:
 			event.keycode = VC_DEAD_DOUBLEACUTE;
-			return event;
+			break;
 		case XK_dead_caron:
 			event.keycode = VC_DEAD_CARON;
-			return event;
+			break;
 		case XK_dead_cedilla:
 			event.keycode = VC_DEAD_CEDILLA;
-			return event;
+			break;
 		case XK_dead_ogonek:
 			event.keycode = VC_DEAD_OGONEK;
-			return event;
+			break;
 		case XK_dead_iota:
 			event.keycode = VC_DEAD_IOTA;
-			return event;
+			break;
 		case XK_dead_voiced_sound:
 			event.keycode = VC_DEAD_VOICED_SOUND;
-			return event;
+			break;
 		case XK_dead_semivoiced_sound:
 			event.keycode = VC_DEAD_SEMIVOICED_SOUND;
-			return event;
+			break;
 
 		// Unknown Keyboard Codes
 		case XK_ampersand:
 			event.keycode = VC_AMPERSAND;
-			return event;
+			break;
 		case XK_asterisk:
 			event.keycode = VC_ASTERISK;
-			return event;
+			break;
 		case XK_quotedbl:
 			event.keycode = VC_QUOTEDBL;
-			return event;
+			break;
 		case XK_less:
 			event.keycode = VC_LESS;
-			return event;
+			break;
 		case XK_greater:
 			event.keycode = VC_GREATER;
-			return event;
+			break;
 		case XK_braceleft:
 			event.keycode = VC_BRACELEFT;
-			return event;
+			break;
 		case XK_braceright:
 			event.keycode = VC_BRACERIGHT;
-			return event;
+			break;
 
 		// Unknown Extended Keyboard Codes
 		case XK_at:
 			event.keycode = VC_AT;
-			return event;
+			break;
 		case XK_colon:
 			event.keycode = VC_COLON;
-			return event;
+			break;
 		case XK_asciicircum:
 			event.keycode = VC_CIRCUMFLEX;
-			return event;
+			break;
 		case XK_dollar:
 			event.keycode = VC_DOLLAR;
-			return event;
+			break;
 		case XK_EuroSign:
 			event.keycode = VC_EURO_SIGN;
-			return event;
+			break;
 		case XK_exclam:
 			event.keycode = VC_EXCLAMATION_MARK;
-			return event;
+			break;
 		case XK_exclamdown:
 			event.keycode = VC_INVERTED_EXCLAMATION_MARK;
-			return event;
+			break;
 		case XK_parenleft:
 			event.keycode = VC_LEFT_PARENTHESIS;
-			return event;
+			break;
 		case XK_numbersign:
 			event.keycode = VC_NUMBER_SIGN;
-			return event;
+			break;
 		case XK_plus:
 			event.keycode = VC_PLUS;
-			return event;
+			break;
 		case XK_parenright:
 			event.keycode = VC_RIGHT_PARENTHESIS;
-			return event;
+			break;
 		case XK_underscore:
 			event.keycode = VC_UNDERSCORE;
-			return event;
+			break;
 
 
 		// For input method support on Asian Keyboards.
@@ -607,139 +607,147 @@ uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode) {
 		#ifndef SUN_KEYBOARD
 		case XK_Mode_switch:			// TODO Testing Needed.
 			event.keycode = VC_MODECHANGE;
-			return event;
+			break;
 		#endif
 		case XK_Kana_Shift:				// TODO Testing Needed.
 			event.keycode = VC_KANA;
-			return event;
+			break;
 		case XK_Kanji:					// TODO Testing Needed.
 			event.keycode = VC_KANJI;
-			return event;
+			break;
 		case XK_Eisu_Shift:				// TODO Testing Needed.
 			event.keycode = VC_ALPHANUMERIC;
-			return event;
+			break;
 		case XK_Katakana:				// TODO Testing Needed.
 			event.keycode = VC_KATAKANA;
-			return event;
+			break;
 		case XK_Hiragana:				// TODO Testing Needed.
 			event.keycode = VC_HIRAGANA;
-			return event;
+			break;
 		case XK_Zenkaku:				// TODO Testing Needed.
 			event.keycode = VC_FULL_WIDTH;
-			return event;
+			break;
 		case XK_Hankaku:				// TODO Testing Needed.
 			event.keycode = VC_HALF_WIDTH;
-			return event;
+			break;
 		case XK_Romaji:					// TODO Testing Needed.
 			event.keycode = VC_ROMAN_CHARACTERS;
-			return event;
+			break;
 		case XK_MultipleCandidate:		// TODO Testing Needed.
 			event.keycode = VC_ALL_CANDIDATES;
-			return event;
+			break;
 		case XK_PreviousCandidate:		// TODO Testing Needed.
 			event.keycode = VC_PREVIOUS_CANDIDATE;
-			return event;
+			break;
 		case XK_Codeinput:				// TODO Testing Needed.
 			event.keycode = VC_CODE_INPUT;
-			return event;
+			break;
 		case XK_Hiragana_Katakana:		// TODO Testing Needed.
 			event.keycode = VC_JAPANESE_KATAKANA;
-			return event;
+			break;
 		case XK_Zenkaku_Hankaku:		// TODO Testing Needed.
 			event.keycode = VC_JAPANESE_HIRAGANA;
-			return event;
+			break;
 		/* case XK_Romaji:				// TODO Testing Needed
 			keyevent.keycode = VC_JAPANESE_ROMAN;
 			return keyevent; */
 		case XK_Kana_Lock:				// TODO Testing Needed.
 			event.keycode = VC_KANA_LOCK;
-			return event;
+			break;
 		case XK_Eisu_toggle:			// TODO Testing Needed.
 			event.keycode = VC_INPUT_METHOD_ON_OFF;
-			return event;
+			break;
 
 		// For Sun keyboards.
 		#ifdef SUN_KEYBOARD
 		case SunXK_Cut:
 			event.keycode = VC_CUT;
-			return event;
+			break;
 		case SunXK_Copy:
 			event.keycode = VC_COPY;
-			return event;
+			break;
 		case SunXK_Paste:
 			event.keycode = VC_PASTE;
-			return event;
+			break;
 		case SunXK_Undo:
 			event.keycode = VC_UNDO;
-			return event;
+			break;
 		case SunXK_Again:
 			event.keycode = VC_AGAIN;
-			return event;
+			break;
 		case SunXK_Find:
 			event.keycode = VC_FIND;
-			return event;
+			break;
 		case SunXK_Props:
 			event.keycode = VC_PROPS;
-			return event;
+			break;
 		case SunXK_Stop:
 			event.keycode = VC_STOP;
-			return event;
+			break;
 		case SunXK_Compose:
 			event.keycode = VC_COMPOSE;
-			return event;
+			break;
 		case SunXK_AltGraph:
 			event.keycode = VC_ALT_GRAPH;
-			return event;
+			break;
 		#endif
 
 		case XK_Begin:
 			event.keycode = VC_BEGIN;
-			return event;
+			break;
 
 		default:
 		case XK_VoidSymbol:
 			event.keycode = VC_UNDEFINED;
 			event.location = NH_KEY_LOCATION_UNKNOWN;
-			return event;
+			break;
 	}
+
+	return event;
 }
 
-uint_fast8_t convert_to_virtual_button(uint_fast8_t native_button) {
-	uint_fast8_t virtual_button;
-	
-	switch (native_button) {
+uint_fast8_t ConvertToVirtualButton(uint_fast8_t nativeButton) {
+	uint_fast8_t virtualButton;
+
+	switch (nativeButton) {
 		case Button1:
-			virtual_button = NH_BUTTON1;
+			virtualButton = NH_BUTTON1;
+			break;
 		case Button2:
-			virtual_button = NH_BUTTON3;
+			virtualButton = NH_BUTTON3;
+			break;
 		case Button3:
-			virtual_button = NH_BUTTON2;
+			virtualButton = NH_BUTTON2;
+			break;
 		case Button4:
-			virtual_button = NH_BUTTON4;
+			virtualButton = NH_BUTTON4;
+			break;
 		case Button5:
-			virtual_button = NH_BUTTON5;
+			virtualButton = NH_BUTTON5;
+			break;
 
 		default:
 		case AnyButton:
-			virtual_button = VC_NOBUTTON;
+			virtualButton = VC_NOBUTTON;
+			break;
 	}
-	
-	return virtual_button;
+
+	return virtualButton;
 }
 
-uint_fast16_t convert_to_virtual_mask(uint_fast16_t native_mask) {
-	uint_fast16_t virtual_mask = 0x0000;
+uint_fast16_t ConvertToVirtualMask(uint_fast16_t nativeMask) {
+	uint_fast16_t virtualMask = 0x0000;
 
-	if (native_mask & ShiftMask)	virtual_mask |= SHIFT_MASK;
-	if (native_mask & ControlMask)	virtual_mask |= CTRL_MASK;
-	if (native_mask & Mod4Mask)		virtual_mask |= META_MASK;
-	if (native_mask & Mod1Mask)		virtual_mask |= ALT_MASK;
+	if (nativeMask & ShiftMask)		virtualMask |= SHIFT_MASK;
+	if (nativeMask & ControlMask)	virtualMask |= CTRL_MASK;
+	if (nativeMask & Mod4Mask)		virtualMask |= META_MASK;
+	if (nativeMask & Mod1Mask)		virtualMask |= ALT_MASK;
 
-	if (native_mask & Button1Mask)	virtual_mask |= BUTTON1_MASK;
-	if (native_mask & Button2Mask)	virtual_mask |= BUTTON2_MASK;
-	if (native_mask & Button3Mask)	virtual_mask |= BUTTON3_MASK;
-	if (native_mask & Button4Mask)	virtual_mask |= BUTTON4_MASK;
-	if (native_mask & Button5Mask)	virtual_mask |= BUTTON5_MASK;
+	if (nativeMask & Button1Mask)	virtualMask |= BUTTON1_MASK;
+	if (nativeMask & Button2Mask)	virtualMask |= BUTTON2_MASK;
+	if (nativeMask & Button3Mask)	virtualMask |= BUTTON3_MASK;
+	if (nativeMask & Button4Mask)	virtualMask |= BUTTON4_MASK;
+	if (nativeMask & Button5Mask)	virtualMask |= BUTTON5_MASK;
 
-	return virtual_mask;
+	return virtualMask;
 }

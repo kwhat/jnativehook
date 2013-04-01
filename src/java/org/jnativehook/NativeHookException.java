@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ package org.jnativehook;
 
 /**
  * Signals that a Native Hook Exception has occurred.
- * 
+ *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
  */
@@ -28,15 +28,15 @@ public class NativeHookException extends Exception {
 	private static final long serialVersionUID = 6199753732102764333L;
 
 	/**
-	 * Instantiates a new <code>NativeHookException</code> with null as its 
+	 * Instantiates a new <code>NativeHookException</code> with null as its
 	 * detail message.
 	 */
 	public NativeHookException() {
 		super();
 	}
-	
+
 	/**
-	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * Instantiates a new <code>NativeHookException</code> with a specified
 	 * detail message.
 	 *
 	 * @param message The detail message.
@@ -44,24 +44,24 @@ public class NativeHookException extends Exception {
 	public NativeHookException(String message) {
 		super(message);
 	}
-	
+
 	/**
-	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * Instantiates a new <code>NativeHookException</code> with a specified
 	 * detail message and cause.
 	 *
 	 * @param message The detail message.
-	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * @param cause The cause of the exception. A null value is permitted, and
 	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeHookException(String message, Throwable cause) {
 		super(message, cause);
 	}
-	
+
 	/**
-	 * Instantiates a new <code>NativeHookException</code> with a specified 
+	 * Instantiates a new <code>NativeHookException</code> with a specified
 	 * cause.
 	 *
-	 * @param cause The cause of the exception. A null value is permitted, and 
+	 * @param cause The cause of the exception. A null value is permitted, and
 	 * indicates that the cause is nonexistent or unknown.
 	 */
 	public NativeHookException(Throwable cause) {
