@@ -149,7 +149,7 @@ static int RefreshLocaleList() {
 
 				if (is_loaded) {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
+					fprintf(stdout, "RefreshLocaleList(): Found loacle ID 0x%p in the cache..\n", (void *) locale_item->id);
 					#endif
 
 					// Set the previous local to the current locale.
@@ -164,7 +164,7 @@ static int RefreshLocaleList() {
 				}
 				else {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
+					fprintf(stdout, "RefreshLocaleList(): Removing loacle ID 0x%p from the cache.\n", (void *) locale_item->id);
 					#endif
 
 					// If the old id is not in the new list, remove it.
@@ -204,7 +204,7 @@ static int RefreshLocaleList() {
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
 
 							#ifdef DEBUG
-							fprintf(stdout, "RefreshLocaleList(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
+							fprintf(stdout, "RefreshLocaleList(): Loading layout for 0x%p: %s.\n", (void *) hkl_list[i], layoutFile);
 							#endif
 
 							// Create the new locale item.
@@ -271,7 +271,7 @@ static int RefreshLocaleList() {
 					}
 					#ifdef DEBUG
 					else {
-						fprintf(stderr, "RefreshLocaleList(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
+						fprintf(stderr, "RefreshLocaleList(): Could not find keyboard map for locale 0x%p!\n", (void *) hkl_list[i]);
 					}
 					#endif
 				}
@@ -346,7 +346,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 			// Search the linked list.
 			if (locale_item->id == locale_id) {
 				#ifdef DEBUG
-				fprintf(stdout, "ConvertVirtualKeyToWChar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
+				fprintf(stdout, "ConvertVirtualKeyToWChar(): Activating keyboard layout 0x%p.\n", (void *) locale_item->id);
 				#endif
 
 				// If they layout changes the dead key state needs to be reset.
@@ -377,7 +377,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 	// Check and make sure the unicode helper was loaded.
 	if (locale_current != NULL) {
 		#ifdef DEBUG
-		fprintf(stdout, "ConvertVirtualKeyToWChar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
+		fprintf(stdout, "ConvertVirtualKeyToWChar(): Using keyboard layout 0x%p.\n", (void *) locale_current->id);
 		#endif
 
 		short state = 0;
