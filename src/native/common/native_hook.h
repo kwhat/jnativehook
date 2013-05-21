@@ -16,16 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_NativeHook
+#define _Included_NativeHook
 
-/* Redefined virtual constants for native use.  This file should be machine
- * generated however no tool exists for doing so.
- * Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
- */
+enum {
+	key_pressed, key_released, key_typed
+} VirtualEvent;
 
-#ifndef _Included_org_jnativehook_mouse_NativeMouseWheelEvent
-#define _Included_org_jnativehook_mouse_NativeMouseWheelEvent
+#define KEY_PRESSED_EVENT			1
+#define KEY_RELEASED_EVENT			2
+#define KEY_TYPED_EVENT				3
 
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL	0
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL	1
+#define MOUSE_PRESSED_EVENT			4
+#define MOUSE_RELEASED_EVENT		5
+#define MOUSE_CLICKED_EVENT			6
+#define MOUSE_WHEEL_EVENT			7
+#define MOUSE_MOVED_EVENT			8
+#define MOUSE_DRAGGED_EVENT			9
+
+
+extern void FireHookEvent();
+
+// Native library load callback for platform specific initialization.
+extern void OnLibraryLoad();
+
+// Native library unload callback for platform specific de-initialization.
+extern void OnLibraryUnload();
 
 #endif

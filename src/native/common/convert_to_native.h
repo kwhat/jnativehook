@@ -16,31 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JConvertFromNative
-#define _Included_JConvertFromNative
-
-#include <jni.h>
-
-#include "org_jnativehook_NativeInputEvent.h"
-#include "org_jnativehook_keyboard_NativeKeyEvent.h"
-#include "org_jnativehook_mouse_NativeMouseEvent.h"
-#include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
-
-typedef struct {
-	jint keycode;		// Key Code
-	jint rawcode;		// Raw Code
-	jint location;		// Key Location
-} JKeyDatum;
+#ifndef _Included_ConvertToNative
+#define _Included_ConvertToNative
 
 /* Converts the native key symbol to the virtual key code and keyboard location.
  * The raw code is the platform specific key code. 
  */
-extern JKeyDatum NativeToJKey(unsigned int keysym);
+extern unsigned int ConvertToNativeKey(unsigned int virtualKeyCode);
 
 // Converts the native button code to its virtual counterpart.
-extern jint NativeToJButton(unsigned int button);
+extern unsigned short int ConvertToNativeButton(unsigned short int virtualButton);
 
 // Converts the native modifier mask code to its virtual counterpart.
-extern jint NativeToJEventMask(unsigned int mask);
+extern unsigned int ConvertToNativeMask(unsigned int nativeMask);
 
 #endif

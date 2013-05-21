@@ -2,7 +2,7 @@
 
 <!--
 	JNativeHook: Global keyboard and mouse hooking for Java.
-	Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+	Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -685,14 +685,13 @@
 
 		<echo>Compiling C source...</echo>
 		<!-- Create required directories for compiling -->
-		<mkdir dir="${dir.bin.obj}" />
-		<mkdir dir="${dir.bin.obj}/common" />
 		<mkdir dir="${dir.bin.obj}/jni" />
-		<mkdir dir="${dir.bin.obj}/${dir.src.platform}" />
+		<mkdir dir="${dir.bin.obj}/native/common" />
+		<mkdir dir="${dir.bin.obj}/native/${dir.src.platform}" />
 
 		<fileset dir="${dir.src.native}" id="file.src">
-			<include name="common/*.c" />
-			<include name="jni/*.c" />
+			<!-- include name="common/*.c" />
+			<include name="jni/*.c" /-->
 			<include name="${dir.src.platform}/*.c" />
 		</fileset>
 

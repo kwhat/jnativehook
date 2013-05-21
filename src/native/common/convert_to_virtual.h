@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,16 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_ConvertToVirtual
+#define _Included_ConvertToVirtual
 
-/* Redefined virtual constants for native use.  This file should be machine
- * generated however no tool exists for doing so.
- * Reference: org/jnativehook/mouse/NativeMouseWheelEvent.java
+/* Converts the native key symbol to the virtual key code and keyboard location.
+ * The raw code is the platform specific key code. 
  */
+extern unsigned int ConvertToVirtualKey(unsigned int virtualKeyCode);
 
-#ifndef _Included_org_jnativehook_mouse_NativeMouseWheelEvent
-#define _Included_org_jnativehook_mouse_NativeMouseWheelEvent
+// Converts the native button code to its virtual counterpart.
+extern unsigned short int ConvertToVirtualButton(unsigned short int virtualButton);
 
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL	0
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL	1
+// Converts the native modifier mask code to its virtual counterpart.
+extern unsigned int ConvertToVirtualMask(unsigned int nativeMask);
 
 #endif

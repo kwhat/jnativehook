@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,20 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JConvertFromNative
-#define _Included_JConvertFromNative
+#ifndef _Included_SystemProperties
+#define _Included_SystemProperties
 
-#include <stdint.h>
+// Retrieves the keyboard auto repeat rate.
+extern long int GetAutoRepeatRate();
 
-/* Converts the native key symbol to the virtual key code and keyboard location.
- * The raw code is the platform specific key code. 
- */
-extern uint_fast16_t convert_to_virtual_keycode(uint_fast16_t native_keycode);
+// Retrieves the keyboard auto repeat delay.
+extern long int GetAutoRepeatDelay();
 
-// Converts the native button code to its virtual counterpart.
-extern uint_fast8_t convert_to_virtual_button(uint_fast8_t native_button);
+// Retrieves the mouse acceleration multiplier.
+extern long int GetPointerAccelerationMultiplier();
 
-// Converts the virtual modifier mask to its native counterpart.
-extern uint_fast16_t convert_to_virtual_mask(uint_fast16_t native_mask);
+// Retrieves the mouse acceleration threshold.
+extern long int GetPointerAccelerationThreshold();
+
+// Retrieves the mouse sensitivity.
+extern long int GetPointerSensitivity();
+
+// Retrieves the double/triple click interval.
+extern long int GetMultiClickTime();
 
 #endif

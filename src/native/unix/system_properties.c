@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -35,17 +36,17 @@
 static XtAppContext app_context;
 #endif
 
-Display *disp;
+extern Display *disp;
 
-int_fast32_t GetAutoRepeatRate() {
+long int GetAutoRepeatRate() {
 	bool successful = false;
-	int_fast32_t value = -1;
-	unsigned int kb_delay = 0, kb_rate = 0;
+	long int value = -1;
+	unsigned int delay = 0, rate = 0;
 
 	#ifdef XKB
 	// Attempt to acquire the keyboard auto repeat rate using the XKB extension.
 	if (!successful) {
-		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &kb_delay, &kb_rate);
+		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &delay, &rate);
 	}
 	#endif
 
@@ -55,23 +56,23 @@ int_fast32_t GetAutoRepeatRate() {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 		if (successful) {
-			kb_delay = (unsigned int) kbdinfo.delay;
-			kb_rate = (unsigned int) kbdinfo.rate;
+			delay = (unsigned int) kbdinfo.delay;
+			rate = (unsigned int) kbdinfo.rate;
 		}
 	}
 	#endif
 
 	if (successful) {
-		value = (int_fast32_t) kb_delay;
+		value = (long int) delay;
 	}
 
-	(void) kb_rate;
+	(void) rate;
 	return value;
 }
 
-int_fast32_t GetAutoRepeatDelay() {
+long int GetAutoRepeatDelay() {
 	bool successful = false;
-	int_fast32_t value = -1;
+	long int value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
 
 	#ifdef XKB
@@ -94,20 +95,20 @@ int_fast32_t GetAutoRepeatDelay() {
 	#endif
 
 	if (successful) {
-		value = (int_fast32_t) kb_rate;
+		value = (long int) kb_rate;
 	}
 
 	(void) kb_delay;
 	return value;
 }
 
-int_fast32_t GetPointerAccelerationMultiplier() {
-	int_fast32_t value = -1;
+long int GetPointerAccelerationMultiplier() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_denominator >= 0) {
-		value = (int_fast32_t) accel_denominator;
+		value = (long int) accel_denominator;
 	}
 	(void) accel_numerator;
 	(void) threshold;
@@ -115,13 +116,13 @@ int_fast32_t GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-int_fast32_t GetPointerAccelerationThreshold() {
-	int_fast32_t value = -1;
+long int GetPointerAccelerationThreshold() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (threshold >= 0) {
-		value = (int_fast32_t) threshold;
+		value = (long int) threshold;
 	}
 	(void) accel_numerator;
 	(void) accel_denominator;
@@ -129,13 +130,13 @@ int_fast32_t GetPointerAccelerationThreshold() {
 	return value;
 }
 
-int_fast32_t GetPointerSensitivity() {
-	int_fast32_t value = -1;
+long int GetPointerSensitivity() {
+	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_numerator >= 0) {
-		value = (int_fast32_t) accel_numerator;
+		value = (long int) accel_numerator;
 	}
 	(void) accel_denominator;
 	(void) threshold;
@@ -143,8 +144,8 @@ int_fast32_t GetPointerSensitivity() {
 	return value;
 }
 
-int_fast32_t GetMultiClickTime() {
-	int_fast32_t value = 200;
+long int GetMultiClickTime() {
+	long int value = 200;
 	int clicktime;
 	bool successful = false;
 
@@ -174,64 +175,8 @@ int_fast32_t GetMultiClickTime() {
 	#endif
 
 	if (successful) {
-		value = (int_fast32_t) clicktime;
+		value = (long int) clicktime;
 	}
 
 	return value;
-}
-
-
-void OnLibraryLoad() {
-	// Tell X Threads are OK.
-	XInitThreads();
-
-	#ifdef XT
-	XtToolkitInitialize();
-	app_context = XtCreateApplicationContext();
-	#endif
-
-	// Open local display.
-	disp = XOpenDisplay(XDisplayName(NULL));
-	#ifdef DEBUG
-	if (disp != NULL) {
-		fprintf(stdout, "OnLibraryLoad(): XOpenDisplay successful.\n");
-	}
-	else {
-		fprintf(stderr, "OnLibraryLoad(): XOpenDisplay failure!\n");
-	}
-	#endif
-
-	Bool isAutoRepeat = False;
-	#ifdef XKB
-	// Enable detectable autorepeat.
-	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
-	#else
-	XAutoRepeatOn(disp);
-
-	XKeyboardState kb_state;
-	XGetKeyboardControl(disp, &kb_state);
-
-	isAutoRepeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
-	#endif
-
-	#ifdef DEBUG
-	if (isAutoRepeat) {
-		fprintf(stdout, "OnLibraryLoad(): Successfully enabled detectable autorepeat.\n");
-	}
-	else {
-		fprintf(stderr, "OnLibraryLoad(): Could not enable detectable auto-repeat!\n");
-	}
-	#endif
-}
-
-void OnLibraryUnload() {
-	#ifdef XT
-	XtDestroyApplicationContext(app_context);
-	#endif
-
-	// Destroy the native displays.
-	if (disp != NULL) {
-		XCloseDisplay(disp);
-		disp = NULL;
-	}
 }

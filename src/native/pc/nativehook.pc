@@ -1,0 +1,9 @@
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: nativehook
+Description: nativehook library
+Version: 1.2.0_M1
+Libs: -L${libdir} -lnativehook  
+Cflags: -I${includedir}

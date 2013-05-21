@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,3 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_SystemProperties
+#define _Included_SystemProperties
+
+// Native library load callback for platform specific initialization.
+extern void OnLibraryLoad();
+
+// Native library unload callback for platform specific de-initialization.
+extern void OnLibraryUnload();
+
+#endif

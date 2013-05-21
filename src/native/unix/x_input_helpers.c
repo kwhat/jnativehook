@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+
 #include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -397,6 +399,49 @@ wchar_t KeySymToUnicode(KeySym keysym) {
 		case XK_thorn:
 		case XK_ydiaeresis:
 			return keysym;
+		case XK_Tab:
+		#ifdef XK_MISCELLANY
+		case XK_KP_Tab:
+		#endif
+			return '\t';
+		case XK_Return:
+		#ifdef XK_MISCELLANY
+		case XK_KP_Enter:
+		#endif
+			return '\n';
+		#ifdef XK_MISCELLANY
+		case XK_KP_0:
+		case XK_KP_1:
+		case XK_KP_2:
+		case XK_KP_3:
+		case XK_KP_4:
+		case XK_KP_5:
+		case XK_KP_6:
+		case XK_KP_7:
+		case XK_KP_8:
+		case XK_KP_9:
+			return keysym - (XK_KP_0 - XK_0);		// Assumes values are defined in order.
+		case XK_Linefeed:
+			return '\r';
+		case XK_KP_Space:
+			return XK_space;
+		case XK_BackSpace:
+			return '\b';
+		case XK_KP_Equal:
+			return XK_equal;
+		case XK_KP_Multiply:
+			return XK_asterisk;
+		case XK_KP_Add:
+			return XK_plus;
+		case XK_KP_Separator:
+			return XK_comma;						// Often but not always a comma?
+		case XK_KP_Subtract:
+			return XK_minus;
+		case XK_KP_Decimal:
+			return XK_period;
+		case XK_KP_Divide:
+			return XK_slash;
+		#endif
 		#endif
 
 

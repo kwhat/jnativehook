@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,25 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _included_system_properties
-#define _included_system_properties
+#include "nativehook.h"
 
-// Retrieves the keyboard auto repeat rate.
-extern int_fast32_t get_auto_repeat_rate();
+static unsigned int lastError = NATIVEHOOK_SUCCESS;
 
-// Retrieves the keyboard auto repeat delay.
-extern int_fast32_t get_auto_repeat_delay();
+void setError(unsigned int errCode) {
+	lastError = errCode;
+}
 
-// Retrieves the mouse acceleration multiplier.
-extern int_fast32_t get_pointer_acceleration_multiplier();
-
-// Retrieves the mouse acceleration threshold.
-extern int_fast32_t get_pointer_acceleration_threshold();
-
-// Retrieves the mouse sensitivity.
-extern int_fast32_t get_pointer_sensitivity();
-
-// Retrieves the double/triple click interval.
-extern int_fast32_t get_multi_click_time();
-
-#endif
+unsigned int getError() {
+	return lastError;
+}

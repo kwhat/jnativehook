@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,16 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef enum {
-        HOOK_THREAD_START_ERROR,
-        HOOK_THREAD_STOP_ERROR,
-        HOOK_THREAD_INIT_ERROR
-} native_hook_errors;
+#ifndef _Included_NativeThread_h
+#define _Included_NativeThread_h
 
-void set_last_error(int errno) {
-	
-}
+#include <stdbool.h>
 
-int get_last_error() {
-	return errno;
-}
+// Attempt to start the global hook thread.
+extern int StartNativeThread();
+
+// Attempt to stop the global hook thread.
+extern int StopNativeThread();
+
+// Determine the status of the global hook thread.
+extern bool IsNativeThreadRunning();
+
+#endif

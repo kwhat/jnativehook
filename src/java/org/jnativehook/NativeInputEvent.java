@@ -51,31 +51,31 @@ public class NativeInputEvent extends EventObject {
 	private int modifiers;
 
 	/** The Shift key modifier constant. */
-	public static final int SHIFT_MASK		= 1;
+	public static final int SHIFT_MASK		= 1 << 0;
 
 	/** The Ctrl key modifier constant. */
-	public static final int CTRL_MASK		= 2;
+	public static final int CTRL_MASK		= 1 << 1;
 
 	/** The Meta key modifier constant. */
-	public static final int META_MASK		= 4;
+	public static final int META_MASK		= 1 << 2;
 
 	/** The Alt key modifier constant. */
-	public static final int ALT_MASK		= 8;
+	public static final int ALT_MASK		= 1 << 3;
 
 	/** The Button1 modifier constant. */
-	public static final int BUTTON1_MASK	= 16;
+	public static final int BUTTON1_MASK	= 1 << 4;
 
 	/** The Button2 modifier constant. */
-	public static final int BUTTON2_MASK	= 32;
+	public static final int BUTTON2_MASK	= 1 << 5;
 
 	/** The Button3 modifier constant. */
-	public static final int BUTTON3_MASK	= 64;
+	public static final int BUTTON3_MASK	= 1 << 6;
 
 	/** The Button4 modifier constant. */
-	public static final int BUTTON4_MASK	= 128;
+	public static final int BUTTON4_MASK	= 1 << 7;
 
 	/** The Button5 modifier constant. */
-	public static final int BUTTON5_MASK	= 256;
+	public static final int BUTTON5_MASK	= 1 << 8;
 
 
 	/**
