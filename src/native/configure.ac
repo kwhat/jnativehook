@@ -145,11 +145,13 @@ AS_IF(
 		CFLAGS="$X11_CFLAGS $CFLAGS"
 
 		# Check for XRecord.
-		AC_CHECK_HEADERS([X11/extensions/record.h], [], [], [
-			[#ifdef HAVE_NUMBER_H
-			 # include <X11/extensions/record.h>
-			 #endif]
-		])
+		AC_CHECK_LIB([Xtst], [XRecordQueryVersion], [], 
+			[AC_MSG_ERROR([Some features will be disabled])],
+			$LIBS)
+		
+		AC_CHECK_HEADERS([X11/extensions/record.h], [], 
+			[AC_MSG_ERROR([Missing XRecord])], 
+			[#include <X11/Xlib.h>])
 
 		AS_IF([test "x$enable_xkb" = "xyes"], [
 			AC_DEFINE([USE_XKB], 1, [Enable X Keyboard Extension])

@@ -406,7 +406,7 @@ static void LowLevelProc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
 
 static void *ThreadProc(void *arg) {
 	int *status = (int *) arg;
-	*status = FAILURE;
+	*status = NATIVEHOOK_FAILURE;
 
 	// XRecord context for use later.
 	context = 0;
@@ -452,7 +452,7 @@ static void *ThreadProc(void *arg) {
 					// Async requires that we loop so that our thread does not return.
 					if (XRecordEnableContextAsync(disp_data, context, LowLevelProc, NULL) != 0) {
 						// Set the exit status.
-						*status = SUCCESS;
+						*status = NATIVEHOOK_SUCCESS;
 
 						#ifdef XRECORD_ASYNC
 						while (running) {
@@ -476,7 +476,7 @@ static void *ThreadProc(void *arg) {
 						#endif
 
 						// Set the exit status.
-						*status = ERROR_X_RECORD_ENABLE_CONTEXT;
+						*status = NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT;
 					}
 
 					// Callback for additional thread cleanup.
@@ -495,7 +495,7 @@ static void *ThreadProc(void *arg) {
 				#endif
 
 				// Set the exit status.
-				*status = ERROR_X_RECORD_CREATE_CONTEXT;
+				*status = NATIVEHOOK_ERROR_X_RECORD_CREATE_CONTEXT;
 			}
 
 			// Free the XRecordRange.
@@ -507,7 +507,7 @@ static void *ThreadProc(void *arg) {
 			#endif
 
 			// Set the exit status.
-			*status = ERROR_X_RECORD_ALLOC_RANGE;
+			*status = NATIVEHOOK_ERROR_X_RECORD_ALLOC_RANGE;
 		}
 
 		XCloseDisplay(disp_data);
@@ -519,7 +519,7 @@ static void *ThreadProc(void *arg) {
 		#endif
 
 		// Set the exit status.
-		*status = ERROR_X_OPEN_DISPLAY;
+		*status = NATIVEHOOK_ERROR_X_OPEN_DISPLAY;
 	}
 
 	#ifdef DEBUG
@@ -533,7 +533,7 @@ static void *ThreadProc(void *arg) {
 }
 
 int StartNativeThread() {
-	int status = FAILURE;
+	int status = NATIVEHOOK_FAILURE;
 
 	// We shall use the default pthread attributes: thread is joinable
 	// (not detached) and has default (non real-time) scheduling policy.
@@ -589,7 +589,7 @@ int StartNativeThread() {
 						fprintf(stdout, "StartNativeThread(): initialization successful.\n");
 						#endif
 
-						status = SUCCESS;
+						status = NATIVEHOOK_SUCCESS;
 					}
 					else {
 						#ifdef DEBUG
@@ -612,7 +612,7 @@ int StartNativeThread() {
 					fprintf(stderr, "StartNativeThread(): Thread create failure!\n");
 					#endif
 
-					status = ERROR_THREAD_CREATE;
+					status = NATIVEHOOK_ERROR_THREAD_CREATE;
 				}
 			}
 			else {
@@ -620,7 +620,7 @@ int StartNativeThread() {
 				fprintf (stderr, "ThreadProc(): XRecord is not currently available!\n");
 				#endif
 
-				status = ERROR_X_RECORD_NOT_FOUND;
+				status = NATIVEHOOK_ERROR_X_RECORD_NOT_FOUND;
 			}
 		}
 		else {
@@ -634,7 +634,7 @@ int StartNativeThread() {
 				dspCtrl = NULL;
 			}
 
-			status = ERROR_X_OPEN_DISPLAY;
+			status = NATIVEHOOK_ERROR_X_OPEN_DISPLAY;
 		}
 	}
 
@@ -645,7 +645,7 @@ int StartNativeThread() {
 }
 
 int StopNativeThread() {
-	int status = FAILURE;
+	int status = NATIVEHOOK_FAILURE;
 
 	// Lock the thread control mutex.  This will be unlocked when the
 	// thread has fully stopped.

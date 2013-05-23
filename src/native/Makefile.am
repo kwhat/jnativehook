@@ -54,7 +54,7 @@ OS_SRC = \
     windows/WinUnicodeHelper.c
 endif
 
-libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -fno-strict-aliasing
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -fno-strict-aliasing -I$(top_srcdir)/include -I$(top_srcdir)/common
 libnativehook_la_LDFLAGS = $(LTLDFLAGS)
 libnativehook_la_SOURCES = \
 	common/error.c \

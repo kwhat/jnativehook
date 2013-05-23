@@ -1,0 +1,3 @@
+common/libnativehook_la-error.lo: common/error.c include/nativehook.h
+
+include/nativehook.h:
