@@ -62,7 +62,7 @@ long int GetAutoRepeatRate() {
 	#endif
 
 	if (successful) {
-		value = (long) kb_delay;
+		value = (long int) kb_delay;
 	}
 
 	(void) kb_rate;
@@ -94,7 +94,7 @@ long int GetAutoRepeatDelay() {
 	#endif
 
 	if (successful) {
-		value = (long) kb_rate;
+		value = (long int) kb_rate;
 	}
 
 	(void) kb_delay;
@@ -107,7 +107,7 @@ long int GetPointerAccelerationMultiplier() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_denominator >= 0) {
-		value = accel_denominator;
+		value = (long int) accel_denominator;
 	}
 	(void) accel_numerator;
 	(void) threshold;
@@ -121,7 +121,7 @@ long int GetPointerAccelerationThreshold() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (threshold >= 0) {
-		value = threshold;
+		value = (long int) threshold;
 	}
 	(void) accel_numerator;
 	(void) accel_denominator;
@@ -135,7 +135,7 @@ long int GetPointerSensitivity() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_numerator >= 0) {
-		value = accel_numerator;
+		value = (long int) accel_numerator;
 	}
 	(void) accel_denominator;
 	(void) threshold;
@@ -174,7 +174,7 @@ long int GetMultiClickTime() {
 	#endif
 
 	if (successful) {
-		value = clicktime;
+		value = (long int) clicktime;
 	}
 
 	return value;
