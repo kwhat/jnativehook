@@ -40,7 +40,7 @@ AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([Makefile pc/nativehook.pc])
 AC_CONFIG_AUX_DIR([config])
-AC_CONFIG_HEADERS([config.h:config.h.in])
+AC_CONFIG_HEADERS([common/config.h:common/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Initialize automake.
@@ -145,12 +145,12 @@ AS_IF(
 		CFLAGS="$X11_CFLAGS $CFLAGS"
 
 		# Check for XRecord.
-		AC_CHECK_LIB([Xtst], [XRecordQueryVersion], [], 
+		AC_CHECK_LIB([Xtst], [XRecordQueryVersion], [],
 			[AC_MSG_ERROR([Some features will be disabled])],
 			$LIBS)
-		
-		AC_CHECK_HEADERS([X11/extensions/record.h], [], 
-			[AC_MSG_ERROR([Missing XRecord])], 
+
+		AC_CHECK_HEADERS([X11/extensions/record.h], [],
+			[AC_MSG_ERROR([Missing XRecord])],
 			[#include <X11/Xlib.h>])
 
 		AS_IF([test "x$enable_xkb" = "xyes"], [

@@ -23,32 +23,61 @@
 #define NATIVEHOOK_SUCCESS							0x00
 #define NATIVEHOOK_FAILURE							0x01
 
-#define NATIVEHOOK_ERROR_THREAD_CREATE				0x02
-#define NATIVEHOOK_ERROR_THREAD_INIT				0x03
-#define NATIVEHOOK_ERROR_THREAD_START				0x04
-#define NATIVEHOOK_ERROR_THREAD_STOP				0x05
+#define NATIVEHOOK_ERROR_OUT_OF_MEMORY				0x02
 
-#define NATIVEHOOK_ERROR_X_OPEN_DISPLAY				0x10
-#define NATIVEHOOK_ERROR_X_RECORD_NOT_FOUND			0x11
-#define NATIVEHOOK_ERROR_X_RECORD_ALLOC_RANGE		0x12
-#define NATIVEHOOK_ERROR_X_RECORD_CREATE_CONTEXT	0x13
-#define NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT	0x14
+#define NATIVEHOOK_ERROR_THREAD_CREATE				0x10
+#define NATIVEHOOK_ERROR_THREAD_INIT				0x11
+#define NATIVEHOOK_ERROR_THREAD_START				0x12
+#define NATIVEHOOK_ERROR_THREAD_STOP				0x13
+
+#define NATIVEHOOK_ERROR_X_OPEN_DISPLAY				0x20
+#define NATIVEHOOK_ERROR_X_RECORD_NOT_FOUND			0x21
+#define NATIVEHOOK_ERROR_X_RECORD_ALLOC_RANGE		0x22
+#define NATIVEHOOK_ERROR_X_RECORD_CREATE_CONTEXT	0x23
+#define NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT	0x24
 /* End Error Codes */
 
-/* Begin Virtual Key Codes */
+
+/* Begin Virtual Event Types */
+#define EVENT_KEY_PRESSED		1
+#define EVENT_KEY_RELEASED		2
+#define EVENT_KEY_TYPED			3
+#define EVENT_MOUSE_PRESSED		4
+#define EVENT_MOUSE_RELEASED	5
+#define EVENT_MOUSE_CLICKED		6
+#define EVENT_MOUSE_MOVED		7
+#define EVENT_MOUSE_DRAGGED		8
+#define EVENT_MOUSE_WHEEL		9
+
 typedef struct {
+	unsigned short int type;
 	unsigned long int time;
+	unsigned short int mask;
+	void *data;
+} VritualEvent;
+
+typedef struct {
 	unsigned short int keycode;
 	unsigned short int rawcode;
-	unsigned char location;
-} VritualKeyEvent;
+	wchar_t keychar;
+} KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 
-#define LOCATION_UNKNOWN				0
-#define LOCATION_STANDARD				1
-#define LOCATION_LEFT					2
-#define LOCATION_RIGHT					3
-#define LOCATION_NUMPAD					4
+typedef struct {
+	unsigned short int button;
+	unsigned short int clicks;
+	unsigned short int x;
+	unsigned short int y;
+} MouseEventData, MousePressedEventData, MouseReleasedEventData, MouseClickedEventData;
 
+typedef struct {
+	unsigned short int type;
+	unsigned short int amount;
+	signed int rotation;
+} MouseWheelEventData;
+/* End Virtual Event Types */
+
+
+/* Begin Virtual Key Codes */
 #define VC_ENTER						'\n'
 #define VC_BACK_SPACE					'\b'
 #define VC_TAB							'\t'
@@ -278,34 +307,29 @@ typedef struct {
 #define CHAR_UNDEFINED					0xFFFF	// CharCode Unknown
 
 #define VC_UNDEFINED					0x0000	// KeyCode Unknown
-
 /* End Virtual Key Codes */
 
+
 /* Begin Virtual Modifier Masks */
-#define SHIFT_MASK			1 << 0
-#define CTRL_MASK			1 << 1
-#define META_MASK			1 << 2
-#define ALT_MASK			1 << 3
+#define MASK_SHIFT_L		1 << 0
+#define MASK_CTRL_L			1 << 1
+#define MASK_META_L			1 << 2
+#define MASK_ALT_L			1 << 3
 
-//#define SHIFT_MASK		1 << 4
-//#define CTRL_MASK			1 << 5
-//#define META_MASK			1 << 6
-//#define ALT_MASK			1 << 7
+#define MASK_SHIFT_R		1 << 4
+#define MASK_CTRL_R			1 << 5
+#define MASK_META_R			1 << 6
+#define MASK_ALT_R			1 << 7
 
-#define BUTTON1_MASK		1 << 8
-#define BUTTON2_MASK		1 << 9
-#define BUTTON3_MASK		1 << 10
-#define BUTTON4_MASK		1 << 11
-#define BUTTON5_MASK		1 << 12
+#define MASK_BUTTON1		1 << 8
+#define MASK_BUTTON2		1 << 9
+#define MASK_BUTTON3		1 << 10
+#define MASK_BUTTON4		1 << 11
+#define MASK_BUTTON5		1 << 12
 /* End Virtual Modifier Masks */
 
-/* Begin Virtual Mouse Buttons */
-#define EVENT_MOUSE_PRESSED		1
-#define EVENT_MOUSE_RELEASED	2
-#define EVENT_MOUSE_MOVED		3
-#define EVENT_MOUSE_DRAGGED		4
-#define EVENT_MOUSE_WHEEL		5
 
+/* Begin Virtual Mouse Buttons */
 #define MOUSE_NOBUTTON			0	// AnyButton
 #define MOUSE_BUTTON1			1
 #define MOUSE_BUTTON2			2

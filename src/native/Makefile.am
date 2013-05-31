@@ -15,7 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-MAINTAINERCLEANFILES = Makefile.in aclocal.m4
+#MOSTLYCLEANFILES, CLEANFILES, DISTCLEANFILES, and MAINTAINERCLEANFILES
+
+DISTCLEANFILES = config.cache config/* configure
+MAINTAINERCLEANFILES = config.h.in* Makefile.in aclocal.m4
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -27,9 +30,12 @@ EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt
 #AM_LDFLAGS = -Wl,--as-needed,-O1
 
 # Define bin and lib targets.
-#bin_PROGRAMS = nativehookdemo
+bin_PROGRAMS = nativehookdemo
 lib_LTLIBRARIES = libnativehook.la
 include_HEADERS = include/libnativehook.h
+
+nativehookdemo_SOURCES = common/nativehookdemo.c
+nativehookdemo_LDADD = $(top_builddir)/$(backend)/libnativehook.la $(LIBS_DEMO)
 
 if OS_UNIX
 OS_SRC = \
@@ -53,6 +59,11 @@ if OS_WINDOWS
 OS_SRC = \
     windows/WinUnicodeHelper.c
 endif
+
+nativehookdemo_CFLAGS
+libnativehook_la_LDFLAGS = $(LTLDFLAGS)
+libnativehook_la_SOURCES = \
+	common/nativehook_demo.c
 
 libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -fno-strict-aliasing -I$(top_srcdir)/include -I$(top_srcdir)/common
 libnativehook_la_LDFLAGS = $(LTLDFLAGS)
