@@ -16,25 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_SystemProperties
-#define _Included_SystemProperties
+#ifndef _included_system_properties
+#define _included_system_properties
 
 // Retrieves the keyboard auto repeat rate.
-extern long int GetAutoRepeatRate();
+extern long int hook_get_auto_repeat_rate();
 
 // Retrieves the keyboard auto repeat delay.
-extern long int GetAutoRepeatDelay();
+extern long int hook_get_auto_repeat_delay();
 
 // Retrieves the mouse acceleration multiplier.
-extern long int GetPointerAccelerationMultiplier();
+extern long int hook_get_pointer_acceleration_multiplier();
 
 // Retrieves the mouse acceleration threshold.
-extern long int GetPointerAccelerationThreshold();
+extern long int hook_get_pointer_acceleration_threshold();
 
 // Retrieves the mouse sensitivity.
-extern long int GetPointerSensitivity();
+extern long int hook_get_pointer_sensitivity();
 
 // Retrieves the double/triple click interval.
-extern long int GetMultiClickTime();
+extern long int hook_get_multi_click_time();
 
 #endif

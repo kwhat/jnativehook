@@ -352,7 +352,11 @@ typedef struct {
 extern "C" {
 #endif
 
-
+	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+	NATIVEHOOK_API int hook_enable();
+	NATIVEHOOK_API int hook_disable();
+	NATIVEHOOK_API bool hook_is_enabled();
+	
 #ifdef __cplusplus
 }
 #endif

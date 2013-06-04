@@ -16,18 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_NativeThread_h
-#define _Included_NativeThread_h
+#ifndef _included_hook_thread_h
+#define _included_hook_thread_h
 
 #include <stdbool.h>
 
+extern void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+
 // Attempt to start the global hook thread.
-extern int StartNativeThread();
+extern int hook_enable();
 
 // Attempt to stop the global hook thread.
-extern int StopNativeThread();
+extern int hook_disable();
 
 // Determine the status of the global hook thread.
-extern bool IsNativeThreadRunning();
+extern bool hook_is_enable();
 
 #endif

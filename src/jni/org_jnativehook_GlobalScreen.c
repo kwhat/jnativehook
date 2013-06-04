@@ -16,10 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "NativeErrors.h"
-#include "NativeGlobals.h"
-#include "NativeHelpers.h"
-#include "NativeThread.h"
+#include "nativehook.h"
 #include "org_jnativehook_GlobalScreen.h"
 
 static void SetNativeProperties(JNIEnv *env) {
@@ -187,7 +184,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	//jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	//jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	//jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
-
 
 	jclass clsNativeInputEvent = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
 	jmethodID idGetID = (*env)->GetMethodID(env, clsNativeInputEvent, "getID", "()I");

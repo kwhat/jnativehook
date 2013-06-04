@@ -24,517 +24,517 @@
 
 #include "nativehook.h"
 
-unsigned int ConvertToNativeKey(unsigned int virtualKeyCode) {
-	unsigned int keyCode;
+unsigned int convert_to_native_key(unsigned int virtual_keycode) {
+	unsigned int native_keycode;
 
-	switch (virtualKeyCode) {
+	switch (virtual_keycode) {
 		case VC_ENTER:
-			keyCode = XK_Return;
+			native_keycode = XK_Return;
 			break;
 		case VC_BACK_SPACE:
-			keyCode = XK_BackSpace;
+			native_keycode = XK_BackSpace;
 			break;
 		case VC_TAB:
-			keyCode = XK_Tab;
+			native_keycode = XK_Tab;
 			break;
 		#ifndef SUN_KEYBOARD
 		case VC_CANCEL:
-			keyCode = XK_Cancel;
+			native_keycode = XK_Cancel;
 			break;
 		#endif
 
 
 		case VC_SHIFT_L:
-			keyCode = XK_Shift_L;
+			native_keycode = XK_Shift_L;
 			break;
 		case VC_SHIFT_R:
-			keyCode = XK_Shift_R;
+			native_keycode = XK_Shift_R;
 			break;
 		case VC_CONTROL_L:
-			keyCode = XK_Control_L;
+			native_keycode = XK_Control_L;
 			break;
 		case VC_CONTROL_R:
-			keyCode = XK_Control_R;
+			native_keycode = XK_Control_R;
 			break;
 		case VC_ALT_L:
-			keyCode = XK_Alt_L;
+			native_keycode = XK_Alt_L;
 			break;
 		case VC_ALT_R:
-			keyCode = XK_Alt_R;
+			native_keycode = XK_Alt_R;
 			break;
 		case VC_META_L:
-			keyCode = XK_Meta_L;
+			native_keycode = XK_Meta_L;
 			break;
 		case VC_META_R:
-			keyCode = XK_Meta_R;
+			native_keycode = XK_Meta_R;
 			break;
 		case VC_SUPER_L:
-			keyCode = XK_Super_L;
+			native_keycode = XK_Super_L;
 			break;
 		case VC_SUPER_R:
-			keyCode = XK_Super_R;
+			native_keycode = XK_Super_R;
 			break;
 
 
 		case VC_CONTEXT_MENU:
-			keyCode = XK_Menu;
+			native_keycode = XK_Menu;
 			break;
 
 
 		case VC_PAUSE:
-			keyCode = XK_Pause;
+			native_keycode = XK_Pause;
 			break;
 		case VC_CAPS_LOCK:
-			keyCode = XK_Caps_Lock;
+			native_keycode = XK_Caps_Lock;
 			break;
 		case VC_ESCAPE:
-			keyCode = XK_Escape;
+			native_keycode = XK_Escape;
 			break;
 		case VC_SPACE:
-			keyCode = XK_space;
+			native_keycode = XK_space;
 			break;
 
 
 		case VC_UP:
-			keyCode = XK_Up;
+			native_keycode = XK_Up;
 			break;
 		case VC_DOWN:
-			keyCode = XK_Down;
+			native_keycode = XK_Down;
 			break;
 		case VC_LEFT:
-			keyCode = XK_Left;
+			native_keycode = XK_Left;
 			break;
 		case VC_RIGHT:
-			keyCode = XK_Right;
+			native_keycode = XK_Right;
 			break;
 
 
 		case VC_COMMA:
-			keyCode = XK_comma;
+			native_keycode = XK_comma;
 			break;
 		case VC_MINUS:
-			keyCode = XK_minus;
+			native_keycode = XK_minus;
 			break;
 		case VC_PERIOD:
-			keyCode = XK_period;
+			native_keycode = XK_period;
 			break;
 		case VC_SLASH:
-			keyCode = XK_slash;
+			native_keycode = XK_slash;
 			break;
 
 
 		case VC_0:
-			keyCode = XK_0;
+			native_keycode = XK_0;
 			break;
 		case VC_1:
-			keyCode = XK_1;
+			native_keycode = XK_1;
 			break;
 		case VC_2:
-			keyCode = XK_2;
+			native_keycode = XK_2;
 			break;
 		case VC_3:
-			keyCode = XK_3;
+			native_keycode = XK_3;
 			break;
 		case VC_4:
-			keyCode = XK_4;
+			native_keycode = XK_4;
 			break;
 		case VC_5:
-			keyCode = XK_5;
+			native_keycode = XK_5;
 			break;
 		case VC_6:
-			keyCode = XK_6;
+			native_keycode = XK_6;
 			break;
 		case VC_7:
-			keyCode = XK_7;
+			native_keycode = XK_7;
 			break;
 		case VC_8:
-			keyCode = XK_8;
+			native_keycode = XK_8;
 			break;
 		case VC_9:
-			keyCode = XK_9;
+			native_keycode = XK_9;
 			break;
 
 
 		case VC_SEMICOLON:
-			keyCode = XK_semicolon;
+			native_keycode = XK_semicolon;
 			break;
 		case VC_EQUALS:
-			keyCode = XK_equal;
+			native_keycode = XK_equal;
 			break;
 
 		case VC_A:
-			keyCode = XK_A;
+			native_keycode = XK_A;
 			break;
 		case VC_B:
-			keyCode = XK_B;
+			native_keycode = XK_B;
 			break;
 		case VC_C:
-			keyCode = XK_C;
+			native_keycode = XK_C;
 			break;
 		case VC_D:
-			keyCode = XK_D;
+			native_keycode = XK_D;
 			break;
 		case VC_E:
-			keyCode = XK_E;
+			native_keycode = XK_E;
 			break;
 		case VC_F:
-			keyCode = XK_F;
+			native_keycode = XK_F;
 			break;
 		case VC_G:
-			keyCode = XK_G;
+			native_keycode = XK_G;
 			break;
 		case VC_H:
-			keyCode = XK_H;
+			native_keycode = XK_H;
 			break;
 		case VC_I:
-			keyCode = XK_I;
+			native_keycode = XK_I;
 			break;
 		case VC_J:
-			keyCode = XK_J;
+			native_keycode = XK_J;
 			break;
 		case VC_K:
-			keyCode = XK_K;
+			native_keycode = XK_K;
 			break;
 		case VC_L:
-			keyCode = XK_L;
+			native_keycode = XK_L;
 			break;
 		case VC_M:
-			keyCode = XK_M;
+			native_keycode = XK_M;
 			break;
 		case VC_N:
-			keyCode = XK_N;
+			native_keycode = XK_N;
 			break;
 		case VC_O:
-			keyCode = XK_O;
+			native_keycode = XK_O;
 			break;
 		case VC_P:
-			keyCode = XK_P;
+			native_keycode = XK_P;
 			break;
 		case VC_Q:
-			keyCode = XK_Q;
+			native_keycode = XK_Q;
 			break;
 		case VC_R:
-			keyCode = XK_R;
+			native_keycode = XK_R;
 			break;
 		case VC_S:
-			keyCode = XK_S;
+			native_keycode = XK_S;
 			break;
 		case VC_T:
-			keyCode = XK_T;
+			native_keycode = XK_T;
 			break;
 		case VC_U:
-			keyCode = XK_U;
+			native_keycode = XK_U;
 			break;
 		case VC_V:
-			keyCode = XK_V;
+			native_keycode = XK_V;
 			break;
 		case VC_W:
-			keyCode = XK_W;
+			native_keycode = XK_W;
 			break;
 		case VC_X:
-			keyCode = XK_X;
+			native_keycode = XK_X;
 			break;
 		case VC_Y:
-			keyCode = XK_Y;
+			native_keycode = XK_Y;
 			break;
 		case VC_Z:
-			keyCode = XK_Z;
+			native_keycode = XK_Z;
 			break;
 
 		case VC_OPEN_BRACKET:
-			keyCode = XK_bracketleft;
+			native_keycode = XK_bracketleft;
 			break;
 		case VC_BACK_SLASH:
-			keyCode = XK_backslash;
+			native_keycode = XK_backslash;
 			break;
 		case VC_CLOSE_BRACKET:
-			keyCode = XK_bracketright;
+			native_keycode = XK_bracketright;
 			break;
 
 		case VC_KP_0:
-			keyCode = XK_KP_0;
+			native_keycode = XK_KP_0;
 			break;
 		case VC_KP_1:
-			keyCode = XK_KP_1;
+			native_keycode = XK_KP_1;
 			break;
 		case VC_KP_2:
-			keyCode = XK_KP_2;
+			native_keycode = XK_KP_2;
 			break;
 		case VC_KP_3:
-			keyCode = XK_KP_3;
+			native_keycode = XK_KP_3;
 			break;
 		case VC_KP_4:
-			keyCode = XK_KP_4;
+			native_keycode = XK_KP_4;
 			break;
 		case VC_KP_5:
-			keyCode = XK_KP_5;
+			native_keycode = XK_KP_5;
 			break;
 		case VC_KP_6:
-			keyCode = XK_KP_6;
+			native_keycode = XK_KP_6;
 			break;
 		case VC_KP_7:
-			keyCode = XK_KP_7;
+			native_keycode = XK_KP_7;
 			break;
 		case VC_KP_8:
-			keyCode = XK_KP_8;
+			native_keycode = XK_KP_8;
 			break;
 		case VC_KP_9:
-			keyCode = XK_KP_9;
+			native_keycode = XK_KP_9;
 			break;
 
 		case VC_KP_MULTIPLY:
-			keyCode = XK_KP_Multiply;
+			native_keycode = XK_KP_Multiply;
 			break;
 		case VC_KP_ADD:
-			keyCode = XK_KP_Add;
+			native_keycode = XK_KP_Add;
 			break;
 		case VC_KP_SEPARATOR:
-			keyCode = XK_KP_Separator;
+			native_keycode = XK_KP_Separator;
 			break;
 		case VC_KP_SUBTRACT:
-			keyCode = XK_KP_Subtract;
+			native_keycode = XK_KP_Subtract;
 			break;
 		case VC_KP_ENTER:
-			keyCode = XK_KP_Enter;
+			native_keycode = XK_KP_Enter;
 			break;
 		case VC_KP_DECIMAL:
-			keyCode = XK_KP_Decimal;
+			native_keycode = XK_KP_Decimal;
 			break;
 		case VC_KP_DIVIDE:
-			keyCode = XK_KP_Divide;
+			native_keycode = XK_KP_Divide;
 			break;
 		case VC_KP_DELETE:
-			keyCode = XK_KP_Delete;
+			native_keycode = XK_KP_Delete;
 			break;
 		case VC_NUM_LOCK:
-			keyCode = XK_Num_Lock;
+			native_keycode = XK_Num_Lock;
 			break;
 		case VC_CLEAR:
-			keyCode = XK_Clear;
+			native_keycode = XK_Clear;
 			break;
 
 		case VC_SCROLL_LOCK:
-			keyCode = XK_Scroll_Lock;
+			native_keycode = XK_Scroll_Lock;
 			break;
 
 		// Function Keys
 		case VC_F1:
-			keyCode = XK_F1;
+			native_keycode = XK_F1;
 			break;
 		case VC_F2:
-			keyCode = XK_F2;
+			native_keycode = XK_F2;
 			break;
 		case VC_F3:
-			keyCode = XK_F3;
+			native_keycode = XK_F3;
 			break;
 		case VC_F4:
-			keyCode = XK_F4;
+			native_keycode = XK_F4;
 			break;
 		case VC_F5:
-			keyCode = XK_F5;
+			native_keycode = XK_F5;
 			break;
 		case VC_F6:
-			keyCode = XK_F6;
+			native_keycode = XK_F6;
 			break;
 		case VC_F7:
-			keyCode = XK_F7;
+			native_keycode = XK_F7;
 			break;
 		case VC_F8:
-			keyCode = XK_F8;
+			native_keycode = XK_F8;
 			break;
 		case VC_F9:
-			keyCode = XK_F9;
+			native_keycode = XK_F9;
 			break;
 		case VC_F10:
-			keyCode = XK_F10;
+			native_keycode = XK_F10;
 			break;
 		case VC_F11:
-			keyCode = XK_F11;
+			native_keycode = XK_F11;
 			break;
 		case VC_F12:
-			keyCode = XK_F12;
+			native_keycode = XK_F12;
 			break;
 
 		// Extended Function Keys
 		case  VC_F13:
-			keyCode = XK_F13;
+			native_keycode = XK_F13;
 			break;
 		case  VC_F14:
-			keyCode = XK_F14;
+			native_keycode = XK_F14;
 			break;
 		case  VC_F15:
-			keyCode = XK_F15;
+			native_keycode = XK_F15;
 			break;
 		case  VC_F16:
-			keyCode = XK_F16;
+			native_keycode = XK_F16;
 			break;
 		case  VC_F17:
-			keyCode = XK_F17;
+			native_keycode = XK_F17;
 			break;
 		case  VC_F18:
-			keyCode = XK_F18;
+			native_keycode = XK_F18;
 			break;
 		case  VC_F19:
-			keyCode = XK_F19;
+			native_keycode = XK_F19;
 			break;
 		case  VC_F20:
-			keyCode = XK_F20;
+			native_keycode = XK_F20;
 			break;
 		case  VC_F21:
-			keyCode = XK_F21;
+			native_keycode = XK_F21;
 			break;
 		case  VC_F22:
-			keyCode = XK_F22;
+			native_keycode = XK_F22;
 			break;
 		case  VC_F23:
-			keyCode = XK_F23;
+			native_keycode = XK_F23;
 			break;
 		case  VC_F24:
-			keyCode = XK_F24;
+			native_keycode = XK_F24;
 			break;
 
 		case VC_PRINTSCREEN:
-			keyCode = XK_Print;
+			native_keycode = XK_Print;
 			break;
 		case VC_INSERT:
-			keyCode = XK_Insert;
+			native_keycode = XK_Insert;
 			break;
 		case VC_DELETE:
-			keyCode = XK_Delete;
+			native_keycode = XK_Delete;
 			break;
 		case VC_HELP:
-			keyCode = XK_Help;
+			native_keycode = XK_Help;
 			break;
 
 		case VC_PAGE_UP:
-			keyCode = XK_Page_Up;
+			native_keycode = XK_Page_Up;
 			break;
 		case VC_PAGE_DOWN:
-			keyCode = XK_Page_Down;
+			native_keycode = XK_Page_Down;
 			break;
 		case VC_HOME:
-			keyCode = XK_Home;
+			native_keycode = XK_Home;
 			break;
 		case VC_END:
-			keyCode = XK_End;
+			native_keycode = XK_End;
 			break;
 
 		case VC_QUOTE:
-			keyCode = XK_apostrophe;
+			native_keycode = XK_apostrophe;
 			break;
 		case VC_BACK_QUOTE:
-			keyCode = XK_grave;
+			native_keycode = XK_grave;
 			break;
 
 		// For European keyboards
 		case VC_DEAD_GRAVE:
-			keyCode = XK_dead_grave;
+			native_keycode = XK_dead_grave;
 			break;
 		case VC_DEAD_ACUTE:
-			keyCode = XK_dead_acute;
+			native_keycode = XK_dead_acute;
 			break;
 		case VC_DEAD_CIRCUMFLEX:
-			keyCode = XK_dead_circumflex;
+			native_keycode = XK_dead_circumflex;
 			break;
 		case VC_DEAD_TILDE:
-			keyCode = XK_dead_tilde;
+			native_keycode = XK_dead_tilde;
 			break;
 		case VC_DEAD_MACRON:
-			keyCode = XK_dead_macron;
+			native_keycode = XK_dead_macron;
 			break;
 		case VC_DEAD_BREVE:
-			keyCode = XK_dead_breve;
+			native_keycode = XK_dead_breve;
 			break;
 		case VC_DEAD_ABOVEDOT:
-			keyCode = XK_dead_abovedot;
+			native_keycode = XK_dead_abovedot;
 			break;
 		case VC_DEAD_DIAERESIS:
-			keyCode = XK_dead_diaeresis;
+			native_keycode = XK_dead_diaeresis;
 			break;
 		case VC_DEAD_ABOVERING:
-			keyCode = XK_dead_abovering;
+			native_keycode = XK_dead_abovering;
 			break;
 		case VC_DEAD_DOUBLEACUTE:
-			keyCode = XK_dead_doubleacute;
+			native_keycode = XK_dead_doubleacute;
 			break;
 		case VC_DEAD_CARON:
-			keyCode = XK_dead_caron;
+			native_keycode = XK_dead_caron;
 			break;
 		case VC_DEAD_CEDILLA:
-			keyCode = XK_dead_cedilla;
+			native_keycode = XK_dead_cedilla;
 			break;
 		case VC_DEAD_OGONEK:
-			keyCode = XK_dead_ogonek;
+			native_keycode = XK_dead_ogonek;
 			break;
 		case VC_DEAD_IOTA:
-			keyCode = XK_dead_iota;
+			native_keycode = XK_dead_iota;
 			break;
 		case VC_DEAD_VOICED_SOUND:
-			keyCode = XK_dead_voiced_sound;
+			native_keycode = XK_dead_voiced_sound;
 			break;
 		case VC_DEAD_SEMIVOICED_SOUND:
-			keyCode = XK_dead_semivoiced_sound;
+			native_keycode = XK_dead_semivoiced_sound;
 			break;
 
 		// Unknown Keyboard Codes
 		case VC_AMPERSAND:
-			keyCode = XK_ampersand;
+			native_keycode = XK_ampersand;
 			break;
 		case VC_ASTERISK:
-			keyCode = XK_asterisk;
+			native_keycode = XK_asterisk;
 			break;
 		case VC_QUOTEDBL:
-			keyCode = XK_quotedbl;
+			native_keycode = XK_quotedbl;
 			break;
 		case VC_LESS:
-			keyCode = XK_less;
+			native_keycode = XK_less;
 			break;
 		case VC_GREATER:
-			keyCode = XK_greater;
+			native_keycode = XK_greater;
 			break;
 		case VC_BRACELEFT:
-			keyCode = XK_braceleft;
+			native_keycode = XK_braceleft;
 			break;
 		case VC_BRACERIGHT:
-			keyCode = XK_braceright;
+			native_keycode = XK_braceright;
 			break;
 
 		// Unknown Extended Keyboard Codes
 		case VC_AT:
-			keyCode = XK_at;
+			native_keycode = XK_at;
 			break;
 		case VC_COLON:
-			keyCode = XK_colon;
+			native_keycode = XK_colon;
 			break;
 		case VC_CIRCUMFLEX:
-			keyCode = XK_asciicircum;
+			native_keycode = XK_asciicircum;
 			break;
 		case VC_DOLLAR:
-			keyCode = XK_dollar;
+			native_keycode = XK_dollar;
 			break;
 		case VC_EURO_SIGN:
-			keyCode = XK_EuroSign;
+			native_keycode = XK_EuroSign;
 			break;
 		case VC_EXCLAMATION_MARK:
-			keyCode = XK_exclam;
+			native_keycode = XK_exclam;
 			break;
 		case VC_INVERTED_EXCLAMATION_MARK:
-			keyCode = XK_exclamdown;
+			native_keycode = XK_exclamdown;
 			break;
 		case VC_LEFT_PARENTHESIS:
-			keyCode = XK_parenleft;
+			native_keycode = XK_parenleft;
 			break;
 		case VC_NUMBER_SIGN:
-			keyCode = XK_numbersign;
+			native_keycode = XK_numbersign;
 			break;
 		case VC_PLUS:
-			keyCode = XK_plus;
+			native_keycode = XK_plus;
 			break;
 		case VC_RIGHT_PARENTHESIS:
-			keyCode = XK_parenright;
+			native_keycode = XK_parenright;
 			break;
 		case VC_UNDERSCORE:
-			keyCode = XK_underscore;
+			native_keycode = XK_underscore;
 			break;
 
 
@@ -555,147 +555,147 @@ unsigned int ConvertToNativeKey(unsigned int virtualKeyCode) {
 		*/
 		#ifndef SUN_KEYBOARD
 		case VC_MODECHANGE:				// TODO Testing Needed.
-			keyCode = XK_Mode_switch;
+			native_keycode = XK_Mode_switch;
 			break;
 		#endif
 		case VC_KANA:					// TODO Testing Needed.
-			keyCode = XK_Kana_Shift;
+			native_keycode = XK_Kana_Shift;
 			break;
 		case VC_KANJI:					// TODO Testing Needed.
-			keyCode = XK_Kanji;
+			native_keycode = XK_Kanji;
 			break;
 		case VC_ALPHANUMERIC:			// TODO Testing Needed.
-			keyCode = XK_Eisu_Shift;
+			native_keycode = XK_Eisu_Shift;
 			break;
 		case VC_KATAKANA:				// TODO Testing Needed.
-			keyCode = XK_Katakana;
+			native_keycode = XK_Katakana;
 			break;
 		case VC_HIRAGANA:				// TODO Testing Needed.
-			keyCode = XK_Hiragana;
+			native_keycode = XK_Hiragana;
 			break;
 		case VC_FULL_WIDTH:				// TODO Testing Needed.
-			keyCode = XK_Zenkaku;
+			native_keycode = XK_Zenkaku;
 			break;
 		case VC_HALF_WIDTH:				// TODO Testing Needed.
-			keyCode = XK_Hankaku;
+			native_keycode = XK_Hankaku;
 			break;
 		case VC_ROMAN_CHARACTERS:		// TODO Testing Needed.
-			keyCode = XK_Romaji;
+			native_keycode = XK_Romaji;
 			break;
 		case VC_ALL_CANDIDATES:			// TODO Testing Needed.
-			keyCode = XK_MultipleCandidate;
+			native_keycode = XK_MultipleCandidate;
 			break;
 		case VC_PREVIOUS_CANDIDATE:		// TODO Testing Needed.
-			keyCode = XK_PreviousCandidate;
+			native_keycode = XK_PreviousCandidate;
 			break;
 		case VC_CODE_INPUT:				// TODO Testing Needed.
-			keyCode = XK_Codeinput;
+			native_keycode = XK_Codeinput;
 			break;
 		case VC_JAPANESE_KATAKANA:		// TODO Testing Needed.
-			keyCode = XK_Hiragana_Katakana;
+			native_keycode = XK_Hiragana_Katakana;
 			break;
 		case VC_JAPANESE_HIRAGANA:		// TODO Testing Needed.
-			keyCode = XK_Zenkaku_Hankaku;
+			native_keycode = XK_Zenkaku_Hankaku;
 			break;
 		/* case VC_JAPANESE_ROMAN:		// TODO Testing Needed
 			keykeyCode = XK_Romaji;
 			return keyevent; */
 		case VC_KANA_LOCK:				// TODO Testing Needed.
-			keyCode = XK_Kana_Lock;
+			native_keycode = XK_Kana_Lock;
 			break;
 		case VC_INPUT_METHOD_ON_OFF:	// TODO Testing Needed.
-			keyCode = XK_Eisu_toggle;
+			native_keycode = XK_Eisu_toggle;
 			break;
 
 		// For Sun keyboards.
 		#ifdef SUN_KEYBOARD
 		case VC_CUT:
-			keyCode = SunXK_Cut;
+			native_keycode = SunXK_Cut;
 			break;
 		case VC_COPY:
-			keyCode = SunXK_Copy;
+			native_keycode = SunXK_Copy;
 			break;
 		case VC_PASTE:
-			keyCode = SunXK_Paste;
+			native_keycode = SunXK_Paste;
 			break;
 		case VC_UNDO:
-			keyCode = SunXK_Undo;
+			native_keycode = SunXK_Undo;
 			break;
 		case VC_AGAIN:
-			keyCode = SunXK_Again;
+			native_keycode = SunXK_Again;
 			break;
 		case VC_FIND:
-			keyCode = SunXK_Find;
+			native_keycode = SunXK_Find;
 			break;
 		case VC_PROPS:
-			keyCode = SunXK_Props;
+			native_keycode = SunXK_Props;
 			break;
 		case VC_STOP:
-			keyCode = SunXK_Stop;
+			native_keycode = SunXK_Stop;
 			break;
 		case VC_COMPOSE:
-			keyCode = SunXK_Compose;
+			native_keycode = SunXK_Compose;
 			break;
 		case VC_ALT_GRAPH:
-			keyCode = SunXK_AltGraph;
+			native_keycode = SunXK_AltGraph;
 			break;
 		#endif
 
 		case VC_BEGIN:
-			keyCode = XK_Begin;
+			native_keycode = XK_Begin;
 			break;
 
 		default:
 		case VC_UNDEFINED:
-			keyCode = XK_VoidSymbol;
+			native_keycode = XK_VoidSymbol;
 			break;
 	}
 
-	return keyCode;
+	return native_keycode;
 }
 
-unsigned short int ConvertToNativeButton(unsigned short int virtualButton) {
-	unsigned short int nativeButton;
+unsigned int convert_to_native_button(unsigned short int virtual_button) {
+	unsigned short int native_button;
 
-	switch (virtualButton) {
+	switch (virtual_button) {
 		case MOUSE_BUTTON1:
-			nativeButton = Button1;
+			native_button = Button1;
 			break;
 		case MOUSE_BUTTON2:
-			nativeButton = Button2;
+			native_button = Button2;
 			break;
 		case MOUSE_BUTTON3:
-			nativeButton = Button3;
+			native_button = Button3;
 			break;
 		case MOUSE_BUTTON4:
-			nativeButton = Button4;
+			native_button = Button4;
 			break;
 		case MOUSE_BUTTON5:
-			nativeButton = Button5;
+			native_button = Button5;
 			break;
 
 		default:
 		case MOUSE_NOBUTTON:
-			nativeButton = AnyButton;
+			native_button = AnyButton;
 			break;
 	}
 
-	return nativeButton;
+	return native_button;
 }
 
-unsigned short int ConvertToNativeMask(unsigned short int virtualMask) {
-	unsigned short int nativeMask = 0x0000;
+unsigned short int convert_to_native_mask(unsigned short int virtual_mask) {
+	unsigned short int native_mask = 0x0000;
 
-	if (virtualMask & SHIFT_MASK)	nativeMask |= ShiftMask;
-	if (virtualMask & CTRL_MASK)	nativeMask |= ControlMask;
-	if (virtualMask & META_MASK)	nativeMask |= Mod4Mask;
-	if (virtualMask & ALT_MASK)		nativeMask |= Mod1Mask;
+	if (virtual_mask & SHIFT_MASK)		native_mask |= ShiftMask;
+	if (virtual_mask & CTRL_MASK)		native_mask |= ControlMask;
+	if (virtual_mask & META_MASK)		native_mask |= Mod4Mask;
+	if (virtual_mask & ALT_MASK)		native_mask |= Mod1Mask;
 
-	if (virtualMask & BUTTON1_MASK)	nativeMask |= Button1Mask;
-	if (virtualMask & BUTTON2_MASK)	nativeMask |= Button2Mask;
-	if (virtualMask & BUTTON3_MASK)	nativeMask |= Button3Mask;
-	if (virtualMask & BUTTON4_MASK)	nativeMask |= Button4Mask;
-	if (virtualMask & BUTTON5_MASK)	nativeMask |= Button5Mask;
+	if (virtual_mask & BUTTON1_MASK)	native_mask |= Button1Mask;
+	if (virtual_mask & BUTTON2_MASK)	native_mask |= Button2Mask;
+	if (virtual_mask & BUTTON3_MASK)	native_mask |= Button3Mask;
+	if (virtual_mask & BUTTON4_MASK)	native_mask |= Button4Mask;
+	if (virtual_mask & BUTTON5_MASK)	native_mask |= Button5Mask;
 
-	return nativeMask;
+	return native_mask;
 }

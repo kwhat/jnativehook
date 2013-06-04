@@ -122,8 +122,6 @@ bool ThreadStartCallback() {
 			thread_ex.message = "Failed to create JNI global references";
 		}
 
-
-
 		#ifdef DEBUG
 		fprintf(stdout, "ThreadStartCallback(): Detach from JVM successful.\n");
 		#endif

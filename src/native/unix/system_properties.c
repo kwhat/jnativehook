@@ -38,7 +38,7 @@ static XtAppContext app_context;
 
 extern Display *disp;
 
-long int GetAutoRepeatRate() {
+long int hook_get_auto_repeat_rate() {
 	bool successful = false;
 	long int value = -1;
 	unsigned int delay = 0, rate = 0;
@@ -70,7 +70,7 @@ long int GetAutoRepeatRate() {
 	return value;
 }
 
-long int GetAutoRepeatDelay() {
+long int hook_get_auto_repeat_delay() {
 	bool successful = false;
 	long int value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
@@ -102,7 +102,7 @@ long int GetAutoRepeatDelay() {
 	return value;
 }
 
-long int GetPointerAccelerationMultiplier() {
+long int hook_get_pointer_acceleration_multiplier() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -116,7 +116,7 @@ long int GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-long int GetPointerAccelerationThreshold() {
+long int hook_get_pointer_acceleration_threshold() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -130,7 +130,7 @@ long int GetPointerAccelerationThreshold() {
 	return value;
 }
 
-long int GetPointerSensitivity() {
+long int hook_get_pointer_sensitivity() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -144,19 +144,19 @@ long int GetPointerSensitivity() {
 	return value;
 }
 
-long int GetMultiClickTime() {
+long int hook_get_multi_click_time() {
 	long int value = 200;
-	int clicktime;
+	int click_time;
 	bool successful = false;
 
 	// Try and acquire the multi-click time from the user defined X defaults.
 	char *xprop = XGetDefault(disp, "*", "multiClickTime");
-	if (xprop != NULL && sscanf(xprop, "%4i", &clicktime) != EOF) {
+	if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
 		successful = true;
 	}
 
 	xprop = XGetDefault(disp, "OpenWindows", "MultiClickTimeout");
-	if (xprop != NULL && sscanf(xprop, "%4i", &clicktime) != EOF) {
+	if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
 		successful = true;
 	}
 
@@ -167,15 +167,15 @@ long int GetMultiClickTime() {
 	// Fall back to the X Toolkit extension if available and other efforts failed.
     XtDisplayInitialize(app_context, disp, "JNativeHook", "JNativeHook", NULL, 0, &argc, argv);
 	if (!successful) {
-		clicktime = XtGetMultiClickTime(disp);
-		if (clicktime >= 0) {
+		click_time = XtGetMultiClickTime(disp);
+		if (click_time >= 0) {
 			successful = true;
 		}
 	}
 	#endif
 
 	if (successful) {
-		value = (long int) clicktime;
+		value = (long int) click_time;
 	}
 
 	return value;

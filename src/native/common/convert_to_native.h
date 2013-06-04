@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_ConvertToNative
-#define _Included_ConvertToNative
+#ifndef _included_convert_to_native
+#define _included_convert_to_native
 
 /* Converts the native key symbol to the virtual key code and keyboard location.
  * The raw code is the platform specific key code. 
  */
-extern unsigned int ConvertToNativeKey(unsigned int virtualKeyCode);
+extern unsigned int convert_to_native_key(unsigned int virtual_keycode);
 
 // Converts the native button code to its virtual counterpart.
-extern unsigned short int ConvertToNativeButton(unsigned short int virtualButton);
+extern unsigned int convert_to_native_button(unsigned int virtual_button);
 
 // Converts the native modifier mask code to its virtual counterpart.
-extern unsigned int ConvertToNativeMask(unsigned int nativeMask);
+extern unsigned int convert_to_native_mask(unsigned int virtual_mask);
 
 #endif
