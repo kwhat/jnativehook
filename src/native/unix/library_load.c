@@ -20,7 +20,7 @@
 
 Display *disp;
 
-void OnLibraryLoad() {
+void on_library_load() {
 	// Tell X Threads are OK.
 	XInitThreads();
 
@@ -63,7 +63,7 @@ void OnLibraryLoad() {
 	#endif
 }
 
-void OnLibraryUnload() {
+void on_library_unload() {
 	#ifdef XT
 	XtDestroyApplicationContext(app_context);
 	#endif

@@ -28,7 +28,7 @@ static void SetNativeProperties(JNIEnv *env) {
 		char buffer[16];
 
 		// Set the native keyboard auto repeat rate.
-		long rate = GetAutoRepeatRate();
+		long rate = hook_get_auto_repeat_rate();
 		if (rate >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetAutoRepeatRate(): successful. (rate: %li)\n", rate);
@@ -50,7 +50,7 @@ static void SetNativeProperties(JNIEnv *env) {
 		#endif
 
 
-		long delay = GetAutoRepeatDelay();
+		long delay = hook_get_auto_repeat_delay();
 		if (delay >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetAutoRepeatDelay(): successful. (delay: %li)\n", delay);
@@ -73,7 +73,7 @@ static void SetNativeProperties(JNIEnv *env) {
 
 
 		// 0-Threshold X, 1-Threshold Y and 2-Speed.
-		long multiplier = GetPointerAccelerationMultiplier();
+		long multiplier = hook_get_pointer_acceleration_multiplier();
 		if (multiplier >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetPointerAccelerationMultiplier(): successful. (multiplier: %li)\n", multiplier);
@@ -96,7 +96,7 @@ static void SetNativeProperties(JNIEnv *env) {
 
 
 		// 0-Threshold X, 1-Threshold Y and 2-Speed.
-		long threshold = GetPointerAccelerationThreshold();
+		long threshold = hook_get_pointer_acceleration_threshold();
 		if (threshold >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetPointerAccelerationThreshold(): successful. (threshold: %li)\n", threshold);
@@ -118,7 +118,7 @@ static void SetNativeProperties(JNIEnv *env) {
 		#endif
 
 
-		long sensitivity = GetPointerSensitivity();
+		long sensitivity = hook_get_pointer_sensitivity();
 		if (sensitivity >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetPointerSensitivity(): successful. (sensitivity: %li)\n", sensitivity);
@@ -140,7 +140,7 @@ static void SetNativeProperties(JNIEnv *env) {
 		#endif
 
 
-		long clicktime = GetMultiClickTime();
+		long clicktime = hook_get_multi_click_time();
 		if (clicktime >= 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "GetMultiClickTime(): successful. (time: %li)\n", clicktime);
@@ -211,15 +211,15 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	StartNativeThread();
+	hook_enabled();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	StopNativeThread();
+	hook_disable();
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	return (jboolean) IsNativeThreadRunning();
+	return (jboolean) hook_is_enable();
 }
 
 
@@ -269,8 +269,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 // JNI exit point, This is executed when the Java virtual machine detaches from the native library.
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) {
 	// Stop the native thread if its running.
-	if (IsNativeThreadRunning()) {
-		StopNativeThread();
+	if (hook_is_enable()) {
+		hook_disable();
 	}
 
 	// Run platform specific unload items.

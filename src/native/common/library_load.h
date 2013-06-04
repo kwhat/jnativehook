@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_SystemProperties
-#define _Included_SystemProperties
+#ifndef _included_system_properties
+#define _included_system_properties
 
 // Native library load callback for platform specific initialization.
-extern void OnLibraryLoad();
+extern void on_library_load();
 
 // Native library unload callback for platform specific de-initialization.
-extern void OnLibraryUnload();
+extern void on_library_unload();
 
 #endif

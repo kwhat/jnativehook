@@ -37,7 +37,7 @@ LTLDFLAGS="-version-info ${lt_current}:${lt_revision}:${lt_age}"
 AC_INIT([nativehook], NATIVEHOOK_VERSION_STRING, NATIVEHOOK_BUGS)
 
 AC_PREREQ(2.64)
-AC_CONFIG_SRCDIR([include/nativehook.h])
+#AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([Makefile pc/nativehook.pc])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_HEADERS([common/config.h:common/config.h.in])
