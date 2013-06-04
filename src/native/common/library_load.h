@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _included_system_properties
-#define _included_system_properties
+#ifndef _included_library_load
+#define _included_library_load
 
 // Native library load callback for platform specific initialization.
 extern void on_library_load();

@@ -16,16 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-
-#ifdef SUN_KEYBOARD
-#include <X11/Sunkeysym.h>
-#endif
-
 #include "NativeToJava.h"
 
-JKeyDatum NativeToJKey(unsigned int keysym) {
+jint NativeToJKey(unsigned int keysym, jint *location) {
 	JKeyDatum jkey;
 	jkey.rawcode = keysym;
 	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;

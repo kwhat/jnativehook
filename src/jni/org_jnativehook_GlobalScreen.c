@@ -19,7 +19,7 @@
 #include "nativehook.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-static void SetNativeProperties(JNIEnv *env) {
+static void JNISetProperties(JNIEnv *env) {
 	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
@@ -164,7 +164,7 @@ static void SetNativeProperties(JNIEnv *env) {
 }
 
 
-static void ClearNativeProperties(JNIEnv *env) {
+static void JNIClearProperties(JNIEnv *env) {
 	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
 	jmethodID clearProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "clearProperty", "(Ljava/lang/String;)Ljava/lang/String;");
 
@@ -180,7 +180,7 @@ static void ClearNativeProperties(JNIEnv *env) {
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *UNUSED(env), jclass UNUSED(cls), jobject UNUSED(event)) {
 	//FIXME Use the native globals.
-	
+
 	//jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	//jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	//jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
@@ -245,11 +245,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 			ThrowFatalError("Failed to locate one or more required classes.");
 		}
 
-		// Run platform specific load items.
-		OnLibraryLoad();
-
 		// Set java properties from native sources.
-		SetNativeProperties(env);
+		JNISetProperties(env);
 	}
 	else {
 		#ifdef DEBUG
@@ -273,15 +270,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) 
 		hook_disable();
 	}
 
-	// Run platform specific unload items.
-	OnLibraryUnload();
-
 	// Grab the currently JNI interface pointer so we can cleanup the
 	// system properties set on load.
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Clear java properties from native sources.
-		ClearNativeProperties(env);
+		JNIClearProperties(env);
 	}
 	#ifdef DEBUG
 	else {
@@ -291,7 +285,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) 
 	}
 	#endif
 
-	DestroyJNIGlobals();
+	JNIDestroyGlobals();
 
 	#ifdef DEBUG
 	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");

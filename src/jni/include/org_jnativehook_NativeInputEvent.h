@@ -29,10 +29,15 @@
 #define org_jnativehook_NativeInputEvent_META_MASK				1 << 2
 #define org_jnativehook_NativeInputEvent_ALT_MASK				1 << 3
 
-#define org_jnativehook_NativeInputEvent_BUTTON1_MASK			1 << 4
-#define org_jnativehook_NativeInputEvent_BUTTON2_MASK			1 << 5
-#define org_jnativehook_NativeInputEvent_BUTTON3_MASK			1 << 6
-#define org_jnativehook_NativeInputEvent_BUTTON4_MASK			1 << 7
-#define org_jnativehook_NativeInputEvent_BUTTON5_MASK			1 << 8
+//#define org_jnativehook_NativeInputEvent_SHIFT_R_MASK			1 << 4
+//#define org_jnativehook_NativeInputEvent_CTRL_R_MASK			1 << 5
+//#define org_jnativehook_NativeInputEvent_META_R_MASK			1 << 6
+//#define org_jnativehook_NativeInputEvent_ALT_R_MASK			1 << 7
+
+#define org_jnativehook_NativeInputEvent_BUTTON1_MASK			1 << 8
+#define org_jnativehook_NativeInputEvent_BUTTON2_MASK			1 << 9
+#define org_jnativehook_NativeInputEvent_BUTTON3_MASK			1 << 10
+#define org_jnativehook_NativeInputEvent_BUTTON4_MASK			1 << 11
+#define org_jnativehook_NativeInputEvent_BUTTON5_MASK			1 << 12
 
 #endif

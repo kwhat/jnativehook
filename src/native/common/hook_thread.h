@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-extern void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+extern void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const));
 
 // Attempt to start the global hook thread.
 extern int hook_enable();

@@ -74,9 +74,9 @@ static MouseEventData *mouse_data = null;
 static MouseWheelEventData *mouse_wheel_data = null;
 
 // Event dispatch callback
-static void (*current_dispatch_proc)(VirtualEvent * const) = null;
+static int (*current_dispatch_proc)(VirtualEvent * const) = null;
 
-void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const)) {
+void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const)) {
 	current_dispatch_proc = dispatch_proc;
 }
 
@@ -112,7 +112,7 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 				struct timeval  timeVal;
 				gettimeofday(&timeVal, NULL);
 				unsigned long int event_time = (timeVal.tv_sec * 1000) + (timeVal.tv_usec / 1000);
-				
+
 				// Use more readable variables.
 				int event_type = data->type;
 				BYTE event_code = data->event.u.u.detail;
@@ -309,7 +309,7 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						}
 						unsigned int modifiers = ConvertToVirtualMask(event_mask);
 
-						// Check the upper half of virtual modifiers for non zero 
+						// Check the upper half of virtual modifiers for non zero
 						// values and set the mouse dragged flag.
 						mouse_dragged = modifiers >> 4 > 0;
 						if (mouse_dragged) {

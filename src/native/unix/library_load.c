@@ -17,8 +17,13 @@
  */
 
 #include <X11/Xlib.h>
+#include "library_load.h"
 
 Display *disp;
+
+// Create a shared object constructor and destructor.
+void __attribute__ ((constructor)) on_library_load(void);
+void __attribute__ ((destructor)) on_library_unload(void);
 
 void on_library_load() {
 	// Tell X Threads are OK.
@@ -33,10 +38,10 @@ void on_library_load() {
 	disp = XOpenDisplay(XDisplayName(NULL));
 	#ifdef DEBUG
 	if (disp != NULL) {
-		fprintf(stdout, "OnLibraryLoad(): XOpenDisplay successful.\n");
+		fprintf(stdout, "on_library_load(): XOpenDisplay successful.\n");
 	}
 	else {
-		fprintf(stderr, "OnLibraryLoad(): XOpenDisplay failure!\n");
+		fprintf(stderr, "on_library_load(): XOpenDisplay failure!\n");
 	}
 	#endif
 
@@ -55,10 +60,10 @@ void on_library_load() {
 
 	#ifdef DEBUG
 	if (isAutoRepeat) {
-		fprintf(stdout, "OnLibraryLoad(): Successfully enabled detectable autorepeat.\n");
+		fprintf(stdout, "on_library_load(): Successfully enabled detectable autorepeat.\n");
 	}
 	else {
-		fprintf(stderr, "OnLibraryLoad(): Could not enable detectable auto-repeat!\n");
+		fprintf(stderr, "on_library_load(): Could not enable detectable auto-repeat!\n");
 	}
 	#endif
 }

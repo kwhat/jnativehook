@@ -16,31 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_NativeHook
-#define _Included_NativeHook
+#include "library_load.h"
 
-enum {
-	key_pressed, key_released, key_typed
-} VirtualEvent;
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
+	switch (fdwReason) {
+		case DLL_PROCESS_ATTACH:
+			on_library_load();
+			break;
+		case DLL_PROCESS_DETACH:
+			on_library_unload();
+	        break;
+    }
 
-#define KEY_PRESSED_EVENT			1
-#define KEY_RELEASED_EVENT			2
-#define KEY_TYPED_EVENT				3
+    return TRUE;
+}
 
-#define MOUSE_PRESSED_EVENT			4
-#define MOUSE_RELEASED_EVENT		5
-#define MOUSE_CLICKED_EVENT			6
-#define MOUSE_WHEEL_EVENT			7
-#define MOUSE_MOVED_EVENT			8
-#define MOUSE_DRAGGED_EVENT			9
+void on_library_load() {
 
+}
 
-extern void FireHookEvent();
+void on_library_unload() {
 
-// Native library load callback for platform specific initialization.
-extern void OnLibraryLoad();
-
-// Native library unload callback for platform specific de-initialization.
-extern void OnLibraryUnload();
-
-#endif
+}
