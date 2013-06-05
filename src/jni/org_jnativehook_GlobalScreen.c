@@ -19,6 +19,136 @@
 #include "nativehook.h"
 #include "org_jnativehook_GlobalScreen.h"
 
+static void JNIEventDispatcher(VirtualEvent *const event) {
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		// Create the global screen references up front to save time in the callback.
+		jobject org_jnativehook_GlobalScreen = (*env)->CallStaticObjectMethod(
+				env,
+				clsGlobalScreen,
+				idGetInstance);
+
+		if (org_jnativehook_GlobalScreen != NULL) {
+			// Call Thread.currentThread().setName("JNativeHook Native Hook");
+			//jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
+			//(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
+			//(*env)->DeleteLocalRef(env, objCurrentThread);
+
+			switch (event->type) {
+				case EVENT_KEY_PRESSED:
+					objInputEvent = (*env)->NewObject(
+											env,
+											clsKeyEvent,
+											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
+											(jlong) event->time,
+											event->mask,
+											event->data->rawcode,
+											event->data->keycode,
+											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+											jkey.location);
+
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
+					(*env)->DeleteLocalRef(env, objInputEvent);
+					break;
+
+				case EVENT_KEY_RELEASED:
+					objInputEvent = (*env)->NewObject(
+											env,
+											clsKeyEvent,
+											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
+											(jlong) event->time,
+											event->mask,
+											event->data->rawcode,
+											event->data->keycode,
+											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+											jkey.location);
+
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
+					(*env)->DeleteLocalRef(env, objInputEvent);
+					break;
+
+				case EVENT_KEY_TYPED:
+					objInputEvent = (*env)->NewObject(
+											env,
+											clsKeyEvent,
+											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
+											(jlong) event->time,
+											event->mask,
+											event->data->rawcode,
+											org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
+											event->data->keytxt,
+											jkey.location);
+
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
+					(*env)->DeleteLocalRef(env, objInputEvent);
+					break;
+
+				case EVENT_MOUSE_PRESSED:
+					objInputEvent = (*env)->NewObject(
+												env,
+												clsMouseEvent,
+												idMouseButtonEvent,
+												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
+												(jlong) event->time,
+												event->mask,
+												(jint) event->data->x,
+												(jint) event->data->y,
+												(jint) event->data->clicks,
+												(jint) event->data->button);
+
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
+					(*env)->DeleteLocalRef(env, objInputEvent);
+					break;
+
+				case EVENT_MOUSE_RELEASED:
+					objInputEvent = (*env)->NewObject(
+												env,
+												clsMouseEvent,
+												idMouseButtonEvent,
+												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
+												(jlong) event->time,
+												event->mask,
+												(jint) event->data->x,
+												(jint) event->data->y,
+												(jint) event->data->clicks,
+												(jint) event->data->button);
+
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
+					(*env)->DeleteLocalRef(env, objInputEvent);
+					break;
+
+				case EVENT_MOUSE_CLICKED:
+					break;
+
+				case EVENT_MOUSE_MOVED:
+					break;
+
+				case EVENT_MOUSE_DRAGGED:
+					break;
+
+				case EVENT_MOUSE_WHEEL:
+					break;
+			}
+
+			(*env)->DeleteLocalRef(env, org_jnativehook_GlobalScreen);
+		}
+		else {
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
+
+			#ifdef DEBUG
+			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			//thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			//thread_ex.message = "Failed to create JNI global references";
+		}
+	}
+}
+
 static void JNISetProperties(JNIEnv *env) {
 	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
 	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
@@ -179,7 +309,7 @@ static void JNIClearProperties(JNIEnv *env) {
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *UNUSED(env), jclass UNUSED(cls), jobject UNUSED(event)) {
-	//FIXME Use the native globals.
+	//FIXME Use the jni globals!
 
 	//jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	//jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
@@ -211,14 +341,21 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	hook_enabled();
+	// Start the java event dispatch thread.
+	(*env)->CallVoidMethod(env, org_jnativehook_GlobalScreen, idStartEventDispatcher);
+
+	hook_enable();
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
 	hook_disable();
+
+	// Stop the java event dispatch thread.
+	(*env)->CallVoidMethod(env, org_jnativehook_GlobalScreen, idStopEventDispatcher);
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
+	// Simple wrapper to return the hook status.
 	return (jboolean) hook_is_enable();
 }
 
@@ -247,6 +384,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
 
 		// Set java properties from native sources.
 		JNISetProperties(env);
+
+		// Set the hook callback function to dispatch events.
+		hook_set_dispatch_proc(&JNIEventDispatcher);
 	}
 	else {
 		#ifdef DEBUG

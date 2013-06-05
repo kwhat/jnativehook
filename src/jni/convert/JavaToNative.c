@@ -18,118 +18,64 @@
 
 #include "JavaToNative.h"
 
-JKeyDatum NativeToJKey(unsigned int keysym) {
+jint NativeToJKey(unsigned int virtualkey, jint *keycode, jint *location) {
 	JKeyDatum jkey;
 	jkey.rawcode = keysym;
-	jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
 
-	switch ((unsigned int) keysym) {
-		case XK_KP_0:
-		case XK_KP_Insert:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD0;
-			goto LOCATION_NP;
-		case XK_KP_1:
-		case XK_KP_End:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD1;
-			goto LOCATION_NP;
-		case XK_KP_2:
-		case XK_KP_Down:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD2;
-			goto LOCATION_NP;
-		case XK_KP_3:
-		case XK_KP_Page_Down:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD3;
-			goto LOCATION_NP;
-		case XK_KP_4:
-		case XK_KP_Left:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD4;
-			goto LOCATION_NP;
-		case XK_KP_5:
-		case XK_KP_Begin:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD5;
-			goto LOCATION_NP;
-		case XK_KP_6:
-		case XK_KP_Right:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD6;
-			goto LOCATION_NP;
-		case XK_KP_7:
-		case XK_KP_Home:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD7;
-			goto LOCATION_NP;
-		case XK_KP_8:
-		case XK_KP_Up:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD8;
-			goto LOCATION_NP;
-		case XK_KP_9:
-		case XK_KP_Page_Up:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD9;
-			goto LOCATION_NP;
+	switch (keysym) {
+		case VC_SHIFT_L:
+		case VC_CONTROL_L:
+		case VC_ALT_L:
+		case VC_META_L:
+		case VC_SUPER_L:
+			*keycode = virtualkey;
+			*location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
+			break;
 
-		case XK_KP_Multiply:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_MULTIPLY;
-			goto LOCATION_NP;
-		case XK_KP_Add:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ADD;
-			goto LOCATION_NP;
-		case XK_KP_Separator:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SEPARATOR;
-			goto LOCATION_NP;
-		case XK_KP_Subtract:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SUBTRACT;
-			goto LOCATION_NP;
-		case XK_KP_Enter:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ENTER;
-			goto LOCATION_NP;
-		case XK_KP_Decimal:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DECIMAL;
-			goto LOCATION_NP;
-		case XK_KP_Divide:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DIVIDE;
-			goto LOCATION_NP;
-		case XK_KP_Delete:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DELETE;
-			goto LOCATION_NP;
-		case XK_Num_Lock:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK;
-			goto LOCATION_NP;
-		case XK_Clear:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CLEAR;
-			goto LOCATION_NP;
-		LOCATION_NP:
-			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
-			return jkey;
+		case VC_SHIFT_R:
+		case VC_CONTROL_R:
+		case VC_ALT_R:
+		case VC_META_R:
+		case VC_SUPER_R:
+			*keycode = virtualkey & 0xFF;
+			*location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
+			break;
 
+		case VC_KP_0:
+		case VC_KP_1:
+		case VC_KP_2:
+		case VC_KP_3:
+		case VC_KP_4:
+		case VC_KP_5:
+		case VC_KP_6:
+		case VC_KP_7:
+		case VC_KP_8:
+		case VC_KP_9:
 
+		case VC_KP_UP:
+		case VC_KP_DOWN:
+		case VC_KP_LEFT:
+		case VC_KP_RIGHT:
 
-		case XK_Begin:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_BEGIN;
-			return jkey;
+		case VC_KP_ENTER:
+		case VC_KP_MULTIPLY:
+		case VC_KP_ADD:
+		case VC_KP_SEPARATOR:
+		case VC_KP_SUBTRACT:
+		case VC_KP_DECIMAL:
+		case VC_KP_DIVIDE:
+		case VC_KP_DELETE:
+			*keycode = virtualkey & 0xFF;
+			*location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+			break;
 
 		default:
-		case XK_VoidSymbol:
-			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED;
-			jkey.location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
-			return jkey;
+			*keycode = virtualkey;
+			*location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
+			break;
 	}
-}
 
-jint NativeToJButton(unsigned int button) {
-	switch (button) {
-		case Button1:
-			return org_jnativehook_mouse_NativeMouseEvent_BUTTON1;
-		case Button2:
-			return org_jnativehook_mouse_NativeMouseEvent_BUTTON3;
-		case Button3:
-			return org_jnativehook_mouse_NativeMouseEvent_BUTTON2;
-		case Button4:
-			return org_jnativehook_mouse_NativeMouseEvent_BUTTON4;
-		case Button5:
-			return org_jnativehook_mouse_NativeMouseEvent_BUTTON5;
-
-		default:
-		case AnyButton:
-			return org_jnativehook_mouse_NativeMouseEvent_NOBUTTON;
-	}
+	return JNI_OK;
 }
 
 jint NativeToJEventMask(unsigned int mask) {

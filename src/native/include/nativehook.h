@@ -38,7 +38,7 @@
 /* End Error Codes */
 
 
-/* Begin Virtual Event Types */
+/* Begin Virtual Event Types and Data Structures */
 #define EVENT_KEY_PRESSED		1
 #define EVENT_KEY_RELEASED		2
 #define EVENT_KEY_TYPED			3
@@ -74,14 +74,14 @@ typedef struct {
 	unsigned short int amount;
 	signed int rotation;
 } MouseWheelEventData;
-/* End Virtual Event Types */
+/* End Virtual Event Types and Data Structures */
 
 
 /* Begin Virtual Key Codes */
 #define VC_ENTER						'\n'
 #define VC_BACK_SPACE					'\b'
 #define VC_TAB							'\t'
-#define VC_CANCEL						0x0C
+#define VC_CANCEL						0x03
 
 #define VC_SHIFT_L						0x10
 #define VC_SHIFT_R						0x0210
@@ -91,99 +91,108 @@ typedef struct {
 #define VC_ALT_R						0x0212	// Option or Alt Key
 #define VC_META_L						0x9D	// OSX: Command
 #define VC_META_R						0x029D	// OSX: Command
-#define VC_SUPER_L						0x020E	// Windows Key
+#define VC_SUPER_L						0x0C	// Windows Key
 #define VC_SUPER_R						0x020C	// Windows Key
 #define VC_CONTEXT_MENU					0x020D
 
 #define VC_PAUSE						0x13
 #define VC_CAPS_LOCK					0x14
 #define VC_ESCAPE						0x1B
-#define VC_SPACE						0x20
 
-#define VC_UP							0x26
-#define VC_DOWN							0x28
-#define VC_LEFT							0x25
-#define VC_RIGHT						0x27
 
-#define VC_COMMA						0x2C	// ','
-#define VC_MINUS						0x2D	// '-'
-#define VC_PERIOD						0x2E	// '.'
-#define VC_SLASH						0x2F	// '/'
+// Begin Cursor Key Zone
+#define VC_LEFT							0x0025
+#define VC_UP							0x0026
+#define VC_RIGHT						0x0027
+#define VC_DOWN							0x0028
+// End Cursor Key Zone
 
-#define VC_0							0x30
-#define VC_1							0x31
-#define VC_2							0x32
-#define VC_3							0x33
-#define VC_4							0x34
-#define VC_5							0x35
-#define VC_6							0x36
-#define VC_7							0x37
-#define VC_8							0x38
-#define VC_9							0x39
+// Begin Alphanumeric Zone
+#define VC_SPACE						0x0020
 
-#define VC_SEMICOLON					0x3B	// ';'
-#define VC_EQUALS						0x3D	// '='
+#define VC_COMMA						0x002C	// ','
+#define VC_MINUS						0x002D	// '-'
+#define VC_PERIOD						0x002E	// '.'
+#define VC_SLASH						0x002F	// '/'
 
-#define VC_A							0x41
-#define VC_B							0x42
-#define VC_C							0x43
-#define VC_D							0x44
-#define VC_E							0x45
-#define VC_F							0x46
-#define VC_G							0x47
-#define VC_H							0x48
-#define VC_I							0x49
-#define VC_J							0x4A
-#define VC_K							0x4B
-#define VC_L							0x4C
-#define VC_M							0x4D
-#define VC_N							0x4E
-#define VC_O							0x4F
-#define VC_P							0x50
-#define VC_Q							0x51
-#define VC_R							0x52
-#define VC_S							0x53
-#define VC_T							0x54
-#define VC_U							0x55
-#define VC_V							0x56
-#define VC_W							0x57
-#define VC_X							0x58
-#define VC_Y							0x59
-#define VC_Z							0x5A
+#define VC_0							0x0030
+#define VC_1							0x0031
+#define VC_2							0x0032
+#define VC_3							0x0033
+#define VC_4							0x0034
+#define VC_5							0x0035
+#define VC_6							0x0036
+#define VC_7							0x0037
+#define VC_8							0x0038
+#define VC_9							0x0039
 
-#define VC_OPEN_BRACKET					0x5B	// '['
-#define VC_BACK_SLASH					0x5C	// '\'
-#define VC_CLOSE_BRACKET				0x5D	// ']'
+#define VC_SEMICOLON					0x003B	// ';'
+#define VC_EQUALS						0x003D	// '='
 
-#define VC_KP_0							0x60
-#define VC_KP_1							0x61
-#define VC_KP_2							0x62
-#define VC_KP_3							0x63
-#define VC_KP_4							0x64
-#define VC_KP_5							0x65
-#define VC_KP_6							0x66
-#define VC_KP_7							0x67
-#define VC_KP_8							0x68
-#define VC_KP_9							0x69
+#define VC_A							0x0041
+#define VC_B							0x0042
+#define VC_C							0x0043
+#define VC_D							0x0044
+#define VC_E							0x0045
+#define VC_F							0x0046
+#define VC_G							0x0047
+#define VC_H							0x0048
+#define VC_I							0x0049
+#define VC_J							0x004A
+#define VC_K							0x004B
+#define VC_L							0x004C
+#define VC_M							0x004D
+#define VC_N							0x004E
+#define VC_O							0x004F
+#define VC_P							0x0050
+#define VC_Q							0x0051
+#define VC_R							0x0052
+#define VC_S							0x0053
+#define VC_T							0x0054
+#define VC_U							0x0055
+#define VC_V							0x0056
+#define VC_W							0x0057
+#define VC_X							0x0058
+#define VC_Y							0x0059
+#define VC_Z							0x005A
 
-#define VC_KP_UP						0xE0
-#define VC_KP_DOWN						0xE1
-#define VC_KP_LEFT						0xE2
-#define VC_KP_RIGHT						0xE3
+#define VC_OPEN_BRACKET					0x005B	// '['
+#define VC_BACK_SLASH					0x005C	// '\'
+#define VC_CLOSE_BRACKET				0x005D	// ']'
 
-#define VC_KP_ENTER						0x026A
-#define VC_KP_MULTIPLY					0x6A
-#define VC_KP_ADD						0x6B
-#define VC_KP_SEPARATOR					0x6C
-#define VC_KP_SUBTRACT					0x6D
-#define VC_KP_DECIMAL					0x6E
-#define VC_KP_DIVIDE					0x6F
-#define VC_DELETE						0x027F
-#define VC_KP_DELETE					0x7F
+// Begin Numeric Zone
+#define VC_KP_0							0x0130
+#define VC_KP_1							0x0131
+#define VC_KP_2							0x0132
+#define VC_KP_3							0x0133
+#define VC_KP_4							0x0134
+#define VC_KP_5							0x0135
+#define VC_KP_6							0x0136
+#define VC_KP_7							0x0137
+#define VC_KP_8							0x0138
+#define VC_KP_9							0x0139
+
+#define VC_KP_LEFT						0x0125
+#define VC_KP_UP						0x0126
+#define VC_KP_DOWN						0x0127
+#define VC_KP_RIGHT						0x0128
+
+#define VC_KP_ENTER						0x016A
+#define VC_KP_MULTIPLY					0x016A
+#define VC_KP_ADD						0x016B
+#define VC_KP_SEPARATOR					0x016C
+#define VC_KP_SUBTRACT					0x016D
+#define VC_KP_DECIMAL					0x016E
+#define VC_KP_DIVIDE					0x016F
+#define VC_KP_DELETE					0x017F
+
+#define VC_DELETE						0x7F
 #define VC_NUM_LOCK						0x90
 #define VC_CLEAR						0x03	// OSX: Number Lock
 #define VC_SCROLL_LOCK					0x91
 
+
+// Begin Function Keys
 #define VC_F1							0x70
 #define VC_F2							0x71
 #define VC_F3							0x72
@@ -209,6 +218,7 @@ typedef struct {
 #define VC_F22							0xF009
 #define VC_F23							0xF00A
 #define VC_F24							0xF00B
+// End Function Keys
 
 
 #define VC_PRINTSCREEN					0x9A
@@ -251,7 +261,6 @@ typedef struct {
 #define VC_BRACELEFT					0xA1
 #define VC_BRACERIGHT					0xA2
 
-
 // Unknown Extended Keyboard Codes.
 #define VC_AT							0x0200
 #define VC_COLON						0x0201
@@ -265,7 +274,6 @@ typedef struct {
 #define VC_PLUS							0x0209
 #define VC_RIGHT_PARENTHESIS			0x020A
 #define VC_UNDERSCORE					0x020B
-
 
 // For input method support on Asian Keyboards.
 #define VC_FINAL						0x0018	// Unknown Win32 API
@@ -356,7 +364,7 @@ extern "C" {
 	NATIVEHOOK_API int hook_enable();
 	NATIVEHOOK_API int hook_disable();
 	NATIVEHOOK_API bool hook_is_enabled();
-	
+
 #ifdef __cplusplus
 }
 #endif
