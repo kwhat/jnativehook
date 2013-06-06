@@ -19,17 +19,13 @@
 #include "NativeErrors.h"
 #include "JNIGlobals.h"
 
-// Global Ref to the JVM
-JavaVM *jvm;
-jint jni_version = JNI_VERSION_1_4;
-
 GlobalScreen *org_jnativehook_GlobalScreen = null;
 NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = null;
 NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = null;
 NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = null;
 
 int CreateJNIGlobals(JNIEnv *env) {
-	int status = JNI_ERROR;
+	int status = JNI_ERR;
 
 	// Allocate memory for the Java object structure representation.
 	org_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
@@ -216,18 +212,22 @@ int DestroyJNIGlobals(JNIEnv *env) {
 	clsNativeMouseWheelEvent = NULL;
 
 	(*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen->class);
-	org_jnativehook_GlobalScreen->class = NULL;
 
 	// Set all the global method ID's to null.
+	org_jnativehook_GlobalScreen->class = NULL;
 	org_jnativehook_GlobalScreen->getInstance = NULL;
 	org_jnativehook_GlobalScreen->dispatchEvent = NULL;
 	org_jnativehook_GlobalScreen->startEventDispatcher = NULL;
 	org_jnativehook_GlobalScreen->stopEventDispatcher = NULL;
 
-		idNativeKeyEvent = NULL;
-		idNativeMouseButtonEvent = NULL;
-		idNativeMouseMotionEvent = NULL;
-		idNativeMouseWheelEvent = NULL;
+	org_jnativehook_keyboard_NativeKeyEvent->class = NULL;
+	org_jnativehook_keyboard_NativeKeyEvent->init = NULL;
+
+	org_jnativehook_mouse_NativeMouseEvent->class = NULL;
+	org_jnativehook_mouse_NativeMouseEvent->init = NULL;
+
+	org_jnativehook_mouse_NativeMouseWheelEvent->class = NULL;
+	org_jnativehook_mouse_NativeMouseWheelEvent->init = NULL;
 
 	// Free any memory being used for Java object structures.
 	if (org_jnativehook_mouse_NativeMouseWheelEvent != null) {

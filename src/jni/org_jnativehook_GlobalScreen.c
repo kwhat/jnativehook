@@ -36,10 +36,10 @@ static void JNIEventDispatcher(VirtualEvent *const event) {
 
 			switch (event->type) {
 				case EVENT_KEY_PRESSED:
-					objInputEvent = (*env)->NewObject(
+					NativeKeyEvent_object = (*env)->NewObject(
 											env,
-											clsKeyEvent,
-											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent->class,
+											org_jnativehook_keyboard_NativeKeyEvent->init,
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
 											(jlong) event->time,
 											event->mask,
@@ -48,15 +48,15 @@ static void JNIEventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
-					(*env)->DeleteLocalRef(env, objInputEvent);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, NativeKeyEvent_object);
+					(*env)->DeleteLocalRef(env, NativeKeyEvent_object);
 					break;
 
 				case EVENT_KEY_RELEASED:
-					objInputEvent = (*env)->NewObject(
+					NativeKeyEvent_object = (*env)->NewObject(
 											env,
-											clsKeyEvent,
-											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent->class,
+											org_jnativehook_keyboard_NativeKeyEvent->init,
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
 											(jlong) event->time,
 											event->mask,
@@ -65,15 +65,15 @@ static void JNIEventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
-					(*env)->DeleteLocalRef(env, objInputEvent);
+					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, NativeKeyEvent_object);
+					(*env)->DeleteLocalRef(env, NativeKeyEvent_object);
 					break;
 
 				case EVENT_KEY_TYPED:
 					objInputEvent = (*env)->NewObject(
 											env,
-											clsKeyEvent,
-											idKeyEvent,
+											org_jnativehook_keyboard_NativeKeyEvent->class,
+											org_jnativehook_keyboard_NativeKeyEvent->init,
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 											(jlong) event->time,
 											event->mask,
@@ -89,8 +89,8 @@ static void JNIEventDispatcher(VirtualEvent *const event) {
 				case EVENT_MOUSE_PRESSED:
 					objInputEvent = (*env)->NewObject(
 												env,
-												clsMouseEvent,
-												idMouseButtonEvent,
+												org_jnativehook_mouse_NativeMouseEvent->class,
+												org_jnativehook_mouse_NativeMouseEvent->init,
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
 												(jlong) event->time,
 												event->mask,
@@ -106,8 +106,8 @@ static void JNIEventDispatcher(VirtualEvent *const event) {
 				case EVENT_MOUSE_RELEASED:
 					objInputEvent = (*env)->NewObject(
 												env,
-												clsMouseEvent,
-												idMouseButtonEvent,
+												org_jnativehook_mouse_NativeMouseEvent->class,
+												org_jnativehook_mouse_NativeMouseEvent->init,
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
 												(jlong) event->time,
 												event->mask,
@@ -357,77 +357,4 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JN
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
 	// Simple wrapper to return the hook status.
 	return (jboolean) hook_is_enable();
-}
-
-
-// JNI entry point, This is executed when the Java virtual machine attaches to the native library.
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *UNUSED(reserved)) {
-	/* Grab the currently running virtual machine so we can attach to it in
-	 * functions that are not called from java. ( I.E. ThreadProc )
-	 */
-	jvm = vm;
-	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		#ifdef DEBUG
-		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
-		#endif
-
-		// Create all the global class references onload to prevent class loader
-		// issues with JNLP and some IDE's.
-		if (CreateJNIGlobals() == RETURN_FAILURE) {
-			#ifdef DEBUG
-			fprintf(stderr, "JNI_OnLoad(): CreateJNIGlobals() failed!\n");
-			#endif
-
-			ThrowFatalError("Failed to locate one or more required classes.");
-		}
-
-		// Set java properties from native sources.
-		JNISetProperties(env);
-
-		// Set the hook callback function to dispatch events.
-		hook_set_dispatch_proc(&JNIEventDispatcher);
-	}
-	else {
-		#ifdef DEBUG
-		fprintf(stderr, "JNI_OnLoad(): GetEnv() failed!\n");
-		#endif
-
-		ThrowFatalError("Failed to aquire JNI interface pointer");
-	}
-
-	#ifdef DEBUG
-	fprintf(stdout, "JNI_Load(): JNI Loaded.\n");
-	#endif
-
-    return jni_version;
-}
-
-// JNI exit point, This is executed when the Java virtual machine detaches from the native library.
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *UNUSED(vm), void *UNUSED(reserved)) {
-	// Stop the native thread if its running.
-	if (hook_is_enable()) {
-		hook_disable();
-	}
-
-	// Grab the currently JNI interface pointer so we can cleanup the
-	// system properties set on load.
-	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		// Clear java properties from native sources.
-		JNIClearProperties(env);
-	}
-	#ifdef DEBUG
-	else {
-		// It is not critical that these values are cleared so no exception
-		// will be thrown.
-		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
-	}
-	#endif
-
-	JNIDestroyGlobals();
-
-	#ifdef DEBUG
-	fprintf(stdout, "JNI_OnUnload(): JNI Unloaded.\n");
-	#endif
 }
