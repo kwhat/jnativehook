@@ -17,6 +17,8 @@
  */
 
 #include <stdbool.h>
+#include <stdio.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -29,13 +31,19 @@
 static bool running = false;
 
 void dispatch_proc(VirtualEvent * const event) {
-	fprintf(stdout, "id=%d,when=%ld,mask=%#00X", event->type, event->time, event->mask);
+	fprintf(stdout,	"id=%d,when=%ld,mask=%#0X",
+			event->type, event->time, event->mask);
 
+	void *data = event->data;
 	switch (event->type) {
 		case EVENT_KEY_PRESSED:
 		case EVENT_KEY_RELEASED:
 		case EVENT_KEY_TYPED:
-			fprintf(stdout, ",keycode=%d,keychar=%lc,rawcode=%d\n", event->data->keycode, event->data->keychar, event->data->keycode);
+			fprintf(stdout,
+					",keycode=%d,keychar=%lc,rawcode=%d\n",
+					((KeyboardEventData *) data)->keycode,
+					((KeyboardEventData *) data)->keychar,
+					((KeyboardEventData *) data)->keycode);
 			break;
 
 		case EVENT_MOUSE_PRESSED:
@@ -43,11 +51,20 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_MOUSE_CLICKED:
 		case EVENT_MOUSE_MOVED:
 		case EVENT_MOUSE_DRAGGED:
-			fprintf(stdout, ",(%d,%d),button=%d,clicks=%d\n", event->data->x, event->data->y, event->data->button, event->data->clicks);
+			fprintf(stdout,
+					",(%d,%d),button=%d,clicks=%d\n",
+					((MouseEventData *) data)->x,
+					((MouseEventData *) data)->y,
+					((MouseEventData *) data)->button,
+					((MouseEventData *) data)->clicks);
 			break;
 
 		case EVENT_MOUSE_WHEEL:
-			fprintf(stdout, ",type=%d,amount=%d,rotation=%d\n", event->data->type, event->data->amount, event->data->rotation);
+			fprintf(stdout,
+					",type=%d,amount=%d,rotation=%d\n",
+					((MouseWheelEventData *) data)->type,
+					((MouseWheelEventData *) data)->amount,
+					((MouseWheelEventData *) data)->rotation);
 			break;
 	}
 }
