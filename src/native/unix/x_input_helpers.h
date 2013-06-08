@@ -23,25 +23,25 @@
  * This functions in much the same way as XKeycodeToKeysym() but allows for a
  * faster and more flexible lookup.
  */
-extern KeySym KeyCodeToKeySym(KeyCode keycode, unsigned int event_mask);
+extern KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask);
 
 /* Converts an X11 key symbol to a single Unicode character.  No direct X11
  * functionality exists to provide this information.
  */
-extern wchar_t KeySymToUnicode(KeySym keysym);
+extern wchar_t keysym_to_unicode(KeySym keysym);
 
 /* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
  * functionality.  This method is called by OnLibraryLoad() and may need to be
  * called in combination with UnloadInputHelper() if the native keyboard layout
  * is changed.
  */
-extern void LoadInputHelper();
+extern void load_input_helper();
 
 /* De-initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
  * functionality.  This method is called by OnLibraryUnload() and may need to be
  * called in combination with LoadInputHelper() if the native keyboard layout
  * is changed.
  */
-extern void UnloadInputHelper();
+extern void unload_input_helper();
 
 #endif

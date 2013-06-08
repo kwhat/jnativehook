@@ -38,13 +38,20 @@ AC_INIT([nativehook], NATIVEHOOK_VERSION_STRING, NATIVEHOOK_BUGS)
 
 AC_PREREQ(2.64)
 #AC_CONFIG_SRCDIR([include/nativehook.h])
-AC_CONFIG_FILES([Makefile pc/nativehook.pc])
+AC_CONFIG_FILES([
+	darwin/Makefile \
+	demo/Makefile \
+	pc/nativehook.pc \
+	unix/Makefile \
+	windows/Makefile \
+	Makefile
+])
 AC_CONFIG_AUX_DIR([config])
-AC_CONFIG_HEADERS([common/config.h:common/config.h.in])
+AC_CONFIG_HEADERS([include/config.h:include/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Initialize automake.
-AM_INIT_AUTOMAKE([1.9 foreign subdir-objects -Wall])
+AM_INIT_AUTOMAKE([1.9 foreign -Wall])
 
 # Checks for language.
 AC_LANG([C])
@@ -52,6 +59,7 @@ AC_LANG([C])
 # Checks for programs.
 AM_PROG_AR
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CC_C99
 AC_PROG_LIBTOOL
 
@@ -59,8 +67,6 @@ AC_PROG_LIBTOOL
 AC_C_CONST
 AC_HEADER_STDBOOL
 #AC_CHECK_HEADERS([inttypes.h stdint.h])
-
-
 
 # Initialize libtool.
 LT_PREREQ([2.2])
@@ -91,6 +97,10 @@ AC_ARG_ENABLE([debug],
 	[enable_xkb="$enableval"],
 	[enable_xkb="no"])
 
+AC_ARG_ENABLE([demo],
+	AS_HELP_STRING([--enable-demo], [Enable demo application (default: disabled)]),
+	[enable_demo=$enableval],
+	[enable_demo='yes'])
 
 # Unix Options
 AC_ARG_ENABLE([xkb],
@@ -204,9 +214,12 @@ AS_IF(
 	])
 
 # OS info for Automake
-AM_CONDITIONAL(OS_UNIX, test "x$backend" = xunix)
-AM_CONDITIONAL(OS_DARWIN, test "x$backend" = xdarwin)
-AM_CONDITIONAL(OS_WINDOWS, test "x$backend" = xwindows)
+AM_CONDITIONAL([OS_UNIX], [test "x$backend" = "xunix"])
+AM_CONDITIONAL([OS_DARWIN], [test "x$backend" = "xdarwin"])
+AM_CONDITIONAL([OS_WINDOWS], [test "x$backend" = "xwindows"])
+
+# Should the demo application be built?
+AM_CONDITIONAL([BUILD_DEMO], [test "x$enable_demo" = "xyes"])
 
 # Generate the "configure" script
 AC_OUTPUT

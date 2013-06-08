@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -36,9 +35,12 @@
 static XtAppContext app_context;
 #endif
 
+#include "config.h"
+#include "nativehook.h"
+
 extern Display *disp;
 
-long int hook_get_auto_repeat_rate() {
+NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 	bool successful = false;
 	long int value = -1;
 	unsigned int delay = 0, rate = 0;
@@ -70,7 +72,7 @@ long int hook_get_auto_repeat_rate() {
 	return value;
 }
 
-long int hook_get_auto_repeat_delay() {
+NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 	bool successful = false;
 	long int value = -1;
 	unsigned int kb_delay = 0, kb_rate = 0;
@@ -102,7 +104,7 @@ long int hook_get_auto_repeat_delay() {
 	return value;
 }
 
-long int hook_get_pointer_acceleration_multiplier() {
+NATIVEHOOK_API long int hook_get_pointer_acceleration_multiplier() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -116,7 +118,7 @@ long int hook_get_pointer_acceleration_multiplier() {
 	return value;
 }
 
-long int hook_get_pointer_acceleration_threshold() {
+NATIVEHOOK_API long int hook_get_pointer_acceleration_threshold() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -130,7 +132,7 @@ long int hook_get_pointer_acceleration_threshold() {
 	return value;
 }
 
-long int hook_get_pointer_sensitivity() {
+NATIVEHOOK_API long int hook_get_pointer_sensitivity() {
 	long int value = -1;
 	int accel_numerator, accel_denominator, threshold;
 
@@ -144,7 +146,7 @@ long int hook_get_pointer_sensitivity() {
 	return value;
 }
 
-long int hook_get_multi_click_time() {
+NATIVEHOOK_API long int hook_get_multi_click_time() {
 	long int value = 200;
 	int click_time;
 	bool successful = false;

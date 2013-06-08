@@ -686,16 +686,16 @@ unsigned int convert_to_native_button(unsigned short int virtual_button) {
 unsigned short int convert_to_native_mask(unsigned short int virtual_mask) {
 	unsigned short int native_mask = 0x0000;
 
-	if (virtual_mask & SHIFT_MASK)		native_mask |= ShiftMask;
-	if (virtual_mask & CTRL_MASK)		native_mask |= ControlMask;
-	if (virtual_mask & META_MASK)		native_mask |= Mod4Mask;
-	if (virtual_mask & ALT_MASK)		native_mask |= Mod1Mask;
+	if (virtual_mask & MASK_SHIFT_L)	native_mask |= ShiftMask;
+	if (virtual_mask & MASK_CTRL_L)		native_mask |= ControlMask;
+	if (virtual_mask & MASK_META_L)		native_mask |= Mod4Mask;
+	if (virtual_mask & MASK_ALT_L)		native_mask |= Mod1Mask;
 
-	if (virtual_mask & BUTTON1_MASK)	native_mask |= Button1Mask;
-	if (virtual_mask & BUTTON2_MASK)	native_mask |= Button2Mask;
-	if (virtual_mask & BUTTON3_MASK)	native_mask |= Button3Mask;
-	if (virtual_mask & BUTTON4_MASK)	native_mask |= Button4Mask;
-	if (virtual_mask & BUTTON5_MASK)	native_mask |= Button5Mask;
+	if (virtual_mask & MASK_BUTTON1)	native_mask |= Button1Mask;
+	if (virtual_mask & MASK_BUTTON2)	native_mask |= Button2Mask;
+	if (virtual_mask & MASK_BUTTON3)	native_mask |= Button3Mask;
+	if (virtual_mask & MASK_BUTTON4)	native_mask |= Button4Mask;
+	if (virtual_mask & MASK_BUTTON5)	native_mask |= Button5Mask;
 
 	return native_mask;
 }

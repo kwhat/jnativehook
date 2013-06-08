@@ -17,40 +17,26 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt
-
 AM_CFLAGS = -Wall -Wextra -pedantic -O2 -fno-strict-aliasing -std=c99
 AM_CFLAGS += -I$(top_srcdir)/include
 AM_CFLAGS += -D_GNU_SOURCE -D_XOPEN_SOURCE
 AM_LDFLAGS = -Wl,--as-needed,-O1
 
+#include_HEADERS = include/nativehook.h
 
-SUBDIRS=
+lib_LTLIBRARIES = libnativehook.la
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -fno-strict-aliasing -I$(top_srcdir)/include
+libnativehook_la_LDFLAGS = $(LTLDFLAGS)
+libnativehook_la_SOURCES = \
+	convert_to_native.c \
+	convert_to_virtual.c \
+	hook_thread.c \
+	library_load.c \
+	post_events.c \
+	system_properties.c \
+	x_input_helpers.c
 
-if OS_UNIX
-SUBDIRS += unix
-endif
+CLEANFILES = 
 
-if OS_DARWIN
-SUBDIRS += darwin
-endif
-
-if OS_WINDOWS
-SUBDIRS += windows
-endif
-
-if BUILD_DEMO
-SUBDIRS += demo
-endif
-
-#MOSTLYCLEANFILES, CLEANFILES, DISTCLEANFILES, and MAINTAINERCLEANFILES
-
-DISTCLEANFILES = config.cache config/* configure
-
-MAINTAINERCLEANFILES = autom4te.cache \
-    include/config.h.in \
-    config \
-    m4/* \
-    Makefile.in \
-    aclocal.m4 \
-    configure
+DISTCLEANFILES = \
+	Makefile

@@ -21,6 +21,10 @@
 #include <time.h>
 #endif
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 #include <pthread.h>
 #include <sys/time.h>
 
@@ -29,13 +33,9 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/record.h>
 
-#include "nativehook.h"
 #include "convert_to_native.h"
 #include "convert_to_virtual.h"
-#include "error.h"
-#include "hook_thread.h"
 #include "nativehook.h"
-#include "system_properties.h"
 #include "x_input_helpers.h"
 #include "x_wheel_codes.h"
 
@@ -68,29 +68,29 @@ static pthread_t hook_thread_id;
 static pthread_attr_t hook_thread_attr;
 
 // Virtual event pointers
-static VritualEvent *event = null;
-static KeyboardEventData *keyboard_data = null;
-static MouseEventData *mouse_data = null;
-static MouseWheelEventData *mouse_wheel_data = null;
+static VirtualEvent *event = NULL;
+static KeyboardEventData *keyboard_data = NULL;
+static MouseEventData *mouse_data = NULL;
+static MouseWheelEventData *mouse_wheel_data = NULL;
 
 // Event dispatch callback
-static int (*current_dispatch_proc)(VirtualEvent * const) = null;
+static int (*current_dispatch_proc)(VirtualEvent * const) = NULL;
 
-void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const)) {
+NATIVEHOOK_API void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const)) {
 	current_dispatch_proc = dispatch_proc;
 }
 
 inline static int dispatch_event(VirtualEvent * const event) {
 	int status = NATIVEHOOK_FAILURE;
 
-	if (current_dispatch_proc != null) {
+	if (current_dispatch_proc != NULL) {
 		status = current_dispatch_proc(event);
 	}
 
 	return status;
 }
 
-static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook) {
+static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 	if (hook->category == XRecordStartOfData) {
 		pthread_mutex_lock(&hook_running_mutex);
 		pthread_mutex_unlock(&hook_control_mutex);
@@ -120,30 +120,29 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 				int event_x = data->event.u.keyButtonPointer.rootX;
 				int event_y = data->event.u.keyButtonPointer.rootY;
 
+				KeySym keysym;
+				unsigned short int button;
 				switch (event_type) {
 					case KeyPress:
 						#ifdef DEBUG
 						fprintf(stdout, "hook_event_proc(): Key pressed. (%i)\n", event_code);
 						#endif
 
-						KeySym keysym = KeyCodeToKeySym(event_code, event_mask);
-						KeyCode keycode = ConvertToVirtualKey(keysym);
-						unsigned int modifiers = ConvertToVirtualMask(event_mask);
-
 						// Fire key pressed event.
 						event->type = EVENT_KEY_PRESSED;
-						event->time = event_time
-						event->mask = modifiers;
+						event->time = event_time;
+						event->mask = convert_to_virtual_mask(event_mask);
 						event->data = keyboard_data;
 
-						keyboard_data->keycode = keycode;
+						keysym = keycode_to_keysym(event_code, event_mask);
+						keyboard_data->keycode = convert_to_virtual_key(keysym);
 						keyboard_data->rawcode = event_code;
 						keyboard_data->keychar = CHAR_UNDEFINED;
 
 						dispatch_event(event);
 
 						// Check to make sure the key is printable.
-						wchar_t keychar = KeySymToUnicode(keySym);
+						wchar_t keychar = keysym_to_unicode(keysym);
 						if (keychar != 0x0000) {
 							// Fire key typed event.
 							event->type = EVENT_KEY_TYPED;
@@ -160,17 +159,14 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						fprintf(stdout, "hook_event_proc(): Key released. (%i)\n", event_code);
 						#endif
 
-						KeySym keysym = KeyCodeToKeySym(event_code, event_mask);
-						KeyCode keycode = ConvertToVirtualKey(keysym);
-						unsigned int modifiers = ConvertToVirtualMask(event_mask);
-
 						// Fire key released event.
 						event->type = EVENT_KEY_RELEASED;
-						event->time = event_time
-						event->mask = modifiers;
+						event->time = event_time;
+						event->mask = convert_to_virtual_mask(event_mask);
 						event->data = keyboard_data;
 
-						keyboard_data->keycode = keyCode;
+						keysym = keycode_to_keysym(event_code, event_mask);
+						keyboard_data->keycode = convert_to_virtual_key(keysym);
 						keyboard_data->rawcode = event_code;
 						keyboard_data->keychar = CHAR_UNDEFINED;
 
@@ -183,7 +179,7 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						#endif
 
 						// Track the number of clicks.
-						if ((long) (event_time - click_time) <= GetMultiClickTime()) {
+						if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
 							click_count++;
 						}
 						else {
@@ -191,20 +187,17 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						}
 						click_time = event_time;
 
-						// Convert native modifiers to java modifiers.
-						unsigned int modifiers = ConvertToVirtualMask(event_mask);
-
 						/* This information is all static for X11, its up to the WM to
 						* decide how to interpret the wheel events.
 						*/
 						// TODO Should use constants and a lookup table for button codes.
 						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-							unsigned int button = ConvertToVirtualButton(event_code);
+							unsigned int button = convert_to_virtual_button(event_code);
 
 							// Fire mouse pressed event.
 							event->type = EVENT_MOUSE_PRESSED;
-							event->time = event_time
-							event->mask = modifiers;
+							event->time = event_time;
+							event->mask = convert_to_virtual_mask(event_mask);
 							event->data = mouse_data;
 
 							mouse_data->button = button;
@@ -245,8 +238,8 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 
 							// Fire mouse wheel event.
 							event->type = EVENT_MOUSE_WHEEL;
-							event->time = event_time
-							event->mask = modifiers;
+							event->time = event_time;
+							event->mask = convert_to_virtual_mask(event_mask);
 							event->data = mouse_wheel_data;
 
 							mouse_wheel_data->type = scroll_type;
@@ -265,33 +258,32 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						// TODO Should use constants for button codes.
 						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 							// Handle button release events.
-							unsigned int button = ConvertToVirtualButton(event_code);
-							unsigned int modifiers = ConvertToVirtualMask(event_mask);
 
 							// Fire mouse released event.
 							event->type = EVENT_MOUSE_RELEASED;
-							event->time = event_time
-							event->mask = modifiers;
+							event->time = event_time;
+							event->mask = convert_to_virtual_mask(event_mask);
 							event->data = mouse_data;
 
+							button = convert_to_virtual_button(event_code);
 							mouse_data->button = button;
 							mouse_data->clicks = click_count;
 							mouse_data->x = event_x;
-							mouse_data->y = eventY;
+							mouse_data->y = event_y;
 
 							dispatch_event(event);
 
 							if (mouse_dragged != true) {
 								// Fire mouse clicked event.
 								event->type = EVENT_MOUSE_CLICKED;
-								event->time = event_time
-								event->mask = modifiers;
+								event->time = event_time;
+								event->mask = convert_to_virtual_mask(event_mask);
 								event->data = mouse_data;
 
 								mouse_data->button = button;
 								mouse_data->clicks = click_count;
 								mouse_data->x = event_x;
-								mouse_data->y = eventY;
+								mouse_data->y = event_y;
 
 								dispatch_event(event);
 							}
@@ -304,10 +296,10 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						#endif
 
 						// Reset the click count.
-						if (click_count != 0 && (long) (event_time - click_time) > GetMultiClickTime()) {
+						if (click_count != 0 && (long) (event_time - click_time) > hook_get_multi_click_time()) {
 							click_count = 0;
 						}
-						unsigned int modifiers = ConvertToVirtualMask(event_mask);
+						unsigned int modifiers = convert_to_virtual_mask(event_mask);
 
 						// Check the upper half of virtual modifiers for non zero
 						// values and set the mouse dragged flag.
@@ -315,7 +307,7 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						if (mouse_dragged) {
 							// Create Mouse Dragged event.
 							event->type = EVENT_MOUSE_DRAGGED;
-							event->time = event_time
+							event->time = event_time;
 							event->mask = modifiers;
 							event->data = mouse_data;
 
@@ -327,7 +319,7 @@ static void hook_event_proc(XPointer UNUSED(pointer), XRecordInterceptData *hook
 						else {
 							// Create a Mouse Moved event.
 							event->type = EVENT_MOUSE_MOVED;
-							event->time = event_time
+							event->time = event_time;
 							event->mask = modifiers;
 							event->data = mouse_data;
 
@@ -396,16 +388,16 @@ static void *hook_thread_proc(void *arg) {
 				#endif
 
 				// Initialize Native Input Functions.
-				LoadInputHelper();
+				load_input_helper();
 
 				// Allocate memory for the virtual events only once.
-				event = (VritualEvent *) malloc(sizeof(VritualEvent));
+				event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
 				keyboard_data = (KeyboardEventData *) malloc(sizeof(KeyboardEventData));
 				mouse_data = (MouseEventData *) malloc(sizeof(MouseEventData));
 				mouse_wheel_data = (MouseWheelEventData *) malloc(sizeof(MouseWheelEventData));
 
 				// Check and make sure we didn't run out of memory.
-				if (event != null && keyboard_data != null && mouse_data != null && mouse_wheel_data != null) {
+				if (event != NULL && keyboard_data != NULL && mouse_data != NULL && mouse_wheel_data != NULL) {
 					#ifdef XRECORD_ASYNC
 					// Allow the thread loop to block.
 					running = true;
@@ -454,7 +446,7 @@ static void *hook_thread_proc(void *arg) {
 				XRecordFreeContext(disp_data, context);
 
 				// Cleanup Native Input Functions.
-				UnloadInputHelper();
+				unload_input_helper();
 
 				// Free up memory used for virtual events.
 				free(event);
@@ -505,7 +497,7 @@ static void *hook_thread_proc(void *arg) {
 	pthread_exit(status);
 }
 
-int hook_enable() {
+NATIVEHOOK_API int hook_enable() {
 	int status = NATIVEHOOK_FAILURE;
 
 	// We shall use the default pthread attributes: thread is joinable
@@ -517,7 +509,7 @@ int hook_enable() {
 	pthread_mutex_lock(&hook_control_mutex);
 
 	// Make sure the native thread is not already running.
-	if (hook_is_enable() != true) {
+	if (hook_is_enabled() != true) {
 		// Open the control and data displays.
 		disp_ctrl = XOpenDisplay(NULL);
 
@@ -557,7 +549,7 @@ int hook_enable() {
 					}
 
 					// Handle any possible JNI issue that may have occurred.
-					if (hook_is_enable()) {
+					if (hook_is_enabled()) {
 						#ifdef DEBUG
 						fprintf(stdout, "enable_hook(): initialization successful.\n");
 						#endif
@@ -617,14 +609,14 @@ int hook_enable() {
 	return status;
 }
 
-int hook_disable() {
+NATIVEHOOK_API int hook_disable() {
 	int status = NATIVEHOOK_FAILURE;
 
 	// Lock the thread control mutex.  This will be unlocked when the
 	// thread has fully stopped.
 	pthread_mutex_lock(&hook_control_mutex);
 
-	if (hook_is_enable() == true) {
+	if (hook_is_enabled() == true) {
 		// Try to exit the thread naturally.
 		#ifdef XRECORD_ASYNC
 		running = false;
@@ -670,7 +662,7 @@ int hook_disable() {
 	return status;
 }
 
-bool hook_is_enable() {
+NATIVEHOOK_API bool hook_is_enabled() {
 	bool is_running = false;
 
 	// Try to aquire a lock on the running mutex.

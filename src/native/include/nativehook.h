@@ -19,6 +19,9 @@
 #ifndef __NATIVEHOOK_H
 #define __NATIVEHOOK_H
 
+#include <stdbool.h>
+#include <wchar.h>
+
 /* Begin Error Codes */
 #define NATIVEHOOK_SUCCESS							0x00
 #define NATIVEHOOK_FAILURE							0x01
@@ -49,27 +52,27 @@
 #define EVENT_MOUSE_DRAGGED							8
 #define EVENT_MOUSE_WHEEL							9
 
-typedef struct {
+typedef struct _VritualEvent {
 	unsigned short int type;
 	unsigned long int time;
 	unsigned short int mask;
 	void *data;
-} VritualEvent;
+} VirtualEvent;
 
-typedef struct {
+typedef struct _KeyboardEventData {
 	unsigned short int keycode;
 	unsigned short int rawcode;
 	wchar_t keychar;
 } KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 
-typedef struct {
+typedef struct _MouseEventData {
 	unsigned short int button;
 	unsigned short int clicks;
 	unsigned short int x;
 	unsigned short int y;
 } MouseEventData, MousePressedEventData, MouseReleasedEventData, MouseClickedEventData;
 
-typedef struct {
+typedef struct _MouseWheelEventData {
 	unsigned short int type;
 	unsigned short int amount;
 	signed int rotation;
@@ -81,7 +84,7 @@ typedef struct {
 #define VC_ENTER								'\n'
 #define VC_BACK_SPACE							'\b'
 #define VC_TAB									'\t'
-#define VC_CANCEL								0x03
+#define VC_CANCEL								0x04
 
 #define VC_SHIFT_L								0x10
 #define VC_SHIFT_R								0x0210
@@ -177,7 +180,7 @@ typedef struct {
 #define VC_KP_DOWN								0x0127
 #define VC_KP_RIGHT								0x0128
 
-#define VC_KP_ENTER								0x016A
+#define VC_KP_ENTER								0x0110
 #define VC_KP_MULTIPLY							0x016A
 #define VC_KP_ADD								0x016B
 #define VC_KP_SEPARATOR							0x016C
@@ -360,10 +363,28 @@ typedef struct {
 extern "C" {
 #endif
 
-	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+	NATIVEHOOK_API void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const));
 	NATIVEHOOK_API int hook_enable();
 	NATIVEHOOK_API int hook_disable();
 	NATIVEHOOK_API bool hook_is_enabled();
+
+	// Retrieves the keyboard auto repeat rate.
+	NATIVEHOOK_API long int hook_get_auto_repeat_rate();
+
+	// Retrieves the keyboard auto repeat delay.
+	NATIVEHOOK_API long int hook_get_auto_repeat_delay();
+
+	// Retrieves the mouse acceleration multiplier.
+	NATIVEHOOK_API long int hook_get_pointer_acceleration_multiplier();
+
+	// Retrieves the mouse acceleration threshold.
+	NATIVEHOOK_API long int hook_get_pointer_acceleration_threshold();
+
+	// Retrieves the mouse sensitivity.
+	NATIVEHOOK_API long int hook_get_pointer_sensitivity();
+
+	// Retrieves the double/triple click interval.
+	NATIVEHOOK_API long int hook_get_multi_click_time();
 
 #ifdef __cplusplus
 }
