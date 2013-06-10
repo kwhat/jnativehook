@@ -34,7 +34,7 @@ LTLDFLAGS="-version-info ${lt_current}:${lt_revision}:${lt_age}"
 
 
 # Initialize autoconf.
-AC_INIT([nativehook], NATIVEHOOK_VERSION_STRING, NATIVEHOOK_BUGS)
+AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 
 AC_PREREQ(2.64)
 #AC_CONFIG_SRCDIR([include/nativehook.h])
@@ -70,7 +70,8 @@ AC_HEADER_STDBOOL
 
 # Initialize libtool.
 LT_PREREQ([2.2])
-LT_INIT([dlopen pic-only win32-dll ])
+LT_INIT
+#LT_INIT([dlopen pic-only win32-dll ])
 #LT_LANG([Windows Resource])
 
 
@@ -94,13 +95,13 @@ AS_CASE([$host],
 # Common Options
 AC_ARG_ENABLE([debug],
 	AS_HELP_STRING([--enable-debug], [Enable Debug Output (default: disabled)]),
-	[enable_xkb="$enableval"],
-	[enable_xkb="no"])
+	[enable_debug="$enableval"],
+	[enable_debug="no"])
 
 AC_ARG_ENABLE([demo],
 	AS_HELP_STRING([--enable-demo], [Enable demo application (default: disabled)]),
 	[enable_demo=$enableval],
-	[enable_demo='yes'])
+	[enable_demo="no"])
 
 # Unix Options
 AC_ARG_ENABLE([xkb],
@@ -149,7 +150,7 @@ AS_IF(
 	[test "x$backend" = "xunix"], [
 		# Checks for libraries.
 		PKG_PROG_PKG_CONFIG
-		PKG_CHECK_MODULES(X11, x11)
+		PKG_CHECK_MODULES([X11], [x11])
 
 		LIBS="$X11_LIBS $LIBS"
 		CFLAGS="$X11_CFLAGS $CFLAGS"
@@ -169,12 +170,18 @@ AS_IF(
 
 		AS_IF([test "x$enable_xt" = "xyes"], [
 			AC_DEFINE([USE_XT], 1, [Enable X Toolkit Intrinsics])
-			PKG_CHECK_MODULES(XT, xt)
+			PKG_CHECK_MODULES([XT], [xt])
+
+			LIBS="$XT_LIBS $LIBS"
+			CFLAGS="$XT_CFLAGS $CFLAGS"
 		])
 
 		AS_IF([test "x$enable_xf86misc" = "xyes"], [
-			PKG_CHECK_MODULES(XF86MISC, xxf86misc)
 			AC_DEFINE([USE_XF86MISC], 1, [Enable XFree86-Misc X Extension])
+			PKG_CHECK_MODULES([XF86MISC], [xxf86misc])
+
+			LIBS="$XF86MISC_LIBS $LIBS"
+			CFLAGS="$XF86MISC_CFLAGS $CFLAGS"
 		])
 
 		AS_IF([test "x$enable_xrecord_async" = "xyes"], [
@@ -214,9 +221,7 @@ AS_IF(
 	])
 
 # OS info for Automake
-AM_CONDITIONAL([OS_UNIX], [test "x$backend" = "xunix"])
-AM_CONDITIONAL([OS_DARWIN], [test "x$backend" = "xdarwin"])
-AM_CONDITIONAL([OS_WINDOWS], [test "x$backend" = "xwindows"])
+AC_SUBST([backend])
 
 # Should the demo application be built?
 AM_CONDITIONAL([BUILD_DEMO], [test "x$enable_demo" = "xyes"])

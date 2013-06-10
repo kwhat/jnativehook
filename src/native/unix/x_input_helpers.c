@@ -22,6 +22,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#ifdef USE_DEBUG
+#include <stdio.h>
+#endif
+
 #ifdef XKB
 #include <X11/XKBlib.h>
 static XkbDescPtr keyboard_map;
@@ -180,7 +184,7 @@ KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 			// index = 1
 			keysym = keyboard_map[keycode *keysym_per_keycode + 1];
 		}
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		else {
 			fprintf(stderr, "GetChar(): Unable to determine the KeySym index.\n");
 		}
@@ -3379,12 +3383,12 @@ void load_input_helper() {
 		else {
 			XFree(keyboard_map);
 
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "Initialize(): Unable to get modifier mapping table.\n");
 			#endif
 		}
 	}
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	else {
 		fprintf(stderr, "Initialize(): Unable to get keyboard mapping table.\n");
 	}

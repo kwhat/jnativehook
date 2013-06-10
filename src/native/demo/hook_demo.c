@@ -31,7 +31,7 @@
 static bool running = false;
 
 void dispatch_proc(VirtualEvent * const event) {
-	fprintf(stdout,	"id=%d,when=%ld,mask=%#0X",
+	fprintf(stdout,	"id=%d,when=%ld,mask=0x%X",
 			event->type, event->time, event->mask);
 
 	void *data = event->data;
@@ -40,7 +40,7 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_KEY_RELEASED:
 		case EVENT_KEY_TYPED:
 			fprintf(stdout,
-					",keycode=%d,keychar=%lc,rawcode=%d\n",
+					",keycode=%d,keychar=%lc,rawcode=%d",
 					((KeyboardEventData *) data)->keycode,
 					((KeyboardEventData *) data)->keychar,
 					((KeyboardEventData *) data)->keycode);
@@ -52,7 +52,7 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_MOUSE_MOVED:
 		case EVENT_MOUSE_DRAGGED:
 			fprintf(stdout,
-					",(%d,%d),button=%d,clicks=%d\n",
+					",x=%d,y=%d,button=%d,clicks=%d",
 					((MouseEventData *) data)->x,
 					((MouseEventData *) data)->y,
 					((MouseEventData *) data)->button,
@@ -61,12 +61,14 @@ void dispatch_proc(VirtualEvent * const event) {
 
 		case EVENT_MOUSE_WHEEL:
 			fprintf(stdout,
-					",type=%d,amount=%d,rotation=%d\n",
+					",type=%d,amount=%d,rotation=%d",
 					((MouseWheelEventData *) data)->type,
 					((MouseWheelEventData *) data)->amount,
 					((MouseWheelEventData *) data)->rotation);
 			break;
 	}
+
+	fprintf(stdout, "\n");
 }
 
 int main(int argc, const char * argv[]) {

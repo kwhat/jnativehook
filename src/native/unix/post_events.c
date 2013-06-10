@@ -24,17 +24,17 @@ extern Display *disp;
 
 void PostKeyDownEvent(KeySym keysym, unsigned int state, Time time) {
 	int root_x, root_y, win_x, win_y;
-	
+
 	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
 		root_x = 0;
 		root_y = 0;
 		win_x = 0;
 		win_y = 0;
 	}
-	
+
 	//FIXME Calculate the current server time based on the system timestamp in MS.
 	time = CurrentTime;
-	
+
 	XKeyEvent event;
 	event.type = KeyPress;
 	event.display = disp;
@@ -49,24 +49,24 @@ void PostKeyDownEvent(KeySym keysym, unsigned int state, Time time) {
 	event.state = state; //modifiers
 	event.keycode = XKeysymToKeycode(disp, keysym);
 	event.same_screen = true;
-	
+
 	XSendEvent(disp, InputFocus, false, KeyPressMask, (XEvent *) &event);
 	XFlush(disp);
 }
 
 void PostKeyUpEvent(KeySym keysym, unsigned int state, Time time) {
 	int root_x, root_y, win_x, win_y;
-	
+
 	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
 		root_x = 0;
 		root_y = 0;
 		win_x = 0;
 		win_y = 0;
 	}
-	
+
 	//FIXME Calculate the current server time based on the system timestamp in MS.
 	time = CurrentTime;
-	
+
 	XKeyEvent event;
 	event.type = KeyPress;
 	event.display = disp;
@@ -81,9 +81,9 @@ void PostKeyUpEvent(KeySym keysym, unsigned int state, Time time) {
 	event.state = state; //modifiers
 	event.keycode = XKeysymToKeycode(disp, keysym);
 	event.same_screen = true;
-	
+
 	XSendEvent(disp, InputFocus, false, KeyPressMask, (XEvent *) &event);
-	XFlush(disp);	
+	XFlush(disp);
 }
 
 void PostKeyTypedEvent(wchar_t wchar, Time time) {
@@ -91,6 +91,6 @@ void PostKeyTypedEvent(wchar_t wchar, Time time) {
 	snprintf(buffer, 6, "U%04d", wchar);
 
 	KeySym code = XStringToKeysym(buffer);
-	
+
 	//TODO Send Key Down + Key Up events.
 }

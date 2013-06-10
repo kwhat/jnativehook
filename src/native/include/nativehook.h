@@ -363,9 +363,16 @@ typedef struct _MouseWheelEventData {
 extern "C" {
 #endif
 
-	NATIVEHOOK_API void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const));
+	// Set the event callback function.
+	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+
+	// Insert the event hook.
 	NATIVEHOOK_API int hook_enable();
+
+	// Withdraw the event hook.
 	NATIVEHOOK_API int hook_disable();
+
+	// Check the event hook status.
 	NATIVEHOOK_API bool hook_is_enabled();
 
 	// Retrieves the keyboard auto repeat rate.

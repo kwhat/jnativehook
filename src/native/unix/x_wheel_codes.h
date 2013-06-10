@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_XWheelCodes
-#define _Included_XWheelCodes
+#ifndef _included_x_wheel_codes
+#define _included_x_wheel_codes
 
 // Virtual button codes that are not defined by X11.
 #define WheelUp			4

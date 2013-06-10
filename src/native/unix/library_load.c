@@ -16,7 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+
+#ifdef USE_DEBUG
+#include <stdio.h>
+#endif
+
 #include <X11/Xlib.h>
+
+#ifdef USE_XKB
+#include <X11/XKBlib.h>
+#endif
+
+#ifdef USE_XT
+#include <X11/Intrinsic.h>
+
+XtAppContext xt_context;
+#endif
+
 #include "library_load.h"
 
 Display *disp;
@@ -29,14 +46,14 @@ void on_library_load() {
 	// Tell X Threads are OK.
 	XInitThreads();
 
-	#ifdef XT
+	#ifdef USE_XT
 	XtToolkitInitialize();
-	app_context = XtCreateApplicationContext();
+	xt_context = XtCreateApplicationContext();
 	#endif
 
 	// Open local display.
 	disp = XOpenDisplay(XDisplayName(NULL));
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	if (disp != NULL) {
 		fprintf(stdout, "on_library_load(): XOpenDisplay successful.\n");
 	}
@@ -45,21 +62,22 @@ void on_library_load() {
 	}
 	#endif
 
-	Bool isAutoRepeat = False;
-	#ifdef XKB
+	// NOTE: is_auto_repeat is NOT stdbool!
+	Bool is_auto_repeat = False;
+	#ifdef USE_XKB
 	// Enable detectable autorepeat.
-	XkbSetDetectableAutoRepeat(disp, True, &isAutoRepeat);
+	XkbSetDetectableAutoRepeat(disp, True, &is_auto_repeat);
 	#else
 	XAutoRepeatOn(disp);
 
 	XKeyboardState kb_state;
 	XGetKeyboardControl(disp, &kb_state);
 
-	isAutoRepeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
+	is_auto_repeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
 	#endif
 
-	#ifdef DEBUG
-	if (isAutoRepeat) {
+	#ifdef USE_DEBUG
+	if (is_auto_repeat) {
 		fprintf(stdout, "on_library_load(): Successfully enabled detectable autorepeat.\n");
 	}
 	else {
@@ -69,8 +87,8 @@ void on_library_load() {
 }
 
 void on_library_unload() {
-	#ifdef XT
-	XtDestroyApplicationContext(app_context);
+	#ifdef USE_XT
+	XtDestroyApplicationContext(xt_context);
 	#endif
 
 	// Destroy the native displays.

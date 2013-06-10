@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_XInputHelpers
-#define _Included_XInputHelpers
+#ifndef _included_x_input_helpers
+#define _included_x_input_helpers
 
 /* Converts an X11 key code and event mask to the appropriate X11 key symbol.
  * This functions in much the same way as XKeycodeToKeysym() but allows for a

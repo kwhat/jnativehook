@@ -16,12 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+
 #ifdef XRECORD_ASYNC
 #define _POSIX_C_SOURCE 199309L
 #include <time.h>
 #endif
 
-#ifdef DEBUG
+#ifdef USE_DEBUG
 #include <stdio.h>
 #endif
 
@@ -74,20 +76,20 @@ static MouseEventData *mouse_data = NULL;
 static MouseWheelEventData *mouse_wheel_data = NULL;
 
 // Event dispatch callback
-static int (*current_dispatch_proc)(VirtualEvent * const) = NULL;
+static void (*current_dispatch_proc)(VirtualEvent * const) = NULL;
 
-NATIVEHOOK_API void hook_set_dispatch_proc(int (*dispatch_proc)(VirtualEvent * const)) {
+NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const)) {
+	#ifdef USE_DEBUG
+	fprintf(stdout, "hook_set_dispatch_proc(): Setting new dispatch callback.\n");
+	#endif
+
 	current_dispatch_proc = dispatch_proc;
 }
 
-inline static int dispatch_event(VirtualEvent * const event) {
-	int status = NATIVEHOOK_FAILURE;
-
+inline static void dispatch_event(VirtualEvent * const event) {
 	if (current_dispatch_proc != NULL) {
-		status = current_dispatch_proc(event);
+		current_dispatch_proc(event);
 	}
-
-	return status;
 }
 
 static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
@@ -124,7 +126,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				unsigned short int button;
 				switch (event_type) {
 					case KeyPress:
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stdout, "hook_event_proc(): Key pressed. (%i)\n", event_code);
 						#endif
 
@@ -155,7 +157,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						break;
 
 					case KeyRelease:
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stdout, "hook_event_proc(): Key released. (%i)\n", event_code);
 						#endif
 
@@ -174,10 +176,10 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						break;
 
 					case ButtonPress:
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stdout, "hook_event_proc(): Button pressed. (%i)\n", event_code);
 						#endif
-
+						fprintf(stdout, "\n%ld\n\n", hook_get_multi_click_time());
 						// Track the number of clicks.
 						if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
 							click_count++;
@@ -251,7 +253,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						break;
 
 					case ButtonRelease:
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stdout, "hook_event_proc(): Button released. (%i)\n", event_code);
 						#endif
 
@@ -291,8 +293,8 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						break;
 
 					case MotionNotify:
-						#ifdef DEBUG
-						fprintf(stdout, "hook_event_proc(): Motion Notified. (%i, %i)\n", event_x, eventY);
+						#ifdef USE_DEBUG
+						fprintf(stdout, "hook_event_proc(): Motion Notified. (%i, %i)\n", event_x, event_y);
 						#endif
 
 						// Reset the click count.
@@ -333,7 +335,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						dispatch_event(event);
 						break;
 
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					default:
 						fprintf(stderr, "hook_event_proc(): Unhandled Event Type: 0x%X\n", event_type);
 						break;
@@ -361,7 +363,7 @@ static void *hook_thread_proc(void *arg) {
 
 	Display *disp_data = XOpenDisplay(NULL);
 	if (disp_data != NULL) {
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		fprintf(stdout, "hook_thread_proc(): XOpenDisplay successful.\n");
 		#endif
 
@@ -369,7 +371,7 @@ static void *hook_thread_proc(void *arg) {
 		XRecordClientSpec clients = XRecordAllClients;
 		XRecordRange *range = XRecordAllocRange();
 		if (range != NULL) {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stdout, "hook_thread_proc(): XRecordAllocRange successful.\n");
 			#endif
 
@@ -383,7 +385,7 @@ static void *hook_thread_proc(void *arg) {
 			 */
 			context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 			if (context != 0) {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf(stdout, "hook_thread_proc(): XRecordCreateContext successful.\n");
 				#endif
 
@@ -401,14 +403,12 @@ static void *hook_thread_proc(void *arg) {
 					#ifdef XRECORD_ASYNC
 					// Allow the thread loop to block.
 					running = true;
-					#endif
 
 					// Async requires that we loop so that our thread does not return.
 					if (XRecordEnableContextAsync(disp_data, context, hook_event_proc, NULL) != 0) {
 						// Set the exit status.
 						*status = NATIVEHOOK_SUCCESS;
 
-						#ifdef XRECORD_ASYNC
 						while (running) {
 							XRecordProcessReplies(disp_data);
 
@@ -417,10 +417,16 @@ static void *hook_thread_proc(void *arg) {
 						}
 
 						XRecordDisableContext(disp_ctrl, context);
-						#endif
 					}
+					#else
+					// Sync blocks until XRecordDisableContext() is called.
+					if (XRecordEnableContext(disp_data, context, hook_event_proc, NULL) != 0) {
+						// Set the exit status.
+						*status = NATIVEHOOK_SUCCESS;
+					}
+					#endif
 					else {
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf (stderr, "hook_thread_proc(): XRecordEnableContext failure!\n");
 						#endif
 
@@ -434,7 +440,7 @@ static void *hook_thread_proc(void *arg) {
 					}
 				}
 				else {
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					fprintf(stderr, "hook_thread_proc(): malloc failure!\n");
 					#endif
 
@@ -455,7 +461,7 @@ static void *hook_thread_proc(void *arg) {
 				free(mouse_wheel_data);
 			}
 			else {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf(stderr, "hook_thread_proc(): XRecordCreateContext failure!\n");
 				#endif
 
@@ -467,7 +473,7 @@ static void *hook_thread_proc(void *arg) {
 			XFree(range);
 		}
 		else {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "hook_thread_proc(): XRecordAllocRange failure!\n");
 			#endif
 
@@ -479,7 +485,7 @@ static void *hook_thread_proc(void *arg) {
 		disp_data = NULL;
 	}
 	else {
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		fprintf(stderr, "hook_thread_proc(): XOpenDisplay failure!\n");
 		#endif
 
@@ -487,7 +493,7 @@ static void *hook_thread_proc(void *arg) {
 		*status = NATIVEHOOK_ERROR_X_OPEN_DISPLAY;
 	}
 
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	fprintf(stdout, "hook_thread_proc(): complete.\n");
 	#endif
 
@@ -517,7 +523,7 @@ NATIVEHOOK_API int hook_enable() {
 			// Check to make sure XRecord is installed and enabled.
 			int major, minor;
 			if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf(stdout, "hook_thread_proc(): XRecord version: %d.%d.\n", major, minor);
 				#endif
 
@@ -530,13 +536,13 @@ NATIVEHOOK_API int hook_enable() {
 				priority = sched_get_priority_max(policy);
 
 				if (pthread_create(&hook_thread_id, &hook_thread_attr, hook_thread_proc, malloc(sizeof(int))) == 0) {
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					fprintf(stdout, "enable_hook(): start successful.\n");
 					#endif
 
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					if (pthread_setschedprio(hook_thread_id, priority) != 0) {
-						fprintf(stderr, "enable_hook(): Could not set thread priority %i for thread 0x%X.\n", priority, hook_thread_id);
+						fprintf(stderr, "enable_hook(): Could not set thread priority %i for thread 0x%X.\n", priority, (unsigned int) hook_thread_id);
 					}
 					#else
 					pthread_setschedprio(hook_thread_id, priority);
@@ -550,14 +556,14 @@ NATIVEHOOK_API int hook_enable() {
 
 					// Handle any possible JNI issue that may have occurred.
 					if (hook_is_enabled()) {
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stdout, "enable_hook(): initialization successful.\n");
 						#endif
 
 						status = NATIVEHOOK_SUCCESS;
 					}
 					else {
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stderr, "enable_hook(): initialization failure!\n");
 						#endif
 
@@ -567,13 +573,13 @@ NATIVEHOOK_API int hook_enable() {
 						status = *(int *) thread_status;
 						free(thread_status);
 
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						fprintf(stderr, "enable_hook(): Thread Result (%i)\n", status);
 						#endif
 					}
 				}
 				else {
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					fprintf(stderr, "enable_hook(): Thread create failure!\n");
 					#endif
 
@@ -581,7 +587,7 @@ NATIVEHOOK_API int hook_enable() {
 				}
 			}
 			else {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf (stderr, "hook_thread_proc(): XRecord is not currently available!\n");
 				#endif
 
@@ -589,7 +595,7 @@ NATIVEHOOK_API int hook_enable() {
 			}
 		}
 		else {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "hook_thread_proc(): XOpenDisplay failure!\n");
 			#endif
 
@@ -648,7 +654,7 @@ NATIVEHOOK_API int hook_disable() {
 		XCloseDisplay(disp_ctrl);
 		disp_ctrl = NULL;
 
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		fprintf(stdout, "disable_hook(): Thread Result (%i)\n", status);
 		#endif
 	}
@@ -674,7 +680,7 @@ NATIVEHOOK_API bool hook_is_enabled() {
 		is_running = true;
 	}
 
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	fprintf(stdout, "is_hook_enable(): State (%i)\n", is_running);
 	#endif
 
