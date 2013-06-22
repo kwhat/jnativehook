@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,305 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "nativehook.h"
+#include <nativehook.h>
+
+#include "jni_Globals.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-static void JNIEventDispatcher(VirtualEvent *const event) {
-	JNIEnv *env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		// Create the global screen references up front to save time in the callback.
-		jobject org_jnativehook_GlobalScreen = (*env)->CallStaticObjectMethod(
-				env,
-				clsGlobalScreen,
-				idGetInstance);
-
-		if (org_jnativehook_GlobalScreen != NULL) {
-			// Call Thread.currentThread().setName("JNativeHook Native Hook");
-			//jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
-			//(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
-			//(*env)->DeleteLocalRef(env, objCurrentThread);
-
-			switch (event->type) {
-				case EVENT_KEY_PRESSED:
-					NativeKeyEvent_object = (*env)->NewObject(
-											env,
-											org_jnativehook_keyboard_NativeKeyEvent->class,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
-											(jlong) event->time,
-											event->mask,
-											event->data->rawcode,
-											event->data->keycode,
-											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											jkey.location);
-
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, NativeKeyEvent_object);
-					(*env)->DeleteLocalRef(env, NativeKeyEvent_object);
-					break;
-
-				case EVENT_KEY_RELEASED:
-					NativeKeyEvent_object = (*env)->NewObject(
-											env,
-											org_jnativehook_keyboard_NativeKeyEvent->class,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-											(jlong) event->time,
-											event->mask,
-											event->data->rawcode,
-											event->data->keycode,
-											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											jkey.location);
-
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, NativeKeyEvent_object);
-					(*env)->DeleteLocalRef(env, NativeKeyEvent_object);
-					break;
-
-				case EVENT_KEY_TYPED:
-					objInputEvent = (*env)->NewObject(
-											env,
-											org_jnativehook_keyboard_NativeKeyEvent->class,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
-											(jlong) event->time,
-											event->mask,
-											event->data->rawcode,
-											org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-											event->data->keytxt,
-											jkey.location);
-
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
-					(*env)->DeleteLocalRef(env, objInputEvent);
-					break;
-
-				case EVENT_MOUSE_PRESSED:
-					objInputEvent = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->class,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
-												(jlong) event->time,
-												event->mask,
-												(jint) event->data->x,
-												(jint) event->data->y,
-												(jint) event->data->clicks,
-												(jint) event->data->button);
-
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
-					(*env)->DeleteLocalRef(env, objInputEvent);
-					break;
-
-				case EVENT_MOUSE_RELEASED:
-					objInputEvent = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->class,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
-												(jlong) event->time,
-												event->mask,
-												(jint) event->data->x,
-												(jint) event->data->y,
-												(jint) event->data->clicks,
-												(jint) event->data->button);
-
-					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objInputEvent);
-					(*env)->DeleteLocalRef(env, objInputEvent);
-					break;
-
-				case EVENT_MOUSE_CLICKED:
-					break;
-
-				case EVENT_MOUSE_MOVED:
-					break;
-
-				case EVENT_MOUSE_DRAGGED:
-					break;
-
-				case EVENT_MOUSE_WHEEL:
-					break;
-			}
-
-			(*env)->DeleteLocalRef(env, org_jnativehook_GlobalScreen);
-		}
-		else {
-			// We cant do a whole lot of anything if we cant create JNI globals.
-			// Any exceptions are thrown by CreateJNIGlobals().
-
-			#ifdef DEBUG
-			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
-			#endif
-
-			//thread_ex.class = NATIVE_HOOK_EXCEPTION;
-			//thread_ex.message = "Failed to create JNI global references";
-		}
-	}
-}
-
-static void JNISetProperties(JNIEnv *env) {
-	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
-	jmethodID setProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
-
-	if (clsSystem != NULL && setProperty_ID != NULL) {
-		// Create a buffer for converting numbers to strings.
-		char buffer[16];
-
-		// Set the native keyboard auto repeat rate.
-		long rate = hook_get_auto_repeat_rate();
-		if (rate >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetAutoRepeatRate(): successful. (rate: %li)\n", rate);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", rate) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetAutoRepeatRate(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "GetAutoRepeatRate(): failure!\n");
-		}
-		#endif
-
-
-		long delay = hook_get_auto_repeat_delay();
-		if (delay >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetAutoRepeatDelay(): successful. (delay: %li)\n", delay);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetAutoRepeatDelay(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "GetAutoRepeatDelay(): failure!\n");
-		}
-		#endif
-
-
-		// 0-Threshold X, 1-Threshold Y and 2-Speed.
-		long multiplier = hook_get_pointer_acceleration_multiplier();
-		if (multiplier >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetPointerAccelerationMultiplier(): successful. (multiplier: %li)\n", multiplier);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", multiplier) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetPointerAccelerationMultiplier(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stdout, "GetPointerAccelerationMultiplier(): failure!\n");
-		}
-		#endif
-
-
-		// 0-Threshold X, 1-Threshold Y and 2-Speed.
-		long threshold = hook_get_pointer_acceleration_threshold();
-		if (threshold >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetPointerAccelerationThreshold(): successful. (threshold: %li)\n", threshold);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", threshold) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetPointerAccelerationThreshold(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stdout, "GetPointerAccelerationThreshold(): failure!\n");
-		}
-		#endif
-
-
-		long sensitivity = hook_get_pointer_sensitivity();
-		if (sensitivity >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetPointerSensitivity(): successful. (sensitivity: %li)\n", sensitivity);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", sensitivity) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetPointerSensitivity(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stdout, "GetPointerSensitivity(): failure!\n");
-		}
-		#endif
-
-
-		long clicktime = hook_get_multi_click_time();
-		if (clicktime >= 0) {
-			#ifdef DEBUG
-			fprintf(stdout, "GetMultiClickTime(): successful. (time: %li)\n", clicktime);
-			#endif
-
-			if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
-				(*env)->CallStaticObjectMethod(env, clsSystem, setProperty_ID, (*env)->NewStringUTF(env, "jnativehook.multiClickInterval"), (*env)->NewStringUTF(env, buffer));
-			}
-			#ifdef DEBUG
-			else {
-				fprintf(stderr, "GetMultiClickTime(): failure converting value to string!\n");
-			}
-			#endif
-		}
-		#ifdef DEBUG
-		else {
-			fprintf(stderr, "GetMultiClickTime(): failure!\n");
-		}
-		#endif
-	}
-}
-
-
-static void JNIClearProperties(JNIEnv *env) {
-	jclass clsSystem = (*env)->FindClass(env, "java/lang/System");
-	jmethodID clearProperty_ID = (*env)->GetStaticMethodID(env, clsSystem, "clearProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-
-	if (clsSystem != NULL && clearProperty_ID != NULL) {
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate"));
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay"));
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier"));
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold"));
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity"));
-		(*env)->CallStaticObjectMethod(env, clsSystem, clearProperty_ID, (*env)->NewStringUTF(env, "jnativehook.multiClickInterval"));
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *UNUSED(env), jclass UNUSED(cls), jobject UNUSED(event)) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
 	//FIXME Use the jni globals!
 
 	//jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	//jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	//jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
-
+/*
 	jclass clsNativeInputEvent = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
 	jmethodID idGetID = (*env)->GetMethodID(env, clsNativeInputEvent, "getID", "()I");
 	jmethodID idGetModifiers = (*env)->GetMethodID(env, clsNativeInputEvent, "getModifiers", "()I");
@@ -338,23 +51,40 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		default:
 			break;
 	}
+*/
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	// Start the java event dispatch thread.
-	(*env)->CallVoidMethod(env, org_jnativehook_GlobalScreen, idStartEventDispatcher);
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
+	// Request an instance of the GlobalScreen.
+	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
+			env,
+			org_jnativehook_GlobalScreen->cls,
+			org_jnativehook_GlobalScreen->getInstance);
 
-	hook_enable();
+	if (GlobalScreen_object != NULL) {
+		// Start the java event dispatch thread.
+		(*env)->CallVoidMethod(env, GlobalScreen_object, org_jnativehook_GlobalScreen->startEventDispatcher);
+
+		hook_enable();
+	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
-	hook_disable();
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
+	// Request an instance of the GlobalScreen.
+	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
+			env,
+			org_jnativehook_GlobalScreen->cls,
+			org_jnativehook_GlobalScreen->getInstance);
 
-	// Stop the java event dispatch thread.
-	(*env)->CallVoidMethod(env, org_jnativehook_GlobalScreen, idStopEventDispatcher);
+	if (GlobalScreen_object != NULL) {
+		hook_disable();
+
+		// Start the java event dispatch thread.
+		(*env)->CallVoidMethod(env, GlobalScreen_object, org_jnativehook_GlobalScreen->stopEventDispatcher);
+	}
 }
 
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *UNUSED(env), jclass UNUSED(cls)) {
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *env, jclass cls) {
 	// Simple wrapper to return the hook status.
-	return (jboolean) hook_is_enable();
+	return (jboolean) hook_is_enabled();
 }

@@ -22,7 +22,7 @@
 #include <X11/Sunkeysym.h>
 #endif
 
-#include "nativehook.h"
+#include <nativehook.h>
 
 unsigned int convert_to_native_key(unsigned int virtual_keycode) {
 	unsigned int native_keycode;

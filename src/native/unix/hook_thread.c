@@ -19,7 +19,7 @@
 #include <config.h>
 
 #ifdef XRECORD_ASYNC
-#define _POSIX_C_SOURCE 199309L
+// Requires _POSIX_C_SOURCE >= 199309L
 #include <time.h>
 #endif
 
@@ -88,8 +88,17 @@ NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * 
 
 inline static void dispatch_event(VirtualEvent * const event) {
 	if (current_dispatch_proc != NULL) {
+		#ifdef USE_DEBUG
+		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
+		#endif
+
 		current_dispatch_proc(event);
 	}
+	#ifdef USE_DEBUG
+	else {
+		fprintf(stderr, "dispatch_event(): No dispatch proc set! (%d)\n", event->type);
+	}
+	#endif
 }
 
 static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
@@ -179,7 +188,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						#ifdef USE_DEBUG
 						fprintf(stdout, "hook_event_proc(): Button pressed. (%i)\n", event_code);
 						#endif
-						fprintf(stdout, "\n%ld\n\n", hook_get_multi_click_time());
+
 						// Track the number of clicks.
 						if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
 							click_count++;

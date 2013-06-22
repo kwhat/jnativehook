@@ -26,7 +26,7 @@
 #include <stdio.h>
 #endif
 
-#ifdef XKB
+#ifdef USE_XKB
 #include <X11/XKBlib.h>
 static XkbDescPtr keyboard_map;
 #else
@@ -44,7 +44,7 @@ extern Display *disp;
 KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 	KeySym keysym = NoSymbol;
 
-	#ifdef XKB
+	#ifdef USE_XKB
 	if (keyboard_map) {
 		// What is diff between XkbKeyGroupInfo and XkbKeyNumGroups?
 		unsigned char info = XkbKeyGroupInfo(keyboard_map, keycode);
@@ -3342,7 +3342,7 @@ wchar_t keysym_to_unicode(KeySym keysym) {
 }
 
 void load_input_helper() {
-	#ifdef XKB
+	#ifdef USE_XKB
 	// Get the map.
 	keyboard_map = XkbGetMap(disp, XkbAllClientInfoMask, XkbUseCoreKbd);
 	#else
@@ -3398,7 +3398,7 @@ void load_input_helper() {
 
 void unload_input_helper() {
 	if (keyboard_map) {
-		#ifdef XKB
+		#ifdef USE_XKB
 		XkbFreeClientMap(keyboard_map, XkbAllClientInfoMask, true);
 		#else
 		XFree(keyboard_map);

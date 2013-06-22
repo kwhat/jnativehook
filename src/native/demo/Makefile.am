@@ -17,11 +17,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CFLAGS = -Wall -Wextra -pedantic -O2 -std=c99 -I$(top_srcdir)/include
-AM_LDFLAGS = -Wl,--as-needed,-O1
-
 bin_PROGRAMS = nativehookdemo
 nativehookdemo_SOURCES = hook_demo.c
 nativehookdemo_LDADD = $(top_builddir)/$(backend)/libnativehook.la
-nativehookdemo_CFLAGS = -Wall
-nativehookdemo_LDFLAGS = $(LTLDFLAGS)
+nativehookdemo_CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_POSIX_C_SOURCE=199309L -I$(top_srcdir)/include
+nativehookdemo_LDFLAGS = -Wl,--as-needed,-O1

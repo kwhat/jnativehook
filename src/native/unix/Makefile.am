@@ -17,16 +17,11 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CFLAGS = -Wall -Wextra -pedantic -O2 -fno-strict-aliasing -std=c99
-AM_CFLAGS += -I$(top_srcdir)/include
-AM_CFLAGS += -D_GNU_SOURCE -D_XOPEN_SOURCE
-AM_LDFLAGS = -Wl,--as-needed,-O1
-
 #include_HEADERS = include/nativehook.h
 
 lib_LTLIBRARIES = libnativehook.la
-libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -fno-strict-aliasing -I$(top_srcdir)/include
-libnativehook_la_LDFLAGS = $(LTLDFLAGS)
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -std=c99 -I$(top_srcdir)/include
+libnativehook_la_LDFLAGS = -Wl,--as-needed,-O1
 libnativehook_la_SOURCES = \
 	convert_to_native.c \
 	convert_to_virtual.c \
@@ -36,7 +31,7 @@ libnativehook_la_SOURCES = \
 	system_properties.c \
 	x_input_helpers.c
 
-CLEANFILES = 
+CLEANFILES =
 
 DISTCLEANFILES = \
 	Makefile

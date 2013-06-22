@@ -37,7 +37,7 @@ LTLDFLAGS="-version-info ${lt_current}:${lt_revision}:${lt_age}"
 AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 
 AC_PREREQ(2.64)
-#AC_CONFIG_SRCDIR([include/nativehook.h])
+AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
 	darwin/Makefile \
 	demo/Makefile \
@@ -120,19 +120,19 @@ AC_ARG_ENABLE([xf86misc],
 	[enable_xf86misc="no"])
 
 AC_ARG_ENABLE([xrecord-async],
-	AS_HELP_STRING([--disable-xrecord-async], [Disable XRecord Asynchronous API (default: enabled)])
+	AS_HELP_STRING([--disable-xrecord-async], [Disable XRecord Asynchronous API (default: enabled)]),
 	[enable_xrecord_async="$enableval"],
 	[enable_xrecord_async="yes"])
 
 
 # Darwin Options
 AC_ARG_ENABLE([corefoundation],
-	AS_HELP_STRING([--disable-corefoundation],	[Disable CoreFoundation framework (default: enabled)])
+	AS_HELP_STRING([--disable-corefoundation],	[Disable CoreFoundation framework (default: enabled)]),
 	[enable_corefoundation="$enableval"],
 	[enable_corefoundation="yes"])
 
 AC_ARG_ENABLE([iokit],
-	AS_HELP_STRING([--disable-iokit],	[Disable IOKit framework (default: enabled)])
+	AS_HELP_STRING([--disable-iokit],	[Disable IOKit framework (default: enabled)]),
 	[enable_iokit="$enableval"],
 	[enable_iokit="yes"])
 
@@ -186,6 +186,7 @@ AS_IF(
 
 		AS_IF([test "x$enable_xrecord_async" = "xyes"], [
 			AC_DEFINE([USE_XRECORD_ASYNC], 1, [Enable XRecord Asynchronous API])
+			CFLAGS="$CFLAGS -D_POSIX_C_SOURCE=199309L"
 		])
 
 		AX_PTHREAD([found_pthreads=yes], [found_pthreads=no])

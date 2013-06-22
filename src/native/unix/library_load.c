@@ -17,6 +17,7 @@
  */
 
 #include <config.h>
+#include <nativehook.h>
 
 #ifdef USE_DEBUG
 #include <stdio.h>
@@ -32,6 +33,7 @@
 #include <X11/Intrinsic.h>
 
 XtAppContext xt_context;
+Display *xt_disp;
 #endif
 
 #include "library_load.h"
@@ -46,11 +48,6 @@ void on_library_load() {
 	// Tell X Threads are OK.
 	XInitThreads();
 
-	#ifdef USE_XT
-	XtToolkitInitialize();
-	xt_context = XtCreateApplicationContext();
-	#endif
-
 	// Open local display.
 	disp = XOpenDisplay(XDisplayName(NULL));
 	#ifdef USE_DEBUG
@@ -62,6 +59,15 @@ void on_library_load() {
 	}
 	#endif
 
+	#ifdef USE_XT
+	XtToolkitInitialize();
+	xt_context = XtCreateApplicationContext();
+	
+	int argc = 0;
+	char ** argv = { NULL };
+	xt_disp = XtOpenDisplay(xt_context, NULL, "NativeHook", "libnativehook", NULL, 0, &argc, argv);
+	#endif
+	
 	// NOTE: is_auto_repeat is NOT stdbool!
 	Bool is_auto_repeat = False;
 	#ifdef USE_XKB
@@ -87,7 +93,13 @@ void on_library_load() {
 }
 
 void on_library_unload() {
+	// Stop the native thread if its running.
+	if (hook_is_enabled()) {
+		hook_disable();
+	}
+
 	#ifdef USE_XT
+	XtCloseDisplay(xt_disp);
 	XtDestroyApplicationContext(xt_context);
 	#endif
 

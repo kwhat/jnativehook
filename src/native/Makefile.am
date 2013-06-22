@@ -17,18 +17,16 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt
-
-AM_CFLAGS = -Wall -Wextra -Wno-unused-parameter -pedantic -O2 -fno-strict-aliasing -std=c99
-AM_CFLAGS += -I$(top_srcdir)/include
-AM_CFLAGS += -D_GNU_SOURCE -D_XOPEN_SOURCE
-AM_LDFLAGS = -Wl,--as-needed,-O1
+include_HEADERS = include/nativehook.h
+pkgconfigdir = $(libdir)/pc
 
 SUBDIRS = $(backend)
 
 if BUILD_DEMO
 SUBDIRS += demo
 endif
+
+EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt
 
 #MOSTLYCLEANFILES, CLEANFILES, DISTCLEANFILES, and MAINTAINERCLEANFILES
 

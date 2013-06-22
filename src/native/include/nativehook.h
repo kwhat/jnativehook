@@ -73,6 +73,9 @@ typedef struct _MouseEventData {
 } MouseEventData, MousePressedEventData, MouseReleasedEventData, MouseClickedEventData;
 
 typedef struct _MouseWheelEventData {
+	unsigned short int clicks;
+	unsigned short int x;
+	unsigned short int y;
 	unsigned short int type;
 	unsigned short int amount;
 	signed int rotation;

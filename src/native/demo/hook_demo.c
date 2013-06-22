@@ -25,11 +25,13 @@
 #include <time.h>
 #endif
 
-#include "nativehook.h"
+#include <nativehook.h>
 
 // Program's is running sentinel.
 static bool running = false;
 
+// NOTE: This function executes on the hook thread!  If you need to block
+// please do so on another thread via your own event dispatcher.
 void dispatch_proc(VirtualEvent * const event) {
 	fprintf(stdout,	"id=%d,when=%ld,mask=0x%X",
 			event->type, event->time, event->mask);
@@ -43,7 +45,13 @@ void dispatch_proc(VirtualEvent * const event) {
 					",keycode=%d,keychar=%lc,rawcode=%d",
 					((KeyboardEventData *) data)->keycode,
 					((KeyboardEventData *) data)->keychar,
-					((KeyboardEventData *) data)->keycode);
+					((KeyboardEventData *) data)->rawcode);
+
+			if (((KeyboardEventData *) data)->keycode == VC_ESCAPE) {
+				running = false;
+				fprintf(stdout, "running == false\n");
+			}
+
 			break;
 
 		case EVENT_MOUSE_PRESSED:

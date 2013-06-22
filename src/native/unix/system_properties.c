@@ -33,8 +33,7 @@
 
 #ifdef USE_XT
 #include <X11/Intrinsic.h>
-
-extern XtAppContext xt_context;
+extern Display *xt_disp;
 #endif
 
 #include "nativehook.h"
@@ -175,16 +174,12 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	long int value = 200;
 	int click_time;
 	bool successful = false;
-
+//*
 	#ifdef USE_XT
 	// Try and use the Xt extention to get the current multi-click.
 	if (!successful) {
-		int argc = 0;
-		char ** argv = {NULL};
-
 		// Fall back to the X Toolkit extension if available and other efforts failed.
-		XtDisplayInitialize(xt_context, disp, "NativeHook", "libnativehook", NULL, 0, &argc, argv);
-		click_time = XtGetMultiClickTime(disp);
+		click_time = XtGetMultiClickTime(xt_disp);
 		if (click_time >= 0) {
 			#ifdef USE_DEBUG
 			fprintf(stdout, "hook_get_multi_click_time(): XtGetMultiClickTime success. (%d)\n", click_time);
@@ -194,7 +189,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 		}
 	}
 	#endif
-
+//*/
 	// Try and acquire the multi-click time from the user defined X defaults.
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "*", "multiClickTime");
