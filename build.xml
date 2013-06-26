@@ -508,7 +508,7 @@
 		<property name="cc.prefix" location="${dir.bin}"/>
 
 		<echo>Configuring...</echo>
-<!-- -flto -fuse-linker-plugin -->
+		<!-- -flto -fuse-linker-plugin -->
 		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/obj/native" failonerror="true" osfamily="unix">
 			<arg line="CFLAGS='-std=c99'" />
 			<arg line="LDFLAGS='-Wl,--as-needed,-O1'" />
@@ -603,6 +603,48 @@
 		</apply>
 	</target>
 
+	<target name="test" depends="compile" description="Perform test cases.">
+		<mkdir dir="${dir.bin}/test" />
+
+		<javac destdir="${dir.bin}/test"
+			bootclasspath="${java.bootclasspath}"
+			debug="true"
+			debuglevel="lines,vars,source"
+			optimize="true"
+			deprecation="false"
+			includeantruntime="false"
+			listfiles="true"
+			compiler="modern"
+			source="1.5"
+			target="1.5"
+			verbose="false"
+		>
+			<compilerarg value="-Xlint:unchecked" />
+
+			<src path="${dir.src}/test" />
+			<classpath>
+				<pathelement location="${dir.jar}" />
+				<pathelement path="${dir.bin}/src" />
+				<pathelement path="${dir.bin}/test" />
+			</classpath>
+		</javac>
+
+		<junit>
+			<classpath>
+				<pathelement location="${dir.jar}" />
+				<pathelement path="${dir.bin}/src" />
+				<pathelement path="${dir.bin}/test" />
+			</classpath>
+
+			<formatter type="brief" usefile="false" />
+			<!-- test name="TestExample" / -->
+			<batchtest> <!-- todir="${reports.tests}" -->
+				<fileset dir="${dir.test}">
+					<include name="**/*Test*.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>

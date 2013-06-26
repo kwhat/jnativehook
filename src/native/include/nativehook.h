@@ -366,6 +366,9 @@ typedef struct _MouseWheelEventData {
 extern "C" {
 #endif
 
+	// Send a virtual event back to the system.
+	NATIVEHOOK_API void hook_post_event(VirtualEvent * const event);
+
 	// Set the event callback function.
 	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
 

@@ -124,6 +124,10 @@ AC_ARG_ENABLE([xrecord-async],
 	[enable_xrecord_async="$enableval"],
 	[enable_xrecord_async="yes"])
 
+AC_ARG_ENABLE([xtest],
+	AS_HELP_STRING([--disable-xtest], [Disable XTest Extension (default: enabled)]),
+	[enable_xtest="$enableval"],
+	[enable_xtest="yes"])
 
 # Darwin Options
 AC_ARG_ENABLE([corefoundation],
@@ -157,11 +161,11 @@ AS_IF(
 
 		# Check for XRecord.
 		AC_CHECK_LIB([Xtst], [XRecordQueryVersion], [],
-			[AC_MSG_ERROR([Some features will be disabled])],
+			[AC_MSG_ERROR([libXtst does not include XRecord extention!])],
 			$LIBS)
 
 		AC_CHECK_HEADERS([X11/extensions/record.h], [],
-			[AC_MSG_ERROR([Missing XRecord])],
+			[AC_MSG_ERROR([XRecord extention header could not be found!])],
 			[#include <X11/Xlib.h>])
 
 		AS_IF([test "x$enable_xkb" = "xyes"], [
@@ -187,6 +191,16 @@ AS_IF(
 		AS_IF([test "x$enable_xrecord_async" = "xyes"], [
 			AC_DEFINE([USE_XRECORD_ASYNC], 1, [Enable XRecord Asynchronous API])
 			CFLAGS="$CFLAGS -D_POSIX_C_SOURCE=199309L"
+		])
+
+		AS_IF([test "x$enable_xtest" = "xyes"], [
+			AC_CHECK_LIB([Xtst], [XTestQueryExtension],
+				[AC_CHECK_HEADERS([X11/extensions/XTest.h],
+						[AC_DEFINE([USE_XTEST], 1, [Enable XTest Extension])],
+						[AC_MSG_WARN([XTest extention header could not be found!])],
+						[#include <X11/Xlib.h>])],
+				[AC_MSG_WARN([libXtst does not include XTest extention!])],
+				$LIBS)
 		])
 
 		AX_PTHREAD([found_pthreads=yes], [found_pthreads=no])

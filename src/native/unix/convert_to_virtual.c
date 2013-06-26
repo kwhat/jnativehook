@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+#include <nativehook.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #ifdef SUN_KEYBOARD
 #include <X11/Sunkeysym.h>
 #endif
-
-#include "nativehook.h"
 
 unsigned int convert_to_virtual_key(unsigned int native_keycode) {
 	unsigned int virtual_keycode;

@@ -16,81 +16,221 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+#include <nativehook.h>
+
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <X11/Xlib.h>
+
+#ifdef USE_XTEST
+#include <X11/extensions/XTest.h>
+#endif
+
+#include "convert_to_native.h"
+#include "convert_to_virtual.h"
 
 extern Display *disp;
 
-void PostKeyDownEvent(KeySym keysym, unsigned int state, Time time) {
-	int root_x, root_y, win_x, win_y;
+NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
+	char buffer[4];
 
-	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
+	#ifdef USE_XTEST
+	Bool is_press;
+
+	void *data = event->data;
+	switch (event->type) {
+		case EVENT_KEY_PRESSED:
+			is_press = True;
+			goto EVENT_KEY;
+
+		case EVENT_KEY_TYPED:
+			// Need to convert a wchar_t to keysym!
+			snprintf(buffer, 4, "%lc", ((KeyboardEventData *) data)->keychar);
+
+			event->type = EVENT_KEY_PRESSED;
+			((KeyboardEventData *) data)->keycode = convert_to_virtual_key(XStringToKeysym(buffer));
+			((KeyboardEventData *) data)->keychar = CHAR_UNDEFINED;
+			hook_post_event(event);
+
+		case EVENT_KEY_RELEASED:
+			is_press = False;
+
+		EVENT_KEY:
+			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, convert_to_native_key(((KeyboardEventData *) data)->keycode)), is_press, 0);
+			break;
+
+		case EVENT_MOUSE_WHEEL:
+			// Wheel events are simply button press events.
+
+		case EVENT_MOUSE_PRESSED:
+			is_press = True;
+			goto EVENT_BUTTON;
+
+		case EVENT_MOUSE_CLICKED:
+			event->type = EVENT_MOUSE_PRESSED;
+			hook_post_event(event);
+
+		case EVENT_MOUSE_RELEASED:
+			is_press = False;
+			goto EVENT_BUTTON;
+
+		EVENT_BUTTON:
+			XTestFakeButtonEvent(disp, ((MouseEventData *) data)->button, is_press, 0);
+			break;
+
+		case EVENT_MOUSE_DRAGGED:
+			// FIXME Trigger the button down events followed by a motion event!
+			//goto EVENT_MOTION;
+
+		case EVENT_MOUSE_MOVED:
+			XTestFakeMotionEvent(disp, -1, ((MouseEventData *) data)->x, ((MouseEventData *) data)->y, 0);
+			break;
+	}
+	#else
+	XEvent *x_event = NULL;
+	long x_mask = NoEventMask;
+
+	Window root_win, child_win;
+	int root_x, root_y;
+	int win_x, win_y;
+	unsigned int mask;
+	if (!XQueryPointer(disp, DefaultRootWindow(disp), &root_win, &child_win, &root_x, &root_y, &win_x, &win_y, &mask)) {
 		root_x = 0;
 		root_y = 0;
 		win_x = 0;
 		win_y = 0;
 	}
 
-	//FIXME Calculate the current server time based on the system timestamp in MS.
-	time = CurrentTime;
+	void *data = event->data;
+	switch (event->type) {
+		case EVENT_KEY_PRESSED:
+			x_event = (XEvent *) malloc(sizeof(XKeyEvent));
+			((XKeyEvent *) x_event)->type = KeyPress;
+			x_mask = KeyPressMask;
+			goto EVENT_KEY;
 
-	XKeyEvent event;
-	event.type = KeyPress;
-	event.display = disp;
-	event.window = DefaultRootWindow(disp); //InputFocus; //XGetInputFocus();
-	event.root = DefaultRootWindow(disp);
-	event.subwindow = None;
-	event.time = time;
-	event.x = win_x;
-	event.y = win_y;
-	event.x_root = root_x;
-	event.y_root = root_y;
-	event.state = state; //modifiers
-	event.keycode = XKeysymToKeycode(disp, keysym);
-	event.same_screen = true;
+		case EVENT_KEY_TYPED:
+			// Need to convert a wchar_t to keysym!
+			snprintf(buffer, 4, "U%04d", ((KeyboardEventData *) data)->keychar);
 
-	XSendEvent(disp, InputFocus, false, KeyPressMask, (XEvent *) &event);
-	XFlush(disp);
-}
+			event->type = EVENT_KEY_PRESSED;
+			((KeyboardEventData *) data)->keycode = convert_to_virtual_key(XStringToKeysym(buffer));
+			((KeyboardEventData *) data)->keychar = CHAR_UNDEFINED;
+			hook_post_event(event);
 
-void PostKeyUpEvent(KeySym keysym, unsigned int state, Time time) {
-	int root_x, root_y, win_x, win_y;
+		case EVENT_KEY_RELEASED:
+			x_event = (XEvent *) malloc(sizeof(XKeyEvent));
+			((XKeyEvent *) x_event)->type = KeyRelease;
+			x_mask = KeyReleaseMask;
 
-	if (!XQueryPointer(disp, DefaultRootWindow(disp), NULL, NULL, &root_x, &root_y, &win_x, &win_y, NULL)) {
-		root_x = 0;
-		root_y = 0;
-		win_x = 0;
-		win_y = 0;
+		EVENT_KEY:
+			((XKeyEvent *) x_event)->display = disp;
+			((XKeyEvent *) x_event)->window = root_win; //InputFocus; //XGetInputFocus();
+			((XKeyEvent *) x_event)->root = root_win;
+			((XKeyEvent *) x_event)->subwindow = None;
+			((XKeyEvent *) x_event)->time = CurrentTime;
+			((XKeyEvent *) x_event)->x = win_x;
+			((XKeyEvent *) x_event)->y = win_y;
+			((XKeyEvent *) x_event)->x_root = root_x;
+			((XKeyEvent *) x_event)->y_root = root_y;
+			((XKeyEvent *) x_event)->state = convert_to_native_mask(event->mask);
+			((XKeyEvent *) x_event)->keycode = XKeysymToKeycode(disp, convert_to_native_key(((KeyboardEventData *) data)->keycode));
+			((XKeyEvent *) x_event)->same_screen = True;
+			break;
+
+
+		case EVENT_MOUSE_WHEEL:
+			// Wheel events are simply button press events.
+
+		case EVENT_MOUSE_PRESSED:
+			x_event = (XEvent *) malloc(sizeof(XButtonEvent));
+			x_mask = ButtonPressMask;
+			goto EVENT_BUTTON;
+
+		case EVENT_MOUSE_CLICKED:
+			event->type = EVENT_MOUSE_PRESSED;
+			hook_post_event(event);
+
+		case EVENT_MOUSE_RELEASED:
+			x_event = (XEvent *) malloc(sizeof(XButtonEvent));
+			x_mask = KeyReleaseMask;
+			goto EVENT_BUTTON;
+
+		EVENT_BUTTON:
+			((XButtonEvent *) x_event)->display = disp;
+			((XButtonEvent *) x_event)->window = root_win; //InputFocus; //XGetInputFocus();
+			((XButtonEvent *) x_event)->root = root_win;
+			((XButtonEvent *) x_event)->subwindow = None;
+			((XButtonEvent *) x_event)->time = CurrentTime;
+			((XButtonEvent *) x_event)->x = win_x;
+			((XButtonEvent *) x_event)->y = win_y;
+			((XButtonEvent *) x_event)->x_root = root_x;
+			((XButtonEvent *) x_event)->y_root = root_y;
+			((XButtonEvent *) x_event)->state = convert_to_native_mask(event->mask);
+			((XButtonEvent *) x_event)->button = ((MouseEventData *) data)->button;
+			((XButtonEvent *) x_event)->same_screen = True;
+			break;
+
+		case EVENT_MOUSE_DRAGGED:
+			x_event = (XEvent *) malloc(sizeof(XMotionEvent));
+			((XMotionEvent *) x_event)->state = convert_to_native_mask(event->mask);
+
+			// TODO Dump the ASM and check how GCC optimizes the following...
+			if (((XMotionEvent *) x_event)->state & Button1Mask) {
+				x_mask |= Button1MotionMask;
+			}
+
+			if (((XMotionEvent *) x_event)->state & Button2Mask) {
+				x_mask |= Button2MotionMask;
+			}
+
+			if (((XMotionEvent *) x_event)->state & Button3Mask) {
+				x_mask |= Button3MotionMask;
+			}
+
+			if (((XMotionEvent *) x_event)->state & Button4Mask) {
+				x_mask |= Button4MotionMask;
+			}
+
+			if (((XMotionEvent *) x_event)->state & Button5Mask) {
+				x_mask |= Button5MotionMask;
+			}
+
+			// This little trick works because Button#MotionMasks align with
+			// the Button#Masks.  The compiler *SHOULD* do this for us!
+			/*
+			x_mask = ((XButtonEvent *) x_event)->state &
+					(Button1MotionMask | Button2MotionMask |
+					Button2MotionMask | Button3MotionMask | Button5MotionMask);
+			*/
+			goto EVENT_MOTION;
+
+		case EVENT_MOUSE_MOVED:
+			x_event = (XEvent *) malloc(sizeof(XMotionEvent));
+			((XMotionEvent *) x_event)->state = convert_to_native_mask(event->mask);
+			goto EVENT_MOTION;
+
+		EVENT_MOTION:
+			((XMotionEvent *) x_event)->display = disp;
+			((XMotionEvent *) x_event)->window = root_win; //InputFocus; //XGetInputFocus();
+			((XMotionEvent *) x_event)->root = root_win;
+			((XMotionEvent *) x_event)->subwindow = None;
+			((XMotionEvent *) x_event)->time = CurrentTime;
+			((XMotionEvent *) x_event)->x = win_x; // Not sure what to do this
+			((XMotionEvent *) x_event)->y = win_y; // Not sure what to do this
+			((XMotionEvent *) x_event)->x_root = ((MouseEventData *) data)->x;
+			((XMotionEvent *) x_event)->y_root = ((MouseEventData *) data)->y;
+			((XMotionEvent *) x_event)->state = convert_to_native_mask(event->mask);;
+			((XMotionEvent *) x_event)->is_hint = NotifyNormal;
+			((XMotionEvent *) x_event)->same_screen = True;
+			break;
 	}
 
-	//FIXME Calculate the current server time based on the system timestamp in MS.
-	time = CurrentTime;
+	XSendEvent(disp, InputFocus, False, x_mask, x_event);
+	#endif
 
-	XKeyEvent event;
-	event.type = KeyPress;
-	event.display = disp;
-	event.window = DefaultRootWindow(disp); //InputFocus; //XGetInputFocus();
-	event.root = DefaultRootWindow(disp);
-	event.subwindow = None;
-	event.time = time;
-	event.x = win_x;
-	event.y = win_y;
-	event.x_root = root_x;
-	event.y_root = root_y;
-	event.state = state; //modifiers
-	event.keycode = XKeysymToKeycode(disp, keysym);
-	event.same_screen = true;
-
-	XSendEvent(disp, InputFocus, false, KeyPressMask, (XEvent *) &event);
+	// Don't forget to flush!
 	XFlush(disp);
-}
-
-void PostKeyTypedEvent(wchar_t wchar, Time time) {
-	char buffer[6];
-	snprintf(buffer, 6, "U%04d", wchar);
-
-	KeySym code = XStringToKeysym(buffer);
-
-	//TODO Send Key Down + Key Up events.
 }

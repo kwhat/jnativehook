@@ -47,10 +47,12 @@ void dispatch_proc(VirtualEvent * const event) {
 					((KeyboardEventData *) data)->keychar,
 					((KeyboardEventData *) data)->rawcode);
 
+			/* FIXME for this not to segfault, a dispatch thread needs to be created.
 			if (((KeyboardEventData *) data)->keycode == VC_ESCAPE) {
 				running = false;
-				fprintf(stdout, "running == false\n");
+				fprintf(stdout, "\nrunning == false");
 			}
+			*/
 
 			break;
 
@@ -79,7 +81,7 @@ void dispatch_proc(VirtualEvent * const event) {
 	fprintf(stdout, "\n");
 }
 
-int main(int argc, const char * argv[]) {
+int main() {
 	hook_set_dispatch_proc(&dispatch_proc);
 
 	int status = hook_enable();

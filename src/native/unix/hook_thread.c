@@ -18,8 +18,10 @@
 
 #include <config.h>
 
-#ifdef XRECORD_ASYNC
-// Requires _POSIX_C_SOURCE >= 199309L
+#ifdef USE_XRECORD_ASYNC
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE  < 199309L
+#warning "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
+#endif
 #include <time.h>
 #endif
 
@@ -27,6 +29,7 @@
 #include <stdio.h>
 #endif
 
+#include <nativehook.h>
 #include <pthread.h>
 #include <sys/time.h>
 
@@ -37,7 +40,6 @@
 
 #include "convert_to_native.h"
 #include "convert_to_virtual.h"
-#include "nativehook.h"
 #include "x_input_helpers.h"
 #include "x_wheel_codes.h"
 
@@ -61,7 +63,7 @@ static Display *disp_ctrl;
 static XRecordContext context;
 
 // Thread and hook handles.
-#ifdef XRECORD_ASYNC
+#ifdef USE_XRECORD_ASYNC
 static volatile bool running;
 #endif
 static pthread_mutex_t hook_running_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -409,7 +411,7 @@ static void *hook_thread_proc(void *arg) {
 
 				// Check and make sure we didn't run out of memory.
 				if (event != NULL && keyboard_data != NULL && mouse_data != NULL && mouse_wheel_data != NULL) {
-					#ifdef XRECORD_ASYNC
+					#ifdef USE_XRECORD_ASYNC
 					// Allow the thread loop to block.
 					running = true;
 
@@ -422,7 +424,9 @@ static void *hook_thread_proc(void *arg) {
 							XRecordProcessReplies(disp_data);
 
 							// Prevent 100% CPU utilization.
+							#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE  >= 199309L
 							nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
+							#endif
 						}
 
 						XRecordDisableContext(disp_ctrl, context);
@@ -439,7 +443,7 @@ static void *hook_thread_proc(void *arg) {
 						fprintf (stderr, "hook_thread_proc(): XRecordEnableContext failure!\n");
 						#endif
 
-						#ifdef XRECORD_ASYNC
+						#ifdef USE_XRECORD_ASYNC
 						// Reset the running state.
 						running = false;
 						#endif
@@ -633,7 +637,7 @@ NATIVEHOOK_API int hook_disable() {
 
 	if (hook_is_enabled() == true) {
 		// Try to exit the thread naturally.
-		#ifdef XRECORD_ASYNC
+		#ifdef USE_XRECORD_ASYNC
 		running = false;
 
 		// Wait for the thread to die.

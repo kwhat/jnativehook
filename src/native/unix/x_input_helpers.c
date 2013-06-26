@@ -39,7 +39,6 @@ static bool is_caps_lock = false, is_shift_lock = false;
 // Unicode-Remapse the NativeHelpers display.
 extern Display *disp;
 
-
 // Faster more flexible alternative to XKeycodeToKeysym...
 KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 	KeySym keysym = NoSymbol;
