@@ -144,7 +144,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_0								= 0x30;
 	public static final int VK_1							= 0x31;
 	public static final int VK_2								= 0x32;
-	public static final int VK_3							= 0x33;
+	public static final int VK_3								= 0x33;
 	public static final int VK_4							= 0x34;
 	public static final int VK_5							= 0x35;
 	public static final int VK_6							= 0x36;
@@ -162,7 +162,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_D							= 0x44;
 	public static final int VK_E							= 0x45;
 	public static final int VK_F							= 0x46;
-	public static final int VK_G							= 0x47;
+	public static final int VK_G								= 0x47;
 	public static final int VK_H							= 0x48;
 	public static final int VK_I								= 0x49;
 	public static final int VK_J							= 0x4A;
@@ -172,7 +172,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VK_N							= 0x4E;
 	public static final int VK_O								= 0x4F;
 	public static final int VK_P							= 0x50;
-	public static final int VK_Q							= 0x51;
+	public static final int VK_Q								= 0x51;
 	public static final int VK_R							= 0x52;
 	public static final int VK_S							= 0x53;
 	public static final int VK_T							= 0x54;

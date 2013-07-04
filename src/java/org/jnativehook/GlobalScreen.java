@@ -247,7 +247,7 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static native boolean isNativeHookRegistered();
-	
+
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but maybe used to synthesize
@@ -378,7 +378,7 @@ public class GlobalScreen {
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
 				t.setName("JNativeHook Native Dispatch");
-				
+
 				return t;
 			}
 		});
