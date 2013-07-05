@@ -31,7 +31,7 @@
 static bool running = false;
 
 // NOTE: This function executes on the hook thread!  If you need to block
-// please do so on another thread via your own event dispatcher.
+// please do so on another thread with your own event dispatcher implementation.
 void dispatch_proc(VirtualEvent * const event) {
 	fprintf(stdout,	"id=%d,when=%ld,mask=0x%X",
 			event->type, event->time, event->mask);
@@ -47,12 +47,11 @@ void dispatch_proc(VirtualEvent * const event) {
 					((KeyboardEventData *) data)->keychar,
 					((KeyboardEventData *) data)->rawcode);
 
-			/* FIXME for this not to segfault, a dispatch thread needs to be created.
+			// If the escape key is pressed, naturally terminate the program.
 			if (((KeyboardEventData *) data)->keycode == VC_ESCAPE) {
 				running = false;
 				fprintf(stdout, "\nrunning == false");
 			}
-			*/
 
 			break;
 

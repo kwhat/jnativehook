@@ -44,7 +44,7 @@ KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 	KeySym keysym = NoSymbol;
 
 	#ifdef USE_XKB
-	if (keyboard_map) {
+	if (keyboard_map != NULL) {
 		// What is diff between XkbKeyGroupInfo and XkbKeyNumGroups?
 		unsigned char info = XkbKeyGroupInfo(keyboard_map, keycode);
 		unsigned int num_groups = XkbKeyNumGroups(keyboard_map, keycode);
@@ -101,7 +101,7 @@ KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 		keysym = XkbKeySymEntry(keyboard_map, keycode, level, group);
 	}
 	#else
-	if (keyboard_map) {
+	if (keyboard_map != NULL) {
 		if (modifier_mask & Mod2Mask &&
 				((keyboard_map[keycode *keysym_per_keycode + 1] >= 0xFF80 && keyboard_map[keycode *keysym_per_keycode + 1] <= 0xFFBD) ||
 				(keyboard_map[keycode *keysym_per_keycode + 1] >= 0x11000000 && keyboard_map[keycode *keysym_per_keycode + 1] <= 0x1100FFFF))

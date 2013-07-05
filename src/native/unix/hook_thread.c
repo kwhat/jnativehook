@@ -19,9 +19,6 @@
 #include <config.h>
 
 #ifdef USE_XRECORD_ASYNC
-#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE  < 199309L
-#warning "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
-#endif
 #include <time.h>
 #endif
 
@@ -113,250 +110,239 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 		pthread_mutex_unlock(&hook_running_mutex);
 	}
 	else if (hook->category == XRecordFromServer || hook->category == XRecordFromClient) {
-		if (disp_ctrl != NULL) {
-			// Check and make sure the thread is stull running to avoid the
-			// potential crash associated with late event arrival.  This code is
-			// guaranteed to run after all thread start.
-			if (pthread_mutex_trylock(&hook_running_mutex) != 0) {
-				// Get XRecord data.
-				XRecordDatum *data = (XRecordDatum *) hook->data;
+		// Get XRecord data.
+		XRecordDatum *data = (XRecordDatum *) hook->data;
 
-				// Native event data.
-				struct timeval  timeVal;
-				gettimeofday(&timeVal, NULL);
-				unsigned long int event_time = (timeVal.tv_sec * 1000) + (timeVal.tv_usec / 1000);
+		// Native event data.
+		struct timeval  timeVal;
+		gettimeofday(&timeVal, NULL);
+		unsigned long int event_time = (timeVal.tv_sec * 1000) + (timeVal.tv_usec / 1000);
 
-				// Use more readable variables.
-				int event_type = data->type;
-				BYTE event_code = data->event.u.u.detail;
-				int event_mask = data->event.u.keyButtonPointer.state;
-				int event_x = data->event.u.keyButtonPointer.rootX;
-				int event_y = data->event.u.keyButtonPointer.rootY;
+		// Use more readable variables.
+		int event_type = data->type;
+		BYTE event_code = data->event.u.u.detail;
+		int event_mask = data->event.u.keyButtonPointer.state;
+		int event_x = data->event.u.keyButtonPointer.rootX;
+		int event_y = data->event.u.keyButtonPointer.rootY;
 
-				KeySym keysym;
-				unsigned short int button;
-				switch (event_type) {
-					case KeyPress:
-						#ifdef USE_DEBUG
-						fprintf(stdout, "hook_event_proc(): Key pressed. (%i)\n", event_code);
-						#endif
+		KeySym keysym;
+		unsigned short int button;
+		switch (event_type) {
+			case KeyPress:
+				#ifdef USE_DEBUG
+				fprintf(stdout, "hook_event_proc(): Key pressed. (%i)\n", event_code);
+				#endif
 
-						// Fire key pressed event.
-						event->type = EVENT_KEY_PRESSED;
-						event->time = event_time;
-						event->mask = convert_to_virtual_mask(event_mask);
-						event->data = keyboard_data;
+				// Fire key pressed event.
+				event->type = EVENT_KEY_PRESSED;
+				event->time = event_time;
+				event->mask = convert_to_virtual_mask(event_mask);
+				event->data = keyboard_data;
 
-						keysym = keycode_to_keysym(event_code, event_mask);
-						keyboard_data->keycode = convert_to_virtual_key(keysym);
-						keyboard_data->rawcode = event_code;
-						keyboard_data->keychar = CHAR_UNDEFINED;
+				keysym = keycode_to_keysym(event_code, event_mask);
+				keyboard_data->keycode = convert_to_virtual_key(keysym);
+				keyboard_data->rawcode = event_code;
+				keyboard_data->keychar = CHAR_UNDEFINED;
 
-						dispatch_event(event);
+				dispatch_event(event);
 
-						// Check to make sure the key is printable.
-						wchar_t keychar = keysym_to_unicode(keysym);
-						if (keychar != 0x0000) {
-							// Fire key typed event.
-							event->type = EVENT_KEY_TYPED;
+				// Check to make sure the key is printable.
+				wchar_t keychar = keysym_to_unicode(keysym);
+				if (keychar != 0x0000) {
+					// Fire key typed event.
+					event->type = EVENT_KEY_TYPED;
 
-							keyboard_data->keycode = VC_UNDEFINED;
-							keyboard_data->keychar = keychar;
+					keyboard_data->keycode = VC_UNDEFINED;
+					keyboard_data->keychar = keychar;
 
-							dispatch_event(event);
-						}
-						break;
-
-					case KeyRelease:
-						#ifdef USE_DEBUG
-						fprintf(stdout, "hook_event_proc(): Key released. (%i)\n", event_code);
-						#endif
-
-						// Fire key released event.
-						event->type = EVENT_KEY_RELEASED;
-						event->time = event_time;
-						event->mask = convert_to_virtual_mask(event_mask);
-						event->data = keyboard_data;
-
-						keysym = keycode_to_keysym(event_code, event_mask);
-						keyboard_data->keycode = convert_to_virtual_key(keysym);
-						keyboard_data->rawcode = event_code;
-						keyboard_data->keychar = CHAR_UNDEFINED;
-
-						dispatch_event(event);
-						break;
-
-					case ButtonPress:
-						#ifdef USE_DEBUG
-						fprintf(stdout, "hook_event_proc(): Button pressed. (%i)\n", event_code);
-						#endif
-
-						// Track the number of clicks.
-						if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
-							click_count++;
-						}
-						else {
-							click_count = 1;
-						}
-						click_time = event_time;
-
-						/* This information is all static for X11, its up to the WM to
-						* decide how to interpret the wheel events.
-						*/
-						// TODO Should use constants and a lookup table for button codes.
-						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-							unsigned int button = convert_to_virtual_button(event_code);
-
-							// Fire mouse pressed event.
-							event->type = EVENT_MOUSE_PRESSED;
-							event->time = event_time;
-							event->mask = convert_to_virtual_mask(event_mask);
-							event->data = mouse_data;
-
-							mouse_data->button = button;
-							mouse_data->clicks = click_count;
-							mouse_data->x = event_x;
-							mouse_data->y = event_y;
-
-							dispatch_event(event);
-						}
-						else if (event_code == WheelUp || event_code == WheelDown) {
-							/* Scroll wheel release events.
-							* Scroll type: WHEEL_UNIT_SCROLL
-							* Scroll amount: 3 unit increments per notch
-							* Units to scroll: 3 unit increments
-							* Vertical unit increment: 15 pixels
-							*/
-
-							/* X11 does not have an API call for acquiring the mouse scroll type.  This
-							* maybe part of the XInput2 (XI2) extention but I will wont know until it
-							* is available on my platform.  For the time being we will just use the
-							* unit scroll value.
-							*/
-							int scroll_type = WHEEL_UNIT_SCROLL;
-
-							/* Some scroll wheel properties are available via the new XInput2 (XI2)
-							* extention.  Unfortunately the extention is not available on my
-							* development platform at this time.  For the time being we will just
-							* use the Windows default value of 3.
-							*/
-							int scroll_amount = 3;
-
-							// Wheel Rotated Down and Towards.
-							int wheel_rotation = 1; // event_code == WheelDown
-							if (event_code == WheelUp) {
-								// Wheel Rotated Up and Away.
-								wheel_rotation = -1;
-							}
-
-							// Fire mouse wheel event.
-							event->type = EVENT_MOUSE_WHEEL;
-							event->time = event_time;
-							event->mask = convert_to_virtual_mask(event_mask);
-							event->data = mouse_wheel_data;
-
-							mouse_wheel_data->type = scroll_type;
-							mouse_wheel_data->amount = scroll_amount;
-							mouse_wheel_data->rotation = wheel_rotation;
-
-							dispatch_event(event);
-						}
-						break;
-
-					case ButtonRelease:
-						#ifdef USE_DEBUG
-						fprintf(stdout, "hook_event_proc(): Button released. (%i)\n", event_code);
-						#endif
-
-						// TODO Should use constants for button codes.
-						if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
-							// Handle button release events.
-
-							// Fire mouse released event.
-							event->type = EVENT_MOUSE_RELEASED;
-							event->time = event_time;
-							event->mask = convert_to_virtual_mask(event_mask);
-							event->data = mouse_data;
-
-							button = convert_to_virtual_button(event_code);
-							mouse_data->button = button;
-							mouse_data->clicks = click_count;
-							mouse_data->x = event_x;
-							mouse_data->y = event_y;
-
-							dispatch_event(event);
-
-							if (mouse_dragged != true) {
-								// Fire mouse clicked event.
-								event->type = EVENT_MOUSE_CLICKED;
-								event->time = event_time;
-								event->mask = convert_to_virtual_mask(event_mask);
-								event->data = mouse_data;
-
-								mouse_data->button = button;
-								mouse_data->clicks = click_count;
-								mouse_data->x = event_x;
-								mouse_data->y = event_y;
-
-								dispatch_event(event);
-							}
-						}
-						break;
-
-					case MotionNotify:
-						#ifdef USE_DEBUG
-						fprintf(stdout, "hook_event_proc(): Motion Notified. (%i, %i)\n", event_x, event_y);
-						#endif
-
-						// Reset the click count.
-						if (click_count != 0 && (long) (event_time - click_time) > hook_get_multi_click_time()) {
-							click_count = 0;
-						}
-						unsigned int modifiers = convert_to_virtual_mask(event_mask);
-
-						// Check the upper half of virtual modifiers for non zero
-						// values and set the mouse dragged flag.
-						mouse_dragged = modifiers >> 4 > 0;
-						if (mouse_dragged) {
-							// Create Mouse Dragged event.
-							event->type = EVENT_MOUSE_DRAGGED;
-							event->time = event_time;
-							event->mask = modifiers;
-							event->data = mouse_data;
-
-							mouse_data->button = MOUSE_NOBUTTON;
-							mouse_data->clicks = click_count;
-							mouse_data->x = event_x;
-							mouse_data->y = event_y;
-						}
-						else {
-							// Create a Mouse Moved event.
-							event->type = EVENT_MOUSE_MOVED;
-							event->time = event_time;
-							event->mask = modifiers;
-							event->data = mouse_data;
-
-							mouse_data->button = MOUSE_NOBUTTON;
-							mouse_data->clicks = click_count;
-							mouse_data->x = event_x;
-							mouse_data->y = event_y;
-						}
-
-						// Fire mouse moved event.
-						dispatch_event(event);
-						break;
-
-					#ifdef USE_DEBUG
-					default:
-						fprintf(stderr, "hook_event_proc(): Unhandled Event Type: 0x%X\n", event_type);
-						break;
-					#endif
+					dispatch_event(event);
 				}
-			}
-			else {
-				// Unlock the mutex incase trylock succeeded.
-				pthread_mutex_unlock(&hook_running_mutex);
-			}
+				break;
+
+			case KeyRelease:
+				#ifdef USE_DEBUG
+				fprintf(stdout, "hook_event_proc(): Key released. (%i)\n", event_code);
+				#endif
+
+				// Fire key released event.
+				event->type = EVENT_KEY_RELEASED;
+				event->time = event_time;
+				event->mask = convert_to_virtual_mask(event_mask);
+				event->data = keyboard_data;
+
+				keysym = keycode_to_keysym(event_code, event_mask);
+				keyboard_data->keycode = convert_to_virtual_key(keysym);
+				keyboard_data->rawcode = event_code;
+				keyboard_data->keychar = CHAR_UNDEFINED;
+
+				dispatch_event(event);
+				break;
+
+			case ButtonPress:
+				#ifdef USE_DEBUG
+				fprintf(stdout, "hook_event_proc(): Button pressed. (%i)\n", event_code);
+				#endif
+
+				// Track the number of clicks.
+				if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
+					click_count++;
+				}
+				else {
+					click_count = 1;
+				}
+				click_time = event_time;
+
+				/* This information is all static for X11, its up to the WM to
+				* decide how to interpret the wheel events.
+				*/
+				// TODO Should use constants and a lookup table for button codes.
+				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+					unsigned int button = convert_to_virtual_button(event_code);
+
+					// Fire mouse pressed event.
+					event->type = EVENT_MOUSE_PRESSED;
+					event->time = event_time;
+					event->mask = convert_to_virtual_mask(event_mask);
+					event->data = mouse_data;
+
+					mouse_data->button = button;
+					mouse_data->clicks = click_count;
+					mouse_data->x = event_x;
+					mouse_data->y = event_y;
+
+					dispatch_event(event);
+				}
+				else if (event_code == WheelUp || event_code == WheelDown) {
+					/* Scroll wheel release events.
+					* Scroll type: WHEEL_UNIT_SCROLL
+					* Scroll amount: 3 unit increments per notch
+					* Units to scroll: 3 unit increments
+					* Vertical unit increment: 15 pixels
+					*/
+
+					/* X11 does not have an API call for acquiring the mouse scroll type.  This
+					* maybe part of the XInput2 (XI2) extention but I will wont know until it
+					* is available on my platform.  For the time being we will just use the
+					* unit scroll value.
+					*/
+					int scroll_type = WHEEL_UNIT_SCROLL;
+
+					/* Some scroll wheel properties are available via the new XInput2 (XI2)
+					* extention.  Unfortunately the extention is not available on my
+					* development platform at this time.  For the time being we will just
+					* use the Windows default value of 3.
+					*/
+					int scroll_amount = 3;
+
+					// Wheel Rotated Down and Towards.
+					int wheel_rotation = 1; // event_code == WheelDown
+					if (event_code == WheelUp) {
+						// Wheel Rotated Up and Away.
+						wheel_rotation = -1;
+					}
+
+					// Fire mouse wheel event.
+					event->type = EVENT_MOUSE_WHEEL;
+					event->time = event_time;
+					event->mask = convert_to_virtual_mask(event_mask);
+					event->data = mouse_wheel_data;
+
+					mouse_wheel_data->type = scroll_type;
+					mouse_wheel_data->amount = scroll_amount;
+					mouse_wheel_data->rotation = wheel_rotation;
+
+					dispatch_event(event);
+				}
+				break;
+
+			case ButtonRelease:
+				#ifdef USE_DEBUG
+				fprintf(stdout, "hook_event_proc(): Button released. (%i)\n", event_code);
+				#endif
+
+				// TODO Should use constants for button codes.
+				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
+					// Handle button release events.
+
+					// Fire mouse released event.
+					event->type = EVENT_MOUSE_RELEASED;
+					event->time = event_time;
+					event->mask = convert_to_virtual_mask(event_mask);
+					event->data = mouse_data;
+
+					button = convert_to_virtual_button(event_code);
+					mouse_data->button = button;
+					mouse_data->clicks = click_count;
+					mouse_data->x = event_x;
+					mouse_data->y = event_y;
+
+					dispatch_event(event);
+
+					if (mouse_dragged != true) {
+						// Fire mouse clicked event.
+						event->type = EVENT_MOUSE_CLICKED;
+						event->time = event_time;
+						event->mask = convert_to_virtual_mask(event_mask);
+						event->data = mouse_data;
+
+						mouse_data->button = button;
+						mouse_data->clicks = click_count;
+						mouse_data->x = event_x;
+						mouse_data->y = event_y;
+
+						dispatch_event(event);
+					}
+				}
+				break;
+
+			case MotionNotify:
+				#ifdef USE_DEBUG
+				fprintf(stdout, "hook_event_proc(): Motion Notified. (%i, %i)\n", event_x, event_y);
+				#endif
+
+				// Reset the click count.
+				if (click_count != 0 && (long) (event_time - click_time) > hook_get_multi_click_time()) {
+					click_count = 0;
+				}
+				unsigned int modifiers = convert_to_virtual_mask(event_mask);
+
+				// Check the upper half of virtual modifiers for non zero
+				// values and set the mouse dragged flag.
+				mouse_dragged = modifiers >> 4 > 0;
+				if (mouse_dragged) {
+					// Create Mouse Dragged event.
+					event->type = EVENT_MOUSE_DRAGGED;
+					event->time = event_time;
+					event->mask = modifiers;
+					event->data = mouse_data;
+
+					mouse_data->button = MOUSE_NOBUTTON;
+					mouse_data->clicks = click_count;
+					mouse_data->x = event_x;
+					mouse_data->y = event_y;
+				}
+				else {
+					// Create a Mouse Moved event.
+					event->type = EVENT_MOUSE_MOVED;
+					event->time = event_time;
+					event->mask = modifiers;
+					event->data = mouse_data;
+
+					mouse_data->button = MOUSE_NOBUTTON;
+					mouse_data->clicks = click_count;
+					mouse_data->x = event_x;
+					mouse_data->y = event_y;
+				}
+
+				// Fire mouse moved event.
+				dispatch_event(event);
+				break;
+
+			#ifdef USE_DEBUG
+			default:
+				fprintf(stderr, "hook_event_proc(): Unhandled Event Type: 0x%X\n", event_type);
+				break;
+			#endif
 		}
 	}
 
@@ -377,6 +363,11 @@ static void *hook_thread_proc(void *arg) {
 		#ifdef USE_DEBUG
 		fprintf(stdout, "hook_thread_proc(): XOpenDisplay successful.\n");
 		#endif
+
+		// Make sure the data display is synchronized to prevent late event delivery!
+		// See Bug 42356 for more information.
+		// https://bugs.freedesktop.org/show_bug.cgi?id=42356#c4
+		XSynchronize(disp_data, True);
 
 		// Setup XRecord range.
 		XRecordClientSpec clients = XRecordAllClients;
@@ -426,10 +417,10 @@ static void *hook_thread_proc(void *arg) {
 							// Prevent 100% CPU utilization.
 							#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE  >= 199309L
 							nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
+							#else
+							#warning "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
 							#endif
 						}
-
-						XRecordDisableContext(disp_ctrl, context);
 					}
 					#else
 					// Sync blocks until XRecordDisableContext() is called.
@@ -637,16 +628,11 @@ NATIVEHOOK_API int hook_disable() {
 
 	if (hook_is_enabled() == true) {
 		// Try to exit the thread naturally.
-		#ifdef USE_XRECORD_ASYNC
-		running = false;
-
-		// Wait for the thread to die.
-		void *thread_status;
-		pthread_join(hook_thread_id, &thread_status);
-		status = *(int *) thread_status;
-		free(thread_status);
-		#else
 		if (XRecordDisableContext(disp_ctrl, context) != 0) {
+			#ifdef USE_XRECORD_ASYNC
+			running = false;
+			#endif
+
 			// See Bug 42356 for more information.
 			// https://bugs.freedesktop.org/show_bug.cgi?id=42356#c4
 			XFlush(disp_ctrl);
@@ -657,18 +643,17 @@ NATIVEHOOK_API int hook_disable() {
 			pthread_join(hook_thread_id, &thread_status);
 			status = *(int *) thread_status;
 			free(thread_status);
+			
+			// Clean up the thread attribute.
+			pthread_attr_destroy(&hook_thread_attr);
+
+			// Close down any open displays.
+			XCloseDisplay(disp_ctrl);
+			disp_ctrl = NULL;
 		}
-		#endif
-
-		// Clean up the thread attribute.
-		pthread_attr_destroy(&hook_thread_attr);
-
-		// Close down any open displays.
-		XCloseDisplay(disp_ctrl);
-		disp_ctrl = NULL;
-
+		
 		#ifdef USE_DEBUG
-		fprintf(stdout, "disable_hook(): Thread Result (%i)\n", status);
+		fprintf(stdout, "hook_disable(): Thread Result (%i)\n", status);
 		#endif
 	}
 
@@ -694,7 +679,7 @@ NATIVEHOOK_API bool hook_is_enabled() {
 	}
 
 	#ifdef USE_DEBUG
-	fprintf(stdout, "is_hook_enable(): State (%i)\n", is_running);
+	fprintf(stdout, "hook_is_enabled(): State (%i)\n", is_running);
 	#endif
 
 	return is_running;

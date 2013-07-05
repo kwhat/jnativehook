@@ -120,9 +120,9 @@ AC_ARG_ENABLE([xf86misc],
 	[enable_xf86misc="no"])
 
 AC_ARG_ENABLE([xrecord-async],
-	AS_HELP_STRING([--disable-xrecord-async], [Disable XRecord Asynchronous API (default: enabled)]),
+	AS_HELP_STRING([--enable-xrecord-async], [Enable XRecord Asynchronous API (default: disabled)]),
 	[enable_xrecord_async="$enableval"],
-	[enable_xrecord_async="yes"])
+	[enable_xrecord_async="no"])
 
 AC_ARG_ENABLE([xtest],
 	AS_HELP_STRING([--disable-xtest], [Disable XTest Extension (default: enabled)]),
