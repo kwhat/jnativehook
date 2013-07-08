@@ -335,6 +335,11 @@ typedef struct _MouseWheelEventData {
 #define MASK_META_R								1 << 6
 #define MASK_ALT_R								1 << 7
 
+#define MASK_SHIFT								MASK_SHIFT_L	| MASK_SHIFT_R
+#define MASK_CTRL								MASK_CTRL_L		| MASK_CTRL_R
+#define MASK_META								MASK_META_L		| MASK_META_R
+#define MASK_ALT								MASK_ALT_L		| MASK_ALT_R
+
 #define MASK_BUTTON1							1 << 8
 #define MASK_BUTTON2							1 << 9
 #define MASK_BUTTON3							1 << 10

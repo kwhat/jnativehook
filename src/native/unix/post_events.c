@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #ifdef USE_XTEST
 #include <X11/extensions/XTest.h>
@@ -33,11 +34,49 @@
 
 extern Display *disp;
 
+// This lookup table must be in the same order the masks are defined.
+#ifdef USE_XTEST
+static KeySym keymask_lookup[8] = {
+	XK_Shift_L,
+	XK_Control_L,
+	XK_Meta_L,
+	XK_Alt_L,
+	
+	XK_Shift_R,
+	XK_Control_R,
+	XK_Meta_R,
+	XK_Alt_R
+};
+
+static unsigned int btnmask_lookup[5] = {
+	MASK_BUTTON1,
+	MASK_BUTTON2,
+	MASK_BUTTON3,
+	MASK_BUTTON4,
+	MASK_BUTTON5
+};
+#endif
+
 NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 	char buffer[4];
 
 	#ifdef USE_XTEST
 	Bool is_press;
+
+	// XTest does not have modifier support, so we fake it by depressing the 
+	// appropriate modifier keys.
+	// TODO Check and see if GCC unrolls these loops with -02
+	for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
+		if (event->mask & 1 << i) {
+			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, keymask_lookup[i]), True, 0);
+		}
+	}
+
+	for (unsigned int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
+		if (event->mask & btnmask_lookup[i]) {
+			XTestFakeButtonEvent(disp, i + 1, True, 0);
+		}
+	}
 
 	void *data = event->data;
 	switch (event->type) {
@@ -61,13 +100,13 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, convert_to_native_key(((KeyboardEventData *) data)->keycode)), is_press, 0);
 			break;
 
-		case EVENT_MOUSE_WHEEL:
-			// Wheel events are simply button press events.
-
 		case EVENT_MOUSE_PRESSED:
 			is_press = True;
 			goto EVENT_BUTTON;
 
+		case EVENT_MOUSE_WHEEL:
+			// Wheel events should be the same as click events on X11.
+			
 		case EVENT_MOUSE_CLICKED:
 			event->type = EVENT_MOUSE_PRESSED;
 			hook_post_event(event);
@@ -81,12 +120,24 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			break;
 
 		case EVENT_MOUSE_DRAGGED:
-			// FIXME Trigger the button down events followed by a motion event!
-			//goto EVENT_MOTION;
+			// The button masks are all applied with the modifier masks.
 
 		case EVENT_MOUSE_MOVED:
 			XTestFakeMotionEvent(disp, -1, ((MouseEventData *) data)->x, ((MouseEventData *) data)->y, 0);
 			break;
+	}
+	
+	// Release the previously held modifier keys used to fake the event mask.
+	for (int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
+		if (event->mask & 1 << i) {
+			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, keymask_lookup[i]), False, 0);
+		}
+	}
+
+	for (int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
+		if (event->mask & btnmask_lookup[i]) {
+			XTestFakeButtonEvent(disp, i + 1, False, 0);
+		}
 	}
 	#else
 	XEvent *x_event = NULL;
@@ -140,14 +191,13 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			((XKeyEvent *) x_event)->same_screen = True;
 			break;
 
-
-		case EVENT_MOUSE_WHEEL:
-			// Wheel events are simply button press events.
-
 		case EVENT_MOUSE_PRESSED:
 			x_event = (XEvent *) malloc(sizeof(XButtonEvent));
 			x_mask = ButtonPressMask;
 			goto EVENT_BUTTON;
+
+		case EVENT_MOUSE_WHEEL:
+			// Wheel events should be the same as click events on X11.
 
 		case EVENT_MOUSE_CLICKED:
 			event->type = EVENT_MOUSE_PRESSED;
