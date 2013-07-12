@@ -616,6 +616,7 @@
 		</apply>
 	</target>
 
+
 	<target name="test" depends="configure" description="Compile and perform JUnit tests.">
 		<echo>Compiling JUnit source...</echo>
 		<mkdir dir="${dir.bin}/class/test" />
@@ -656,6 +657,7 @@
 			</batchtest>
 		</junit>
 	</target>
+
 
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
