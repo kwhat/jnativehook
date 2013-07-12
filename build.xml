@@ -652,7 +652,7 @@
 			<!-- test name="TestExample" / -->
 			<batchtest> <!-- todir="${reports.tests}" -->
 				<fileset dir="${dir.src}/test">
-					<include name="**/*.java"/>
+					<include name="**/*Test.java"/>
 				</fileset>
 			</batchtest>
 		</junit>

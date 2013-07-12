@@ -33,16 +33,18 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testGetRawCode() {
+		System.out.println("getRawCode");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x41,
+				0x00,		// Modifiers
+				0x41,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
-		assertEquals(event.getRawCode(), 0x41);
+		assertEquals(0x41, event.getRawCode());
 	}
 
 	/**
@@ -50,17 +52,19 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testSetRawCode() {
+		System.out.println("setRawCode");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
 		event.setRawCode(0x41);
-		assertEquals(event.getRawCode(), 0x41);
+		assertEquals(0x41, event.getRawCode());
 	}
 
 	/**
@@ -68,16 +72,18 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testGetKeyCode() {
+		System.out.println("getKeyCode");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
-		assertEquals(event.getKeyCode(), NativeKeyEvent.VK_A);
+		assertEquals(NativeKeyEvent.VK_A, event.getKeyCode());
 	}
 
 	/**
@@ -85,17 +91,19 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testSetKeyCode() {
+		System.out.println("setKeyCode");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
 		event.setKeyCode(NativeKeyEvent.VK_A);
-		assertEquals(event.getKeyCode(), NativeKeyEvent.VK_A);
+		assertEquals(NativeKeyEvent.VK_A, event.getKeyCode());
 	}
 
 	/**
@@ -103,16 +111,18 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testGetKeyChar() {
+		System.out.println("getKeyChar");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				'A',
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
-		assertEquals(event.getKeyChar(), 'A');
+		assertEquals('A', event.getKeyChar());
 	}
 
 	/**
@@ -120,17 +130,19 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testSetKeyChar() {
+		System.out.println("setKeyChar");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
 		event.setKeyChar('A');
-		assertEquals(event.getKeyChar(), 'A');
+		assertEquals('A', event.getKeyChar());
 	}
 
 	/**
@@ -138,16 +150,18 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testGetKeyLocation() {
+		System.out.println("getKeyLocation");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
-		assertEquals(event.getKeyLocation(), NativeKeyEvent.KEY_LOCATION_STANDARD);
+		assertEquals(NativeKeyEvent.KEY_LOCATION_STANDARD, event.getKeyLocation());
 	}
 
 	/**
@@ -155,6 +169,8 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testGetKeyText() {
+		System.out.println("getKeyText");
+
 		assertFalse(NativeKeyEvent.getKeyText(NativeKeyEvent.VK_A).equals(""));
 	}
 
@@ -163,11 +179,13 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testIsActionKey() {
+		System.out.println("isActionKey");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_F1,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
@@ -183,11 +201,13 @@ public class NativeKeyEventTest {
 	 */
 	@Test
 	public void testParamString() {
+		System.out.println("paramString");
+
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
-				0x00,
-				0x00,
+				0x00,		// Modifiers
+				0x00,		// Raw Code
 				NativeKeyEvent.VK_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
@@ -240,7 +260,7 @@ public class NativeKeyEventTest {
 				// Search for the next aviable VK_ code.
 				if ((searchPosition = Arrays.binarySearch(nativeSet, javaSet[j])) >= 0) {
 					for (int offset = 0; offset < searchPosition - j; offset++) {
-						System.out.println("Extra Native Key: " + nativeSet[i + offset]);
+						System.err.println("Extra Native Key: " + nativeSet[i + offset]);
 					}
 
 					// We found the current awt VK_ code in the native list.
@@ -250,7 +270,7 @@ public class NativeKeyEventTest {
 				}
 				else if ((searchPosition = Arrays.binarySearch(javaSet, nativeSet[i])) >= 0) {
 					for (int offset = 0; offset < searchPosition - i; offset++) {
-						System.out.println("Missing Native Key: " + javaSet[j + offset]);
+						System.err.println("Missing Native Key: " + javaSet[j + offset]);
 					}
 
 					// We found the current natve hook VK_ code in the awt list.
@@ -259,8 +279,8 @@ public class NativeKeyEventTest {
 					j = searchPosition;
 				}
 			}
-			else if (nativeKeyCodes.get(nativeSet[i]) != javaKeyCodes.get(javaSet[j])) {
-				System.out.println("Key Code Missmatch: " + nativeKeyCodes.get(nativeSet[i]) + " != " + javaKeyCodes.get(javaSet[j]));
+			else if (nativeKeyCodes.get(nativeSet[i]).equals(javaKeyCodes.get(javaSet[j])) != true) {
+				System.err.println("Key Code Missmatch for " + nativeSet[i] + ": " + nativeKeyCodes.get(nativeSet[i]) + " != " + javaKeyCodes.get(javaSet[j]));
 			}
 		}
 	}

@@ -256,19 +256,21 @@ public class GlobalScreen {
 	 * @param e the <code>NativeInputEvent</code> to dispatch.
 	 */
 	public final void dispatchEvent(final NativeInputEvent e) {
-		eventExecutor.execute(new Runnable() {
-			public void run() {
-				if (e instanceof NativeKeyEvent) {
-					processKeyEvent((NativeKeyEvent) e);
+		if (eventExecutor != null) {
+			eventExecutor.execute(new Runnable() {
+				public void run() {
+					if (e instanceof NativeKeyEvent) {
+						processKeyEvent((NativeKeyEvent) e);
+					}
+					else if (e instanceof NativeMouseWheelEvent) {
+						processMouseWheelEvent((NativeMouseWheelEvent) e);
+					}
+					else if (e instanceof NativeMouseEvent) {
+						processMouseEvent((NativeMouseEvent) e);
+					}
 				}
-				else if (e instanceof NativeMouseWheelEvent) {
-					processMouseWheelEvent((NativeMouseWheelEvent) e);
-				}
-				else if (e instanceof NativeMouseEvent) {
-					processMouseEvent((NativeMouseEvent) e);
-				}
-			}
-		});
+			});
+		}
 	}
 
 	/**

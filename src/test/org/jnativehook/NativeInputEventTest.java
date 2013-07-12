@@ -22,16 +22,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-/**
- *
- * @author abarker
- */
 public class NativeInputEventTest {
 	/**
 	 * Test of getID method, of class NativeInputEvent.
 	 */
 	@Test
 	public void testGetID() {
+		System.out.println("getID");
+
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.getInstance(),
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
@@ -46,6 +44,8 @@ public class NativeInputEventTest {
 	 */
 	@Test
 	public void testGetWhen() {
+		System.out.println("getWhen");
+
 		long when = System.currentTimeMillis();
 
 		NativeInputEvent event = new NativeInputEvent(
@@ -62,6 +62,8 @@ public class NativeInputEventTest {
 	 */
 	@Test
 	public void testGetModifiers() {
+		System.out.println("getModifiers");
+
 		int mask =	NativeInputEvent.ALT_MASK |
 					NativeInputEvent.CTRL_MASK |
 					NativeInputEvent.META_MASK |
@@ -81,6 +83,8 @@ public class NativeInputEventTest {
 	 */
 	@Test
 	public void testSetModifiers() {
+		System.out.println("setModifiers");
+
 		int mask =	NativeInputEvent.BUTTON1_MASK |
 					NativeInputEvent.BUTTON2_MASK |
 					NativeInputEvent.BUTTON3_MASK |
@@ -102,6 +106,8 @@ public class NativeInputEventTest {
 	 */
 	@Test
 	public void testGetModifiersText() {
+		System.out.println("getModifiersText");
+
 		int mask =	NativeInputEvent.ALT_MASK |
 					NativeInputEvent.BUTTON1_MASK;
 
@@ -113,6 +119,8 @@ public class NativeInputEventTest {
 	 */
 	@Test
 	public void testParamString() {
+		System.out.println("paramString");
+
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.getInstance(),
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
