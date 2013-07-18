@@ -18,6 +18,10 @@
 
 #include <jni.h>
 
-extern unsigned int jni_JavaKeyToNative(jint keycode, jint location);
+extern jint jni_ConvertToJavaType(unsigned int nativeType, jint *javaType);
 
-extern jint jni_NativeToJavaKey(unsigned int virtualkey, jint *keycode, jint *location);
+extern jint jni_ConvertToNativeType(jint javaType, unsigned int *nativeType);
+
+extern jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned int *nativeKeyCode);
+
+extern jint jni_ConvertToJavaKeyCode(unsigned int nativeKeyCode, jint *javaKeyCode, jint *javaKeyLocation);

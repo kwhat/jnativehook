@@ -38,7 +38,7 @@ extern jint jni_version;
  * available methods for each class; only methods used in native code are
  * included.
  */
-typedef struct _GlobalScreen {
+typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
 	jmethodID getInstance;
 	jmethodID dispatchEvent;
@@ -46,23 +46,35 @@ typedef struct _GlobalScreen {
 	jmethodID stopEventDispatcher;
 } GlobalScreen;
 
+typedef struct _org_jnativehook_NativeInputEvent {
+	jclass cls;
+	jmethodID init;
+	jmethodID getID;
+	jmethodID getKeyCode;
+	jmethodID getKeyLocation;
+} NativeInputEvent;
+
 typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
 	jclass cls;
 	jmethodID init;
+	NativeInputEvent *parent;
 } NativeKeyEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseEvent {
 	jclass cls;
 	jmethodID init;
+	NativeInputEvent *parent;
 } NativeMouseEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
 	jclass cls;
 	jmethodID init;
+	NativeInputEvent *parent;
 } NativeMouseWheelEvent;
 
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
+extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;

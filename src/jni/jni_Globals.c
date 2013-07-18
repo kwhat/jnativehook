@@ -22,6 +22,7 @@
 #include "jni_Globals.h"
 
 GlobalScreen *org_jnativehook_GlobalScreen = NULL;
+NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
 NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = NULL;
 NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = NULL;
 NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
@@ -31,12 +32,14 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 	// Allocate memory for the Java object structure representation.
 	org_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
+	org_jnativehook_NativeInputEvent = malloc(sizeof(NativeInputEvent));
 	org_jnativehook_keyboard_NativeKeyEvent = malloc(sizeof(NativeKeyEvent));
 	org_jnativehook_mouse_NativeMouseEvent = malloc(sizeof(NativeMouseEvent));
 	org_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
 
 	// Check to make sure memory was allocated properly.
 	if (org_jnativehook_GlobalScreen != NULL
+			&& org_jnativehook_NativeInputEvent != NULL
 			&& org_jnativehook_keyboard_NativeKeyEvent != NULL
 			&& org_jnativehook_mouse_NativeMouseEvent != NULL
 			&& org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
@@ -126,11 +129,50 @@ int jni_CreateGlobals(JNIEnv *env) {
 		}
 		#endif
 
+
+		// Class and Constructor for the NativeInputEvent Object.
+		jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
+		if (NativeInputEvent_class != NULL) {
+			org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
+			org_jnativehook_NativeInputEvent->init = (*env)->GetMethodID(env, org_jnativehook_keyboard_NativeKeyEvent->cls, "<init>", "(Lorg/jnativehook/GlobalScreen;IJI)V");
+
+			if (org_jnativehook_NativeInputEvent->cls != NULL) {
+				// Get the method ID for GlobalScreen.dispatchEvent().
+				org_jnativehook_NativeInputEvent->getID = (*env)->GetMethodID(
+						env,
+						org_jnativehook_GlobalScreen->cls,
+						"getID",
+						"(I)V");
+
+				if (org_jnativehook_NativeInputEvent->getID == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
+					#endif
+
+					// FIXME Throw java.lang.NoSuchMethodError("getID(I)V")
+				}
+			}
+
+			// FIXME better checking and exception throwing needs to be included.
+			#ifdef DEBUG
+			if (org_jnativehook_NativeInputEvent->cls == NULL || org_jnativehook_NativeInputEvent->init == NULL) {
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V!\n");
+			}
+			#endif
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeKeyEvent class!\n");
+		}
+		#endif
+
+
 		// Class and Constructor for the NativeKeyEvent Object.
 		jclass NativeKeyEvent_class = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 		if (NativeKeyEvent_class != NULL) {
 			org_jnativehook_keyboard_NativeKeyEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeKeyEvent_class);
 			org_jnativehook_keyboard_NativeKeyEvent->init = (*env)->GetMethodID(env, org_jnativehook_keyboard_NativeKeyEvent->cls, "<init>", "(IJIIICI)V");
+			org_jnativehook_keyboard_NativeKeyEvent->parent = org_jnativehook_NativeInputEvent;
 
 			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
@@ -151,6 +193,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 		if (NativeMouseEvent_class != NULL) {
 			org_jnativehook_mouse_NativeMouseEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseEvent_class);
 			org_jnativehook_mouse_NativeMouseEvent->init = (*env)->GetMethodID(env, org_jnativehook_mouse_NativeMouseEvent->cls, "<init>", "(IJIIIII)V");
+			org_jnativehook_mouse_NativeMouseEvent->parent = org_jnativehook_NativeInputEvent;
 
 			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
@@ -171,6 +214,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 		if (NativeMouseWheelEvent_class != NULL) {
 			org_jnativehook_mouse_NativeMouseWheelEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseWheelEvent_class);
 			org_jnativehook_mouse_NativeMouseWheelEvent->init = (*env)->GetMethodID(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls, "<init>", "(IJIIIIIII)V");
+			org_jnativehook_mouse_NativeMouseWheelEvent->parent = org_jnativehook_mouse_NativeMouseEvent;
 
 			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
@@ -204,48 +248,35 @@ int jni_CreateGlobals(JNIEnv *env) {
 }
 
 int jni_DestroyGlobals(JNIEnv *env) {
-	(*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeKeyEvent->cls);
-	org_jnativehook_keyboard_NativeKeyEvent->cls = NULL;
-
-	(*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseEvent->cls);
-	org_jnativehook_mouse_NativeMouseEvent->cls = NULL;
-
-	(*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls);
-	org_jnativehook_mouse_NativeMouseWheelEvent->cls = NULL;
-
-	(*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen->cls);
-
-	// Set all the global method ID's to null.
-	org_jnativehook_GlobalScreen->cls = NULL;
-	org_jnativehook_GlobalScreen->getInstance = NULL;
-	org_jnativehook_GlobalScreen->dispatchEvent = NULL;
-	org_jnativehook_GlobalScreen->startEventDispatcher = NULL;
-	org_jnativehook_GlobalScreen->stopEventDispatcher = NULL;
-
-	org_jnativehook_keyboard_NativeKeyEvent->cls = NULL;
-	org_jnativehook_keyboard_NativeKeyEvent->init = NULL;
-
-	org_jnativehook_mouse_NativeMouseEvent->cls = NULL;
-	org_jnativehook_mouse_NativeMouseEvent->init = NULL;
-
-	org_jnativehook_mouse_NativeMouseWheelEvent->cls = NULL;
-	org_jnativehook_mouse_NativeMouseWheelEvent->init = NULL;
-
 	// Free any memory being used for Java object structures.
-	if (org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
+	if (org_jnativehook_GlobalScreen != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen->cls);
 		free(org_jnativehook_GlobalScreen);
+		org_jnativehook_GlobalScreen = NULL;
 	}
 
-	if (org_jnativehook_mouse_NativeMouseEvent != NULL) {
-		free(org_jnativehook_GlobalScreen);
+	if (org_jnativehook_keyboard_NativeInputEvent != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeInputEvent->cls);
+		free(org_jnativehook_keyboard_NativeInputEvent);
+		org_jnativehook_keyboard_NativeInputEvent = NULL;
 	}
 
 	if (org_jnativehook_keyboard_NativeKeyEvent != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeKeyEvent->cls);
 		free(org_jnativehook_keyboard_NativeKeyEvent);
+		org_jnativehook_keyboard_NativeKeyEvent = NULL:
 	}
 
-	if (org_jnativehook_GlobalScreen != NULL) {
-		free(org_jnativehook_GlobalScreen);
+	if (org_jnativehook_mouse_NativeMouseEvent != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseEvent->cls);
+		free(org_jnativehook_mouse_NativeMouseEvent);
+		org_jnativehook_mouse_NativeMouseEvent = NULL;
+	}
+
+	if (org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls);
+		free(org_jnativehook_mouse_NativeMouseWheelEvent);
+		org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
 	}
 
 	return JNI_OK;

@@ -41,7 +41,7 @@ static KeySym keymask_lookup[8] = {
 	XK_Control_L,
 	XK_Meta_L,
 	XK_Alt_L,
-	
+
 	XK_Shift_R,
 	XK_Control_R,
 	XK_Meta_R,
@@ -63,7 +63,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 	#ifdef USE_XTEST
 	Bool is_press;
 
-	// XTest does not have modifier support, so we fake it by depressing the 
+	// XTest does not have modifier support, so we fake it by depressing the
 	// appropriate modifier keys.
 	// TODO Check and see if GCC unrolls these loops with -02
 	for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
@@ -106,7 +106,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		case EVENT_MOUSE_WHEEL:
 			// Wheel events should be the same as click events on X11.
-			
+
 		case EVENT_MOUSE_CLICKED:
 			event->type = EVENT_MOUSE_PRESSED;
 			hook_post_event(event);
@@ -126,7 +126,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			XTestFakeMotionEvent(disp, -1, ((MouseEventData *) data)->x, ((MouseEventData *) data)->y, 0);
 			break;
 	}
-	
+
 	// Release the previously held modifier keys used to fake the event mask.
 	for (int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
 		if (event->mask & 1 << i) {

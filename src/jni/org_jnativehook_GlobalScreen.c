@@ -22,36 +22,59 @@
 #include "org_jnativehook_GlobalScreen.h"
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
-	//FIXME Use the jni globals!
-
-	//jclass clsNativeKeyEvent = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
-	//jclass clsNativeMouseEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
-	//jclass clsNativeMouseWheelEvent = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
-/*
-	jclass clsNativeInputEvent = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
-	jmethodID idGetID = (*env)->GetMethodID(env, clsNativeInputEvent, "getID", "()I");
-	jmethodID idGetModifiers = (*env)->GetMethodID(env, clsNativeInputEvent, "getModifiers", "()I");
-
-	jint id = (*env)->CallIntMethod(env, event, idGetID);
+	// Convert Java event to Virtual.
 	jint modifiers = (*env)->CallIntMethod(env, event, idGetModifiers);
+
+	// Convert the event type.
+	unsigned int nativeType;
+	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
+	if (jni_ConvertToNativeType(javaType, &nativeType) != JNI_OK) {
+		// throw new IllegalArgumentException?
+	}
+
+	// Convert the keycode and location.
+	unsigned int nativeKeyCode;
+	jint javaKeyCode = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getKeyCode);
+	jint javaKeyLocation = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getKeyLocation);
+	if (jni_ConvertToNativeKeyCode(javaKeyCode, javaKeyLocation, &nativeKeyCode)) {
+		// throw new IllegalArgumentException?
+	}
+
+	// Allocate memory for the virtual events only once.
+	VirtualEvent *virtual_event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
+	virtual_event->type = convert_to_virtual_type((unsigned int) id);
+	virtual_event->mask = convert_to_virtual_mask((unsigned int) modifiers);
+
+	keyboard_data = (KeyboardEventData *) malloc(sizeof(KeyboardEventData));
+	mouse_data = (MouseEventData *) malloc(sizeof(MouseEventData));
+	mouse_wheel_data = (MouseWheelEventData *) malloc(sizeof(MouseWheelEventData));
 
 	switch (id) {
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
-			PostKeyDownEvent();
-			break;
-
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-			PostKeyTypedEvent();
+		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
+			// TODO
+			virtual_event->data = malloc(sizeof(KeyboardEventData));
+
+			((KeyboardEventData) virtual_event->data)->keycode;
+			((KeyboardEventData) virtual_event->data)->rawcode;
+			((KeyboardEventData) virtual_event->data)->keychar;
 			break;
 
-		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-			PostKeyUpEvent();
-			break;
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
+
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
+
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
 
 		default:
 			break;
 	}
-*/
+
+	hook_post_event(virtual_event);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
