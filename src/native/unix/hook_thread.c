@@ -61,21 +61,18 @@ static XRecordContext context;
 
 // Thread and hook handles.
 #ifdef USE_XRECORD_ASYNC
-static volatile bool running;
+static bool running;
 #endif
 static pthread_mutex_t hook_running_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hook_control_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hook_thread_id;
 static pthread_attr_t hook_thread_attr;
 
-// Virtual event pointers
+// Virtual event pointer.
 static VirtualEvent *event = NULL;
-static KeyboardEventData *keyboard_data = NULL;
-static MouseEventData *mouse_data = NULL;
-static MouseWheelEventData *mouse_wheel_data = NULL;
 
 // Event dispatch callback
-static void (*current_dispatch_proc)(VirtualEvent * const) = NULL;
+static void (*current_dispatch_proc)(VirtualEvent *const) = NULL;
 
 NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const)) {
 	#ifdef USE_DEBUG
@@ -85,7 +82,7 @@ NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * 
 	current_dispatch_proc = dispatch_proc;
 }
 
-inline static void dispatch_event(VirtualEvent * const event) {
+inline static void dispatch_event(VirtualEvent *const event) {
 	if (current_dispatch_proc != NULL) {
 		#ifdef USE_DEBUG
 		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
@@ -388,12 +385,9 @@ static void *hook_thread_proc(void *arg) {
 
 				// Allocate memory for the virtual events only once.
 				event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
-				keyboard_data = (KeyboardEventData *) malloc(sizeof(KeyboardEventData));
-				mouse_data = (MouseEventData *) malloc(sizeof(MouseEventData));
-				mouse_wheel_data = (MouseWheelEventData *) malloc(sizeof(MouseWheelEventData));
 
 				// Check and make sure we didn't run out of memory.
-				if (event != NULL && keyboard_data != NULL && mouse_data != NULL && mouse_wheel_data != NULL) {
+				if (event != NULL) {
 					#ifdef USE_XRECORD_ASYNC
 					// Allow the thread loop to block.
 					running = true;
@@ -434,6 +428,9 @@ static void *hook_thread_proc(void *arg) {
 						// Set the exit status.
 						*status = NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT;
 					}
+
+					// Free up memory used for virtual events.
+					free(event);
 				}
 				else {
 					#ifdef USE_DEBUG
@@ -449,12 +446,6 @@ static void *hook_thread_proc(void *arg) {
 
 				// Cleanup Native Input Functions.
 				unload_input_helper();
-
-				// Free up memory used for virtual events.
-				free(event);
-				free(keyboard_data);
-				free(mouse_data);
-				free(mouse_wheel_data);
 			}
 			else {
 				#ifdef USE_DEBUG
@@ -628,14 +619,14 @@ NATIVEHOOK_API int hook_disable() {
 			// See Bug 42356 for more information.
 			// https://bugs.freedesktop.org/show_bug.cgi?id=42356#c4
 			XFlush(disp_ctrl);
-			//XSync(disp_ctrl, true);
+			//XSync(disp_ctrl, True);
 
 			// Wait for the thread to die.
 			void *thread_status;
 			pthread_join(hook_thread_id, &thread_status);
 			status = *(int *) thread_status;
 			free(thread_status);
-			
+
 			// Clean up the thread attribute.
 			pthread_attr_destroy(&hook_thread_attr);
 
@@ -643,7 +634,7 @@ NATIVEHOOK_API int hook_disable() {
 			XCloseDisplay(disp_ctrl);
 			disp_ctrl = NULL;
 		}
-		
+
 		#ifdef USE_DEBUG
 		fprintf(stdout, "hook_disable(): Thread Result (%i)\n", status);
 		#endif

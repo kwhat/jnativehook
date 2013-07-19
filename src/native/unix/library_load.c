@@ -62,12 +62,12 @@ void on_library_load() {
 	#ifdef USE_XT
 	XtToolkitInitialize();
 	xt_context = XtCreateApplicationContext();
-	
+
 	int argc = 0;
 	char ** argv = { NULL };
 	xt_disp = XtOpenDisplay(xt_context, NULL, "NativeHook", "libnativehook", NULL, 0, &argc, argv);
 	#endif
-	
+
 	// NOTE: is_auto_repeat is NOT stdbool!
 	Bool is_auto_repeat = False;
 	#ifdef USE_XKB
@@ -93,10 +93,12 @@ void on_library_load() {
 }
 
 void on_library_unload() {
+	/* TODO This seems to be causing problems with SIGTERM
 	// Stop the native thread if its running.
 	if (hook_is_enabled()) {
 		hook_disable();
 	}
+	*/
 
 	#ifdef USE_XT
 	XtCloseDisplay(xt_disp);
