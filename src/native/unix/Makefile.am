@@ -27,7 +27,7 @@ libnativehook_la_SOURCES = \
 	convert_to_virtual.c \
 	hook_thread.c \
 	library_load.c \
-	post_events.c \
+	post_event.c \
 	system_properties.c \
 	x_input_helpers.c
 

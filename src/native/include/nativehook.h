@@ -42,22 +42,17 @@
 
 
 /* Begin Virtual Event Types and Data Structures */
-#define EVENT_KEY_PRESSED							1
-#define EVENT_KEY_RELEASED							2
-#define EVENT_KEY_TYPED								3
-#define EVENT_MOUSE_PRESSED							4
-#define EVENT_MOUSE_RELEASED						5
-#define EVENT_MOUSE_CLICKED							6
-#define EVENT_MOUSE_MOVED							7
-#define EVENT_MOUSE_DRAGGED							8
-#define EVENT_MOUSE_WHEEL							9
-
-typedef struct _VritualEvent {
-	unsigned short int type;
-	unsigned long int time;
-	unsigned short int mask;
-	void *data;
-} VirtualEvent;
+typedef enum _EventType {
+	EVENT_KEY_PRESSED, 
+	EVENT_KEY_RELEASED, 
+	EVENT_KEY_TYPED,
+	EVENT_MOUSE_PRESSED,
+	EVENT_MOUSE_RELEASED,
+	EVENT_MOUSE_CLICKED,
+	EVENT_MOUSE_MOVED,
+	EVENT_MOUSE_DRAGGED,
+	EVENT_MOUSE_WHEEL
+} EventType;
 
 typedef struct _KeyboardEventData {
 	unsigned short int keycode;
@@ -80,6 +75,17 @@ typedef struct _MouseWheelEventData {
 	unsigned short int amount;
 	signed int rotation;
 } MouseWheelEventData;
+
+typedef struct _VritualEvent {
+	EventType type;
+	unsigned long int time;
+	unsigned short int mask;
+	union {
+		KeyboardEventData keyboard;
+		MouseEventData mouse;
+		MouseWheelEventData wheel;
+	} data;
+} VirtualEvent;
 /* End Virtual Event Types and Data Structures */
 
 

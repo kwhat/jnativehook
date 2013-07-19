@@ -19,12 +19,14 @@
 #include <jni.h>
 #include <nativehook.h>
 
-#include "jni_NativeConvert.h"
+#include "jni_Converter.h"
 #include "org_jnativehook_NativeInputEvent.h"
 #include "org_jnativehook_keyboard_NativeKeyEvent.h"
+#include "org_jnativehook_mouse_NativeMouseEvent.h"
+#include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
 
-jint jni_ConvertToJavaType(unsigned int nativeType, jint *javaType) {
+jint jni_ConvertToJavaType(EventType nativeType, jint *javaType) {
 	jint status = JNI_OK;
 
 	switch (nativeType) {
@@ -74,7 +76,7 @@ jint jni_ConvertToJavaType(unsigned int nativeType, jint *javaType) {
 }
 
 
-jint jni_ConvertToNativeType(jint javaType, unsigned int *nativeType) {
+jint jni_ConvertToNativeType(jint javaType, EventType *nativeType) {
 	jint status = JNI_OK;
 
 	switch (javaType) {
@@ -122,22 +124,23 @@ jint jni_ConvertToNativeType(jint javaType, unsigned int *nativeType) {
 }
 
 
-jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned int *nativeKeyCode) {
+jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short int *nativeKeyCode) {
 	jint status = JNI_OK;
 
 	switch (javaKeyLocation) {
 		case org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT:
 		case org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT:
-				*nativeKeyCode = (virtualkey >> 2) & 0x02FF;
+				*nativeKeyCode = (javaKeyCode >> 2) & 0x02FF;
 			break;
 
 		case org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD:
-			*nativeKeyCode = (virtualkey >> 2) & 0x01FF;
+			*nativeKeyCode = (javaKeyCode >> 2) & 0x01FF;
 			break;
 
 		default:
 		case org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD:
 			// No conversion required.
+			*nativeKeyCode = javaKeyCode;
 			break;
 	}
 
@@ -145,7 +148,7 @@ jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned
 }
 
 
-jint jni_ConvertToJavaKeyCode(unsigned int nativeKeyCode, jint *javaKeyCode, jint *javaKeyLocation) {
+jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCode, jint *javaKeyLocation) {
 	jint status = JNI_OK;
 
 	switch (nativeKeyCode) {
@@ -154,7 +157,7 @@ jint jni_ConvertToJavaKeyCode(unsigned int nativeKeyCode, jint *javaKeyCode, jin
 		case VC_ALT_L:
 		case VC_META_L:
 		case VC_SUPER_L:
-			*javaKeyCode = virtualkey;
+			*javaKeyCode = nativeKeyCode;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
 			break;
 
@@ -163,7 +166,7 @@ jint jni_ConvertToJavaKeyCode(unsigned int nativeKeyCode, jint *javaKeyCode, jin
 		case VC_ALT_R:
 		case VC_META_R:
 		case VC_SUPER_R:
-			*javaKeyCode = virtualkey & 0xFF;
+			*javaKeyCode = nativeKeyCode & 0xFF;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
 			break;
 
@@ -191,15 +194,34 @@ jint jni_ConvertToJavaKeyCode(unsigned int nativeKeyCode, jint *javaKeyCode, jin
 		case VC_KP_DECIMAL:
 		case VC_KP_DIVIDE:
 		case VC_KP_DELETE:
-			*javaKeyCode = virtualkey & 0xFF;
+			*javaKeyCode = nativeKeyCode & 0xFF;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 			break;
 
 		default:
-			*javaKeyCode = virtualkey;
+			*javaKeyCode = nativeKeyCode;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
 			break;
 	}
 
 	return status;
 }
+
+/*
+jint jni_ConvertToJavaModifierMask(unsigned int nativeMask, jint *javaMask) {
+	jint status = JNI_OK;
+
+	*javaMask = (jint) nativeMask;
+
+	return status;
+}
+
+
+jint jni_ConvertToNativeModifierMask(jint javaType, unsigned int *nativeType) {
+	jint status = JNI_OK;
+
+	*nativeType = (unsigned int) javaType;
+
+	return status;
+}
+*/

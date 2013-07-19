@@ -255,16 +255,16 @@ int jni_DestroyGlobals(JNIEnv *env) {
 		org_jnativehook_GlobalScreen = NULL;
 	}
 
-	if (org_jnativehook_keyboard_NativeInputEvent != NULL) {
-		(*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeInputEvent->cls);
-		free(org_jnativehook_keyboard_NativeInputEvent);
-		org_jnativehook_keyboard_NativeInputEvent = NULL;
+	if (org_jnativehook_NativeInputEvent != NULL) {
+		(*env)->DeleteGlobalRef(env, org_jnativehook_NativeInputEvent->cls);
+		free(org_jnativehook_NativeInputEvent);
+		org_jnativehook_NativeInputEvent = NULL;
 	}
 
 	if (org_jnativehook_keyboard_NativeKeyEvent != NULL) {
 		(*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeKeyEvent->cls);
 		free(org_jnativehook_keyboard_NativeKeyEvent);
-		org_jnativehook_keyboard_NativeKeyEvent = NULL:
+		org_jnativehook_keyboard_NativeKeyEvent = NULL;
 	}
 
 	if (org_jnativehook_mouse_NativeMouseEvent != NULL) {

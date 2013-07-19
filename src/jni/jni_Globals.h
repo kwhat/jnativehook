@@ -50,14 +50,16 @@ typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
 	jmethodID init;
 	jmethodID getID;
-	jmethodID getKeyCode;
-	jmethodID getKeyLocation;
+	jmethodID getModifiers;
 } NativeInputEvent;
 
 typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
 	jclass cls;
 	jmethodID init;
 	NativeInputEvent *parent;
+	jmethodID getKeyCode;
+	jmethodID getKeyLocation;
+	jmethodID getKeyChar;
 } NativeKeyEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseEvent {
@@ -69,7 +71,7 @@ typedef struct _org_jnativehook_mouse_NativeMouseEvent {
 typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
 	jclass cls;
 	jmethodID init;
-	NativeInputEvent *parent;
+	NativeMouseEvent *parent;
 } NativeMouseWheelEvent;
 
 // Global variables for Java object struct representation.

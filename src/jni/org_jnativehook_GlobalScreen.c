@@ -16,49 +16,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include <nativehook.h>
 
+#include "jni_Converter.h"
 #include "jni_Globals.h"
+#include "org_jnativehook_NativeInputEvent.h"
+#include "org_jnativehook_keyboard_NativeKeyEvent.h"
+#include "org_jnativehook_mouse_NativeMouseEvent.h"
+#include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 #include "org_jnativehook_GlobalScreen.h"
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
-	// Convert Java event to Virtual.
-	jint modifiers = (*env)->CallIntMethod(env, event, idGetModifiers);
-
 	// Convert the event type.
 	unsigned int nativeType;
 	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
-	if (jni_ConvertToNativeType(javaType, &nativeType) != JNI_OK) {
-		// throw new IllegalArgumentException?
-	}
 
-	// Convert the keycode and location.
-	unsigned int nativeKeyCode;
-	jint javaKeyCode = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getKeyCode);
-	jint javaKeyLocation = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getKeyLocation);
-	if (jni_ConvertToNativeKeyCode(javaKeyCode, javaKeyLocation, &nativeKeyCode)) {
-		// throw new IllegalArgumentException?
-	}
+	// Allocate memory for the virtual event and set the type.
+	VirtualEvent *virtualEvent = (VirtualEvent *) malloc(sizeof(VirtualEvent));
+	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
 
-	// Allocate memory for the virtual events only once.
-	VirtualEvent *virtual_event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
-	virtual_event->type = convert_to_virtual_type((unsigned int) id);
-	virtual_event->mask = convert_to_virtual_mask((unsigned int) modifiers);
+	// Convert Java event to Virtual.
+	virtualEvent->mask = (unsigned int) (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getModifiers);
 
-	keyboard_data = (KeyboardEventData *) malloc(sizeof(KeyboardEventData));
-	mouse_data = (MouseEventData *) malloc(sizeof(MouseEventData));
-	mouse_wheel_data = (MouseWheelEventData *) malloc(sizeof(MouseWheelEventData));
-
-	switch (id) {
-		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
+	switch (javaType) {
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
+			virtualEvent->data.keyboard.keychar = 
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
+			break;
+			
+		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-			// TODO
-			virtual_event->data = malloc(sizeof(KeyboardEventData));
-
-			((KeyboardEventData) virtual_event->data)->keycode;
-			((KeyboardEventData) virtual_event->data)->rawcode;
-			((KeyboardEventData) virtual_event->data)->keychar;
+			// Convert the keycode and location.
+			jni_ConvertToNativeKeyCode(
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode), 
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation), 
+					&(virtualEvent->data.keyboard.keycode));
 			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
@@ -74,7 +67,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 			break;
 	}
 
-	hook_post_event(virtual_event);
+	hook_post_event(virtualEvent);
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {

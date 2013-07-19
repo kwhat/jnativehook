@@ -78,7 +78,6 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 		}
 	}
 
-	void *data = event->data;
 	switch (event->type) {
 		case EVENT_KEY_PRESSED:
 			is_press = True;
@@ -86,18 +85,22 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		case EVENT_KEY_TYPED:
 			// Need to convert a wchar_t to keysym!
-			snprintf(buffer, 4, "%lc", ((KeyboardEventData *) data)->keychar);
+			snprintf(buffer, 4, "%lc", event->data.keyboard.keychar);
 
 			event->type = EVENT_KEY_PRESSED;
-			((KeyboardEventData *) data)->keycode = convert_to_virtual_key(XStringToKeysym(buffer));
-			((KeyboardEventData *) data)->keychar = CHAR_UNDEFINED;
+			event->data.keyboard.keycode = convert_to_virtual_key(XStringToKeysym(buffer));
+			event->data.keyboard.keychar = CHAR_UNDEFINED;
 			hook_post_event(event);
 
 		case EVENT_KEY_RELEASED:
 			is_press = False;
 
 		EVENT_KEY:
-			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, convert_to_native_key(((KeyboardEventData *) data)->keycode)), is_press, 0);
+			XTestFakeKeyEvent(
+				disp, 
+				XKeysymToKeycode(disp, convert_to_native_key(event->data.keyboard.keycode)), 
+				is_press, 
+				0);
 			break;
 
 		case EVENT_MOUSE_PRESSED:
@@ -116,25 +119,25 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			goto EVENT_BUTTON;
 
 		EVENT_BUTTON:
-			XTestFakeButtonEvent(disp, ((MouseEventData *) data)->button, is_press, 0);
+			XTestFakeButtonEvent(disp, event->data.mouse.button, is_press, 0);
 			break;
 
 		case EVENT_MOUSE_DRAGGED:
 			// The button masks are all applied with the modifier masks.
 
 		case EVENT_MOUSE_MOVED:
-			XTestFakeMotionEvent(disp, -1, ((MouseEventData *) data)->x, ((MouseEventData *) data)->y, 0);
+			XTestFakeMotionEvent(disp, -1, event->data.mouse.x, event->data.mouse.y, 0);
 			break;
 	}
 
 	// Release the previously held modifier keys used to fake the event mask.
-	for (int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
+	for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
 		if (event->mask & 1 << i) {
 			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, keymask_lookup[i]), False, 0);
 		}
 	}
 
-	for (int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
+	for (unsigned int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
 		if (event->mask & btnmask_lookup[i]) {
 			XTestFakeButtonEvent(disp, i + 1, False, 0);
 		}
@@ -164,11 +167,11 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		case EVENT_KEY_TYPED:
 			// Need to convert a wchar_t to keysym!
-			snprintf(buffer, 4, "U%04d", ((KeyboardEventData *) data)->keychar);
+			snprintf(buffer, 4, "U%04d", event->data.keyboard.keychar);
 
 			event->type = EVENT_KEY_PRESSED;
-			((KeyboardEventData *) data)->keycode = convert_to_virtual_key(XStringToKeysym(buffer));
-			((KeyboardEventData *) data)->keychar = CHAR_UNDEFINED;
+			event->data.keyboard.keycode = convert_to_virtual_key(XStringToKeysym(buffer));
+			event->data.keyboard.keychar = CHAR_UNDEFINED;
 			hook_post_event(event);
 
 		case EVENT_KEY_RELEASED:
@@ -187,7 +190,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			((XKeyEvent *) x_event)->x_root = root_x;
 			((XKeyEvent *) x_event)->y_root = root_y;
 			((XKeyEvent *) x_event)->state = convert_to_native_mask(event->mask);
-			((XKeyEvent *) x_event)->keycode = XKeysymToKeycode(disp, convert_to_native_key(((KeyboardEventData *) data)->keycode));
+			((XKeyEvent *) x_event)->keycode = XKeysymToKeycode(disp, convert_to_native_key(event->data.keyboard.keycode));
 			((XKeyEvent *) x_event)->same_screen = True;
 			break;
 
@@ -219,7 +222,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			((XButtonEvent *) x_event)->x_root = root_x;
 			((XButtonEvent *) x_event)->y_root = root_y;
 			((XButtonEvent *) x_event)->state = convert_to_native_mask(event->mask);
-			((XButtonEvent *) x_event)->button = ((MouseEventData *) data)->button;
+			((XButtonEvent *) x_event)->button = event->data.mouse.button;
 			((XButtonEvent *) x_event)->same_screen = True;
 			break;
 
@@ -270,8 +273,8 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			((XMotionEvent *) x_event)->time = CurrentTime;
 			((XMotionEvent *) x_event)->x = win_x; // Not sure what to do this
 			((XMotionEvent *) x_event)->y = win_y; // Not sure what to do this
-			((XMotionEvent *) x_event)->x_root = ((MouseEventData *) data)->x;
-			((XMotionEvent *) x_event)->y_root = ((MouseEventData *) data)->y;
+			((XMotionEvent *) x_event)->x_root = event->data.mouse.x;
+			((XMotionEvent *) x_event)->y_root = event->data.mouse.y;
 			((XMotionEvent *) x_event)->state = convert_to_native_mask(event->mask);;
 			((XMotionEvent *) x_event)->is_hint = NotifyNormal;
 			((XMotionEvent *) x_event)->same_screen = True;

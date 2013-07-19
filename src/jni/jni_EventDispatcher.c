@@ -19,8 +19,8 @@
 #include <jni.h>
 #include <nativehook.h>
 
+#include "jni_Converter.h"
 #include "jni_Globals.h"
-#include "jni_NativeConvert.h"
 #include "org_jnativehook_NativeInputEvent.h"
 #include "org_jnativehook_keyboard_NativeKeyEvent.h"
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
@@ -42,10 +42,9 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 			jobject NativeInputEvent_object = NULL;
 			jint keycode, location;
 
-			void *data = event->data;
 			switch (event->type) {
 				case EVENT_KEY_PRESSED:
-					jni_NativeToJavaKey(((KeyboardEventData *) data)->keycode, &keycode, &location);
+					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -54,14 +53,14 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) ((KeyboardEventData *) data)->rawcode,
+											(jint) event->data.keyboard.rawcode,
 											keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
 					break;
 
 				case EVENT_KEY_RELEASED:
-					jni_NativeToJavaKey(((KeyboardEventData *) data)->keycode, &keycode, &location);
+					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -70,14 +69,14 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) ((KeyboardEventData *) data)->rawcode,
+											(jint) event->data.keyboard.rawcode,
 											keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
 					break;
 
 				case EVENT_KEY_TYPED:
-					jni_NativeToJavaKey(((KeyboardEventData *) data)->keycode, &keycode, &location);
+					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -86,9 +85,9 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) ((KeyboardEventData *) data)->rawcode,
+											(jint) event->data.keyboard.rawcode,
 											(jint) org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-											(jchar) ((KeyboardEventData *) data)->keychar,
+											(jchar) event->data.keyboard.keychar,
 											location);
 					break;
 
@@ -100,10 +99,10 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseEventData *) data)->x,
-												(jint) ((MouseEventData *) data)->y,
-												(jint) ((MouseEventData *) data)->clicks,
-												(jint) ((MouseEventData *) data)->button);
+												(jint) event->data.mouse.x,
+												(jint) event->data.mouse.y,
+												(jint) event->data.mouse.clicks,
+												(jint) event->data.mouse.button);
 					break;
 
 				case EVENT_MOUSE_RELEASED:
@@ -114,10 +113,10 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseEventData *) data)->x,
-												(jint) ((MouseEventData *) data)->y,
-												(jint) ((MouseEventData *) data)->clicks,
-												(jint) ((MouseEventData *) data)->button);
+												(jint) event->data.mouse.x,
+												(jint) event->data.mouse.y,
+												(jint) event->data.mouse.clicks,
+												(jint) event->data.mouse.button);
 					break;
 
 				case EVENT_MOUSE_CLICKED:
@@ -128,10 +127,10 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseEventData *) data)->x,
-												(jint) ((MouseEventData *) data)->y,
-												(jint) ((MouseEventData *) data)->clicks,
-												(jint) ((MouseEventData *) data)->button);
+												(jint) event->data.mouse.x,
+												(jint) event->data.mouse.y,
+												(jint) event->data.mouse.clicks,
+												(jint) event->data.mouse.button);
 					break;
 
 				case EVENT_MOUSE_MOVED:
@@ -142,10 +141,10 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseEventData *) data)->x,
-												(jint) ((MouseEventData *) data)->y,
-												(jint) ((MouseEventData *) data)->clicks,
-												(jint) ((MouseEventData *) data)->button);
+												(jint) event->data.mouse.x,
+												(jint) event->data.mouse.y,
+												(jint) event->data.mouse.clicks,
+												(jint) event->data.mouse.button);
 					break;
 
 				case EVENT_MOUSE_DRAGGED:
@@ -156,10 +155,10 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseEventData *) data)->x,
-												(jint) ((MouseEventData *) data)->y,
-												(jint) ((MouseEventData *) data)->clicks,
-												(jint) ((MouseEventData *) data)->button);
+												(jint) event->data.mouse.x,
+												(jint) event->data.mouse.y,
+												(jint) event->data.mouse.clicks,
+												(jint) event->data.mouse.button);
 					break;
 
 				case EVENT_MOUSE_WHEEL:
@@ -170,12 +169,12 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
 												(jlong) event->time,
 												(jint) event->mask,
-												(jint) ((MouseWheelEventData *) data)->x,
-												(jint) ((MouseWheelEventData *) data)->y,
-												(jint) ((MouseWheelEventData *) data)->clicks,
-												(jint) ((MouseWheelEventData *) data)->type,
-												(jint) ((MouseWheelEventData *) data)->amount,
-												(jint) ((MouseWheelEventData *) data)->rotation);
+												(jint) event->data.wheel.x,
+												(jint) event->data.wheel.y,
+												(jint) event->data.wheel.clicks,
+												(jint) event->data.wheel.type,
+												(jint) event->data.wheel.amount,
+												(jint) event->data.wheel.rotation);
 					break;
 			}
 
