@@ -16,6 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_jni_Properties_h
+#define _Included_jni_Properties_h
+
+#include <jni.h>
+
 extern void jni_SetProperties(JNIEnv *env);
 
 extern void jni_ClearProperties(JNIEnv *env);
+
+#endif

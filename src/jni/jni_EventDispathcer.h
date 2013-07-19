@@ -16,7 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_jni_EventDispathcer_h
+#define _Included_jni_EventDispathcer_h
+
 #include <nativehook.h>
 
 // This is a simple forwarding function to the Java event dispatcher.
 void jni_EventDispatcher(VirtualEvent *const event);
+
+#endif

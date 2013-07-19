@@ -16,16 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_JNIErrors_h
-#define _Included_JNIErrors_h
-
-#ifdef DEBUG
-#include <stdio.h>
-#include <unistd.h>
-#endif
-
-#include <jni.h>
-#include <stdlib.h>
+#ifndef _Included_jni_Errors_h
+#define _Included_jni_Errors_h
 
 // Exception class definitions.
 #define java_lang_InternalError				"java/lang/InternalError"

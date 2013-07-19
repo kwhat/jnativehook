@@ -16,7 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 #include <jni.h>
+#include <stdlib.h>
 
 #include "jni_Errors.h"
 #include "jni_Globals.h"
@@ -44,83 +49,71 @@ int jni_CreateGlobals(JNIEnv *env) {
 			&& org_jnativehook_mouse_NativeMouseEvent != NULL
 			&& org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
 
-		// Lookup a local reference for the GlobalScreen class.
+		// Lookup a local reference for the GlobalScreen class and create a global reference.
 		jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
-		// TODO Check what happens when GlobalScreen_class == null, this check may not be required!
-		if (GlobalScreen_class != NULL) {
-			// Convert the local reference to a global reference.
-			org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
-			if (org_jnativehook_GlobalScreen->cls != NULL) {
-				// Get the method ID for GlobalScreen.getInstance()
-				org_jnativehook_GlobalScreen->getInstance = (*env)->GetStaticMethodID(
-						env,
-						org_jnativehook_GlobalScreen->cls,
-						"getInstance",
-						"()Lorg/jnativehook/GlobalScreen;");
+		org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
+		if (org_jnativehook_GlobalScreen->cls != NULL) {
+			// Get the method ID for GlobalScreen.getInstance()
+			org_jnativehook_GlobalScreen->getInstance = (*env)->GetStaticMethodID(
+					env,
+					org_jnativehook_GlobalScreen->cls,
+					"getInstance",
+					"()Lorg/jnativehook/GlobalScreen;");
 
-				if (org_jnativehook_GlobalScreen->getInstance == NULL) {
-					#ifdef DEBUG
-					fprintf(stderr, "CreateJNIGlobals()Lorg/jnativehook/GlobalScreen: Failed to acquire the method ID for GlobalScreen.getInstance()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("getInstance()Lorg/jnativehook/GlobalScreen;")
-				}
-
-
-				// Get the method ID for GlobalScreen.dispatchEvent().
-				org_jnativehook_GlobalScreen->dispatchEvent = (*env)->GetMethodID(
-						env,
-						org_jnativehook_GlobalScreen->cls,
-						"dispatchEvent",
-						"(Lorg/jnativehook/NativeInputEvent;)V");
-
-				if (org_jnativehook_GlobalScreen->dispatchEvent == NULL) {
-					#ifdef DEBUG
-					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("dispatchEvent(Lorg/jnativehook/NativeInputEvent;)V")
-				}
-
-				// Get the method ID for GlobalScreen.startEventDispatcher().
-				org_jnativehook_GlobalScreen->startEventDispatcher = (*env)->GetMethodID(
-						env,
-						org_jnativehook_GlobalScreen->cls,
-						"startEventDispatcher",
-						"()V");
-
-				if (org_jnativehook_GlobalScreen->startEventDispatcher == NULL) {
-					#ifdef DEBUG
-					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.startEventDispatcher()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("startEventDispatcher()V")
-				}
-
-
-				// Get the method ID for GlobalScreen.stopEventDispatcher().
-				org_jnativehook_GlobalScreen->stopEventDispatcher = (*env)->GetMethodID(
-						env,
-						org_jnativehook_GlobalScreen->cls,
-						"stopEventDispatcher",
-						"()V");
-
-				if (org_jnativehook_GlobalScreen->stopEventDispatcher == NULL) {
-					#ifdef DEBUG
-					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.stopEventDispatcher()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("stopEventDispatcher()V")
-				}
-			}
-			else {
-				status = JNI_ENOMEM;
-
+			if (org_jnativehook_GlobalScreen->getInstance == NULL) {
 				#ifdef DEBUG
-				fprintf(stderr, "CreateJNIGlobals(): Failed to allocate memory for JNI structures!\n");
+				fprintf(stderr, "CreateJNIGlobals()Lorg/jnativehook/GlobalScreen: Failed to acquire the method ID for GlobalScreen.getInstance()!\n");
 				#endif
 
-				// FIXME Throw java.lang.OutOfMemoryError
+				// FIXME Throw java.lang.NoSuchMethodError("getInstance()Lorg/jnativehook/GlobalScreen;")
+			}
+
+
+			// Get the method ID for GlobalScreen.dispatchEvent().
+			org_jnativehook_GlobalScreen->dispatchEvent = (*env)->GetMethodID(
+					env,
+					org_jnativehook_GlobalScreen->cls,
+					"dispatchEvent",
+					"(Lorg/jnativehook/NativeInputEvent;)V");
+
+			if (org_jnativehook_GlobalScreen->dispatchEvent == NULL) {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("dispatchEvent(Lorg/jnativehook/NativeInputEvent;)V")
+			}
+
+
+			// Get the method ID for GlobalScreen.startEventDispatcher().
+			org_jnativehook_GlobalScreen->startEventDispatcher = (*env)->GetMethodID(
+					env,
+					org_jnativehook_GlobalScreen->cls,
+					"startEventDispatcher",
+					"()V");
+
+			if (org_jnativehook_GlobalScreen->startEventDispatcher == NULL) {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.startEventDispatcher()!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("startEventDispatcher()V")
+			}
+
+
+			// Get the method ID for GlobalScreen.stopEventDispatcher().
+			org_jnativehook_GlobalScreen->stopEventDispatcher = (*env)->GetMethodID(
+					env,
+					org_jnativehook_GlobalScreen->cls,
+					"stopEventDispatcher",
+					"()V");
+
+			if (org_jnativehook_GlobalScreen->stopEventDispatcher == NULL) {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.stopEventDispatcher()!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("stopEventDispatcher()V")
 			}
 		}
 		#ifdef DEBUG
@@ -132,37 +125,58 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 		// Class and Constructor for the NativeInputEvent Object.
 		jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
-		if (NativeInputEvent_class != NULL) {
-			org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
-			org_jnativehook_NativeInputEvent->init = (*env)->GetMethodID(env, org_jnativehook_keyboard_NativeKeyEvent->cls, "<init>", "(Lorg/jnativehook/GlobalScreen;IJI)V");
+		org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
+		if (org_jnativehook_NativeInputEvent->cls != NULL) {
+			// Get the method ID for NativeInputEvent constructor.
+			org_jnativehook_NativeInputEvent->init = (*env)->GetMethodID(
+					env,
+					org_jnativehook_NativeInputEvent->cls,
+					"<init>",
+					"(Lorg/jnativehook/GlobalScreen;IJI)V");
 
-			if (org_jnativehook_NativeInputEvent->cls != NULL) {
-				// Get the method ID for GlobalScreen.dispatchEvent().
-				org_jnativehook_NativeInputEvent->getID = (*env)->GetMethodID(
-						env,
-						org_jnativehook_GlobalScreen->cls,
-						"getID",
-						"(I)V");
-
-				if (org_jnativehook_NativeInputEvent->getID == NULL) {
-					#ifdef DEBUG
-					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("getID(I)V")
-				}
-			}
-
-			// FIXME better checking and exception throwing needs to be included.
-			#ifdef DEBUG
-			if (org_jnativehook_NativeInputEvent->cls == NULL || org_jnativehook_NativeInputEvent->init == NULL) {
+			if (org_jnativehook_NativeInputEvent->init == NULL) {
+				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V")
 			}
-			#endif
+
+
+			// Get the method ID for NativeInputEvent.getID().
+			org_jnativehook_NativeInputEvent->getID = (*env)->GetMethodID(
+					env,
+					org_jnativehook_NativeInputEvent->cls,
+					"getID",
+					"()I");
+
+			if (org_jnativehook_NativeInputEvent->getID == NULL) {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("getID()I")
+			}
+
+
+			// Get the method ID for GlobalScreen.dispatchEvent().
+			org_jnativehook_NativeInputEvent->getModifiers = (*env)->GetMethodID(
+					env,
+					org_jnativehook_NativeInputEvent->cls,
+					"getModifiers",
+					"()I");
+
+			if (org_jnativehook_NativeInputEvent->getModifiers == NULL) {
+				#ifdef DEBUG
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
+				#endif
+
+				// FIXME Throw java.lang.NoSuchMethodError("getModifiers()I")
+			}
 		}
 		#ifdef DEBUG
 		else {
-			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeKeyEvent class!\n");
+			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeInputEvent class!\n");
 		}
 		#endif
 
@@ -173,6 +187,53 @@ int jni_CreateGlobals(JNIEnv *env) {
 			org_jnativehook_keyboard_NativeKeyEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeKeyEvent_class);
 			org_jnativehook_keyboard_NativeKeyEvent->init = (*env)->GetMethodID(env, org_jnativehook_keyboard_NativeKeyEvent->cls, "<init>", "(IJIIICI)V");
 			org_jnativehook_keyboard_NativeKeyEvent->parent = org_jnativehook_NativeInputEvent;
+
+			if (org_jnativehook_keyboard_NativeKeyEvent->cls != NULL) {
+				// Get the method ID for NativeKeyEvent.getKeyCode().
+				org_jnativehook_keyboard_NativeKeyEvent->getKeyCode = (*env)->GetMethodID(
+						env,
+						org_jnativehook_keyboard_NativeKeyEvent->cls,
+						"getKeyCode",
+						"()I");
+
+				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyCode == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyCode()!\n");
+					#endif
+
+					// FIXME Throw java.lang.NoSuchMethodError("getKeyCode()I")
+				}
+
+				// Get the method ID for NativeKeyEvent.getKeyLocation().
+				org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation = (*env)->GetMethodID(
+						env,
+						org_jnativehook_keyboard_NativeKeyEvent->cls,
+						"getKeyLocation",
+						"()I");
+
+				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyLocation()!\n");
+					#endif
+
+					// FIXME Throw java.lang.NoSuchMethodError("getKeyLocation()I")
+				}
+
+				// Get the method ID for NativeKeyEvent.getKeyChar().
+				org_jnativehook_keyboard_NativeKeyEvent->getKeyChar = (*env)->GetMethodID(
+						env,
+						org_jnativehook_keyboard_NativeKeyEvent->cls,
+						"getKeyChar",
+						"()C");
+
+				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyChar == NULL) {
+					#ifdef DEBUG
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyChar()!\n");
+					#endif
+
+					// FIXME Throw java.lang.NoSuchMethodError("getKeyChar()C")
+				}
+			}
 
 			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG

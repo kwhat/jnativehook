@@ -27,31 +27,20 @@
 
 // Virtual event pointers
 static VirtualEvent *event = NULL;
-static KeyboardEventData *keyboard_data = NULL;
-static MouseEventData *mouse_data = NULL;
-static MouseWheelEventData *mouse_wheel_data = NULL;
 
 int main() {
 	// Allocate memory for the virtual events only once.
 	event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
-	keyboard_data = (KeyboardEventData *) malloc(sizeof(KeyboardEventData));
-	mouse_data = (MouseEventData *) malloc(sizeof(MouseEventData));
-	mouse_wheel_data = (MouseWheelEventData *) malloc(sizeof(MouseWheelEventData));
-
 
 	event->type = EVENT_KEY_PRESSED;
 	event->mask = 0x00;
-	event->data = keyboard_data;
 
-	keyboard_data->keycode = VC_A;
-	keyboard_data->keychar = CHAR_UNDEFINED;
+	event->data.keyboard.keycode = VC_A;
+	event->data.keyboard.keychar = CHAR_UNDEFINED;
 
 	hook_post_event(event);
 
 	free(event);
-	free(keyboard_data);
-	free(mouse_data);
-	free(mouse_wheel_data);
 
 	return 0;
 }

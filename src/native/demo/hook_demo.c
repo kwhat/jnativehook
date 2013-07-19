@@ -36,23 +36,24 @@ void dispatch_proc(VirtualEvent * const event) {
 	fprintf(stdout,	"id=%d,when=%ld,mask=0x%X",
 			event->type, event->time, event->mask);
 
-	void *data = event->data;
 	switch (event->type) {
 		case EVENT_KEY_PRESSED:
+			// If the escape key is pressed, naturally terminate the program.
+			if (event->data.keyboard.keycode == VC_ESCAPE) {
+				running = false;
+			}
 		case EVENT_KEY_RELEASED:
+			fprintf(stdout,
+					",keycode=%d,rawcode=%d",
+					event->data.keyboard.keycode,
+					event->data.keyboard.rawcode);
+			break;
+
 		case EVENT_KEY_TYPED:
 			fprintf(stdout,
-					",keycode=%d,keychar=%lc,rawcode=%d",
-					((KeyboardEventData *) data)->keycode,
-					((KeyboardEventData *) data)->keychar,
-					((KeyboardEventData *) data)->rawcode);
-
-			// If the escape key is pressed, naturally terminate the program.
-			if (((KeyboardEventData *) data)->keycode == VC_ESCAPE) {
-				running = false;
-				fprintf(stdout, "\nrunning == false");
-			}
-
+					"keychar=%lc,rawcode=%d",
+					event->data.keyboard.keychar,
+					event->data.keyboard.rawcode);
 			break;
 
 		case EVENT_MOUSE_PRESSED:
@@ -62,18 +63,18 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_MOUSE_DRAGGED:
 			fprintf(stdout,
 					",x=%d,y=%d,button=%d,clicks=%d",
-					((MouseEventData *) data)->x,
-					((MouseEventData *) data)->y,
-					((MouseEventData *) data)->button,
-					((MouseEventData *) data)->clicks);
+					event->data.mouse.x,
+					event->data.mouse.y,
+					event->data.mouse.button,
+					event->data.mouse.clicks);
 			break;
 
 		case EVENT_MOUSE_WHEEL:
 			fprintf(stdout,
 					",type=%d,amount=%d,rotation=%d",
-					((MouseWheelEventData *) data)->type,
-					((MouseWheelEventData *) data)->amount,
-					((MouseWheelEventData *) data)->rotation);
+					event->data.wheel.type,
+					event->data.wheel.amount,
+					event->data.wheel.rotation);
 			break;
 	}
 

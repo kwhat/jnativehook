@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _Included_jni_Converter_h
+#define _Included_jni_Converter_h
+
 #include <jni.h>
+#include <nativehook.h>
 
 extern jint jni_ConvertToJavaType(EventType nativeType, jint *javaType);
 
@@ -25,3 +29,5 @@ extern jint jni_ConvertToNativeType(jint javaType, EventType *nativeType);
 extern jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short int *nativeKeyCode);
 
 extern jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCode, jint *javaKeyLocation);
+
+#endif
