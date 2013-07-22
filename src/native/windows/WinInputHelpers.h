@@ -41,6 +41,8 @@
 #define VK_DBE_NOCODEINPUT				0x0FB		// Changes the mode to no-code input.
 #endif
 
+#define VK_NUMPAD_RETURN				0xFF01		// Custom keycode for the numpad enter.
+
 /* Windows does not track the button masks of its events so we need to do it
  * manually.  The left and right masks solve the problem of if both control
  * keys are depressed a the same time and only one is removed we should still
