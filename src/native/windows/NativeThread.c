@@ -102,7 +102,13 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 					else if (kbhook->vkCode == VK_LWIN)		SetModifierMask(MOD_LWIN);
 					else if (kbhook->vkCode == VK_RWIN)		SetModifierMask(MOD_RWIN);
 
-					jkey = NativeToJKey(kbhook->vkCode);
+					// Workaround for Windows numpad return key.
+					if (kbhook->vkCode == VK_RETURN && kbhook->flags && 0x01) {
+						jkey = NativeToJKey(VK_NUMPAD_RETURN);
+					}
+					else {
+						jkey = NativeToJKey(kbhook->vkCode);
+					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire key pressed event.

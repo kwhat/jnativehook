@@ -247,6 +247,13 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static native boolean isNativeHookRegistered();
+	
+	/**
+	 * Send a native input event to the system.
+	 *
+	 * @since 1.2
+	 */
+	public static native void postNativeEvent(NativeInputEvent e);
 
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is

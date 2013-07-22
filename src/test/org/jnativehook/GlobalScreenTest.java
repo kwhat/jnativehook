@@ -349,7 +349,87 @@ public class GlobalScreenTest {
 		GlobalScreen.unregisterNativeHook();
 		assertFalse(GlobalScreen.isNativeHookRegistered());
 	}
+	
+	/**
+	 * Test of dispatchEvent method, of class GlobalScreen.
+	 */
+	@Test
+	public void testPostNativeEvent() throws InterruptedException {
+		System.out.println("dispatchEvent");
 
+		// Setup and event listener.
+		NativeKeyListenerImpl keyListener = new NativeKeyListenerImpl();
+		GlobalScreen.getInstance().addNativeKeyListener(keyListener);
+
+		NativeMouseInputListenerImpl mouseListener = new NativeMouseInputListenerImpl();
+		GlobalScreen.getInstance().addNativeMouseListener(mouseListener);
+
+		NativeMouseWheelListenerImpl wheelListener = new NativeMouseWheelListenerImpl();
+		GlobalScreen.getInstance().addNativeMouseWheelListener(wheelListener);
+
+		// Make sure the dispatcher is running!
+		GlobalScreen.getInstance().startEventDispatcher();
+
+		// Dispatch a key event and check to see if it was sent.
+		NativeKeyEvent keyEvent = new NativeKeyEvent(
+				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
+				0x00,		// Modifiers
+				0x41,		// Raw Code
+				NativeKeyEvent.VK_UNDEFINED,
+				NativeKeyEvent.CHAR_UNDEFINED,
+				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+
+		synchronized (keyListener) {
+			GlobalScreen.postNativeEvent(keyEvent);
+			keyListener.wait(3000);
+			assertEquals(keyEvent, keyListener.getLastEvent());
+		}
+
+
+		// Dispatch a mouse event and check to see if it was sent.
+		NativeMouseEvent mouseEvent = new NativeMouseEvent(
+				NativeMouseEvent.NATIVE_MOUSE_CLICKED,
+				System.currentTimeMillis(),
+				0x00,	// Modifiers
+				50,		// X
+				75,		// Y
+				1,		// Click Count
+				NativeMouseEvent.BUTTON1);
+
+		synchronized (mouseListener) {
+			GlobalScreen.postNativeEvent(mouseEvent);
+			mouseListener.wait(3000);
+			assertEquals(mouseEvent, mouseListener.getLastEvent());
+		}
+
+		// Dispatch a mouse event and check to see if it was sent.
+		NativeMouseWheelEvent wheelEvent = new NativeMouseWheelEvent(
+				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+				System.currentTimeMillis(),
+				0x00,	// Modifiers
+				50,		// X
+				75,		// Y
+				1,		// Click Count
+				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
+				3,		// Scroll Amount
+				-1);	// Wheel Rotation
+
+		synchronized (wheelListener) {
+			GlobalScreen.postNativeEvent(wheelEvent);
+			wheelListener.wait(3000);
+			assertEquals(wheelEvent, wheelListener.getLastEvent());
+		}
+
+		// Stop the event dispatcher.
+		GlobalScreen.getInstance().stopEventDispatcher();
+
+		// Remove all added listeners.
+		GlobalScreen.getInstance().removeNativeKeyListener(keyListener);
+		GlobalScreen.getInstance().removeNativeMouseListener(mouseListener);
+		GlobalScreen.getInstance().removeNativeMouseWheelListener(wheelListener);
+	}
+	
 	/**
 	 * Test of dispatchEvent method, of class GlobalScreen.
 	 */

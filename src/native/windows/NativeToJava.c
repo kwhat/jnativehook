@@ -296,9 +296,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_SUBTRACT:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_SUBTRACT;
 			goto LOCATION_NP;
-		/* case XK_KP_Enter:			// Windows keypad enter fires at standard location.
+		case VK_NUMPAD_RETURN:			// Windows keypad enter fires at standard location.
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_ENTER;
-			goto LOCATION_NP; */
+			goto LOCATION_NP;
 		case VK_DECIMAL:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DECIMAL;
 			goto LOCATION_NP;
