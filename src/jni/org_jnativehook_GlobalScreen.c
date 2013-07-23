@@ -36,24 +36,25 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	VirtualEvent *virtualEvent = (VirtualEvent *) malloc(sizeof(VirtualEvent));
 	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
 
-	// Convert Java event to Virtual.
+	// Convert Java event to virtual event.
 	virtualEvent->mask = (unsigned int) (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getModifiers);
 
 	switch (javaType) {
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-			virtualEvent->data.keyboard.keychar = 
+			virtualEvent->data.keyboard.keychar =
 					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
 			break;
-			
+
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
 			// Convert the keycode and location.
 			jni_ConvertToNativeKeyCode(
-					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode), 
-					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation), 
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode),
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation),
 					&(virtualEvent->data.keyboard.keycode));
 			break;
 
+		// FIXME Implement!
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:

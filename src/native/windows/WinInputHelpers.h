@@ -41,7 +41,19 @@
 #define VK_DBE_NOCODEINPUT				0x0FB		// Changes the mode to no-code input.
 #endif
 
-#define VK_NUMPAD_RETURN				0xFF01		// Custom keycode for the numpad enter.
+// Custom virtual keycodes for the numpad.
+#define VK_NUMPAD_RETURN				0x10D		// Numpad Enter
+#define VK_NUMPAD_PRIOR					0x121		// Numpad Page Up
+#define VK_NUMPAD_NEXT					0x122		// Numpad Page Down
+#define VK_NUMPAD_END					0x123		// Numpad End
+#define VK_NUMPAD_HOME					0x124		// Numpad Home
+#define VK_NUMPAD_LEFT					0x125		// Numpad Left
+#define VK_NUMPAD_UP					0x126		// Numpad Up
+#define VK_NUMPAD_RIGHT					0x127		// Numpad Right
+#define VK_NUMPAD_DOWN					0x128		// Numpad Down
+#define VK_NUMPAD_INSERT				0x12D		// Numpad Insert
+#define VK_NUMPAD_DELETE				0x12E		// Numpad Delete
+
 
 /* Windows does not track the button masks of its events so we need to do it
  * manually.  The left and right masks solve the problem of if both control

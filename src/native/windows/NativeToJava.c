@@ -253,6 +253,36 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CLOSE_BRACKET;
 			return jkey;
 
+		case VK_CLEAR:					// This is the 5 button when numlock is off.
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_CLEAR;
+			goto LOCATION_NP;
+		case VK_NUMPAD_PRIOR:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAGE_UP;
+			goto LOCATION_NP;
+		case VK_NUMPAD_NEXT:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_PAGE_DOWN;
+			goto LOCATION_NP;
+		case VK_NUMPAD_END:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_END;
+			goto LOCATION_NP;
+		case VK_NUMPAD_HOME:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_HOME;
+			goto LOCATION_NP;
+		case VK_NUMPAD_LEFT:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_LEFT;
+			goto LOCATION_NP;
+		case VK_NUMPAD_UP:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UP;
+			goto LOCATION_NP;
+		case VK_NUMPAD_RIGHT:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_UP;
+			goto LOCATION_NP;
+		case VK_NUMPAD_DOWN:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DOWN;
+			goto LOCATION_NP;
+		case VK_NUMPAD_INSERT:
+			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_INSERT;
+			goto LOCATION_NP;
 
 		case  VK_NUMPAD0:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUMPAD0;
@@ -305,9 +335,9 @@ JKeyDatum NativeToJKey(unsigned int keysym) {
 		case VK_DIVIDE:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DIVIDE;
 			goto LOCATION_NP;
-		/* case VK_DELETE:
+		case VK_NUMPAD_DELETE:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_DELETE;
-			goto LOCATION_NP; */
+			goto LOCATION_NP;
 		case VK_NUMLOCK:
 			jkey.keycode = org_jnativehook_keyboard_NativeKeyEvent_VK_NUM_LOCK;
 			goto LOCATION_NP;

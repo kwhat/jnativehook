@@ -102,9 +102,39 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 					else if (kbhook->vkCode == VK_LWIN)		SetModifierMask(MOD_LWIN);
 					else if (kbhook->vkCode == VK_RWIN)		SetModifierMask(MOD_RWIN);
 
-					// Workaround for Windows numpad return key.
-					if (kbhook->vkCode == VK_RETURN && kbhook->flags && 0x01) {
+					// Workaround for Windows numpad keys.
+					if (kbhook->vkCode == VK_RETURN && (kbhook->flags & 0x01) != 0) {
 						jkey = NativeToJKey(VK_NUMPAD_RETURN);
+					}
+					else if (kbhook->vkCode == VK_PRIOR && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_PRIOR);
+					}
+					else if (kbhook->vkCode == VK_NEXT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_NEXT);
+					}
+					else if (kbhook->vkCode == VK_END && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_END);
+					}
+					else if (kbhook->vkCode == VK_HOME && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_HOME);
+					}
+					else if (kbhook->vkCode == VK_LEFT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_LEFT);
+					}
+					else if (kbhook->vkCode == VK_UP && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_UP);
+					}
+					else if (kbhook->vkCode == VK_RIGHT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_RIGHT);
+					}
+					else if (kbhook->vkCode == VK_DOWN && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_DOWN);
+					}
+					else if (kbhook->vkCode == VK_INSERT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_INSERT);
+					}
+					else if (kbhook->vkCode == VK_DELETE && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_DELETE);
 					}
 					else {
 						jkey = NativeToJKey(kbhook->vkCode);
@@ -160,7 +190,43 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 					else if (kbhook->vkCode == VK_LWIN)		UnsetModifierMask(MOD_LWIN);
 					else if (kbhook->vkCode == VK_RWIN)		UnsetModifierMask(MOD_RWIN);
 
-					jkey = NativeToJKey(kbhook->vkCode);
+					// Workaround for Windows numpad keys.
+					if (kbhook->vkCode == VK_RETURN && (kbhook->flags & 0x01) != 0) {
+						jkey = NativeToJKey(VK_NUMPAD_RETURN);
+					}
+					else if (kbhook->vkCode == VK_PRIOR && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_PRIOR);
+					}
+					else if (kbhook->vkCode == VK_NEXT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_NEXT);
+					}
+					else if (kbhook->vkCode == VK_END && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_END);
+					}
+					else if (kbhook->vkCode == VK_HOME && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_HOME);
+					}
+					else if (kbhook->vkCode == VK_LEFT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_LEFT);
+					}
+					else if (kbhook->vkCode == VK_UP && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_UP);
+					}
+					else if (kbhook->vkCode == VK_RIGHT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_RIGHT);
+					}
+					else if (kbhook->vkCode == VK_DOWN && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_DOWN);
+					}
+					else if (kbhook->vkCode == VK_INSERT && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_INSERT);
+					}
+					else if (kbhook->vkCode == VK_DELETE && (kbhook->flags & 0x01) == 0) {
+						jkey = NativeToJKey(VK_NUMPAD_DELETE);
+					}
+					else {
+						jkey = NativeToJKey(kbhook->vkCode);
+					}
 					jmodifiers = NativeToJEventMask(GetModifiers());
 
 					// Fire key released event.

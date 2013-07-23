@@ -61,7 +61,7 @@ static XRecordContext context;
 
 // Thread and hook handles.
 #ifdef USE_XRECORD_ASYNC
-static bool running;
+static volatile bool running;
 #endif
 static pthread_mutex_t hook_running_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hook_control_mutex = PTHREAD_MUTEX_INITIALIZER;
