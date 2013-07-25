@@ -18,6 +18,9 @@
 
 #include "library_load.h"
 
+// Global Variables.
+HINSTANCE hInst = NULL;
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 	switch (fdwReason) {
 		case DLL_PROCESS_ATTACH:
@@ -32,9 +35,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 }
 
 void on_library_load() {
+	//hInst = (HINSTANCE) _hInst;
+	hInst = GetModuleHandle(NULL);
 
+	LoadUnicodeHelper();
 }
 
 void on_library_unload() {
-
+	UnloadUnicodeHelper();
 }

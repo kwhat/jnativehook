@@ -23,31 +23,28 @@
 
 #include <stdlib.h>
 #include "NativeToJava.h"
-#include "WinInputHelpers.h"
+#include "win_input_helpers.h"
 
 static unsigned short int current_modifiers = 0x0000;
 
-// FIXME Either initialize modifiers with // GetKeyState(VK_LSHIFT) & ( 1 << sizeof(SHORT) )
-// TODO I suspect tracking our own will be a little fast, however profiling should be done on both.
-
-void SetModifierMask(unsigned short int mask) {
+void set_modifier_mask(unsigned short int mask) {
 	current_modifiers |= mask;
 }
 
-void UnsetModifierMask(unsigned short int mask) {
+void unset_modifier_mask(unsigned short int mask) {
 	current_modifiers ^= mask;
 }
 
-unsigned short int GetModifiers() {
+unsigned short int get_modifiers() {
 	return current_modifiers;
 }
 
-unsigned short int GetScrollWheelType() {
+unsigned short int get_scroll_wheel_type() {
 	unsigned short int value;
-	UINT wheeltype;
+	UINT wheel_type;
 
-	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheeltype, 0);
-	if (wheeltype == WHEEL_PAGESCROLL) {
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheel_type, 0);
+	if (wheel_type == WHEEL_PAGESCROLL) {
 		value = org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL;
 	}
 	else {
@@ -57,16 +54,16 @@ unsigned short int GetScrollWheelType() {
 	return value;
 }
 
-unsigned short int GetScrollWheelAmount() {
+unsigned short int get_scroll_wheel_amount() {
 	unsigned short int value;
-	UINT wheelamount;
+	UINT wheel_amount;
 
-	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheelamount, 0);
-	if (wheelamount == WHEEL_PAGESCROLL) {
+	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheel_amount, 0);
+	if (wheel_amount == WHEEL_PAGESCROLL) {
 		value = 1;
 	}
 	else {
-		value = (unsigned short int) wheelamount;
+		value = (unsigned short int) wheel_amount;
 	}
 
 	return value;

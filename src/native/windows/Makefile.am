@@ -16,3 +16,22 @@
 #
 
 ACLOCAL_AMFLAGS = -I m4
+
+#include_HEADERS = include/nativehook.h
+
+lib_LTLIBRARIES = libnativehook.la
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -std=c99 -I$(top_srcdir)/include
+libnativehook_la_LDFLAGS = -Wl,--as-needed,--kill-at,-O1
+libnativehook_la_SOURCES = \
+	convert_to_native.c \
+	convert_to_virtual.c \
+	hook_thread.c \
+	library_load.c \
+	post_event.c \
+	system_properties.c \
+	x_input_helpers.c
+
+CLEANFILES =
+
+DISTCLEANFILES = \
+	Makefile
