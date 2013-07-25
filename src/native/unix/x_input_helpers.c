@@ -19,6 +19,8 @@
 #include <config.h>
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -38,6 +40,280 @@ static bool is_caps_lock = false, is_shift_lock = false;
 
 // Unicode-Remapse the NativeHelpers display.
 extern Display *disp;
+
+/*
+ * This table is taken from QEMU x_keymap.c, under the terms:
+ *
+ * Copyright (c) 2003 Fabrice Bellard
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+static const uint8_t xfree86_keycode_to_scancode_table[61] = {
+	0xC7,	// 97  Home
+	0xC8,	// 98  Up
+	0xC9,	// 99  PgUp
+	0xCb,	// 100 Left
+	0x4C,	// 101 KP-5
+	0xCD,	// 102 Right
+	0xCF,	// 103 End
+	0xD0,	// 104 Down
+	0xD1,	// 105 PgDn
+	0xD2,	// 106 Ins
+	0xD3,	// 107 Del
+	0x9C,	// 108 Enter
+	0x9D,	// 109 Ctrl-R
+	0x00,	// 110 Pause
+	0xB7,	// 111 Print
+	0xB5,	// 112 Divide
+	0xB8,	// 113 Alt-R
+	0xC6,	// 114 Break
+	0x00,	// 115
+	0x00,	// 116
+	0x00,	// 117
+	0x00,	// 118
+	0x00,	// 119
+	0x00,	// 120
+	0x00,	// 121
+	0x00,	// 122
+	0x00,	// 123
+	0x00,	// 124
+	0x00,	// 125
+	0x00,	// 126
+	0x00,	// 127
+	0x00,	// 128
+	0x79,	// 129 Henkan
+	0x00,	// 130
+	0x7b,	// 131 Muhenkan
+	0x00,	// 132
+	0x7d,	// 133 Yen
+	0x00,	// 134
+	0x00,	// 135
+	0x47,	// 136 KP_7
+	0x48,	// 137 KP_8
+	0x49,	// 138 KP_9
+	0x4b,	// 139 KP_4
+	0x4c,	// 140 KP_5
+	0x4d,	// 141 KP_6
+	0x4f,	// 142 KP_1
+	0x50,	// 143 KP_2
+	0x51,	// 144 KP_3
+	0x52,	// 145 KP_0
+	0x53,	// 146 KP_.
+	0x47,	// 147 KP_HOME
+	0x48,	// 148 KP_UP
+	0x49,	// 149 KP_PgUp
+	0x4b,	// 150 KP_Left
+	0x4c,	// 151 KP_
+	0x4d,	// 152 KP_Right
+	0x4f,	// 153 KP_End
+	0x50,	// 154 KP_Down
+	0x51,	// 155 KP_PgDn
+	0x52,	// 156 KP_Ins
+	0x53,	// 157 KP_Del
+};
+
+/* This table is generated based off the xfree86 -> scancode mapping above
+ * and the keycode mappings in /usr/share/X11/xkb/keycodes/evdev
+ * and  /usr/share/X11/xkb/keycodes/xfree86
+ */
+
+static const uint8_t evdev_keycode_to_scancode_table[61] = {
+	0x00,	// 97 EVDEV - RO   ("Internet" Keyboards)
+	0x00,	// 98 EVDEV - KATA (Katakana)
+	0x00,	// 99 EVDEV - HIRA (Hiragana)
+	0x79,	// 100 EVDEV - HENK (Henkan)
+	0x70,	// 101 EVDEV - HKTG (Hiragana/Katakana toggle)
+	0x7B,	// 102 EVDEV - MUHE (Muhenkan)
+	0x00,	// 103 EVDEV - JPCM (KPJPComma)
+	0x9C,	// 104 KPEN
+	0x9D,	// 105 RCTL
+	0xB5,	// 106 KPDV
+	0xB7,	// 107 PRSC
+	0xB8,	// 108 RALT
+	0x00,	// 109 EVDEV - LNFD ("Internet" Keyboards)
+	0xC7,	// 110 HOME
+	0xC8,	// 111 UP
+	0xC9,	// 112 PGUP
+	0xCB,	// 113 LEFT
+	0xCD,	// 114 RGHT
+	0xCF,	// 115 END
+	0xD0,	// 116 DOWN
+	0xD1,	// 117 PGDN
+	0xD2,	// 118 INS
+	0xD3,	// 119 DELE
+	0x00,	// 120 EVDEV - I120 ("Internet" Keyboards)
+	0x00,	// 121 EVDEV - MUTE
+	0x00,	// 122 EVDEV - VOL-
+	0x00,	// 123 EVDEV - VOL
+	0x00,	// 124 EVDEV - POWR
+	0x00,	// 125 EVDEV - KPEQ
+	0x00,	// 126 EVDEV - I126 ("Internet" Keyboards)
+	0x00,	// 127 EVDEV - PAUS
+	0x00,	// 128 EVDEV - ????
+	0x00,	// 129 EVDEV - I129 ("Internet" Keyboards)
+	0xF1,	// 130 EVDEV - HNGL (Korean Hangul Latin toggle)
+	0xF2,	// 131 EVDEV - HJCV (Korean Hangul Hanja toggle)
+	0x7D,	// 132 AE13 (Yen)
+	0xDB,	// 133 EVDEV - LWIN
+	0xDC,	// 134 EVDEV - RWIN
+	0xDD,	// 135 EVDEV - MENU
+	0x00,	// 136 EVDEV - STOP
+	0x00,	// 137 EVDEV - AGAI
+	0x00,	// 138 EVDEV - PROP
+	0x00,	// 139 EVDEV - UNDO
+	0x00,	// 140 EVDEV - FRNT
+	0x00,	// 141 EVDEV - COPY
+	0x00,	// 142 EVDEV - OPEN
+	0x00,	// 143 EVDEV - PAST
+	0x00,	// 144 EVDEV - FIND
+	0x00,	// 145 EVDEV - CUT
+	0x00,	// 146 EVDEV - HELP
+	0x00,	// 147 EVDEV - I147
+	0x00,	// 148 EVDEV - I148
+	0x00,	// 149 EVDEV - I149
+	0x00,	// 150 EVDEV - I150
+	0x00,	// 151 EVDEV - I151
+	0x00,	// 152 EVDEV - I152
+	0x00,	// 153 EVDEV - I153
+	0x00,	// 154 EVDEV - I154
+	0x00,	// 155 EVDEV - I156
+	0x00,	// 156 EVDEV - I157
+	0x00,	// 157 EVDEV - I158
+};
+
+static bool has_evdev(void) {
+	bool status = false;
+
+	#ifdef USE_XKBdddd
+	/* The following code is based on vncdisplaykeymap.c under the terms:
+	 *
+	 * Copyright (C) 2008  Anthony Liguori <anthony codemonkey ws>
+	 *
+	 * This program is free software; you can redistribute it and/or modify
+	 * it under the terms of the GNU Lesser General Public License version 2 as
+	 * published by the Free Software Foundation.
+	 */
+	XkbDescPtr desc = XkbGetKeyboard(disp, XkbGBN_AllComponentsMask, XkbUseCoreKbd);
+	if (desc != NULL && desc->names != NULL) {
+		const char *layout_name = XGetAtomName(disp, desc->names->keycodes);
+		#ifdef USE_DEBUG
+		fprintf(stdout, "keycode_to_keysym(): Found keycode atom '%s' (%i).\n", layout_name, (unsigned int) desc->names->keycodes);
+		#endif
+
+		#ifdef USE_DEBUG
+		const char *prefix_xfree86 = "xfree86_";
+		#endif
+		const char *prefix_evdev = "evdev_";
+		if (strncmp(layout_name, prefix_evdev, strlen(prefix_evdev))) {
+			status = true;
+		}
+		#ifdef USE_DEBUG
+		else if (layout_name == NULL) {
+			fprintf(stderr, "keycode_to_keysym(): Unable to determine the keycode name.\n");
+		}
+		else if (!strncmp(layout_name, prefix_xfree86, strlen(prefix_xfree86))) {
+			fprintf(stderr, "keycode_to_keysym(): Unknown keycode name '%s', please file a bug report.\n", layout_name);
+		}
+		#endif
+
+		XkbFreeClientMap(desc, XkbGBN_AllComponentsMask, True);
+	}
+	#ifdef USE_DEBUG
+	else {
+		fprintf(stderr, "keycode_to_keysym(): XkbGetKeyboard failed to locate a valid keyboard!\n");
+	}
+	#endif
+	#else
+	// No known alternative to determine keycode mapping.
+	#pragma message("XKB support is required to accuratly determine keyboard scancodes!")
+
+	/*
+	int property_count;
+
+	Atom *properties = XListProperties(disp, DefaultRootWindow(disp), &property_count);
+
+	char *names[property_count];
+	XGetAtomNames(disp, properties, property_count, names);
+
+	for (int i = 0; i < property_count; i++) {
+		printf("*** Testing %s\n", names[i]);
+	}
+	*/
+
+	//printf("*** Testing %s\n", XGetAtomName(disp, (Atom) 421));
+
+	/*
+	XDeviceInfo *properties = XListInputDevices(disp, &property_count);
+
+	for (int i = 0; i < property_count; i++) {
+		printf("*** Testing %s\n", properties[i].name);
+	}
+
+	XFreeDeviceList(properties);
+	*/
+
+	#endif
+
+	return status;
+}
+
+/* The following code is based on vncdisplaykeymap.c under the terms:
+ *
+ * Copyright (C) 2008  Anthony Liguori <anthony codemonkey ws>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+uint16_t keycode_to_scancode(KeyCode keycode) {
+	uint16_t scancode = 0x00;
+
+	//if (keycode == GDK_Pause) {
+	//	return VKC_PAUSE;
+	//}
+
+	if (keycode < 9) {
+		scancode = 0x00;
+	}
+	if (keycode < 97) {
+		// Simple offset of 8
+		scancode = keycode - 8;
+	}
+	else if (keycode < 158) {
+		if (has_evdev()) {
+			 scancode = evdev_keycode_to_scancode_table[keycode - 97];
+		}
+		else {
+			 scancode = xfree86_keycode_to_scancode_table[keycode - 97];
+		}
+	}
+	else if (keycode == 208) {
+		// Hiragana_Katakana
+		scancode = 0x70;
+	}
+	else if (keycode == 211) {
+		// Backslash
+		scancode = 0x73;
+	}
+
+	return scancode;
+}
 
 // Faster more flexible alternative to XKeycodeToKeysym...
 KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
@@ -185,7 +461,7 @@ KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 		}
 		#ifdef USE_DEBUG
 		else {
-			fprintf(stderr, "GetChar(): Unable to determine the KeySym index.\n");
+			fprintf(stderr, "keycode_to_keysym(): Unable to determine the KeySym index.\n");
 		}
 		#endif
 	}

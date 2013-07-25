@@ -19,6 +19,12 @@
 #ifndef _included_x_input_helpers
 #define _included_x_input_helpers
 
+#include <stdint.h>
+
+/* Converts an X11 key code to the appropriate keyboard scan code.
+ */
+extern uint16_t keycode_to_scancode(KeyCode keycode);
+
 /* Converts an X11 key code and event mask to the appropriate X11 key symbol.
  * This functions in much the same way as XKeycodeToKeysym() but allows for a
  * faster and more flexible lookup.

@@ -111,9 +111,9 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 		XRecordDatum *data = (XRecordDatum *) hook->data;
 
 		// Native event data.
-		struct timeval  timeVal;
-		gettimeofday(&timeVal, NULL);
-		unsigned long int event_time = (timeVal.tv_sec * 1000) + (timeVal.tv_usec / 1000);
+		struct timeval system_time;
+		gettimeofday(&system_time, NULL);
+		unsigned long int event_time = (system_time.tv_sec * 1000) + (system_time.tv_usec / 1000);
 
 		// Use more readable variables.
 		int event_type = data->type;
@@ -137,7 +137,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 
 				keysym = keycode_to_keysym(event_code, event_mask);
 				event->data.keyboard.keycode = convert_to_virtual_key(keysym);
-				event->data.keyboard.rawcode = event_code;
+				event->data.keyboard.rawcode = keycode_to_scancode(event_code);
 				event->data.keyboard.keychar = CHAR_UNDEFINED;
 
 				dispatch_event(event);
@@ -167,7 +167,7 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 
 				keysym = keycode_to_keysym(event_code, event_mask);
 				event->data.keyboard.keycode = convert_to_virtual_key(keysym);
-				event->data.keyboard.rawcode = event_code;
+				event->data.keyboard.rawcode = keycode_to_scancode(event_code);
 				event->data.keyboard.keychar = CHAR_UNDEFINED;
 
 				dispatch_event(event);
@@ -404,7 +404,7 @@ static void *hook_thread_proc(void *arg) {
 							#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE  >= 199309L
 							nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
 							#else
-							#warning "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
+							#pragma message "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
 							#endif
 						}
 					}

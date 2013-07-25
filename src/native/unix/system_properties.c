@@ -174,7 +174,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	long int value = 200;
 	int click_time;
 	bool successful = false;
-//*
+
 	#ifdef USE_XT
 	// Try and use the Xt extention to get the current multi-click.
 	if (!successful) {
@@ -189,7 +189,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 		}
 	}
 	#endif
-//*/
+
 	// Try and acquire the multi-click time from the user defined X defaults.
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "*", "multiClickTime");
