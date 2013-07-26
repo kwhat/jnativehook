@@ -31,19 +31,13 @@
 #include "WinInputHelpers.h"
 #include "WinUnicodeHelper.h"
 
-// Exception global for thread initialization.
-static Exception thread_ex;
-
-// GlobalScreen object.
-static jobject objGlobalScreen;
+// The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
+extern HINSTANCE hInst;
 
 // Click count globals.
 static unsigned short click_count = 0;
 static DWORD click_time = 0;
 static POINT last_click;
-
-// The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
-extern HINSTANCE hInst;
 
 // Thread and hook handles.
 static DWORD hook_thread_id = 0;

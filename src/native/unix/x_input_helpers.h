@@ -31,11 +31,6 @@ extern uint16_t keycode_to_scancode(KeyCode keycode);
  */
 extern KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask);
 
-/* Converts an X11 key symbol to a single Unicode character.  No direct X11
- * functionality exists to provide this information.
- */
-extern wchar_t keysym_to_unicode(KeySym keysym);
-
 /* Initialize items required for KeyCodeToKeySym() and KeySymToUnicode()
  * functionality.  This method is called by OnLibraryLoad() and may need to be
  * called in combination with UnloadInputHelper() if the native keyboard layout

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -181,7 +181,6 @@ long int GetAutoRepeatDelay() {
 			if (CFNumberGetValue((CFNumberRef) pref_val, kCFNumberSInt32Type, &delay)) {
 				// This is the slider value, we must multiply by 15 to convert to
 				// milliseconds.
-				printf("Test: %i\n\n", (int) delay);
 				value = (long) delay * 15;
 				successful = true;
 			}

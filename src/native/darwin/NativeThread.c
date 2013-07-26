@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -40,16 +40,79 @@ static CGEventTimestamp click_time = 0;
 static bool mouse_dragged = false;
 
 // Thread and hook handles.
-static CFMessagePortRef localMsgPort;
 static CFRunLoopSourceRef sourceMsgPort;
+
 static CFRunLoopRef event_loop;
 static CFRunLoopSourceRef event_source;
+
 static pthread_mutex_t hookRunningMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t hookControlMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hookThreadId = 0;
 
 static CGEventFlags prev_event_mask, diff_event_mask, keyup_event_mask;
 static const CGEventFlags key_event_mask = kCGEventFlagMaskShift + kCGEventFlagMaskControl + kCGEventFlagMaskAlternate + kCGEventFlagMaskCommand;
+
+
+
+typedef struct {
+	CGEventRef event;
+	UniChar buffer[4];
+	UniCharCount length;
+} TISMessage;
+
+static TISMessage data = {
+	.event = NULL,
+	.buffer = { 0x00 },
+	.length = 0
+};
+
+void MessagePortProc(void *info) {
+	TISMessage *data = (TISMessage *) info;
+
+	if (data->event != NULL) {
+		// Preform Unicode lookup.
+		KeyCodeToString(data->event, sizeof(data->buffer), &(data->length), data->buffer);
+	}
+
+	// Unlock the control mutex to signal that we have finished on the main run loop.
+	pthread_mutex_unlock(&hookControlMutex);
+}
+
+static void StartMessagePortRunLoop() {
+	CFRunLoopSourceContext context = {
+		.version = 0,
+		.info = &data,
+		.retain = NULL,
+		.release = NULL,
+		.copyDescription = NULL,
+		.equal = NULL,
+		.hash = NULL,
+		.schedule = NULL,
+		.cancel = NULL,
+
+		.perform = MessagePortProc
+	};
+
+	sourceMsgPort = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context);
+	CFRunLoopAddSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+
+	#ifdef DEBUG
+	fprintf(stdout, "StartMessagePortRunLoop(): start successful.\n");
+	#endif
+}
+
+static void StopMessagePortRunLoop() {
+	if (CFRunLoopContainsSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode)) {
+		CFRunLoopRemoveSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
+		CFRelease(sourceMsgPort);
+	}
+
+	sourceMsgPort = NULL;
+
+	#ifdef DEBUG
+	fprintf(stderr, "StopMessagePortRunLoop(): completed.\n");
+	#endif
+}
 
 static void CallbackProc(CFRunLoopObserverRef UNUSED(observer), CFRunLoopActivity activity, void *UNUSED(info)) {
 	switch (activity) {
@@ -69,14 +132,6 @@ static void CallbackProc(CFRunLoopObserverRef UNUSED(observer), CFRunLoopActivit
 			break;
 		#endif
 	}
-}
-
-
-CFDataRef MessagePortProc(CFMessagePortRef UNUSED(msgport), SInt32 UNUSED(msgid), CFDataRef data, void *UNUSED(info)) {
-	//TODO UniChar to CFData
-	printf("MessagePortProc: Testing\n");
-
-	return data;
 }
 
 static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, CGEventRef event, void *UNUSED(refcon)) {
@@ -101,11 +156,6 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 			jint jbutton;
 			jint jscrollType, jscrollAmount, jwheelRotation;
 			jint jmodifiers;
-
-			// Buffer for Unicode char lookup.
-			//const UniCharCount buff_size = 8;
-			//UniChar buffer[buff_size];
-			//UniCharCount buff_len = 0;
 
 			// Java event objects.
 			jobject objKeyEvent, objMouseEvent, objMouseWheelEvent;
@@ -135,11 +185,32 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 
-					/*
-					// Lookup the unicode representation for this event.
-					KeyCodeToString(event, buff_size, &buff_len, buffer);
-					if (buff_len == 1) {
+
+					// Lookup the Unicode representation for this event.
+					CFRunLoopSourceContext context = { .version = 0 };
+					CFRunLoopSourceGetContext(sourceMsgPort, &context);
+
+					// Get the run loop context info pointer.
+					TISMessage *info = (TISMessage *) context.info;
+
+					// Set the event pointer.
+					info->event = event;
+
+					// Lock the control mutex as we enter the main run loop.
+					pthread_mutex_lock(&hookControlMutex);
+
+					// Signal the custom source and wakeup the main run loop.
+					CFRunLoopSourceSignal(sourceMsgPort);
+					CFRunLoopWakeUp(CFRunLoopGetMain());
+
+					// Wait for a lock while the main run loop processes they key typed event.
+					if (pthread_mutex_lock(&hookControlMutex) == 0) {
+						pthread_mutex_unlock(&hookControlMutex);
+					}
+
+					if (info->length == 1) {
 						// Fire key typed event.
 						objKeyEvent = (*env)->NewObject(
 												env,
@@ -150,22 +221,14 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												jmodifiers,
 												jkey.rawcode,
 												org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-												(jchar) buffer[0],
+												(jchar) info->buffer[0],
 												jkey.location);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+						(*env)->DeleteLocalRef(env, objKeyEvent);
 					}
-					*/
-					
-					UInt8 bytes[] = { 0 };
-					
-					CFDataRef sndData = CFDataCreate(kCFAllocatorDefault, bytes, 1);
-					//CFDataRef sndData = CFDataCreateCopy(kCFAllocatorDefault, CFDataRef theData);
-					CFDataRef rtnData;
-					
-					CFTimeInterval timeout = CFAbsoluteTimeGetCurrent();
-					SInt32 resp = CFMessagePortSendRequest(localMsgPort, 0, sndData, timeout + 5, timeout + 10, kCFRunLoopDefaultMode, &rtnData);
-					printf("CFMessagePortSendRequest: %i\n", resp);
-					CFRelease(sndData);
+
+					info->event = NULL;
+					info->length = 0;
 					break;
 
 				case kCGEventKeyUp:
@@ -191,6 +254,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 											org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											jkey.location);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objKeyEvent);
+					(*env)->DeleteLocalRef(env, objKeyEvent);
 					break;
 
 				case kCGEventFlagsChanged:
@@ -296,6 +360,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventLeftMouseUp:
@@ -343,6 +408,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) click_count,
 												jbutton);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 
 					if (mouse_dragged != true) {
 						// Fire mouse clicked event.
@@ -358,6 +424,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 													(jint) click_count,
 													jbutton);
 						(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+						(*env)->DeleteLocalRef(env, objMouseEvent);
 					}
 					break;
 
@@ -392,6 +459,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) event_point.y,
 												(jint) click_count);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventMouseMoved:
@@ -421,6 +489,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 												(jint) event_point.y,
 												(jint) click_count);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseEvent);
+					(*env)->DeleteLocalRef(env, objMouseEvent);
 					break;
 
 				case kCGEventScrollWheel:
@@ -473,6 +542,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 													jscrollAmount,
 													jwheelRotation);
 					(*env)->CallVoidMethod(env, objGlobalScreen, idDispatchEvent, objMouseWheelEvent);
+					(*env)->DeleteLocalRef(env, objMouseWheelEvent);
 					break;
 
 				#ifdef DEBUG
@@ -500,15 +570,102 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 	return noErr;
 }
 
+// This method will be externalized with 1.2
+static bool ThreadStartCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Attached to JVM successful.\n");
+		#endif
+
+		// Create the global screen references up front to save time in the callback.
+		jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
+		if (objLocalScreen != NULL) {
+			objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+
+			// Callback and start native event dispatch thread
+			(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+
+			// Call Thread.currentThread().setName("JNativeHook Native Hook");
+			jobject objCurrentThread = (*env)->CallStaticObjectMethod(env, clsThread, idCurrentThread);
+			(*env)->CallVoidMethod(env, objCurrentThread, idSetName, (*env)->NewStringUTF(env, "JNativeHook Native Hook"));
+			(*env)->DeleteLocalRef(env, objCurrentThread);
+
+			status = true;
+		}
+		else {
+			// We cant do a whole lot of anything if we cant create JNI globals.
+			// Any exceptions are thrown by CreateJNIGlobals().
+
+			#ifdef DEBUG
+			fprintf(stderr, "ThreadStartCallback(): CreateJNIGlobals() failed!\n");
+			#endif
+
+			thread_ex.class = NATIVE_HOOK_EXCEPTION;
+			thread_ex.message = "Failed to create JNI global references";
+		}
+
+
+
+		#ifdef DEBUG
+		fprintf(stdout, "ThreadStartCallback(): Detach from JVM successful.\n");
+		#endif
+	}
+	else {
+		#ifdef DEBUG
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+		#endif
+
+		thread_ex.class = NATIVE_HOOK_EXCEPTION;
+		thread_ex.message = "Failed to attach the native thread to the virtual machine";
+	}
+
+	return status;
+}
+
+// This method will be externalized with 1.2
+static bool ThreadStopCallback() {
+	bool status = false;
+
+	JNIEnv *env = NULL;
+	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
+		// Calling AttachCurrentThread() should result in a no-op.
+
+		// Callback and stop native event dispatch thread.
+		(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
+
+		// Remove the global reference to the GlobalScren object.
+		(*env)->DeleteGlobalRef(env, objGlobalScreen);
+
+		// Detach this thread from the JVM.
+		if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+			status = true;
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "ThreadStopCallback(): DetachCurrentThread() failed!\n");
+		}
+		#endif
+	}
+	#ifdef DEBUG
+	else {
+		fprintf(stderr, "ThreadStartCallback(): AttachCurrentThread() failed!\n");
+	}
+	#endif
+
+	return status;
+}
+
 static void *ThreadProc(void *arg) {
 	int *status = (int *) arg;
 	*status = RETURN_FAILURE;
-	JNIEnv *env = NULL;
 
 	// Check and make sure assistive devices is enabled.
 	if (AXAPIEnabled() == true) {
 		#ifdef DEBUG
-		printf ("Native: Accessibility API is enabled.\n");
+		fprintf(stdout, "ThreadProc(): Accessibility API is enabled.\n");
 		#endif
 
 		// Setup the event mask to listen for.
@@ -562,101 +719,53 @@ static void *ThreadProc(void *arg) {
 					fprintf(stdout, "ThreadProc(): CFRunLoopGetCurrent() success.\n");
 					#endif
 
-					if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-						#ifdef DEBUG
-						fprintf(stdout, "ThreadProc(): Attached to JVM successful.\n");
-						#endif
+					// Initialize Native Input Functions.
+					LoadInputHelper();
 
-						// Initialize Native Input Functions.
-						LoadInputHelper();
+					// Callback for additional thread initialization.
+					if (ThreadStartCallback()) {
+						// Create run loop observers.
+						CFRunLoopObserverRef observer = CFRunLoopObserverCreate(
+															kCFAllocatorDefault,
+															kCFRunLoopEntry | kCFRunLoopExit, //kCFRunLoopAllActivities,
+															true,
+															0,
+															CallbackProc,
+															NULL
+														);
 
-						// Create the global screen references up front to save time in the callback.
-						jobject objLocalScreen = (*env)->CallStaticObjectMethod(env, clsGlobalScreen, idGetInstance);
-						if (objLocalScreen != NULL) {
-							objGlobalScreen = (*env)->NewGlobalRef(env, objLocalScreen);
+						if (observer != NULL) {
+							// Set the exit status.
+							*status = RETURN_SUCCESS;
 
-							// Callback and start native event dispatch thread
-							(*env)->CallVoidMethod(env, objGlobalScreen, idStartEventDispatcher);
+							StartMessagePortRunLoop();
 
-							CFRunLoopObserverRef observer = CFRunLoopObserverCreate(
-																kCFAllocatorDefault,
-																kCFRunLoopEntry | kCFRunLoopExit, //kCFRunLoopAllActivities,
-																true,
-																0,
-																CallbackProc,
-																NULL
-															);
-							if (observer != NULL) {
-								// Set the exit status.
-								*status = RETURN_SUCCESS;
+							CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
+							CFRunLoopAddObserver(event_loop, observer, kCFRunLoopDefaultMode);
 
-								CFRunLoopAddSource(event_loop, event_source, kCFRunLoopDefaultMode);
-								CFRunLoopAddObserver(event_loop, observer, kCFRunLoopDefaultMode);
+							CFRunLoopRun();
 
-								CFRunLoopRun();
+							// Lock back up until we are done processing the exit.
+							CFRunLoopRemoveObserver(event_loop, observer, kCFRunLoopDefaultMode);
+							CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
+							CFRunLoopObserverInvalidate(observer);
 
-								// Lock back up until we are done processing the exit.
-								CFRunLoopRemoveObserver(event_loop, observer, kCFRunLoopDefaultMode);
-								CFRunLoopRemoveSource(event_loop, event_source, kCFRunLoopDefaultMode);
-								CFRunLoopObserverInvalidate(observer);
-							}
-							else {
-								// We cant do a whole lot of anything if we cant create JNI globals.
-								// Any exceptions are thrown by CreateJNIGlobals().
-
-								#ifdef DEBUG
-								fprintf(stderr, "ThreadProc(): CFRunLoopObserverRef() failed!\n");
-								#endif
-
-								thread_ex.class = NATIVE_HOOK_EXCEPTION;
-								thread_ex.message = "Failed to create the run loop observer";
-							}
-
-
-							// Callback and stop native event dispatch thread
-							(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-							// Remove the global reference to the GlobalScren object.
-							(*env)->DeleteGlobalRef(env, objGlobalScreen);
+							StopMessagePortRunLoop();
 						}
 						else {
-							// We cant do a whole lot of anything if we cant create JNI globals.
-							// Any exceptions are thrown by CreateJNIGlobals().
+							// We cant do a whole lot of anything if we cant
+							// create run loop observer.
 
 							#ifdef DEBUG
-							fprintf(stderr, "ThreadProc(): CreateJNIGlobals() failed!\n");
+							fprintf(stderr, "ThreadProc(): CFRunLoopObserverRef() failed!\n");
 							#endif
 
 							thread_ex.class = NATIVE_HOOK_EXCEPTION;
-							thread_ex.message = "Failed to create JNI global references";
+							thread_ex.message = "Failed to create the run loop observer";
 						}
 
-						// Cleanup Native Input Functions.
-						UnloadInputHelper();
-
-						// Destroy all created globals.
-						#ifdef DEBUG
-						if (DestroyJNIGlobals() == RETURN_FAILURE) {
-							fprintf(stderr, "ThreadProc(): DestroyJNIGlobals() failed!\n");
-						}
-						#else
-						DestroyJNIGlobals();
-						#endif
-
-						// Detach this thread from the JVM.
-						(*jvm)->DetachCurrentThread(jvm);
-
-						#ifdef DEBUG
-						fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-						#endif
-					}
-					else {
-						#ifdef DEBUG
-						fprintf(stderr, "ThreadProc(): AttachCurrentThread() failed!\n");
-						#endif
-
-						thread_ex.class = NATIVE_HOOK_EXCEPTION;
-						thread_ex.message = "Failed to attach the native thread to the virtual machine";
+						// Callback for additional thread cleanup.
+						ThreadStopCallback();
 					}
 				}
 				else {
@@ -692,18 +801,6 @@ static void *ThreadProc(void *arg) {
 			thread_ex.class = NATIVE_HOOK_EXCEPTION;
 			thread_ex.message = "Failed to create event port";
 		}
-
-		if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-			// Callback and stop native event dispatch thread
-			(*env)->CallVoidMethod(env, objGlobalScreen, idStopEventDispatcher);
-
-			// Detach this thread from the JVM.
-			(*jvm)->DetachCurrentThread(jvm);
-
-			#ifdef DEBUG
-			fprintf(stdout, "ThreadProc(): Detach from JVM successful.\n");
-			#endif
-		}
 	}
 	else {
 		#ifdef DEBUG
@@ -724,34 +821,6 @@ static void *ThreadProc(void *arg) {
 	pthread_exit(status);
 }
 
-static int StartMessagePortRunLoop() {
-	int status = RETURN_FAILURE;
-	Boolean shouldFreeInfo;
-	
-	CFMessagePortContext context = {
-		.version = 0,
-		.info = NULL,
-		.retain = NULL,
-		.release = NULL,
-		.copyDescription = NULL
-	};
-
-	localMsgPort = CFMessagePortCreateLocal(kCFAllocatorDefault, CFSTR("TextServiceMessagePort"), MessagePortProc, &context, &shouldFreeInfo);
-	if (shouldFreeInfo != true) {
-		sourceMsgPort = CFMessagePortCreateRunLoopSource(kCFAllocatorDefault, localMsgPort, 0);
-		CFRunLoopAddSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
-		status = RETURN_SUCCESS;
-	}
-	
-	return status;
-}
-
-static void StopMessagePortRunLoop() {
-	CFRunLoopRemoveSource(CFRunLoopGetMain(), sourceMsgPort, kCFRunLoopDefaultMode);
-	CFRelease(sourceMsgPort);
-	CFRelease(localMsgPort);
-}
-
 int StartNativeThread() {
 	int status = RETURN_FAILURE;
 
@@ -765,8 +834,6 @@ int StartNativeThread() {
 
 	// Make sure the native thread is not already running.
 	if (IsNativeThreadRunning() != true) {
-		StartMessagePortRunLoop();
-		
 		if (pthread_create(&hookThreadId, NULL, ThreadProc, malloc(sizeof(int))) == 0) {
 			#ifdef DEBUG
 			fprintf(stdout, "StartNativeThread(): start successful.\n");
@@ -836,8 +903,6 @@ int StopNativeThread() {
 		pthread_join(hookThreadId, &thread_status);
 		status = *(int *) thread_status;
 		free(thread_status);
-
-		StopMessagePortRunLoop();
 
 		#ifdef DEBUG
 		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -32,9 +32,9 @@ static UInt32 currDeadkeyState = 0;
 
 // Input source data for the keyboard.
 #if defined(CARBON_LEGACY)
-static void *inputData = NULL;
+static KeyboardLayoutRef previousKeyboardLayout = NULL;
 #elif defined(COREFOUNDATION)
-static CFDataRef inputData = NULL;
+static TISInputSourceRef previousKeyboardLayout = NULL;
 #endif
 
 void SetModifierMask(CGEventFlags mask) {
@@ -49,10 +49,44 @@ CGEventFlags GetModifiers() {
 	return currModifierMask;
 }
 
+// This method must be executed from the main runloop to avoid the seemingly random
+// Exception detected while handling key input.  TSMProcessRawKeyCode failed (-192) errors.
+// CFEqual(CFRunLoopGetCurrent(), CFRunLoopGetMain())
 void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, UniChar *buffer) {
 	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
-	// Initialze the length to zero.
-	*length = 0;
+	#if defined(CARBON_LEGACY)
+	KeyboardLayoutRef currentKeyboardLayout;
+	void *inputData = NULL;
+	if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
+		if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, (const void **) &inputData) != noErr) {
+			inputData = NULL;
+		}
+	}
+	#elif defined(COREFOUNDATION)
+	TISInputSourceRef currentKeyboardLayout = TISCopyCurrentKeyboardLayoutInputSource();
+	CFDataRef inputData = NULL;
+	if (currentKeyboardLayout != NULL && CFGetTypeID(currentKeyboardLayout) == TISInputSourceGetTypeID()) {
+		CFDataRef data = (CFDataRef) TISGetInputSourceProperty(currentKeyboardLayout, kTISPropertyUnicodeKeyLayoutData);
+		if (data != NULL && CFGetTypeID(data) == CFDataGetTypeID() && CFDataGetLength(data) > 0) {
+			inputData = (CFDataRef) data;
+		}
+	}
+
+	// Check if the keyboard layout has changed to see if the dead key state needs to be discarded.
+	if (previousKeyboardLayout != NULL && currentKeyboardLayout != NULL && CFEqual(currentKeyboardLayout, previousKeyboardLayout) == false) {
+		currDeadkeyState = 0;
+	}
+
+	// Release the previous keyboard layout.
+	if (previousKeyboardLayout != NULL) {
+		CFRelease(previousKeyboardLayout);
+	}
+
+	// Set the previous keyboard layout to the current layout.
+	if (currentKeyboardLayout != NULL) {
+		previousKeyboardLayout = currentKeyboardLayout;
+	}
+	#endif
 
 	if (inputData != NULL) {
 		#ifdef CARBON_LEGACY
@@ -142,45 +176,34 @@ void KeyCodeToString(CGEventRef event, UniCharCount size, UniCharCount *length, 
 	#else
 	CGEventKeyboardGetUnicodeString(event, size, length, buffer);
 	#endif
+
+	// The following codes should not be processed because they are invalid.
+	// FIXME This entire function is ugly, hard to follow and needs to be reworked.
+	if (*length == 1) {
+		switch (buffer[0]) {
+			case 0x01:		// Home
+			case 0x04:		// End
+			case 0x05:		// Help Key
+			case 0x10:		// Function Keys
+			case 0x0B:		// Page Up
+			case 0x0C:		// Page Down
+				*length = 0;
+		}
+	}
 }
 
 void LoadInputHelper() {
 	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
-	if (inputData == NULL) {
-		// Reinitialize dead key state each time we need to load the input helper.
-		currDeadkeyState = 0;
-
-		#if defined(CARBON_LEGACY)
-		KeyboardLayoutRef currentKeyboardLayout;
-		if (KLGetCurrentKeyboardLayout(&currentKeyboardLayout) == noErr) {
-			if (KLGetKeyboardLayoutProperty(currentKeyboardLayout, kKLuchrData, (const void **) &inputData) != noErr) {
-				inputData = NULL;
-			}
-		}
-		#elif defined(COREFOUNDATION)
-		TISInputSourceRef currentKeyboardLayout = TISCopyCurrentKeyboardLayoutInputSource();
-		if (currentKeyboardLayout != NULL && CFGetTypeID(currentKeyboardLayout) == TISInputSourceGetTypeID()) {
-			CFDataRef data = (CFDataRef) TISGetInputSourceProperty(currentKeyboardLayout, kTISPropertyUnicodeKeyLayoutData);
-			if (data != NULL && CFGetTypeID(data) == CFDataGetTypeID() && CFDataGetLength(data) > 0) {
-				inputData = (CFDataRef) CFRetain(data);
-			}
-		}
-
-		if (currentKeyboardLayout != NULL) {
-			CFRelease(currentKeyboardLayout);
-		}
-		#endif
-	}
+	// Start with a fresh dead key state.
+	currDeadkeyState = 0;
 	#endif
 }
 
 void UnloadInputHelper() {
-	#if defined(CARBON_LEGACY)
-	inputData = NULL;
-	#elif defined(COREFOUNDATION)
-	if (inputData != NULL) {
-		CFRelease(inputData);
-		inputData = NULL;
+	#if defined(CARBON_LEGACY) || defined(COREFOUNDATION)
+	if (previousKeyboardLayout != NULL) {
+		// Cleanup tracking of the previous layout.
+		CFRelease(previousKeyboardLayout);
 	}
 	#endif
 }
