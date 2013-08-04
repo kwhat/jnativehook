@@ -17,6 +17,7 @@
  */
 
 #include <config.h>
+#include <nativehook.h>
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -35,8 +36,6 @@
 #include <X11/Intrinsic.h>
 extern Display *xt_disp;
 #endif
-
-#include "nativehook.h"
 
 extern Display *disp;
 

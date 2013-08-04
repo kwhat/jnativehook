@@ -17,7 +17,7 @@
  */
 
 #include <stdbool.h>
-#include "OSXInputHelpers.h"
+#include "osx_input_helpers.h"
 #ifdef COREFOUNDATION
 #include <CoreFoundation/CoreFoundation.h>
 #endif

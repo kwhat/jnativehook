@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+#include <nativehook.h>
+
 #include <w32api.h>
 #define WINVER Windows2000
 #define _WIN32_WINNT WINVER
@@ -24,10 +27,7 @@
 #include "NativeErrors.h"
 #include "WinUnicodeHelper.h"
 
-// Global Variables.
-HINSTANCE hInst = NULL;
-
-long int GetAutoRepeatRate() {
+NATIVEHOOK_API long int get_autorepeat_rate() {
 	long int value = -1;
 	long int rate;
 
@@ -38,7 +38,7 @@ long int GetAutoRepeatRate() {
 	return value;
 }
 
-long GetAutoRepeatDelay() {
+NATIVEHOOK_API long int get_auto_repeat_delay() {
 	long int value = -1;
 	long int delay;
 
@@ -49,7 +49,7 @@ long GetAutoRepeatDelay() {
 	return value;
 }
 
-long int GetPointerAccelerationMultiplier() {
+NATIVEHOOK_API long int GetPointerAccelerationMultiplier() {
 	long int value = -1;
 	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
@@ -60,7 +60,7 @@ long int GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-long int GetPointerAccelerationThreshold() {
+NATIVEHOOK_API long int get_pointer_acceleration_threshold() {
 	long int value = -1;
 	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
@@ -72,7 +72,7 @@ long int GetPointerAccelerationThreshold() {
 	return value;
 }
 
-long int GetPointerSensitivity() {
+NATIVEHOOK_API long int get_pointer_sensitivity() {
 	long int value = -1;
 	int sensitivity;
 
@@ -83,7 +83,7 @@ long int GetPointerSensitivity() {
 	return value;
 }
 
-long int GetMultiClickTime() {
+NATIVEHOOK_API long int get_multi_click_time() {
 	long int value = -1;
 	UINT clicktime;
 
@@ -91,25 +91,4 @@ long int GetMultiClickTime() {
 	value = (long int) clicktime;
 
 	return value;
-}
-
-void OnLibraryLoad() {
-	// Load the unicode conversion helper.
-	LoadUnicodeHelper();
-}
-
-void OnLibraryUnload() {
-	// Unload the unicode conversion helper.
-	UnloadUnicodeHelper();
-}
-
-BOOL APIENTRY DllMain(HANDLE _hInst, DWORD reason, LPVOID UNUSED(reserved)) {
-	switch (reason) {
-		case DLL_PROCESS_ATTACH:
-			hInst = (HINSTANCE) _hInst;
-			// hInst = GetModuleHandle(NULL);
-			break;
-	}
-
-	return TRUE;
 }

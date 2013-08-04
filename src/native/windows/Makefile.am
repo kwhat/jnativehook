@@ -29,7 +29,8 @@ libnativehook_la_SOURCES = \
 	library_load.c \
 	post_event.c \
 	system_properties.c \
-	x_input_helpers.c
+	win_input_helpers.c \
+	win_unicode_helper.c
 
 CLEANFILES =
 

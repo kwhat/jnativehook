@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static uint16_t scan_code_lookup[] = {
+const uint16_t scancode_table[] = {
 	VC_UNDEFINED,		// 0x00 00	?
 	VC_ESCAPE,			// 0x01 01
 	VC_1,				// 0x02 02

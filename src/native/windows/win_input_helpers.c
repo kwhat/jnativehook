@@ -16,13 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
+#include <config.h>
+#include <stdlib.h>
 #include <windows.h>
 
-#include <stdlib.h>
-#include "NativeToJava.h"
 #include "win_input_helpers.h"
 
 static unsigned short int current_modifiers = 0x0000;
@@ -45,10 +42,10 @@ unsigned short int get_scroll_wheel_type() {
 
 	SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &wheel_type, 0);
 	if (wheel_type == WHEEL_PAGESCROLL) {
-		value = org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL;
+		value = WHEEL_BLOCK_SCROLL;
 	}
 	else {
-		value = org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL;
+		value = WHEEL_UNIT_SCROLL;
 	}
 
 	return value;

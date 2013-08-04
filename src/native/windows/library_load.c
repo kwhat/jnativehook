@@ -16,7 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+#include <nativehook.h>
+#include <windows.h>
+
 #include "library_load.h"
+#include "win_unicode_helper.h"
 
 // Global Variables.
 HINSTANCE hInst = NULL;
@@ -38,9 +43,9 @@ void on_library_load() {
 	//hInst = (HINSTANCE) _hInst;
 	hInst = GetModuleHandle(NULL);
 
-	LoadUnicodeHelper();
+	load_unicode_helper();
 }
 
 void on_library_unload() {
-	UnloadUnicodeHelper();
+	unload_unicode_helper();
 }

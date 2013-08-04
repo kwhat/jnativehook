@@ -303,26 +303,21 @@ static void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				if (mouse_dragged) {
 					// Create Mouse Dragged event.
 					event->type = EVENT_MOUSE_DRAGGED;
-					event->time = event_time;
-					event->mask = modifiers;
-
-					event->data.mouse.button = MOUSE_NOBUTTON;
-					event->data.mouse.clicks = click_count;
-					event->data.mouse.x = event_x;
-					event->data.mouse.y = event_y;
 				}
 				else {
 					// Create a Mouse Moved event.
 					event->type = EVENT_MOUSE_MOVED;
-					event->time = event_time;
-					event->mask = modifiers;
-
-					event->data.mouse.button = MOUSE_NOBUTTON;
-					event->data.mouse.clicks = click_count;
-					event->data.mouse.x = event_x;
-					event->data.mouse.y = event_y;
 				}
 
+				// Populate common event info.
+				event->time = event_time;
+				event->mask = modifiers;
+
+				event->data.mouse.button = MOUSE_NOBUTTON;
+				event->data.mouse.clicks = click_count;
+				event->data.mouse.x = event_x;
+				event->data.mouse.y = event_y;
+					
 				// Fire mouse moved event.
 				dispatch_event(event);
 				break;

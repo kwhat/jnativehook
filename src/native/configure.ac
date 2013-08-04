@@ -57,7 +57,8 @@ AM_INIT_AUTOMAKE([1.9 foreign -Wall])
 AC_LANG([C])
 
 # Checks for programs.
-AM_PROG_AR
+AC_CHECK_TOOL([AR], [ar], [false])
+#AM_PROG_AR
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
@@ -89,7 +90,7 @@ AS_CASE([$host],
 	[*-mingw* | *-cygwin*], [
 		AC_MSG_RESULT([$host (Windows Compatible)])
 		backend="windows"
-	]
+	],
 	[AC_MSG_ERROR([Unsupported operating system ${host}])])
 
 # Common Options
@@ -222,7 +223,7 @@ AS_IF(
 		if test "x$enable_carbon_legacy" = "xyes" ; then
 			# FIXME AC_MSG_ERROR if this is a 64 bit target.
 			AC_MSG_WARN([Carbon legacy functionality is required for OS X version 10.4 and should only be used on 32-bit targets.])
-			AC_DEFINE([USE_CARBON_LEGACY], 1, [Enable Carbon framework legacy functionalit])
+			AC_DEFINE([USE_CARBON_LEGACY], 1, [Enable Carbon framework legacy functionality])
 		fi
 
 		# Always add Carbon due to non-deprecated #define's
@@ -232,7 +233,7 @@ AS_IF(
 		LDFLAGS="$LDFLAGS -L/usr/local/lib"
 	],
 	[test "x$backend" = "xwindows"], [
-
+		AC_DEFINE([_WIN32_WINNT], 0x0500, [Set minimum Windows version to Windows2000])
 	])
 
 # OS info for Automake

@@ -41,10 +41,12 @@
  *
  ***********************************************************************/
 
+#include <config.h>
+
 #include <stdbool.h>
 #include <stddef.h>
-#include "WinUnicodeHelper.h"
-#include "NativeGlobals.h"
+
+#include "win_unicode_helper.h"
 
 // Structure and pointers for the keyboard locale cache.
 typedef struct _KeyboardLocale {
@@ -60,30 +62,30 @@ static KeyboardLocale* locale_first = NULL;
 static KeyboardLocale* locale_current = NULL;
 
 // Amount of pointer padding to apply for Wow64 instances.
-static short int ptrPadding = 0;
+static short int ptr_padding = 0;
 
 #if defined(_WIN32) && !defined(_WIN64)
 // Small function to check and see if we are executing under Wow64.
-static BOOL IsWow64() {
-	BOOL bIsWow64 = FALSE;
+static BOOL is_wow64() {
+	BOOL status = FALSE;
 
 	LPFN_ISWOW64PROCESS pIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(GetModuleHandle("kernel32"), "IsWow64Process");
 
 	if(pIsWow64Process != NULL) {
-		if (!pIsWow64Process(GetCurrentProcess(), &bIsWow64)) {
-			bIsWow64 = FALSE;
+		if (!pIsWow64Process(GetCurrentProcess(), &status)) {
+			status = FALSE;
 			#ifdef DEBUG
-			fprintf(stderr, "IsWow64(): pIsWow64Process(GetCurrentProcess(), &bIsWow64) failed!\n");
+			fprintf(stderr, "is_wow64(): pIsWow64Process(GetCurrentProcess(), &status) failed!\n");
 			#endif
 		}
 	}
 
-	return bIsWow64;
+	return status;
 }
 #endif
 
 // Locate the DLL that contains the current keyboard layout.
-static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
+static int get_keyboard_layout_file(char *layoutFile, DWORD bufferSize) {
 	int status = RETURN_FAILURE;
 	HKEY hKey;
 	DWORD varType = REG_SZ;
@@ -104,14 +106,14 @@ static int GetKeyboardLayoutFile(char *layoutFile, DWORD bufferSize) {
 	return status;
 }
 
-static int RefreshLocaleList() {
+static int refresh_locale_list() {
 	int count = 0;
 
 	// Get the number of layouts the user has activated.
 	int hkl_size = GetKeyboardLayoutList(0, NULL);
 	if (hkl_size > 0) {
 		#ifdef DEBUG
-		fprintf(stderr, "RefreshLocaleList(): GetKeyboardLayoutList() found %d.\n", hkl_size);
+		fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() found %d.\n", hkl_size);
 		#endif
 
 		// Get the thread id that currently has focus for our default.
@@ -124,10 +126,10 @@ static int RefreshLocaleList() {
 		if (new_size > 0) {
 			#ifdef DEBUG
 			if (new_size != hkl_size) {
-				fprintf(stderr, "RefreshLocaleList(): Locale size mismatch!  Expected %d, received %d.\n", hkl_size, new_size);
+				fprintf(stderr, "refresh_locale_list(): Locale size mismatch!  Expected %d, received %d.\n", hkl_size, new_size);
 			}
 			else {
-				fprintf(stdout, "RefreshLocaleList(): Received %d locales.\n", new_size);
+				fprintf(stdout, "refresh_locale_list(): Received %d locales.\n", new_size);
 			}
 			#endif
 
@@ -149,7 +151,7 @@ static int RefreshLocaleList() {
 
 				if (is_loaded) {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
+					fprintf(stdout, "refresh_locale_list(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
 					#endif
 
 					// Set the previous local to the current locale.
@@ -164,7 +166,7 @@ static int RefreshLocaleList() {
 				}
 				else {
 					#ifdef DEBUG
-					fprintf(stdout, "RefreshLocaleList(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
+					fprintf(stdout, "refresh_locale_list(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
 					#endif
 
 					// If the old id is not in the new list, remove it.
@@ -196,7 +198,7 @@ static int RefreshLocaleList() {
 
 					// Try to pull the current keyboard layout DLL from the registry.
 					char layoutFile[MAX_PATH];
-					if (GetKeyboardLayoutFile(layoutFile, sizeof(layoutFile)) == RETURN_SUCCESS) {
+					if (get_keyboard_layout_file(layoutFile, sizeof(layoutFile)) == RETURN_SUCCESS) {
 						//You can't trust the %SYSPATH%, look it up manually.
 						char systemDirectory[MAX_PATH];
 						if (GetSystemDirectory(systemDirectory, MAX_PATH) != 0) {
@@ -204,7 +206,7 @@ static int RefreshLocaleList() {
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
 
 							#ifdef DEBUG
-							fprintf(stdout, "RefreshLocaleList(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
+							fprintf(stdout, "refresh_locale_list(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
 							#endif
 
 							// Create the new locale item.
@@ -224,10 +226,10 @@ static int RefreshLocaleList() {
 								locale_item->pVkToBit = pKbd->pCharModifiers->pVkToBit;
 
 								// Second element of pKbd, +4 byte offset on wow64.
-								locale_item->pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptrPadding));
+								locale_item->pVkToWcharTable = *((PVK_TO_WCHAR_TABLE *) (base + offsetof(KBDTABLES, pVkToWcharTable) + ptr_padding));
 
 								// Third element of pKbd, +8 byte offset on wow64.
-								locale_item->pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptrPadding * 2)));
+								locale_item->pDeadKey = *((PDEADKEY *) (base + offsetof(KBDTABLES, pDeadKey) + (ptr_padding * 2)));
 
 
 								// This will always be added to the end of the list.
@@ -255,7 +257,7 @@ static int RefreshLocaleList() {
 							}
 							else {
 								#ifdef DEBUG
-								fprintf(stderr, "RefreshLocaleList(): GetProcAddress() failed for KbdLayerDescriptor!\n");
+								fprintf(stderr, "refresh_locale_list(): GetProcAddress() failed for KbdLayerDescriptor!\n");
 								#endif
 
 								FreeLibrary(locale_item->library);
@@ -265,13 +267,13 @@ static int RefreshLocaleList() {
 						}
 						#ifdef DEBUG
 						else {
-							fprintf(stderr, "RefreshLocaleList(): GetSystemDirectory() failed!\n");
+							fprintf(stderr, "refresh_locale_list(): GetSystemDirectory() failed!\n");
 						}
 						#endif
 					}
 					#ifdef DEBUG
 					else {
-						fprintf(stderr, "RefreshLocaleList(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
+						fprintf(stderr, "refresh_locale_list(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
 					}
 					#endif
 				}
@@ -279,7 +281,7 @@ static int RefreshLocaleList() {
 		}
 		else {
 			#ifdef DEBUG
-			fprintf(stderr, "RefreshLocaleList(): GetKeyboardLayoutList() failed!\n");
+			fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() failed!\n");
 			#endif
 
 			// Try and recover by using the current layout.
@@ -293,26 +295,26 @@ static int RefreshLocaleList() {
 	return count;
 }
 
-int LoadUnicodeHelper() {
+int load_unicode_helper() {
 	int count = 0;
 
 	#if defined(_WIN32) && !defined(_WIN64)
-	if (IsWow64()) {
-		ptrPadding = sizeof(void *);
+	if (is_wow64()) {
+		ptr_padding = sizeof(void *);
 	}
 	#endif
 
-	count = RefreshLocaleList();
+	count = refresh_locale_list();
 
 	#ifdef DEBUG
-	fprintf(stdout, "LoadUnicodeHelper(): RefreshLocaleList found %d.\n", count);
+	fprintf(stdout, "load_unicode_helper(): refresh_locale_list found %d.\n", count);
 	#endif
 
 	return count;
 }
 
 // This returns the number of locales that were removed.
-int UnloadUnicodeHelper() {
+int unload_unicode_helper() {
 	int count = 0;
 
 	// Cleanup and free memory from the old list.
@@ -333,7 +335,7 @@ int UnloadUnicodeHelper() {
 	return count;
 }
 
-int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
+int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 	// Get the thread id that currently has focus and
 	DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
 	HKL locale_id = GetKeyboardLayout(focus_pid);
@@ -346,7 +348,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 			// Search the linked list.
 			if (locale_item->id == locale_id) {
 				#ifdef DEBUG
-				fprintf(stdout, "ConvertVirtualKeyToWChar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
+				fprintf(stdout, "convert_vk_to_wchar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
 				#endif
 
 				// If they layout changes the dead key state needs to be reset.
@@ -363,10 +365,10 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 		// If we were unable to find the locale in the list, refresh the list.
 		if (locale_current == NULL) {
 			#ifdef DEBUG
-			fprintf(stdout, "ConvertVirtualKeyToWChar(): Refreshing locale cache.\n");
+			fprintf(stdout, "convert_vk_to_wchar(): Refreshing locale cache.\n");
 			#endif
 
-			RefreshLocaleList();
+			refresh_locale_list();
 		}
 	}
 
@@ -377,7 +379,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 	// Check and make sure the unicode helper was loaded.
 	if (locale_current != NULL) {
 		#ifdef DEBUG
-		fprintf(stdout, "ConvertVirtualKeyToWChar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
+		fprintf(stdout, "convert_vk_to_wchar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
 		#endif
 
 		short state = 0;
@@ -417,10 +419,10 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 		// additional byte fields) that are padded out to 8 bytes by the compiler.
 		unsigned short sizeVkToWcharTable = sizeof(VK_TO_WCHAR_TABLE);
 		#if defined(_WIN32) && !defined(_WIN64)
-		if (IsWow64()) {
+		if (is_wow64()) {
 			// If we are running under Wow64 the size of the first pointer will be
 			// 8 bringing the total size to 10 bytes padded out to 16.
-			sizeVkToWcharTable = (sizeVkToWcharTable + ptrPadding + 7) & -8;
+			sizeVkToWcharTable = (sizeVkToWcharTable + ptr_padding + 7) & -8;
 		}
 		#endif
 
@@ -429,7 +431,7 @@ int ConvertVirtualKeyToWChar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar)
 		int cbSize, n;
 		do {
 			// cbSize is used to calculate n, and n is used for the size of pVkToWchars[j].wch[n]
-			cbSize = *(ptrCurrentVkToWcharTable + offsetof(VK_TO_WCHAR_TABLE, cbSize) + ptrPadding);
+			cbSize = *(ptrCurrentVkToWcharTable + offsetof(VK_TO_WCHAR_TABLE, cbSize) + ptr_padding);
 			n = (cbSize - 2) / 2;
 
 			// Same as VK_TO_WCHARS pVkToWchars[] = pVkToWcharTable[i].pVkToWchars

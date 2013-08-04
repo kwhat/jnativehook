@@ -24,11 +24,11 @@
 #define _WIN32_WINNT WINVER
 #include <windows.h>
 
-#include "NativeToJava.h"
-#include "WinInputHelpers.h"
+#include "convert_to_native.h"
+#include "win_input_helpers.h"
 
 unsigned int convert_to_native_key(unsigned int virtual_keycode) {
-	UINT scancode = MapVirtualKey((UINT) virtual_keycode, MAPVK_VK_TO_VSC);
+	UINT native_keycode = MapVirtualKey(virtual_keycode, MAPVK_VK_TO_VSC);
 
 	return native_keycode;
 }
@@ -38,24 +38,19 @@ unsigned int convert_to_native_button(unsigned short int virtual_button) {
 
 	switch (virtual_button) {
 		case MOUSE_BUTTON1:
-			native_button = Button1;
-			break;
 		case MOUSE_BUTTON2:
-			native_button = Button2;
+			native_button = virtual_button;
 			break;
+			
 		case MOUSE_BUTTON3:
-			native_button = Button3;
-			break;
 		case MOUSE_BUTTON4:
-			native_button = Button4;
-			break;
 		case MOUSE_BUTTON5:
-			native_button = Button5;
+			native_button = virtual_button + 1;
 			break;
 
 		default:
 		case MOUSE_NOBUTTON:
-			native_button = AnyButton;
+			native_button = 0;
 			break;
 	}
 
@@ -65,16 +60,21 @@ unsigned int convert_to_native_button(unsigned short int virtual_button) {
 unsigned short int convert_to_native_mask(unsigned short int virtual_mask) {
 	unsigned short int native_mask = 0x0000;
 
-	if (virtual_mask & MASK_SHIFT_L)	native_mask |= ShiftMask;
-	if (virtual_mask & MASK_CTRL_L)		native_mask |= ControlMask;
-	if (virtual_mask & MASK_META_L)		native_mask |= Mod4Mask;
-	if (virtual_mask & MASK_ALT_L)		native_mask |= Mod1Mask;
+	if (virtual_mask & MASK_SHIFT_L)	native_mask |= MOD_LSHIFT;
+	if (virtual_mask & MASK_CTRL_L)		native_mask |= MOD_LCONTROL;
+	if (virtual_mask & MASK_META_L)		native_mask |= MOD_LWIN;
+	if (virtual_mask & MASK_ALT_L)		native_mask |= MOD_LALT;
 
-	if (virtual_mask & MASK_BUTTON1)	native_mask |= Button1Mask;
-	if (virtual_mask & MASK_BUTTON2)	native_mask |= Button2Mask;
-	if (virtual_mask & MASK_BUTTON3)	native_mask |= Button3Mask;
-	if (virtual_mask & MASK_BUTTON4)	native_mask |= Button4Mask;
-	if (virtual_mask & MASK_BUTTON5)	native_mask |= Button5Mask;
+	if (virtual_mask & MASK_SHIFT_R)	native_mask |= MOD_RSHIFT;
+	if (virtual_mask & MASK_CTRL_R)		native_mask |= MOD_RCONTROL;
+	if (virtual_mask & MASK_META_R)		native_mask |= MOD_RWIN;
+	if (virtual_mask & MASK_ALT_R)		native_mask |= MOD_RALT;
+
+	if (virtual_mask & MASK_BUTTON1)	native_mask |= MOD_RBUTTON;
+	if (virtual_mask & MASK_BUTTON2)	native_mask |= MOD_LBUTTON;
+	if (virtual_mask & MASK_BUTTON3)	native_mask |= MOD_MBUTTON;
+	if (virtual_mask & MASK_BUTTON4)	native_mask |= MOD_XBUTTON1;
+	if (virtual_mask & MASK_BUTTON5)	native_mask |= MOD_XBUTTON2;
 
 	return native_mask;
 }

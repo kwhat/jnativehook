@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_WinInputHelpers
-#define _Included_WinInputHelpers
+#ifndef _included_win_input_helpers
+#define _included_win_input_helpers
 
 #include <stdbool.h>
 #include <limits.h>
@@ -79,22 +79,22 @@
 
 
 // Set the native modifier mask for future events.
-extern void SetModifierMask(unsigned short int mask);
+extern void set_modifier_mask(unsigned short int mask);
 
 // Unset the native modifier mask for future events.
-extern void UnsetModifierMask(unsigned short int mask);
+extern void unset_modifier_mask(unsigned short int mask);
 
 // Get the current native modifier mask state.
-extern unsigned short int GetModifiers();
+extern unsigned short int get_modifiers();
 
 /* Retrieves the mouse wheel scroll type. This function cannot be included as
  * part of the NativeHelpers.h due to platform specific calling restrictions.
  */
-extern unsigned short int GetScrollWheelType();
+extern unsigned short int get_scroll_wheel_type();
 
 /* Retrieves the mouse wheel scroll amount. This function cannot be included as
  * part of the NativeHelpers.h due to platform specific calling restrictions.
  */
-extern unsigned short int GetScrollWheelAmount();
+extern unsigned short int get_scroll_wheel_amount();
 
 #endif
