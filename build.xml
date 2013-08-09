@@ -28,12 +28,12 @@
 	<property name="project.version"	value="${build.major}.${build.minor}.${build.revision}" />
 
 	<!-- Path Settings -->
-	<property name="dir.src"			value="${basedir}${file.separator}src" />
-	<property name="dir.doc"			value="${basedir}${file.separator}doc" />
-	<property name="dir.jar"			value="${basedir}${file.separator}jar" />
-	<property name="dir.dist"			value="${basedir}${file.separator}dist" />
-	<property name="dir.lib"			value="${basedir}${file.separator}lib" />
-	<property name="dir.bin"			value="${basedir}${file.separator}bin" />
+	<property name="dir.src"			value="${basedir}${file.separator}src" relative="true" />
+	<property name="dir.doc"			value="${basedir}${file.separator}doc" relative="true" />
+	<property name="dir.jar"			value="${basedir}${file.separator}jar" relative="true" />
+	<property name="dir.dist"			value="${basedir}${file.separator}dist" relative="true" />
+	<property name="dir.lib"			value="${basedir}${file.separator}lib" relative="true" />
+	<property name="dir.bin"			value="${basedir}${file.separator}bin" relative="true" />
 
 	<!-- Class Path Settings -->
 	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p ant-junit,junit-4)" ant test` -->
@@ -511,6 +511,15 @@
 		<get src="http://code.google.com/p/libnativehook" dest="${dir.src}/native" verbose="true" />
 		-->
 
+
+		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/obj/native" /-->
+		<pathconvert property="dir.src.unix" targetos="unix">
+			<path location="${dir.src}" />
+			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
+			<map from="${dir.src}" to="${dir.src}" />
+		</pathconvert>
+		<echo>${dir.src.unix}</echo>
+
 		<echo>Bootstrapping autoconf build process...</echo>
 		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
 			<arg value="--install" />
@@ -518,6 +527,12 @@
 			<arg value="--force" />
 		</exec>
 
+		<exec executable="bash" dir="${dir.src}/native" failonerror="true" osfamily="windows">
+			<arg value="-c" />
+			<arg value="autoreconf --install --verbose --force" />
+			<!-- autoreconf -install -verbose -force -->
+		</exec>
+		
 		<!-- Create an absolute path installation prefix for JNI static linking. -->
 		<property name="cc.prefix" location="${dir.bin}"/>
 
@@ -531,9 +546,16 @@
 			<arg value="--with-pic" />
 			<arg value="--prefix=${cc.prefix}" />
 		</exec>
+		
+		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/obj/native" /-->
+
+		<exec executable="bash" dir="${dir.bin}/obj/native" failonerror="true" osfamily="windows">
+			<arg value="-c" />
+			<arg line="${dir.src.unix}/native/configure --enable-debug --enable-static --prefix=${cc.prefix}" />
+		</exec>
 
 		<echo>Building...</echo>
-		<exec executable="make" dir="${dir.bin}/obj/native" failonerror="true" osfamily="unix">
+		<exec executable="make" dir="${dir.bin}/obj/native" failonerror="true">
 			<arg value="--jobs=4" />
 			<arg value="install" />
 		</exec>

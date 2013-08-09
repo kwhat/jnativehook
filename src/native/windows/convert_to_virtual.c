@@ -18,6 +18,7 @@
 
 #include <config.h>
 #include <nativehook.h>
+#include <windows.h>
 
 #include "scancode_table.h"
 

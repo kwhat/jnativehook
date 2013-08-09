@@ -18,13 +18,10 @@
 
 #include <config.h>
 #include <nativehook.h>
-
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
 #include <windows.h>
 
 #include "convert_to_native.h"
+#include "scancode_lookup.h"
 #include "win_input_helpers.h"
 
 unsigned int convert_to_native_key(unsigned int virtual_keycode) {
@@ -58,23 +55,7 @@ unsigned int convert_to_native_button(unsigned short int virtual_button) {
 }
 
 unsigned short int convert_to_native_mask(unsigned short int virtual_mask) {
-	unsigned short int native_mask = 0x0000;
-
-	if (virtual_mask & MASK_SHIFT_L)	native_mask |= MOD_LSHIFT;
-	if (virtual_mask & MASK_CTRL_L)		native_mask |= MOD_LCONTROL;
-	if (virtual_mask & MASK_META_L)		native_mask |= MOD_LWIN;
-	if (virtual_mask & MASK_ALT_L)		native_mask |= MOD_LALT;
-
-	if (virtual_mask & MASK_SHIFT_R)	native_mask |= MOD_RSHIFT;
-	if (virtual_mask & MASK_CTRL_R)		native_mask |= MOD_RCONTROL;
-	if (virtual_mask & MASK_META_R)		native_mask |= MOD_RWIN;
-	if (virtual_mask & MASK_ALT_R)		native_mask |= MOD_RALT;
-
-	if (virtual_mask & MASK_BUTTON1)	native_mask |= MOD_RBUTTON;
-	if (virtual_mask & MASK_BUTTON2)	native_mask |= MOD_LBUTTON;
-	if (virtual_mask & MASK_BUTTON3)	native_mask |= MOD_MBUTTON;
-	if (virtual_mask & MASK_BUTTON4)	native_mask |= MOD_XBUTTON1;
-	if (virtual_mask & MASK_BUTTON5)	native_mask |= MOD_XBUTTON2;
+	unsigned short int native_mask = virtual_mask;
 
 	return native_mask;
 }

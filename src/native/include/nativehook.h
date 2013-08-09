@@ -45,8 +45,8 @@
 
 /* Begin Virtual Event Types and Data Structures */
 typedef enum _EventType {
-	EVENT_KEY_PRESSED, 
-	EVENT_KEY_RELEASED, 
+	EVENT_KEY_PRESSED = 1,
+	EVENT_KEY_RELEASED,
 	EVENT_KEY_TYPED,
 	EVENT_MOUSE_PRESSED,
 	EVENT_MOUSE_RELEASED,
@@ -58,7 +58,7 @@ typedef enum _EventType {
 
 typedef struct _KeyboardEventData {
 	unsigned short int keycode;
-	unsigned short int rawcode;
+	unsigned short int scancode;
 	wchar_t keychar;
 } KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 

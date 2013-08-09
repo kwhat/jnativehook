@@ -18,9 +18,19 @@
 
 #include <windows.h>
 
+static KeySym keymask_lookup[8] = {
+	XK_Shift_L,
+	XK_Control_L,
+	XK_Meta_L,
+	XK_Alt_L,
+
+	XK_Shift_R,
+	XK_Control_R,
+	XK_Meta_R,
+	XK_Alt_R
+};
+
 NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
-	char buffer[4];
-	
 	unsigned char events_size = 0, events_max = 28;
 	INPUT *events = malloc(sizeof(INPUT) * events_max);
 	
@@ -37,16 +47,36 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 		}
 	}
 
-	for (unsigned int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
-		if (event->mask & btnmask_lookup[i]) {
-			events[events_count].type = INPUT_MOUSE;
-			events[events_count].mi.dx = 0;
-			events[events_count].mi.dy = 0;
-			events[events_count].mi.mouseData = ;
-			events[events_count].mi.dwFlags = 0x00;
-			events[events_count].mi.time = 0; //GetSystemTime()
-			events_count++;
+	if (event->mask & (MASK_BUTTON1 | MASK_BUTTON2 | MASK_BUTTON3 | MASK_BUTTON4 | MASK_BUTTON5)) {
+		events[events_count].type = INPUT_MOUSE;
+		events[events_count].mi.dx = 0;	// Relative mouse movement due to 
+		events[events_count].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
+		events[events_count].mi.mouseData = 0x00;
+		events[events_count].mi.time = 0; //GetSystemTime()
+		
+		if (event->mask & MASK_BUTTON1) {
+			events[events_count].mi.mouseData &= MOUSEEVENTF_LEFTDOWN;
 		}
+		
+		if (event->mask & MASK_BUTTON2) {
+			events[events_count].mi.mouseData &= MOUSEEVENTF_RIGHTDOWN;
+		}
+		
+		if (event->mask & MASK_BUTTON3) {
+			events[events_count].mi.mouseData &= MOUSEEVENTF_MIDDLEDOWN;
+		}
+		
+		if (event->mask & MASK_BUTTON4) {
+			events[events_count].mi.mouseData = XBUTTON1;
+			events[events_count].mi.mouseData &= MOUSEEVENTF_XDOWN;
+		}
+		
+		if (event->mask & MASK_BUTTON5) {
+			events[events_count].mi.mouseData = XBUTTON2;
+			events[events_count].mi.dwFlags &= MOUSEEVENTF_XDOWN;
+		}
+		
+		events_count++;
 	}
 
 	switch (event->type) {
@@ -56,6 +86,7 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		case EVENT_KEY_TYPED:
 			// Need to convert a wchar_t to keysym!
+			char buffer[4];
 			snprintf(buffer, 4, "%lc", event->data.keyboard.keychar);
 
 			event->type = EVENT_KEY_PRESSED;
@@ -95,14 +126,24 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			goto EVENT_BUTTON;
 
 		EVENT_BUTTON:
-			XTestFakeButtonEvent(disp, event->data.mouse.button, is_press, 0);
+			events[events_count].type = INPUT_MOUSE;
+			events[events_count].mi.dx = event->data.mouse.x;
+			events[events_count].mi.dy = event->data.mouse.y;
+			events[events_count].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
+			events[events_count].mi.time = 0; //GetSystemTime()
+			events_count++;
 			break;
 
 		case EVENT_MOUSE_DRAGGED:
 			// The button masks are all applied with the modifier masks.
 
 		case EVENT_MOUSE_MOVED:
-			XTestFakeMotionEvent(disp, -1, event->data.mouse.x, event->data.mouse.y, 0);
+			events[events_count].type = INPUT_MOUSE;
+			events[events_count].mi.dx = event->data.mouse.x;
+			events[events_count].mi.dy = event->data.mouse.y;
+			events[events_count].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
+			events[events_count].mi.time = 0; //GetSystemTime()
+			events_count++;
 			break;
 	}
 
