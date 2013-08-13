@@ -16,6 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <nativehook.h>
+
 const uint16_t scancode_table[] = {
 	VC_UNDEFINED,		// 0x00 00	?
 	VC_ESCAPE,			// 0x01 01

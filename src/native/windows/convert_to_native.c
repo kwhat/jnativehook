@@ -16,21 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <nativehook.h>
 #include <windows.h>
 
 #include "convert_to_native.h"
-#include "scancode_lookup.h"
-#include "win_input_helpers.h"
+#include "scancode_table.h"
 
 unsigned int convert_to_native_key(unsigned int virtual_keycode) {
-	UINT native_keycode = MapVirtualKey(virtual_keycode, MAPVK_VK_TO_VSC);
+	UINT native_keycode = MapVirtualKey(virtual_keycode, 1); // MAPVK_VSC_TO_VK
 
 	return native_keycode;
 }
 
-unsigned int convert_to_native_button(unsigned short int virtual_button) {
+unsigned int convert_to_native_button(unsigned int virtual_button) {
 	unsigned short int native_button;
 
 	switch (virtual_button) {
@@ -54,7 +56,7 @@ unsigned int convert_to_native_button(unsigned short int virtual_button) {
 	return native_button;
 }
 
-unsigned short int convert_to_native_mask(unsigned short int virtual_mask) {
+unsigned int convert_to_native_mask(unsigned int virtual_mask) {
 	unsigned short int native_mask = virtual_mask;
 
 	return native_mask;

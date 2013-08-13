@@ -16,18 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
-#include <nativehook.h>
+#endif
 
-#include <w32api.h>
-#define WINVER Windows2000
-#define _WIN32_WINNT WINVER
+#include <nativehook.h>
 #include <windows.h>
 
-#include "NativeErrors.h"
-#include "WinUnicodeHelper.h"
+#include "win_unicode_helper.h"
 
-NATIVEHOOK_API long int get_autorepeat_rate() {
+NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 	long int value = -1;
 	long int rate;
 
@@ -38,7 +36,7 @@ NATIVEHOOK_API long int get_autorepeat_rate() {
 	return value;
 }
 
-NATIVEHOOK_API long int get_auto_repeat_delay() {
+NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 	long int value = -1;
 	long int delay;
 
@@ -49,7 +47,7 @@ NATIVEHOOK_API long int get_auto_repeat_delay() {
 	return value;
 }
 
-NATIVEHOOK_API long int GetPointerAccelerationMultiplier() {
+NATIVEHOOK_API long int hook_get_pointer_acceleration_multiplier() {
 	long int value = -1;
 	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
@@ -60,7 +58,7 @@ NATIVEHOOK_API long int GetPointerAccelerationMultiplier() {
 	return value;
 }
 
-NATIVEHOOK_API long int get_pointer_acceleration_threshold() {
+NATIVEHOOK_API long int hook_get_pointer_acceleration_threshold() {
 	long int value = -1;
 	int mouse[3]; // 0-Threshold X, 1-Threshold Y and 2-Speed.
 
@@ -72,7 +70,7 @@ NATIVEHOOK_API long int get_pointer_acceleration_threshold() {
 	return value;
 }
 
-NATIVEHOOK_API long int get_pointer_sensitivity() {
+NATIVEHOOK_API long int hook_get_pointer_sensitivity() {
 	long int value = -1;
 	int sensitivity;
 
@@ -83,7 +81,7 @@ NATIVEHOOK_API long int get_pointer_sensitivity() {
 	return value;
 }
 
-NATIVEHOOK_API long int get_multi_click_time() {
+NATIVEHOOK_API long int hook_get_multi_click_time() {
 	long int value = -1;
 	UINT clicktime;
 

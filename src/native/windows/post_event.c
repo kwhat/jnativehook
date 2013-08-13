@@ -16,102 +16,112 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <stdio.h>
+#include <nativehook.h>
 #include <windows.h>
 
-static KeySym keymask_lookup[8] = {
-	XK_Shift_L,
-	XK_Control_L,
-	XK_Meta_L,
-	XK_Alt_L,
+#include "convert_to_native.h"
 
-	XK_Shift_R,
-	XK_Control_R,
-	XK_Meta_R,
-	XK_Alt_R
+static UINT keymask_lookup[8] = {
+	VK_LSHIFT,
+	VK_LCONTROL,
+	VK_LWIN,
+	VK_LMENU,
+
+	VK_RSHIFT,
+	VK_RCONTROL,
+	VK_RWIN,
+	VK_RMENU
 };
 
 NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 	unsigned char events_size = 0, events_max = 28;
 	INPUT *events = malloc(sizeof(INPUT) * events_max);
 	
-	// XTest does not have modifier support, so we fake it by depressing the
-	// appropriate modifier keys.
-	for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
-		if (event->mask & 1 << i) {
-			events[events_count].type = INPUT_KEYBOARD;
-			events[events_count].ki.wVk = vkCode;
-			events[events_count].ki.wScan = MapVirtualKey(vkCode, 0); //MAPVK_VK_TO_VSC
-			events[events_count].ki.dwFlags = 0x00;
-			events[events_count].ki.time = 0; //GetSystemTime()
-			events_count++;
+	if (event->mask & (MASK_SHIFT | MASK_CTRL | MASK_META | MASK_ALT)) {
+		for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(UINT); i++) {
+			if (event->mask & 1 << i) {
+				events[events_size].type = INPUT_KEYBOARD;
+				events[events_size].ki.wVk = convert_to_native_key(event->data.keyboard.keycode);
+				events[events_size].ki.dwFlags = 0x0000;  // KEYEVENTF_KEYDOWN
+				events[events_size].ki.time = 0; // Use current system time.
+				events_size++;
+			}
 		}
 	}
 
 	if (event->mask & (MASK_BUTTON1 | MASK_BUTTON2 | MASK_BUTTON3 | MASK_BUTTON4 | MASK_BUTTON5)) {
-		events[events_count].type = INPUT_MOUSE;
-		events[events_count].mi.dx = 0;	// Relative mouse movement due to 
-		events[events_count].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
-		events[events_count].mi.mouseData = 0x00;
-		events[events_count].mi.time = 0; //GetSystemTime()
+		events[events_size].type = INPUT_MOUSE;
+		events[events_size].mi.dx = 0;	// Relative mouse movement due to 
+		events[events_size].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
+		events[events_size].mi.mouseData = 0x00;
+		events[events_size].mi.time = 0; // Use current system time.
 		
 		if (event->mask & MASK_BUTTON1) {
-			events[events_count].mi.mouseData &= MOUSEEVENTF_LEFTDOWN;
+			events[events_size].mi.mouseData |= MOUSEEVENTF_LEFTDOWN;
 		}
 		
 		if (event->mask & MASK_BUTTON2) {
-			events[events_count].mi.mouseData &= MOUSEEVENTF_RIGHTDOWN;
+			events[events_size].mi.mouseData |= MOUSEEVENTF_RIGHTDOWN;
 		}
 		
 		if (event->mask & MASK_BUTTON3) {
-			events[events_count].mi.mouseData &= MOUSEEVENTF_MIDDLEDOWN;
+			events[events_size].mi.mouseData |= MOUSEEVENTF_MIDDLEDOWN;
 		}
 		
 		if (event->mask & MASK_BUTTON4) {
-			events[events_count].mi.mouseData = XBUTTON1;
-			events[events_count].mi.mouseData &= MOUSEEVENTF_XDOWN;
+			events[events_size].mi.mouseData = XBUTTON1;
+			events[events_size].mi.mouseData |= MOUSEEVENTF_XDOWN;
 		}
 		
 		if (event->mask & MASK_BUTTON5) {
-			events[events_count].mi.mouseData = XBUTTON2;
-			events[events_count].mi.dwFlags &= MOUSEEVENTF_XDOWN;
+			events[events_size].mi.mouseData = XBUTTON2;
+			events[events_size].mi.dwFlags |= MOUSEEVENTF_XDOWN;
 		}
 		
-		events_count++;
+		events_size++;
 	}
 
+	char buffer[4];
 	switch (event->type) {
 		case EVENT_KEY_PRESSED:
-			is_press = True;
+			events[events_size].ki.dwFlags = 0x0000;  // KEYEVENTF_KEYDOWN
 			goto EVENT_KEY;
 
 		case EVENT_KEY_TYPED:
 			// Need to convert a wchar_t to keysym!
-			char buffer[4];
 			snprintf(buffer, 4, "%lc", event->data.keyboard.keychar);
 
 			event->type = EVENT_KEY_PRESSED;
-			event->data.keyboard.keycode = convert_to_virtual_key(XStringToKeysym(buffer));
+			// TODO Find a better way to do this.
+			event->data.keyboard.keycode = convert_to_native_key(VkKeyScanEx((TCHAR) event->data.keyboard.keycode, GetKeyboardLayout(0)));
 			event->data.keyboard.keychar = CHAR_UNDEFINED;
 			hook_post_event(event);
 
 		case EVENT_KEY_RELEASED:
-			is_press = False;
+			events[events_size].ki.dwFlags = KEYEVENTF_KEYUP;
 
 		EVENT_KEY:
-			events[events_count].type = INPUT_KEYBOARD;
-			events[events_count].ki.wVk = vkCode;
-			events[events_count].ki.wScan = MapVirtualKey(vkCode, 0); //MAPVK_VK_TO_VSC
-			events[events_count].ki.dwFlags = 0x00;
-			if ((vkCode >= 33 && vkCode <= 46) || (vkCode >= 91 && vkCode <= 93)) {
+			events[events_size].type = INPUT_KEYBOARD;
+			
+			events[events_size].ki.wVk = convert_to_native_key(event->data.keyboard.keycode);
+			//events[events_size].ki.wScan = MapVirtualKey(vkCode, 0); //MAPVK_VK_TO_VSC
+			//events[events_size].ki.dwFlags |= KEYEVENTF_SCANCODE;
+			
+			if ((events[events_size].ki.wVk >= 33 && events[events_size].ki.wVk <= 46) || 
+					(events[events_size].ki.wVk >= 91 && events[events_size].ki.wVk <= 93)) {
 				//Key is an extended key.
-				key_events[0].ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+				events[events_size].ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
 			}
-			events[events_count].ki.time = 0; //GetSystemTime()
-			events_count++;
+			events[events_size].ki.time = 0; //GetSystemTime()
+			events_size++;
 			break;
 
 		case EVENT_MOUSE_PRESSED:
-			is_press = True;
 			goto EVENT_BUTTON;
 
 		case EVENT_MOUSE_WHEEL:
@@ -122,56 +132,82 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 			hook_post_event(event);
 
 		case EVENT_MOUSE_RELEASED:
-			is_press = False;
 			goto EVENT_BUTTON;
 
 		EVENT_BUTTON:
-			events[events_count].type = INPUT_MOUSE;
-			events[events_count].mi.dx = event->data.mouse.x;
-			events[events_count].mi.dy = event->data.mouse.y;
-			events[events_count].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
-			events[events_count].mi.time = 0; //GetSystemTime()
-			events_count++;
+			events[events_size].type = INPUT_MOUSE;
+			events[events_size].mi.dx = event->data.mouse.x;
+			events[events_size].mi.dy = event->data.mouse.y;
+			events[events_size].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
+			events[events_size].mi.time = 0; //GetSystemTime()
+			events_size++;
 			break;
 
 		case EVENT_MOUSE_DRAGGED:
 			// The button masks are all applied with the modifier masks.
 
 		case EVENT_MOUSE_MOVED:
-			events[events_count].type = INPUT_MOUSE;
-			events[events_count].mi.dx = event->data.mouse.x;
-			events[events_count].mi.dy = event->data.mouse.y;
-			events[events_count].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
-			events[events_count].mi.time = 0; //GetSystemTime()
-			events_count++;
+			events[events_size].type = INPUT_MOUSE;
+			events[events_size].mi.dx = event->data.mouse.x;
+			events[events_size].mi.dy = event->data.mouse.y;
+			events[events_size].mi.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_MOVE;
+			events[events_size].mi.time = 0; //GetSystemTime()
+			events_size++;
 			break;
 	}
 
 	// Release the previously held modifier keys used to fake the event mask.
-	for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(KeySym); i++) {
-		if (event->mask & 1 << i) {
-			XTestFakeKeyEvent(disp, XKeysymToKeycode(disp, keymask_lookup[i]), False, 0);
+	if (event->mask & (MASK_SHIFT | MASK_CTRL | MASK_META | MASK_ALT)) {
+		for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(UINT); i++) {
+			if (event->mask & 1 << i) {
+				events[events_size].type = INPUT_KEYBOARD;
+				events[events_size].ki.wVk = convert_to_native_key(event->data.keyboard.keycode);
+				events[events_size].ki.dwFlags = KEYEVENTF_KEYUP;
+				events[events_size].ki.time = 0; // Use current system time.
+				events_size++;
+			}
 		}
 	}
 
-	for (unsigned int i = 0; i < sizeof(btnmask_lookup) / sizeof(unsigned int); i++) {
-		if (event->mask & btnmask_lookup[i]) {
-			XTestFakeButtonEvent(disp, i + 1, False, 0);
+	if (event->mask & (MASK_BUTTON1 | MASK_BUTTON2 | MASK_BUTTON3 | MASK_BUTTON4 | MASK_BUTTON5)) {
+		events[events_size].type = INPUT_MOUSE;
+		events[events_size].mi.dx = 0;	// Relative mouse movement due to 
+		events[events_size].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
+		events[events_size].mi.mouseData = 0x00;
+		events[events_size].mi.time = 0; // Use current system time.
+		
+		if (event->mask & MASK_BUTTON1) {
+			events[events_size].mi.mouseData |= MOUSEEVENTF_LEFTUP;
 		}
+		
+		if (event->mask & MASK_BUTTON2) {
+			events[events_size].mi.mouseData |= MOUSEEVENTF_RIGHTUP;
+		}
+		
+		if (event->mask & MASK_BUTTON3) {
+			events[events_size].mi.mouseData |= MOUSEEVENTF_MIDDLEUP;
+		}
+		
+		if (event->mask & MASK_BUTTON4) {
+			events[events_size].mi.mouseData = XBUTTON1;
+			events[events_size].mi.mouseData |= MOUSEEVENTF_XUP;
+		}
+		
+		if (event->mask & MASK_BUTTON5) {
+			events[events_size].mi.mouseData = XBUTTON2;
+			events[events_size].mi.dwFlags |= MOUSEEVENTF_XUP;
+		}
+		
+		events_size++;
 	}
 	
 	//Create the key release input
-	memcpy(key_events + 1, key_events, sizeof(INPUT));
-	key_events[1].ki.dwFlags |= KEYEVENTF_KEYUP;
+	//memcpy(key_events + 1, key_events, sizeof(INPUT));
+	//key_events[1].ki.dwFlags |= KEYEVENTF_KEYUP;
 
-	if (! SendInput(events_count, events, sizeof(INPUT)) ) {
+	if (! SendInput(events_size, events, sizeof(INPUT)) ) {
 		printf("Error 0x%X\n", (unsigned int) GetLastError());
 	}
 	
 	free(events);
-}
-
-void PostKeyTypedEvent(wchar_t wchar, Time time) {
-	SHORT code = VkKeyScanEx((TCHAR) 'B', GetKeyboardLayout(0));
-	printf("Test Scan Code: %d\n", code);
 }

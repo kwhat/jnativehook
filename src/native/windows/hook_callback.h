@@ -25,6 +25,8 @@
 extern LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // Callback used by hook_thead for mouse events.
-extern LRESULT CALLBACK mouse_even_proc(int nCode, WPARAM wParam, LPARAM lParam);
+extern LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam);
+
+extern void initialize_modifiers();
 
 #endif

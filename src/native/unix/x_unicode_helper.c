@@ -49,7 +49,9 @@
  * This software is in the public domain. Share and enjoy!
  ***********************************************************************/
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <stdint.h>
 #ifdef USE_DEBUG

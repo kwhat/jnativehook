@@ -82,6 +82,7 @@ typedef struct _VritualEvent {
 	EventType type;
 	unsigned long int time;
 	unsigned short int mask;
+	bool propagate;
 	union {
 		KeyboardEventData keyboard;
 		MouseEventData mouse;

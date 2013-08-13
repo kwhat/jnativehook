@@ -17,26 +17,15 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-include_HEADERS = include/nativehook.h
-pkgconfigdir = $(libdir)/pc
+#include_HEADERS = include/nativehook.h
 
-SUBDIRS = $(backend) common
+lib_LTLIBRARIES = libnativehook.la
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -std=c99 -I$(top_srcdir)/include
+libnativehook_la_LDFLAGS = -Wl,--as-needed,--kill-at,-O1
+libnativehook_la_SOURCES = \
+	scancode_table.c
 
-if BUILD_DEMO
-SUBDIRS += demo
-endif
+CLEANFILES =
 
-EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt
-
-#MOSTLYCLEANFILES, CLEANFILES, DISTCLEANFILES, and MAINTAINERCLEANFILES
-
-DISTCLEANFILES = config.cache config/* configure
-
-MAINTAINERCLEANFILES = \
-    autom4te.cache \
-    include/config.h* \
-    config \
-    m4/* \
-    Makefile.in \
-    aclocal.m4 \
-    configure
+DISTCLEANFILES = \
+	Makefile

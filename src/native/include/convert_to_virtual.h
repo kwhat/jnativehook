@@ -25,7 +25,7 @@
 extern unsigned int convert_to_virtual_key(unsigned int native_keycode);
 
 // Converts the native button code to its virtual counterpart.
-extern unsigned short int convert_to_virtual_button(unsigned short int native_button);
+extern unsigned int convert_to_virtual_button(unsigned int native_button);
 
 // Converts the native modifier mask code to its virtual counterpart.
 extern unsigned int convert_to_virtual_mask(unsigned int native_mask);

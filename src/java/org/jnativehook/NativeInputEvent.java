@@ -49,6 +49,9 @@ public class NativeInputEvent extends EventObject {
 
 	/** The modifier keys down during event. */
 	private int modifiers;
+	
+	/** Flag to prevent native event propagation. */
+	private boolean propagate;
 
 	/** The Shift key modifier constant. */
 	public static final int SHIFT_MASK		= 1 << 0;
@@ -95,6 +98,7 @@ public class NativeInputEvent extends EventObject {
 		this.id = id;
 		this.when = when;
 		this.modifiers = modifiers;
+		this.propagate = true;
 	}
 
 	/**

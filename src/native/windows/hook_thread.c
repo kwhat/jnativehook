@@ -16,29 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <nativehook.h>
 #include <windows.h>
 
-#include "convert_to_native.h"
-#include "convert_to_virtual.h"
 #include "hook_callback.h"
-#include "win_unicode_helper.h"
 
 // The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
 extern HINSTANCE hInst;
 
-// Click count globals.
-static unsigned short click_count = 0;
-static DWORD click_time = 0;
-static POINT last_click;
-
 // Thread and hook handles.
 static DWORD hook_thread_id = 0;
 static HANDLE hook_thread_handle = NULL, hook_control_handle = NULL;
-static HHOOK keyboard_event_hhook = NULL, mouse_event_hhook = NULL;
+HHOOK keyboard_event_hhook = NULL, mouse_event_hhook = NULL;
 
-static DWORD WINAPI hook_thread_proc(LPVOID UNUSED(lpParameter)) {
+static DWORD WINAPI hook_thread_proc(LPVOID lpParameter) {
 	DWORD status = NATIVEHOOK_FAILURE;
 
 	// Create the native hooks.
@@ -52,14 +47,7 @@ static DWORD WINAPI hook_thread_proc(LPVOID UNUSED(lpParameter)) {
 		#endif
 
 		// Check and setup modifiers.
-		if (GetKeyState(VK_LSHIFT)	 < 0)	SetModifierMask(MOD_LSHIFT);
-		if (GetKeyState(VK_RSHIFT)   < 0)	SetModifierMask(MOD_RSHIFT);
-		if (GetKeyState(VK_LCONTROL) < 0)	SetModifierMask(MOD_LCONTROL);
-		if (GetKeyState(VK_RCONTROL) < 0)	SetModifierMask(MOD_RCONTROL);
-		if (GetKeyState(VK_LMENU)    < 0)	SetModifierMask(MOD_LALT);
-		if (GetKeyState(VK_RMENU)    < 0)	SetModifierMask(MOD_RALT);
-		if (GetKeyState(VK_LWIN)     < 0)	SetModifierMask(MOD_LWIN);
-		if (GetKeyState(VK_RWIN)     < 0)	SetModifierMask(MOD_RWIN);
+		initialize_modifiers();
 
 		// Set the exit status.
 		status = NATIVEHOOK_SUCCESS;
@@ -109,32 +97,41 @@ NATIVEHOOK_API int hook_enable() {
 	int status = NATIVEHOOK_FAILURE;
 
 	// Make sure the native thread is not already running.
-	if (IsNativeThreadRunning() != true) {
+	if (hook_is_enabled() != true) {
 		// Create event handle for the thread hook.
 		hook_control_handle = CreateEvent(NULL, TRUE, FALSE, "hook_control_handle");
 
-		LPTHREAD_START_ROUTINE lpStartAddress = &hook_thread_proc;
+		LPTHREAD_START_ROUTINE lpStartAddress = hook_thread_proc;
 		hook_thread_handle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hook_thread_id);
 		if (hook_thread_handle != INVALID_HANDLE_VALUE) {
 			#ifdef DEBUG
-			fprintf(stdout, "StartNativeThread(): start successful.\n");
+			fprintf(stdout, "hook_enable(): start successful.\n");
 			#endif
 
+			#ifdef USE_DEBUG
+			if (SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS) && SetThreadPriority(hook_thread_id, THREAD_PRIORITY_TIME_CRITICAL)) {
+				fprintf(stderr, "enable_hook(): Could not set thread priority %i for thread 0x%X.\n", THREAD_PRIORITY_TIME_CRITICAL, (unsigned int) hook_thread_handle);
+			}
+			#else
+			SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS);
+			SetThreadPriority(hook_thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
+			#endif
+			
 			// Wait for any possible thread exceptions to get thrown into
 			// the queue
 			WaitForSingleObject(hook_control_handle, INFINITE);
 
 			// TODO Set the return status to the thread exit code.
-			if (IsNativeThreadRunning()) {
+			if (hook_is_enabled()) {
 				#ifdef DEBUG
-				fprintf(stdout, "StartNativeThread(): initialization successful.\n");
+				fprintf(stdout, "hook_enable(): initialization successful.\n");
 				#endif
 
 				status = NATIVEHOOK_SUCCESS;
 			}
 			else {
 				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): initialization failure!\n");
+				fprintf(stderr, "hook_enable(): initialization failure!\n");
 				#endif
 
 				// Wait for the thread to die.
@@ -145,20 +142,16 @@ NATIVEHOOK_API int hook_enable() {
 				status = (int) thread_status;
 
 				#ifdef DEBUG
-				fprintf(stderr, "StartNativeThread(): Thread Result (%i)\n", status);
+				fprintf(stderr, "hook_enable(): thread result (%i)\n", status);
 				#endif
-
-				if (thread_ex.class != NULL && thread_ex.message != NULL)  {
-					ThrowException(thread_ex.class, thread_ex.message);
-				}
 			}
 		}
 		else {
-			#ifdef DEBUG
-			fprintf(stderr, "StartNativeThread(): start failure!\n");
+			#ifdef USE_DEBUG
+			fprintf(stderr, "enable_hook(): Thread create failure!\n");
 			#endif
 
-			ThrowException(NATIVE_HOOK_EXCEPTION, "Native thread start failure");
+			status = NATIVEHOOK_ERROR_THREAD_CREATE;
 		}
 	}
 
@@ -202,7 +195,7 @@ NATIVEHOOK_API bool hook_is_enabled() {
 	}
 
 	#ifdef DEBUG
-	fprintf(stdout, "IsNativeThreadRunning(): State (%i)\n", is_running);
+	fprintf(stdout, "hook_is_enabled(): State (%i)\n", is_running);
 	#endif
 
 	return is_running;

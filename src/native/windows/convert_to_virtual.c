@@ -16,14 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <nativehook.h>
 #include <windows.h>
 
+#include "convert_to_virtual.h"
 #include "scancode_table.h"
 
 unsigned int convert_to_virtual_key(unsigned int scancode) {
-	return scan_code_lookup[scancode];
+	return scancode_table[scancode];
 }
 
 unsigned int convert_to_virtual_button(unsigned int native_button) {

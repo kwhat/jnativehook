@@ -25,11 +25,11 @@ libnativehook_la_LDFLAGS = -Wl,--as-needed,--kill-at,-O1
 libnativehook_la_SOURCES = \
 	convert_to_native.c \
 	convert_to_virtual.c \
+	hook_callback.c \
 	hook_thread.c \
 	library_load.c \
 	post_event.c \
 	system_properties.c \
-	win_input_helpers.c \
 	win_unicode_helper.c
 
 CLEANFILES =

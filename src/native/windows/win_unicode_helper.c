@@ -41,10 +41,15 @@
  *
  ***********************************************************************/
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <nativehook.h>
+#include <windows.h>
 
 #include "win_unicode_helper.h"
 
@@ -86,7 +91,7 @@ static BOOL is_wow64() {
 
 // Locate the DLL that contains the current keyboard layout.
 static int get_keyboard_layout_file(char *layoutFile, DWORD bufferSize) {
-	int status = RETURN_FAILURE;
+	int status = NATIVEHOOK_FAILURE;
 	HKEY hKey;
 	DWORD varType = REG_SZ;
 
@@ -98,7 +103,7 @@ static int get_keyboard_layout_file(char *layoutFile, DWORD bufferSize) {
 		if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, (LPCTSTR) kbdKeyPath, 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS) {
 			if(RegQueryValueEx(hKey, "Layout File", NULL, &varType, (LPBYTE) layoutFile, &bufferSize) == ERROR_SUCCESS) {
 				RegCloseKey(hKey);
-				status = RETURN_SUCCESS;
+				status = NATIVEHOOK_SUCCESS;
 			}
 		}
 	}
@@ -198,7 +203,7 @@ static int refresh_locale_list() {
 
 					// Try to pull the current keyboard layout DLL from the registry.
 					char layoutFile[MAX_PATH];
-					if (get_keyboard_layout_file(layoutFile, sizeof(layoutFile)) == RETURN_SUCCESS) {
+					if (get_keyboard_layout_file(layoutFile, sizeof(layoutFile)) == NATIVEHOOK_SUCCESS) {
 						//You can't trust the %SYSPATH%, look it up manually.
 						char systemDirectory[MAX_PATH];
 						if (GetSystemDirectory(systemDirectory, MAX_PATH) != 0) {

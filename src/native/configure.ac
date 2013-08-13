@@ -39,6 +39,7 @@ AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
+	common/Makefile \
 	darwin/Makefile \
 	demo/Makefile \
 	pc/nativehook.pc \
@@ -72,9 +73,6 @@ AC_HEADER_STDBOOL
 # Initialize libtool.
 LT_PREREQ([2.2])
 LT_INIT
-#LT_INIT([dlopen pic-only win32-dll ])
-#LT_LANG([Windows Resource])
-
 
 # Check for opperating system.
 AC_MSG_CHECKING(operating system)
@@ -90,6 +88,9 @@ AS_CASE([$host],
 	[*-mingw* | *-cygwin*], [
 		AC_MSG_RESULT([$host (Windows Compatible)])
 		backend="windows"
+
+		LT_INIT([dlopen pic-only win32-dll ])
+		LT_LANG([Windows Resource])
 	],
 	[AC_MSG_ERROR([Unsupported operating system ${host}])])
 
@@ -234,6 +235,10 @@ AS_IF(
 	],
 	[test "x$backend" = "xwindows"], [
 		AC_DEFINE([_WIN32_WINNT], 0x0500, [Set minimum Windows version to Windows2000])
+		AC_LIBTOOL_WIN32_DLL
+
+		LDFLAGS="${LDFLAGS} -Wl,--no-undefined"
+		LIBS="${LIBS} -lsetupapi"
 	])
 
 # OS info for Automake
