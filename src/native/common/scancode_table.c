@@ -20,6 +20,7 @@
 #include <config.h>
 #endif
 
+#include <stdint.h>
 #include <nativehook.h>
 
 const uint16_t scancode_table[] = {
@@ -52,7 +53,7 @@ const uint16_t scancode_table[] = {
 	VC_OPEN_BRACKET,	// 0x1A 26
 	VC_CLOSE_BRACKET,	// 0x1B 27
 	VC_ENTER,			// 0x1C 28
-	VC_CTRL_L,			// 0x1D 29
+	VC_CONTROL_L,		// 0x1D 29
 	VC_A,				// 0x1E 30
 	VC_S,				// 0x1F 31
 	VC_D,				// 0x20 32
@@ -78,11 +79,11 @@ const uint16_t scancode_table[] = {
 	VC_COMMA,			// 0x33 51
 	VC_PERIOD,			// 0x34 52
 	VC_SLASH,			// 0x35 53
-	VC_SHIFT_RIGHT,		// 0x36 54
+	VC_SHIFT_R,			// 0x36 54
 	VC_PRINTSCREEN,		// 0x37 55
 	VC_ALT_L,			// 0x38 56
 	VC_SPACE,			// 0x39 57
-	VC_CAPSLOCK,		// 0x3A 58
+	VC_CAPS_LOCK,		// 0x3A 58
 	VC_F1,				// 0x3B 59
 	VC_F2,				// 0x3C 60
 	VC_F3,				// 0x3D 61
@@ -98,11 +99,11 @@ const uint16_t scancode_table[] = {
 	VC_KP_7,			// 0x47 71
 	VC_KP_8,			// 0x48 72
 	VC_KP_9,			// 0x49 73
-	VC_KP_MINUS,		// 0x4A 74
+	VC_KP_SUBTRACT,		// 0x4A 74
 	VC_KP_4,			// 0x4B 75
 	VC_KP_5,			// 0x4C 76
 	VC_KP_6,			// 0x4D 77
-	VC_KP_PLUS,			// 0x4E 78
+	VC_KP_ADD,			// 0x4E 78
 	VC_KP_1,			// 0x4F 79
 	VC_KP_2,			// 0x50 80
 	VC_KP_3,			// 0x51 81
@@ -155,7 +156,7 @@ const uint16_t scancode_table[] = {
 	VC_UNDEFINED,		// 0x80 126
 	VC_UNDEFINED,		// 0x81 127
 	VC_UNDEFINED		// 0x82 128
-}
+};
 
 // Dupes
 // Flag 0x0		Flag 0x1
