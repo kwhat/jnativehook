@@ -17,11 +17,11 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-#include_HEADERS = include/nativehook.h
+include_HEADERS = ../include/nativehook.h
 
 lib_LTLIBRARIES = libnativehook.la
-libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -std=c99 -I$(top_srcdir)/include
-libnativehook_la_LDFLAGS = -Wl,--as-needed,--kill-at,-O1
+libnativehook_la_CFLAGS = -Wall -Wextra -pedantic -Wno-unused-parameter -I$(top_srcdir)/include
+libnativehook_la_LDFLAGS = $(LTLDFLAGS) -no-undefined -as-needed
 libnativehook_la_SOURCES = \
 	convert_to_native.c \
 	convert_to_virtual.c \
@@ -30,9 +30,5 @@ libnativehook_la_SOURCES = \
 	library_load.c \
 	post_event.c \
 	system_properties.c \
-	win_unicode_helper.c
-
-CLEANFILES =
-
-DISTCLEANFILES = \
-	Makefile
+	win_unicode_helper.c \
+	../common/scancode_table.c

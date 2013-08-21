@@ -371,9 +371,9 @@ typedef struct _VritualEvent {
 
 
 #ifdef _WIN32
-      #define NATIVEHOOK_API __declspec(dllexport)
+#define NATIVEHOOK_API __declspec(dllexport)
 #else
-      #define NATIVEHOOK_API
+#define NATIVEHOOK_API
 #endif
 
 #ifdef __cplusplus

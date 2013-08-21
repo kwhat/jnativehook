@@ -39,7 +39,6 @@ AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
-	common/Makefile \
 	darwin/Makefile \
 	demo/Makefile \
 	pc/nativehook.pc \
@@ -61,9 +60,7 @@ AC_LANG([C])
 AC_CHECK_TOOL([AR], [ar], [false])
 #AM_PROG_AR
 AC_PROG_CC
-AM_PROG_CC_C_O
 AC_PROG_CC_C99
-AC_PROG_LIBTOOL
 
 # Checks for header files
 AC_C_CONST
@@ -71,8 +68,7 @@ AC_HEADER_STDBOOL
 #AC_CHECK_HEADERS([inttypes.h stdint.h])
 
 # Initialize libtool.
-LT_PREREQ([2.2])
-LT_INIT
+#LT_PREREQ([2.2])
 
 # Check for opperating system.
 AC_MSG_CHECKING(operating system)
@@ -80,19 +76,25 @@ AS_CASE([$host],
 	[*-freebsd* | *-linux* | *-solaris*], [
 		AC_MSG_RESULT([$host (Unix Compatible)])
 		backend="unix"
+		#LT_INIT
 	],
 	[*-darwin*], [
 		AC_MSG_RESULT([$host (Mac OS X Compatible)])
 		backend="darwin"
+		#LT_INIT
 	],
 	[*-mingw* | *-cygwin*], [
 		AC_MSG_RESULT([$host (Windows Compatible)])
 		backend="windows"
 
-		LT_INIT([dlopen pic-only win32-dll ])
-		LT_LANG([Windows Resource])
+		#LT_INIT([dlopen pic-only win32-dll ])
+		#LT_LANG([Windows Resource])
+		AC_LIBTOOL_WIN32_DLL
 	],
 	[AC_MSG_ERROR([Unsupported operating system ${host}])])
+
+
+AC_PROG_LIBTOOL
 
 # Common Options
 AC_ARG_ENABLE([debug],
@@ -150,6 +152,10 @@ AC_ARG_ENABLE([carbon-legacy],
 
 AS_IF([test "x$enable_debug" = "xyes"], [
 	AC_DEFINE([USE_DEBUG], 1, [Enable Debug Output])
+])
+
+AS_IF([test "x$enable_demo" = "xyes"], [
+	AM_PROG_CC_C_O
 ])
 
 AS_IF(
@@ -234,11 +240,9 @@ AS_IF(
 		LDFLAGS="$LDFLAGS -L/usr/local/lib"
 	],
 	[test "x$backend" = "xwindows"], [
-		AC_DEFINE([_WIN32_WINNT], 0x0500, [Set minimum Windows version to Windows2000])
-		AC_LIBTOOL_WIN32_DLL
-
-		LDFLAGS="${LDFLAGS} -Wl,--no-undefined"
-		LIBS="${LIBS} -lsetupapi"
+		AC_DEFINE([_WIN32_WINNT], 0x0500, [Set minimum Windows version to Windows 2000])
+		
+		#LIBS="${LIBS} -lsetupapi"
 	])
 
 # OS info for Automake

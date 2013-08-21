@@ -20,7 +20,7 @@ ACLOCAL_AMFLAGS = -I m4
 include_HEADERS = include/nativehook.h
 pkgconfigdir = $(libdir)/pc
 
-SUBDIRS = $(backend) common
+SUBDIRS = $(backend)
 
 if BUILD_DEMO
 SUBDIRS += demo
@@ -36,7 +36,6 @@ MAINTAINERCLEANFILES = \
     autom4te.cache \
     include/config.h* \
     config \
-    m4/* \
     Makefile.in \
     aclocal.m4 \
     configure
