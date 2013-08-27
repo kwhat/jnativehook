@@ -20,11 +20,11 @@ ACLOCAL_AMFLAGS = -I m4
 bin_PROGRAMS = hookdemo postdemo
 
 hookdemo_SOURCES = hook_demo.c
-hookdemo_LDADD = $(top_builddir)/$(backend)/libnativehook.la
-hookdemo_CFLAGS = -Wall -Wextra -pedantic -std=c99 -D_POSIX_C_SOURCE=199309L -I$(top_srcdir)/include
+hookdemo_LDADD = $(top_builddir)/libnativehook.la
+hookdemo_CFLAGS = -Wall -Wextra -pedantic -I$(top_srcdir)/include
 hookdemo_LDFLAGS = -Wl,--as-needed,-O1
 
 postdemo_SOURCES = post_demo.c
-postdemo_LDADD = $(top_builddir)/$(backend)/libnativehook.la
-postdemo_CFLAGS = -Wall -Wextra -pedantic -std=c99 -I$(top_srcdir)/include
+postdemo_LDADD = $(top_builddir)/libnativehook.la
+postdemo_CFLAGS = -Wall -Wextra -pedantic -I$(top_srcdir)/include
 postdemo_LDFLAGS = -Wl,--as-needed,-O1

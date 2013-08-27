@@ -24,7 +24,7 @@
 #include <nativehook.h>
 #include <windows.h>
 
-#include "convert_to_native.h"
+#include "input_converter.h"
 
 static UINT keymask_lookup[8] = {
 	VK_LSHIFT,
@@ -41,7 +41,7 @@ static UINT keymask_lookup[8] = {
 NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 	unsigned char events_size = 0, events_max = 28;
 	INPUT *events = malloc(sizeof(INPUT) * events_max);
-	
+
 	if (event->mask & (MASK_SHIFT | MASK_CTRL | MASK_META | MASK_ALT)) {
 		for (unsigned int i = 0; i < sizeof(keymask_lookup) / sizeof(UINT); i++) {
 			if (event->mask & 1 << i) {
@@ -56,33 +56,33 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 	if (event->mask & (MASK_BUTTON1 | MASK_BUTTON2 | MASK_BUTTON3 | MASK_BUTTON4 | MASK_BUTTON5)) {
 		events[events_size].type = INPUT_MOUSE;
-		events[events_size].mi.dx = 0;	// Relative mouse movement due to 
+		events[events_size].mi.dx = 0;	// Relative mouse movement due to
 		events[events_size].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
 		events[events_size].mi.mouseData = 0x00;
 		events[events_size].mi.time = 0; // Use current system time.
-		
+
 		if (event->mask & MASK_BUTTON1) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_LEFTDOWN;
 		}
-		
+
 		if (event->mask & MASK_BUTTON2) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_RIGHTDOWN;
 		}
-		
+
 		if (event->mask & MASK_BUTTON3) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_MIDDLEDOWN;
 		}
-		
+
 		if (event->mask & MASK_BUTTON4) {
 			events[events_size].mi.mouseData = XBUTTON1;
 			events[events_size].mi.mouseData |= MOUSEEVENTF_XDOWN;
 		}
-		
+
 		if (event->mask & MASK_BUTTON5) {
 			events[events_size].mi.mouseData = XBUTTON2;
 			events[events_size].mi.dwFlags |= MOUSEEVENTF_XDOWN;
 		}
-		
+
 		events_size++;
 	}
 
@@ -107,12 +107,12 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		EVENT_KEY:
 			events[events_size].type = INPUT_KEYBOARD;
-			
+
 			events[events_size].ki.wVk = convert_to_native_key(event->data.keyboard.keycode);
 			//events[events_size].ki.wScan = MapVirtualKey(vkCode, 0); //MAPVK_VK_TO_VSC
 			//events[events_size].ki.dwFlags |= KEYEVENTF_SCANCODE;
-			
-			if ((events[events_size].ki.wVk >= 33 && events[events_size].ki.wVk <= 46) || 
+
+			if ((events[events_size].ki.wVk >= 33 && events[events_size].ki.wVk <= 46) ||
 					(events[events_size].ki.wVk >= 91 && events[events_size].ki.wVk <= 93)) {
 				//Key is an extended key.
 				events[events_size].ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
@@ -171,36 +171,36 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 	if (event->mask & (MASK_BUTTON1 | MASK_BUTTON2 | MASK_BUTTON3 | MASK_BUTTON4 | MASK_BUTTON5)) {
 		events[events_size].type = INPUT_MOUSE;
-		events[events_size].mi.dx = 0;	// Relative mouse movement due to 
+		events[events_size].mi.dx = 0;	// Relative mouse movement due to
 		events[events_size].mi.dy = 0;	// MOUSEEVENTF_ABSOLUTE not being set.
 		events[events_size].mi.mouseData = 0x00;
 		events[events_size].mi.time = 0; // Use current system time.
-		
+
 		if (event->mask & MASK_BUTTON1) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_LEFTUP;
 		}
-		
+
 		if (event->mask & MASK_BUTTON2) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_RIGHTUP;
 		}
-		
+
 		if (event->mask & MASK_BUTTON3) {
 			events[events_size].mi.mouseData |= MOUSEEVENTF_MIDDLEUP;
 		}
-		
+
 		if (event->mask & MASK_BUTTON4) {
 			events[events_size].mi.mouseData = XBUTTON1;
 			events[events_size].mi.mouseData |= MOUSEEVENTF_XUP;
 		}
-		
+
 		if (event->mask & MASK_BUTTON5) {
 			events[events_size].mi.mouseData = XBUTTON2;
 			events[events_size].mi.dwFlags |= MOUSEEVENTF_XUP;
 		}
-		
+
 		events_size++;
 	}
-	
+
 	//Create the key release input
 	//memcpy(key_events + 1, key_events, sizeof(INPUT));
 	//key_events[1].ki.dwFlags |= KEYEVENTF_KEYUP;
@@ -208,6 +208,6 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 	if (! SendInput(events_size, events, sizeof(INPUT)) ) {
 		printf("Error 0x%X\n", (unsigned int) GetLastError());
 	}
-	
+
 	free(events);
 }

@@ -39,11 +39,8 @@ AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
-	darwin/Makefile \
 	demo/Makefile \
 	pc/nativehook.pc \
-	unix/Makefile \
-	windows/Makefile \
 	Makefile
 ])
 AC_CONFIG_AUX_DIR([config])
@@ -57,8 +54,6 @@ AM_INIT_AUTOMAKE([1.9 foreign -Wall])
 AC_LANG([C])
 
 # Checks for programs.
-AC_CHECK_TOOL([AR], [ar], [false])
-#AM_PROG_AR
 AC_PROG_CC
 AC_PROG_CC_C99
 
@@ -73,14 +68,16 @@ AC_HEADER_STDBOOL
 # Check for opperating system.
 AC_MSG_CHECKING(operating system)
 AS_CASE([$host],
-	[*-freebsd* | *-linux* | *-solaris*], [
-		AC_MSG_RESULT([$host (Unix Compatible)])
-		backend="unix"
-		#LT_INIT
-	],
 	[*-darwin*], [
 		AC_MSG_RESULT([$host (Mac OS X Compatible)])
 		backend="darwin"
+
+		#LT_INIT
+	],
+	[*-freebsd* | *-linux* | *-solaris*], [
+		AC_MSG_RESULT([$host (Unix Compatible)])
+		backend="unix"
+
 		#LT_INIT
 	],
 	[*-mingw* | *-cygwin*], [
@@ -241,6 +238,10 @@ AS_IF(
 	],
 	[test "x$backend" = "xwindows"], [
 		AC_DEFINE([_WIN32_WINNT], 0x0500, [Set minimum Windows version to Windows 2000])
+
+		AS_IF([test "x$enable_debug" = "xyes"], [
+			CFLAGS="$CFLAGS -Wno-format"
+		])
 		
 		#LIBS="${LIBS} -lsetupapi"
 	])
@@ -250,6 +251,17 @@ AC_SUBST([backend])
 
 # Should the demo application be built?
 AM_CONDITIONAL([BUILD_DEMO], [test "x$enable_demo" = "xyes"])
+
+# Department of redundancy department.  We have already checked the platform 3
+# times!  I am sure there is a technical reason for this, however, it is
+# functionally stupid.
+AM_CONDITIONAL(BUILD_DARWIN, test "x$backend" = "xdarwin")
+AM_CONDITIONAL(BUILD_UNIX, test "x$backend" = "xunix")
+AM_CONDITIONAL(BUILD_WINDOWS, test "x$backend" = "xwindows")
+
+#AC_SUBST([BUILD_DARWIN])
+#AC_SUBST([BUILD_UNIX])
+#AC_SUBST([BUILD_WINDOWS])
 
 # Generate the "configure" script
 AC_OUTPUT

@@ -28,12 +28,12 @@
 	<property name="project.version"	value="${build.major}.${build.minor}.${build.revision}" />
 
 	<!-- Path Settings -->
-	<property name="dir.src"			value="${basedir}${file.separator}src" relative="true" />
-	<property name="dir.doc"			value="${basedir}${file.separator}doc" relative="true" />
-	<property name="dir.jar"			value="${basedir}${file.separator}jar" relative="true" />
-	<property name="dir.dist"			value="${basedir}${file.separator}dist" relative="true" />
-	<property name="dir.lib"			value="${basedir}${file.separator}lib" relative="true" />
-	<property name="dir.bin"			value="${basedir}${file.separator}bin" relative="true" />
+	<property name="dir.src"	value="${basedir}${file.separator}src" />
+	<property name="dir.doc"	value="${basedir}${file.separator}doc" />
+	<property name="dir.jar"	value="${basedir}${file.separator}jar" />
+	<property name="dir.dist"	value="${basedir}${file.separator}dist" />
+	<property name="dir.lib"	value="${basedir}${file.separator}lib" />
+	<property name="dir.bin"	value="${basedir}${file.separator}bin" />
 
 	<!-- Class Path Settings -->
 	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p ant-junit,junit-4)" ant test` -->
@@ -382,10 +382,10 @@
 			<!-- -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -->
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}obj${file.separator}native${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}linux -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
+		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}linux -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
-		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}obj${file.separator}native${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}win32">
+		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}win32">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
@@ -502,7 +502,7 @@
 
 	<target name="compile-native" depends="configure" description="Compiles C source files.">
 		<echo>Compiling native source...</echo>
-		<mkdir dir="${dir.bin}/obj/native" />
+		<mkdir dir="${dir.bin}/native" />
 
 		<!-- FIXME Should be downloaded form hosting site -->
 		<!--
@@ -512,13 +512,12 @@
 		-->
 
 
-		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/obj/native" /-->
-		<pathconvert property="dir.src.unix" targetos="unix">
-			<path location="${dir.src}" />
+		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/native" /-->
+		<pathconvert property="dir.base.unix" targetos="unix">
+			<path location="${basedir}" />
 			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
-			<map from="${dir.src}" to="${dir.src}" />
+			<map from="${basedir}" to="${basedir}" />
 		</pathconvert>
-		<echo>${dir.src.unix}</echo>
 
 		<echo>Bootstrapping autoconf build process...</echo>
 		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
@@ -527,41 +526,35 @@
 			<arg value="--force" />
 		</exec>
 
-		<exec executable="bash" dir="${dir.src}/native" failonerror="true" osfamily="windows">
+		<exec executable="sh" dir="${dir.src}/native" failonerror="true" osfamily="windows">
 			<arg value="-c" />
 			<arg value="autoreconf --install --verbose --force" />
 		</exec>
-		
-		<!-- Create an absolute path installation prefix for JNI static linking. -->
-		<property name="cc.prefix" location="${dir.bin}"/>
 
 		<echo>Configuring...</echo>
-		<!-- -flto -fuse-linker-plugin -->
-		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/obj/native" failonerror="true" osfamily="unix">
+		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
 			<arg line="CFLAGS='-std=c99'" />
 			<arg line="LDFLAGS='-Wl,--as-needed,-O1'" />
 			<arg value="--enable-debug" />
 			<arg value="--enable-static" />
 			<arg value="--with-pic" />
-			<arg value="--prefix=${cc.prefix}" />
+			<arg value="--prefix=${dir.bin}" />
 		</exec>
-		
-		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/obj/native" /-->
 
-		<exec executable="bash" dir="${dir.bin}/obj/native" failonerror="true" osfamily="windows">
+		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
 			<arg value="-c" />
-			<arg line="${dir.src.unix}/native/configure --enable-debug --enable-static --prefix=${cc.prefix}" />
+			<arg value="${dir.base.unix}/src/native/configure --enable-debug --enable-static --prefix=${dir.base.unix}/bin" />
 		</exec>
 
 		<echo>Building...</echo>
-		<exec executable="make" dir="${dir.bin}/obj/native" failonerror="true" osfamily="unix">
-			<arg value="--jobs=4" />
+		<exec executable="make" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
+			<!-- arg value="- -jobs=4" /-->
 			<arg value="install" />
 		</exec>
-		
-		<exec executable="bash" dir="${dir.bin}/obj/native" failonerror="true" osfamily="windows">
+
+		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
 			<arg value="-c" />
-			<arg line="make --jobs=4 install" />
+			<arg value="make install" />
 		</exec>
 	</target>
 

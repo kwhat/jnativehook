@@ -32,8 +32,7 @@
 #include <X11/extensions/XTest.h>
 #endif
 
-#include "convert_to_native.h"
-#include "convert_to_virtual.h"
+#include "input_converter.h"
 
 extern Display *disp;
 
@@ -100,9 +99,9 @@ NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
 
 		EVENT_KEY:
 			XTestFakeKeyEvent(
-				disp, 
-				XKeysymToKeycode(disp, convert_to_native_key(event->data.keyboard.keycode)), 
-				is_press, 
+				disp,
+				XKeysymToKeycode(disp, convert_to_native_key(event->data.keyboard.keycode)),
+				is_press,
 				0);
 			break;
 

@@ -33,8 +33,13 @@ static bool running = false;
 // NOTE: This function executes on the hook thread!  If you need to block
 // please do so on another thread with your own event dispatcher implementation.
 void dispatch_proc(VirtualEvent * const event) {
-	fprintf(stdout,	"id=%d,when=%ld,mask=0x%X",
-			event->type, event->time, event->mask);
+	#if defined(_WIN32) && !defined(_WIN64)
+	fprintf(stdout,	"id=%d,when=%I64u,mask=0x%X",
+					event->type, event->time, event->mask);
+	#else
+	fprintf(stdout,	"id=%d,when=%llu,mask=0x%X",
+					event->type, event->time, event->mask);
+	#endif
 
 	switch (event->type) {
 		case EVENT_KEY_PRESSED:
@@ -43,17 +48,15 @@ void dispatch_proc(VirtualEvent * const event) {
 				running = false;
 			}
 		case EVENT_KEY_RELEASED:
-			fprintf(stdout,
-					",keycode=%d,rawcode=%d",
-					event->data.keyboard.keycode,
-					event->data.keyboard.rawcode);
+			fprintf(stdout, ",keycode=%u,scancode=0x%X",
+							event->data.keyboard.keycode,
+							event->data.keyboard.scancode);
 			break;
 
 		case EVENT_KEY_TYPED:
-			fprintf(stdout,
-					"keychar=%lc,rawcode=%d",
-					event->data.keyboard.keychar,
-					event->data.keyboard.rawcode);
+			fprintf(stdout, "keychar=%lc,scancode=%u",
+							event->data.keyboard.keychar, 
+							event->data.keyboard.scancode);
 			break;
 
 		case EVENT_MOUSE_PRESSED:
@@ -61,20 +64,15 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_MOUSE_CLICKED:
 		case EVENT_MOUSE_MOVED:
 		case EVENT_MOUSE_DRAGGED:
-			fprintf(stdout,
-					",x=%d,y=%d,button=%d,clicks=%d",
-					event->data.mouse.x,
-					event->data.mouse.y,
-					event->data.mouse.button,
-					event->data.mouse.clicks);
+			fprintf(stdout, ",x=%d,y=%d,button=%d,clicks=%d",
+							event->data.mouse.x, event->data.mouse.y,
+							event->data.mouse.button, event->data.mouse.clicks);
 			break;
 
 		case EVENT_MOUSE_WHEEL:
-			fprintf(stdout,
-					",type=%d,amount=%d,rotation=%d",
-					event->data.wheel.type,
-					event->data.wheel.amount,
-					event->data.wheel.rotation);
+			fprintf(stdout, ",type=%d,amount=%d,rotation=%d",
+							event->data.wheel.type, event->data.wheel.amount,
+							event->data.wheel.rotation);
 			break;
 	}
 

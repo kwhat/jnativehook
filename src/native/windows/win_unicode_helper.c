@@ -79,7 +79,7 @@ static BOOL is_wow64() {
 	if(pIsWow64Process != NULL) {
 		if (!pIsWow64Process(GetCurrentProcess(), &status)) {
 			status = FALSE;
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "is_wow64(): pIsWow64Process(GetCurrentProcess(), &status) failed!\n");
 			#endif
 		}
@@ -117,7 +117,7 @@ static int refresh_locale_list() {
 	// Get the number of layouts the user has activated.
 	int hkl_size = GetKeyboardLayoutList(0, NULL);
 	if (hkl_size > 0) {
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() found %d.\n", hkl_size);
 		#endif
 
@@ -129,7 +129,7 @@ static int refresh_locale_list() {
 
 		int new_size = GetKeyboardLayoutList(hkl_size, hkl_list);
 		if (new_size > 0) {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			if (new_size != hkl_size) {
 				fprintf(stderr, "refresh_locale_list(): Locale size mismatch!  Expected %d, received %d.\n", hkl_size, new_size);
 			}
@@ -155,7 +155,7 @@ static int refresh_locale_list() {
 
 
 				if (is_loaded) {
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					fprintf(stdout, "refresh_locale_list(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
 					#endif
 
@@ -170,7 +170,7 @@ static int refresh_locale_list() {
 					count++;
 				}
 				else {
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					fprintf(stdout, "refresh_locale_list(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
 					#endif
 
@@ -210,7 +210,7 @@ static int refresh_locale_list() {
 							char kbdLayoutFilePath[MAX_PATH];
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
 
-							#ifdef DEBUG
+							#ifdef USE_DEBUG
 							fprintf(stdout, "refresh_locale_list(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
 							#endif
 
@@ -261,7 +261,7 @@ static int refresh_locale_list() {
 								count++;
 							}
 							else {
-								#ifdef DEBUG
+								#ifdef USE_DEBUG
 								fprintf(stderr, "refresh_locale_list(): GetProcAddress() failed for KbdLayerDescriptor!\n");
 								#endif
 
@@ -270,13 +270,13 @@ static int refresh_locale_list() {
 								locale_item = NULL;
 							}
 						}
-						#ifdef DEBUG
+						#ifdef USE_DEBUG
 						else {
 							fprintf(stderr, "refresh_locale_list(): GetSystemDirectory() failed!\n");
 						}
 						#endif
 					}
-					#ifdef DEBUG
+					#ifdef USE_DEBUG
 					else {
 						fprintf(stderr, "refresh_locale_list(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
 					}
@@ -285,7 +285,7 @@ static int refresh_locale_list() {
 			}
 		}
 		else {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() failed!\n");
 			#endif
 
@@ -311,7 +311,7 @@ int load_unicode_helper() {
 
 	count = refresh_locale_list();
 
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	fprintf(stdout, "load_unicode_helper(): refresh_locale_list found %d.\n", count);
 	#endif
 
@@ -352,7 +352,7 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 		while (locale_item != NULL) {
 			// Search the linked list.
 			if (locale_item->id == locale_id) {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf(stdout, "convert_vk_to_wchar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
 				#endif
 
@@ -369,7 +369,7 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 
 		// If we were unable to find the locale in the list, refresh the list.
 		if (locale_current == NULL) {
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stdout, "convert_vk_to_wchar(): Refreshing locale cache.\n");
 			#endif
 
@@ -383,7 +383,7 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 
 	// Check and make sure the unicode helper was loaded.
 	if (locale_current != NULL) {
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		fprintf(stdout, "convert_vk_to_wchar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
 		#endif
 

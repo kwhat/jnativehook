@@ -57,6 +57,7 @@
 #ifdef USE_DEBUG
 #include <stdio.h>
 #endif
+#include <X11/Xlib.h>
 
 #include "x_unicode_helper.h"
 

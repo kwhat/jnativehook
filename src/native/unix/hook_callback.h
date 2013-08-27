@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -16,18 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _included_convert_to_virtual
-#define _included_convert_to_virtual
+#ifndef _included_hook_callback
+#define _included_hook_callback
 
-/* Converts the native key symbol to the virtual key code and keyboard location.
- * The raw code is the platform specific key code. 
- */
-extern unsigned int convert_to_virtual_key(unsigned int native_keycode);
+#include <windows.h>
 
-// Converts the native button code to its virtual counterpart.
-extern unsigned int convert_to_virtual_button(unsigned int native_button);
-
-// Converts the native modifier mask code to its virtual counterpart.
-extern unsigned int convert_to_virtual_mask(unsigned int native_mask);
+// Callback used by hook_thead for all events.
+extern hook_event_proc(XPointer pointer, XRecordInterceptData *hook);
 
 #endif

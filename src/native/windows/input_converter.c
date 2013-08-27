@@ -23,15 +23,37 @@
 #include <nativehook.h>
 #include <windows.h>
 
-#include "convert_to_virtual.h"
-#include "scancode_table.h"
+#ifndef MAPVK_VK_TO_VSC
+#define MAPVK_VK_TO_VSC 0
+#endif
 
-unsigned int convert_to_virtual_key(unsigned int scancode) {
-	return scancode_table[scancode];
+#ifndef MAPVK_VSC_TO_VK
+#define MAPVK_VSC_TO_VK 1
+#endif
+
+#ifndef MAPVK_VK_TO_CHAR
+#define MAPVK_VK_TO_CHAR 2
+#endif
+
+#ifndef MAPVK_VSC_TO_VK_EX
+#define MAPVK_VSC_TO_VK_EX 3
+#endif
+
+unsigned int convert_to_virtual_key(unsigned int native_keycode) {
+	unsigned int virtual_keycode = (unsigned int) MapVirtualKey(native_keycode, MAPVK_VSC_TO_VK);
+
+	return virtual_keycode;
 }
 
+unsigned int convert_to_native_key(unsigned int virtual_keycode) {
+	unsigned int native_keycode = (unsigned int) MapVirtualKey(virtual_keycode, MAPVK_VK_TO_VSC);
+
+	return native_keycode;
+}
+
+
 unsigned int convert_to_virtual_button(unsigned int native_button) {
-	unsigned char virtual_button;
+	unsigned int virtual_button;
 
 	switch (native_button) {
 		case VK_LBUTTON:	// MOUSE_BUTTON1
@@ -54,8 +76,39 @@ unsigned int convert_to_virtual_button(unsigned int native_button) {
 	return virtual_button;
 }
 
+unsigned int convert_to_native_button(unsigned int virtual_button) {
+	unsigned int native_button;
+
+	switch (virtual_button) {
+		case MOUSE_BUTTON1:	// VK_LBUTTON
+		case MOUSE_BUTTON2:	// VK_RBUTTON
+			native_button = virtual_button;
+			break;
+
+		case MOUSE_BUTTON3:	// VK_MBUTTON
+		case MOUSE_BUTTON4:	// VK_XBUTTON1
+		case MOUSE_BUTTON5:	// VK_XBUTTON2
+			native_button = virtual_button + 1;
+			break;
+
+		default:
+		case MOUSE_NOBUTTON:
+			native_button = 0;
+			break;
+	}
+
+	return native_button;
+}
+
+
 unsigned int convert_to_virtual_mask(unsigned int native_mask) {
 	unsigned int virtual_mask = native_mask;
 
 	return virtual_mask;
+}
+
+unsigned int convert_to_native_mask(unsigned int virtual_mask) {
+	unsigned int native_mask = virtual_mask;
+
+	return native_mask;
 }

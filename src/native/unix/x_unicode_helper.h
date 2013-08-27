@@ -52,6 +52,9 @@
 #ifndef _included_x_unicode_helper
 #define _included_x_unicode_helper
 
+#include <stdint.h>
+#include <X11/Xlib.h>
+
 /* Converts an X11 key symbol to a single Unicode character.  No direct X11
  * functionality exists to provide this information.
  */

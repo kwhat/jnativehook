@@ -96,7 +96,7 @@ void on_library_load() {
 }
 
 void on_library_unload() {
-	/* TODO This seems to be causing problems with SIGTERM
+	/* FIXME This seems to be causing problems with SIGTERM
 	// Stop the native thread if its running.
 	if (hook_is_enabled()) {
 		hook_disable();

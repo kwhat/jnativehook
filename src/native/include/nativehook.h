@@ -57,31 +57,31 @@ typedef enum _EventType {
 } EventType;
 
 typedef struct _KeyboardEventData {
-	unsigned short int keycode;
-	unsigned short int scancode;
+	int8_t keycode;
+	int16_t scancode;
 	wchar_t keychar;
 } KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 
 typedef struct _MouseEventData {
-	unsigned short int button;
-	unsigned short int clicks;
-	unsigned short int x;
-	unsigned short int y;
+	unsigned short button;
+	unsigned short clicks;
+	unsigned short x;
+	unsigned short y;
 } MouseEventData, MousePressedEventData, MouseReleasedEventData, MouseClickedEventData;
 
 typedef struct _MouseWheelEventData {
-	unsigned short int clicks;
-	unsigned short int x;
-	unsigned short int y;
-	unsigned short int type;
-	unsigned short int amount;
-	signed int rotation;
+	unsigned short clicks;
+	unsigned short x;
+	unsigned short y;
+	unsigned short type;
+	unsigned short amount;
+	signed short rotation;
 } MouseWheelEventData;
 
 typedef struct _VritualEvent {
 	EventType type;
-	unsigned long int time;
-	unsigned short int mask;
+	unsigned long long time;
+	unsigned short mask;
 	bool propagate;
 	union {
 		KeyboardEventData keyboard;
@@ -93,163 +93,196 @@ typedef struct _VritualEvent {
 
 
 /* Begin Virtual Key Codes */
-#define VC_ENTER								'\n'
-#define VC_BACK_SPACE							'\b'
-#define VC_TAB									'\t'
-#define VC_CANCEL								0x04
 
-#define VC_SHIFT_L								0x10
-#define VC_SHIFT_R								0x0210
-#define VC_CONTROL_L							0x11
-#define VC_CONTROL_R							0x0211
-#define VC_ALT_L								0x12	// Option or Alt Key
-#define VC_ALT_R								0x0212	// Option or Alt Key
-#define VC_META_L								0x9D	// OSX: Command
-#define VC_META_R								0x029D	// OSX: Command
-#define VC_SUPER_L								0x0C	// Windows Key
-#define VC_SUPER_R								0x020C	// Windows Key
-#define VC_CONTEXT_MENU							0x020D
-
-#define VC_PAUSE								0x13
-#define VC_CAPS_LOCK							0x14
-#define VC_ESCAPE								0x1B
-
-
-// Begin Cursor Key Zone
-#define VC_LEFT									0x0025
-#define VC_UP									0x0026
-#define VC_RIGHT								0x0027
-#define VC_DOWN									0x0028
-// End Cursor Key Zone
-
-// Begin Alphanumeric Zone
-#define VC_SPACE								0x0020
-
-#define VC_COMMA								0x002C	// ','
-#define VC_MINUS								0x002D	// '-'
-#define VC_PERIOD								0x002E	// '.'
-#define VC_SLASH								0x002F	// '/'
-
-#define VC_0									0x0030
-#define VC_1									0x0031
-#define VC_2									0x0032
-#define VC_3									0x0033
-#define VC_4									0x0034
-#define VC_5									0x0035
-#define VC_6									0x0036
-#define VC_7									0x0037
-#define VC_8									0x0038
-#define VC_9									0x0039
-
-#define VC_SEMICOLON							0x003B	// ';'
-#define VC_EQUALS								0x003D	// '='
-
-#define VC_A									0x0041
-#define VC_B									0x0042
-#define VC_C									0x0043
-#define VC_D									0x0044
-#define VC_E									0x0045
-#define VC_F									0x0046
-#define VC_G									0x0047
-#define VC_H									0x0048
-#define VC_I									0x0049
-#define VC_J									0x004A
-#define VC_K									0x004B
-#define VC_L									0x004C
-#define VC_M									0x004D
-#define VC_N									0x004E
-#define VC_O									0x004F
-#define VC_P									0x0050
-#define VC_Q									0x0051
-#define VC_R									0x0052
-#define VC_S									0x0053
-#define VC_T									0x0054
-#define VC_U									0x0055
-#define VC_V									0x0056
-#define VC_W									0x0057
-#define VC_X									0x0058
-#define VC_Y									0x0059
-#define VC_Z									0x005A
-
-#define VC_OPEN_BRACKET							0x005B	// '['
-#define VC_BACK_SLASH							0x005C	// '\'
-#define VC_CLOSE_BRACKET						0x005D	// ']'
-
-// Begin Numeric Zone
-#define VC_KP_0									0x0130
-#define VC_KP_1									0x0131
-#define VC_KP_2									0x0132
-#define VC_KP_3									0x0133
-#define VC_KP_4									0x0134
-#define VC_KP_5									0x0135
-#define VC_KP_6									0x0136
-#define VC_KP_7									0x0137
-#define VC_KP_8									0x0138
-#define VC_KP_9									0x0139
-
-#define VC_KP_LEFT								0x0125
-#define VC_KP_UP								0x0126
-#define VC_KP_DOWN								0x0127
-#define VC_KP_RIGHT								0x0128
-
-#define VC_KP_ENTER								0x0110
-#define VC_KP_MULTIPLY							0x016A
-#define VC_KP_ADD								0x016B
-#define VC_KP_SEPARATOR							0x016C
-#define VC_KP_SUBTRACT							0x016D
-#define VC_KP_DECIMAL							0x016E
-#define VC_KP_DIVIDE							0x016F
-#define VC_KP_DELETE							0x017F
-
-#define VC_DELETE								0x7F
-#define VC_NUM_LOCK								0x90
-#define VC_CLEAR								0x03	// OSX: Number Lock
-#define VC_SCROLL_LOCK							0x91
-
+#define VC_ESCAPE								0x0001
 
 // Begin Function Keys
-#define VC_F1									0x70
-#define VC_F2									0x71
-#define VC_F3									0x72
-#define VC_F4									0x73
-#define VC_F5									0x74
-#define VC_F6									0x75
-#define VC_F7									0x76
-#define VC_F8									0x77
-#define VC_F9									0x78
-#define VC_F10									0x79
-#define VC_F11									0x7A
-#define VC_F12									0x7B
+#define VC_F1									0x003B
+#define VC_F2									0x003C
+#define VC_F3									0x003D
+#define VC_F4									0x003E
+#define VC_F5									0x003F
+#define VC_F6									0x0040
+#define VC_F7									0x0041
+#define VC_F8									0x0042
+#define VC_F9									0x0043
+#define VC_F10									0x0044
+#define VC_F11									0x0057
+#define VC_F12									0x0058
 
-#define VC_F13									0xF000
-#define VC_F14									0xF001
-#define VC_F15									0xF002
-#define VC_F16									0xF003
-#define VC_F17									0xF004
-#define VC_F18									0xF005
-#define VC_F19									0xF006
-#define VC_F20									0xF007
-#define VC_F21									0xF008
-#define VC_F22									0xF009
-#define VC_F23									0xF00A
-#define VC_F24									0xF00B
+#define VC_F13									0x005B
+#define VC_F14									0x005C
+#define VC_F15									0x005D
+#define VC_F16									0x0063
+#define VC_F17									0x0064
+#define VC_F18									0x0065
+#define VC_F19									0x0066
+#define VC_F20									0x0067
+#define VC_F21									0x0068
+#define VC_F22									0x0069
+#define VC_F23									0x006A
+#define VC_F24									0x006B
 // End Function Keys
 
 
-#define VC_PRINTSCREEN							0x9A
-#define VC_INSERT								0x9B
-#define VC_HELP									0x9C
+// Begin Alphanumeric Zone
+#define VC_BACK_QUOTE							0x0029
 
-#define VC_PAGE_UP								0x21
-#define VC_PAGE_DOWN							0x22
-#define VC_HOME									0x24
-#define VC_END									0x23
+#define VC_1									0x0002
+#define VC_2									0x0003
+#define VC_3									0x0004
+#define VC_4									0x0005
+#define VC_5									0x0006
+#define VC_6									0x0007
+#define VC_7									0x0008
+#define VC_8									0x0009
+#define VC_9									0x000A
+#define VC_0									0x000B
 
-#define VC_BACK_QUOTE							0xC0
-#define VC_QUOTE								0xDE
+#define VC_MINUS								0x000C	// '-'
+#define VC_EQUALS								0x003D	// '='
+#define VC_BACK_SPACE							0x000E
+
+#define VC_TAB									0x000F
+#define VC_CAPS_LOCK							0x003A
+
+#define VC_A									0x001E
+#define VC_B									0x0030
+#define VC_C									0x002E
+#define VC_D									0x0020
+#define VC_E									0x0012
+#define VC_F									0x0021
+#define VC_G									0x0022
+#define VC_H									0x0023
+#define VC_I									0x0017
+#define VC_J									0x0024
+#define VC_K									0x0025
+#define VC_L									0x0026
+#define VC_M									0x0032
+#define VC_N									0x0031
+#define VC_O									0x0018
+#define VC_P									0x0019
+#define VC_Q									0x0010
+#define VC_R									0x0013
+#define VC_S									0x001F
+#define VC_T									0x0014
+#define VC_U									0x0016
+#define VC_V									0x002F
+#define VC_W									0x0011
+#define VC_X									0x002D
+#define VC_Y									0x0015
+#define VC_Z									0x002C
+
+#define VC_OPEN_BRACKET							0x001A	// '['
+#define VC_CLOSE_BRACKET						0x001B	// ']'
+#define VC_BACK_SLASH							0x002B	// '\'
+
+#define VC_SEMICOLON							0x003B	// ';'
+#define VC_QUOTE								0x0028
+#define VC_ENTER								0x001C
+
+#define VC_COMMA								0x0033	// ','
+#define VC_PERIOD								0x0034	// '.'
+#define VC_SLASH								0x0035	// '/'
+
+#define VC_SPACE								0x0039
+// End Alphanumeric Zone
+
+
+#define VC_PRINTSCREEN							0x0E37
+#define VC_SCROLL_LOCK							0x0046
+//FIXME #define VC_PAUSE								0x13
+
+
+// Begin Edit Key Zone
+#define VC_INSERT								0x0E52
+#define VC_DELETE								0x0E53
+#define VC_HOME									0x0E47
+#define VC_END									0x0E4F
+#define VC_PAGE_UP								0x0E49
+#define VC_PAGE_DOWN							0x0E51
+// End Edit Key Zone
+
+
+// Begin Cursor Key Zone
+#define VC_UP									0xE048
+#define VC_LEFT									0xE04B
+#define VC_RIGHT								0xE04D
+#define VC_DOWN									0xE050
+// End Cursor Key Zone
+
+
+// Begin Numeric Zone
+#define VC_CLEAR								0x0E45	// 0x76?? OSX: Number Lock
+#define VC_NUM_LOCK								0x0E45
+#define VC_KP_DIVIDE							0x0E35
+#define VC_KP_MULTIPLY							0x0037
+#define VC_KP_SUBTRACT							0x004A
+
+#define VC_KP_ADD								0x004E
+#define VC_KP_ENTER								0x0E1C
+#define VC_KP_SEPARATOR							0x0053
+
+#define VC_KP_1									0x004F
+#define VC_KP_2									0x0050
+#define VC_KP_3									0x0051
+#define VC_KP_4									0x004B
+#define VC_KP_5									0x004C
+#define VC_KP_6									0x004D
+#define VC_KP_7									0x0047
+#define VC_KP_8									0x0048
+#define VC_KP_9									0x0049
+#define VC_KP_0									0x0052
+// End Numeric Zone
+
+
+// Begin Modifier and Control Keys
+#define VC_SHIFT_L								0x002A
+#define VC_SHIFT_R								0x0E36
+#define VC_CONTROL_L							0x001D
+#define VC_CONTROL_R							0x0E1D
+#define VC_ALT_L								0xD038	// Option or Alt Key
+#define VC_ALT_R								0xDE38	// Option or Alt Key
+#define VC_META_L								0x0E5B	// Windows or Command Key
+#define VC_META_R								0x0E5C	// Windows or Command Key
+#define VC_CONTEXT_MENU							0x0E5D
+// End Modifier and Control Keys
+
+
+// Begin Media Control Keys
+#define VC_POWER								0xE05E
+#define VC_SLEEP								0xE05F
+#define VC_WAKE									0xE063
+#define VC_MUTE									0xE020
+#define VC_VOLUME_UP							0xE030
+#define VC_VOLUME_DOWN							0xE02E
+#define VC_CUT									0xE017
+#define VC_COPY									0xE018
+#define VC_PASTE								0xE00A
+#define VC_HELP									0xE03B
+#define VC_UNDO									0xE008
+#define VC_REDO									0xE007
+#define VC_PLAY									0xE022
+#define VC_STOP									0xE024
+#define VC_REWIND								0xE010
+#define VC_FAST_FORWARD							0xE019
+#define VC_EJECT								0xE02C
+#define VC_MAIL									0xE01E
+#define VC_WEB									0xE032
+#define VC_MUSIC								0xE03C
+#define VC_PICTURES								0xE064
+#define VC_VIDEO								0xE06D
+// End Media Control Keys
+
+
+#define VC_KATAKANA								0x0070
+#define VC_FURIGANA								0x0077
+#define VC_KANJI								0x0079
+#define VC_HIRAGANA								0x007B
 
 
 // For European keyboards.
+/*
 #define VC_DEAD_GRAVE							0x80
 #define VC_DEAD_ACUTE							0x81
 #define VC_DEAD_CIRCUMFLEX						0x82
@@ -266,29 +299,7 @@ typedef struct _VritualEvent {
 #define VC_DEAD_IOTA							0x8D
 #define VC_DEAD_VOICED_SOUND					0x8E
 #define VC_DEAD_SEMIVOICED_SOUND				0x8F
-
-// Unknown Keyboard Codes.
-#define VC_AMPERSAND							0x96
-#define VC_ASTERISK								0x97
-#define VC_QUOTEDBL								0x98
-#define VC_LESS									0x99
-#define VC_GREATER								0xA0
-#define VC_BRACELEFT							0xA1
-#define VC_BRACERIGHT							0xA2
-
-// Unknown Extended Keyboard Codes.
-#define VC_AT									0x0200
-#define VC_COLON								0x0201
-#define VC_CIRCUMFLEX							0x0202
-#define VC_DOLLAR								0x0203
-#define VC_EURO_SIGN							0x0204
-#define VC_EXCLAMATION_MARK						0x0205
-#define VC_INVERTED_EXCLAMATION_MARK			0x0206
-#define VC_LEFT_PARENTHESIS						0x0207
-#define VC_NUMBER_SIGN							0x0208
-#define VC_PLUS									0x0209
-#define VC_RIGHT_PARENTHESIS					0x020A
-#define VC_UNDERSCORE							0x020B
+*/
 
 // For input method support on Asian Keyboards.
 #define VC_FINAL								0x0018	// Unknown Win32 API
@@ -297,10 +308,11 @@ typedef struct _VritualEvent {
 #define VC_ACCEPT								0x001E
 #define VC_MODECHANGE							0x001F	// Unknown Win32 API
 #define VC_KANA									0x0015
-#define VC_KANJI								0x0019
+
 #define VC_ALPHANUMERIC							0x00F0
-#define VC_KATAKANA								0x00F1
-#define VC_HIRAGANA								0x00F2
+
+
+
 #define VC_FULL_WIDTH							0x00F3
 #define VC_HALF_WIDTH							0x00F4
 #define VC_ROMAN_CHARACTERS						0x00F5
@@ -314,22 +326,16 @@ typedef struct _VritualEvent {
 #define VC_INPUT_METHOD_ON_OFF					0x0107
 
 // For Sun keyboards.
-#define VC_CUT									0xFFD1
-#define VC_COPY									0xFFCD
-#define VC_PASTE								0xFFCF
-#define VC_UNDO									0xFFCB
-#define VC_AGAIN								0xFFC9
-#define VC_FIND									0xFFD0
-#define VC_PROPS								0xFFCA
-#define VC_STOP									0xFFC8
+/*
+#define VC_FIND									0xE012
+#define VC_PROPS								//0xFFCA
 #define VC_COMPOSE								0xFF20
 #define VC_ALT_GRAPH							0xFF7E
-
-#define VC_BEGIN								0xFF58
-
-#define CHAR_UNDEFINED							0xFFFF	// CharCode Unknown
+*/
 
 #define VC_UNDEFINED							0x0000	// KeyCode Unknown
+
+#define CHAR_UNDEFINED							0xFFFF	// CharCode Unknown
 /* End Virtual Key Codes */
 
 
@@ -344,10 +350,10 @@ typedef struct _VritualEvent {
 #define MASK_META_R								1 << 6
 #define MASK_ALT_R								1 << 7
 
-#define MASK_SHIFT								MASK_SHIFT_L	| MASK_SHIFT_R
-#define MASK_CTRL								MASK_CTRL_L		| MASK_CTRL_R
-#define MASK_META								MASK_META_L		| MASK_META_R
-#define MASK_ALT								MASK_ALT_L		| MASK_ALT_R
+#define MASK_SHIFT								MASK_SHIFT_L | MASK_SHIFT_R
+#define MASK_CTRL								MASK_CTRL_L  | MASK_CTRL_R
+#define MASK_META								MASK_META_L  | MASK_META_R
+#define MASK_ALT								MASK_ALT_L   | MASK_ALT_R
 
 #define MASK_BUTTON1							1 << 8
 #define MASK_BUTTON2							1 << 9

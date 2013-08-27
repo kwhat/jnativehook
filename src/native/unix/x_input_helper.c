@@ -212,6 +212,7 @@ static const uint8_t evdev_keycode_to_scancode_table[61] = {
 uint16_t keycode_to_scancode(KeyCode keycode) {
 	uint16_t scancode = 0x00;
 
+	// FIXME Address Pause Key.
 	//if (keycode == GDK_Pause) {
 	//	return VKC_PAUSE;
 	//}
@@ -219,7 +220,7 @@ uint16_t keycode_to_scancode(KeyCode keycode) {
 	if (keycode < 9) {
 		scancode = 0x00;
 	}
-	if (keycode < 97) {
+	else if (keycode < 97) {
 		// Simple offset of 8
 		scancode = keycode - 8;
 	}

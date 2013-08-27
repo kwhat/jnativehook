@@ -53,7 +53,7 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
+											(jint) event->data.keyboard.scancode,
 											keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
@@ -69,7 +69,7 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
+											(jint) event->data.keyboard.scancode,
 											keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
@@ -85,7 +85,7 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
+											(jint) event->data.keyboard.scancode,
 											(jint) org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
 											(jchar) event->data.keyboard.keychar,
 											location);

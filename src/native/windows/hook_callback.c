@@ -21,15 +21,21 @@
 #endif
 #include <limits.h>
 #include <nativehook.h>
+#ifdef USE_DEBUG
+#include <stdio.h>
+#endif
+#include <time.h>
 #include <windows.h>
 
-#include "convert_to_native.h"
-#include "convert_to_virtual.h"
+#include "input_converter.h"
 #include "hook_callback.h"
 #include "win_unicode_helper.h"
 
 // Modifiers for tracking key masks.
 static unsigned short int current_modifiers = 0x0000;
+
+// Structure for the current Unix epoch in milliseconds.
+static FILETIME ft;
 
 // Key typed Unicode return values.
 static WCHAR keywchar = '\0', keydead = 0;
@@ -59,14 +65,14 @@ NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * 
 static inline void dispatch_event(VirtualEvent *const event) {
 	if (current_dispatch_proc != NULL) {
 		#ifdef USE_DEBUG
-		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event.type);
+		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
 		#endif
 
 		current_dispatch_proc(event);
 	}
 	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "dispatch_event(): No dispatch proc set! (%d)\n", event.type);
+		fprintf(stderr, "dispatch_event(): No dispatch proc set! (%d)\n", event->type);
 	}
 	#endif
 }
@@ -127,8 +133,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	// MS Keyboard event struct data.
 	KBDLLHOOKSTRUCT *kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
-	// Set the event_time
-	FILETIME ft;
+	// Set the event_time.
 	GetSystemTimeAsFileTime(&ft);
 	// Convert to milliseconds = 100-nanoseconds / 10000
 	__int64 system_time = (((__int64) ft.dwHighDateTime << 32) | ft.dwLowDateTime) / 10000;
@@ -139,8 +144,8 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	switch(wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			#ifdef DEBUG
-			fprintf(stdout, "keyboard_event_proc(): Key pressed. (%i)\n", 
+			#ifdef USE_DEBUG
+			fprintf(stdout, "keyboard_event_proc(): Key pressed. (%i)\n",
 					(unsigned int) kbhook->vkCode);
 			#endif
 
@@ -211,7 +216,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (convert_vk_to_wchar(kbhook->vkCode, &keywchar, &keydead) > 0) {
 				// Fire key typed event.
 				event.type = EVENT_KEY_TYPED;
-				// TODO This shouldn't be necessary but double check that the 
+				// TODO This shouldn't be necessary but double check that the
 				//		ptr const makes this value immutable.
 				//event.mask = get_modifiers();
 
@@ -224,7 +229,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stdout, "keyboard_event_proc(): Key released. (%i)\n", (unsigned int) kbhook->vkCode);
 			#endif
 
@@ -277,7 +282,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				jkey = NativeToJKey(kbhook->vkCode);
 			}
 			*/
-			
+
 			// Fire key released event.
 			event.type = EVENT_KEY_RELEASED;
 			event.mask = get_modifiers();
@@ -289,7 +294,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			dispatch_event(&event);
 			break;
 
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		default:
 			fprintf(stdout, "keyboard_event_proc(): Unhandled keyboard event: 0x%X\n", (unsigned int) wParam);
 			break;
@@ -303,8 +308,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	// MS Mouse event struct data.
 	MSLLHOOKSTRUCT *mshook = (MSLLHOOKSTRUCT *) lParam;
 
-	// Set the event_time
-	FILETIME ft;
+	// Set the event time.
 	GetSystemTimeAsFileTime(&ft);
 	// Convert to milliseconds = 100-nanoseconds / 10000
 	__int64 system_time = (((__int64) ft.dwHighDateTime << 32) | ft.dwLowDateTime) / 10000;
@@ -343,8 +347,8 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 		BUTTONDOWN:
-			#ifdef DEBUG
-			fprintf(stdout, "mouse_even_proc(): Button pressed. (%i)\n", (int) jbutton);
+			#ifdef USE_DEBUG
+			fprintf(stdout, "mouse_event_proc(): Button pressed. (%u)\n", event.data.mouse.button);
 			#endif
 
 			// Track the number of clicks.
@@ -363,7 +367,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			// Fire mouse pressed event.
 			event.type = EVENT_MOUSE_PRESSED;
 			event.mask = get_modifiers();
-			
+
 			event.data.mouse.clicks = click_count;
 			event.data.mouse.x = mshook->pt.x;
 			event.data.mouse.y = mshook->pt.y;
@@ -401,8 +405,8 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 		BUTTONUP:
-			#ifdef DEBUG
-			fprintf(stdout, "mouse_even_proc(): Button released. (%i)\n", (int) jbutton);
+			#ifdef USE_DEBUG
+			fprintf(stdout, "mouse_event_proc(): Button released. (%u)\n", event.data.mouse.button);
 			#endif
 
 			// Fire mouse released event.
@@ -412,17 +416,17 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.data.mouse.clicks = click_count;
 			event.data.mouse.x = mshook->pt.x;
 			event.data.mouse.y = mshook->pt.y;
-			
+
 			dispatch_event(&event);
-			
+
 			if (last_click.x == mshook->pt.x && last_click.y == mshook->pt.y) {
 				// Fire mouse clicked event.
 				event.type = EVENT_MOUSE_CLICKED;
-				// TODO This shouldn't be necessary but double check that the 
+				// TODO This shouldn't be necessary but double check that the
 				//		ptr const makes this value immutable.
 				//event.mask = get_modifiers();
 				//event.data.mouse.button = button;
-				
+
 				event.data.mouse.clicks = click_count;
 				event.data.mouse.x = mshook->pt.x;
 				event.data.mouse.y = mshook->pt.y;
@@ -432,8 +436,8 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case WM_MOUSEMOVE:
-			#ifdef DEBUG
-			fprintf(stdout, "mouse_even_proc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
+			#ifdef USE_DEBUG
+			fprintf(stdout, "mouse_event_proc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 			#endif
 
 			// Reset the click count.
@@ -444,7 +448,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			// We received a mouse move event with the mouse actually moving.
 			// This verifies that the mouse was moved after being depressed.
 			if (last_click.x != mshook->pt.x || last_click.y != mshook->pt.y) {
-				// Check the upper half of the current modifiers for non zero 
+				// Check the upper half of the current modifiers for non zero
 				// value.  This indicates the presence of a button down mask.
 				if (get_modifiers() >> 8) {
 					// Create Mouse Dragged event.
@@ -463,15 +467,15 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				event.data.mouse.clicks = click_count;
 				event.data.mouse.x = mshook->pt.x;
 				event.data.mouse.y = mshook->pt.y;
-				
+
 				// Fire mouse moved event.
 				dispatch_event(&event);
 			}
 			break;
 
 		case WM_MOUSEWHEEL:
-			#ifdef DEBUG
-			fprintf(stdout, "mouse_even_proc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
+			#ifdef USE_DEBUG
+			fprintf(stdout, "mouse_event_proc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
 			#endif
 
 			// Track the number of clicks.
@@ -496,13 +500,13 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			 * the wheel was rotated backward, toward the user. One wheel
 			 * click is defined as WHEEL_DELTA, which is 120. */
 			event.data.wheel.rotation = ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
-			
+
 			dispatch_event(&event);
 			break;
 
-		#ifdef DEBUG
+		#ifdef USE_DEBUG
 		default:
-			fprintf(stdout, "mouse_even_proc(): Unhandled mouse event: 0x%X\n", (unsigned int) wParam);
+			fprintf(stdout, "mouse_event_proc(): Unhandled mouse event: 0x%X\n", (unsigned int) wParam);
 			break;
 		#endif
 	}
@@ -513,7 +517,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 void initialize_modifiers() {
 		current_modifiers = 0x0000;
-		
+
 		if (GetKeyState(VK_LSHIFT)	 < 0)	set_modifier_mask(MASK_SHIFT_L);
 		if (GetKeyState(VK_RSHIFT)   < 0)	set_modifier_mask(MASK_SHIFT_R);
 		if (GetKeyState(VK_LCONTROL) < 0)	set_modifier_mask(MASK_CTRL_L);

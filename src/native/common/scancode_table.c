@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <nativehook.h>
-
+/*
 const uint16_t scancode_table[] = {
 	VC_UNDEFINED,		// 0x00 00	?
 	VC_ESCAPE,			// 0x01 01
@@ -157,6 +157,7 @@ const uint16_t scancode_table[] = {
 	VC_UNDEFINED,		// 0x81 127
 	VC_UNDEFINED		// 0x82 128
 };
+*/
 
 // Dupes
 // Flag 0x0		Flag 0x1
@@ -165,7 +166,6 @@ const uint16_t scancode_table[] = {
 // VC_F13		VC_WIN_L	// 0x5B 91
 // VC_F14		VC_WIN_R	// 0x5C 92
 // VC_F15		VC_MENU		// 0x5D 93
-//
 
 // Number Lock Solution
 // GetKeyState(VK_NUMLOCK) & 0x01
