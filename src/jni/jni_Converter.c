@@ -124,7 +124,7 @@ jint jni_ConvertToNativeType(jint javaType, EventType *nativeType) {
 }
 
 
-jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short int *nativeKeyCode) {
+jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short *nativeKeyCode) {
 	jint status = JNI_OK;
 
 	switch (javaKeyLocation) {
@@ -156,7 +156,6 @@ jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCod
 		case VC_CONTROL_L:
 		case VC_ALT_L:
 		case VC_META_L:
-		case VC_SUPER_L:
 			*javaKeyCode = nativeKeyCode;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
 			break;
@@ -165,7 +164,6 @@ jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCod
 		case VC_CONTROL_R:
 		case VC_ALT_R:
 		case VC_META_R:
-		case VC_SUPER_R:
 			*javaKeyCode = nativeKeyCode & 0xFF;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
 			break;
@@ -181,19 +179,12 @@ jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCod
 		case VC_KP_8:
 		case VC_KP_9:
 
-		case VC_KP_UP:
-		case VC_KP_DOWN:
-		case VC_KP_LEFT:
-		case VC_KP_RIGHT:
-
 		case VC_KP_ENTER:
 		case VC_KP_MULTIPLY:
 		case VC_KP_ADD:
 		case VC_KP_SEPARATOR:
 		case VC_KP_SUBTRACT:
-		case VC_KP_DECIMAL:
 		case VC_KP_DIVIDE:
-		case VC_KP_DELETE:
 			*javaKeyCode = nativeKeyCode & 0xFF;
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 			break;

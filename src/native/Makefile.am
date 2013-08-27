@@ -19,6 +19,11 @@ ACLOCAL_AMFLAGS = -I m4
 
 UNIX_SRC = unix/x_input_helper.c unix/x_unicode_helper.c
 WINDOWS_SRC = windows/hook_callback.c windows/win_unicode_helper.c
+#DARWIN_SRC =
+
+#if BUILD_DARWIN
+#OS_SRC = $(DARWIN_SRC)
+#endif
 
 if BUILD_UNIX
 OS_SRC = $(UNIX_SRC)

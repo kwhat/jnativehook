@@ -429,15 +429,7 @@
 		</condition>
 
 		<!-- Guess what system specific libraries to link against -->
-		<condition property="native.ld.libs" value="-framework ApplicationServices -framework IOKit -framework Carbon">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.ld.libs" value="-lX11 -lXt -lXtst -lc -lpthread">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.ld.libs" value="-lmsvcrt -luser32 -lkernel32">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
+		<property name="native.ld.libs" value="-L${dir.bin}/lib -Wl,-Bstatic -lnativehook" />
 
 		<!-- Set system specific linker arguments -->
 		<condition property="native.ld.args" value="-dynamiclib ${native.ld.flags}">
@@ -605,7 +597,7 @@
 			<sort>
 				<fileset dir="${dir.bin}" id="file.obj">
 					<include name="obj/jni/**/*.o" />
-					<include name="lib/*.a" />
+					<!-- include name="lib/*.a" /-->
 				</fileset>
 
 				<reverse xmlns="antlib:org.apache.tools.ant.types.resources.comparators">
@@ -707,7 +699,7 @@
 			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch}" />
 			<classpath>
 				<pathelement location="${dir.jar}/${project.name}.jar" />
-				<pathelement path="${dir.bin}/class" />
+				<pathelement path="${dir.bin}/class/java" />
 				<pathelement path="${java.class.path}" />
 			</classpath>
 		</java>

@@ -57,8 +57,8 @@ typedef enum _EventType {
 } EventType;
 
 typedef struct _KeyboardEventData {
-	int8_t keycode;
-	int16_t scancode;
+	unsigned short keycode;
+	unsigned short scancode;
 	wchar_t keychar;
 } KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 
