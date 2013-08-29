@@ -17,13 +17,13 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+#DARWIN_SRC =
 UNIX_SRC = unix/x_input_helper.c unix/x_unicode_helper.c
 WINDOWS_SRC = windows/hook_callback.c windows/win_unicode_helper.c
-#DARWIN_SRC =
 
-#if BUILD_DARWIN
-#OS_SRC = $(DARWIN_SRC)
-#endif
+if BUILD_DARWIN
+OS_SRC = $(DARWIN_SRC)
+endif
 
 if BUILD_UNIX
 OS_SRC = $(UNIX_SRC)
@@ -49,7 +49,17 @@ libnativehook_la_SOURCES = common/scancode_table.c \
 	$(OS_SRC)
 
 if BUILD_DEMO
-SUBDIRS = demo
+bin_PROGRAMS = hookdemo postdemo
+
+hookdemo_SOURCES = demo/hook_demo.c
+hookdemo_LDADD = $(top_builddir)/libnativehook.la
+hookdemo_CFLAGS = -Wall -Wextra -pedantic -I$(top_srcdir)/include
+hookdemo_LDFLAGS = -Wl,--as-needed,-O1
+
+postdemo_SOURCES = demo/post_demo.c
+postdemo_LDADD = $(top_builddir)/libnativehook.la
+postdemo_CFLAGS = -Wall -Wextra -pedantic -I$(top_srcdir)/include
+postdemo_LDFLAGS = -Wl,--as-needed,-O1
 endif
 
 EXTRA_DIST = license-commercial.txt license-gpl.txt readme.txt

@@ -47,11 +47,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-			// Convert the keycode and location.
-			jni_ConvertToNativeKeyCode(
-					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode),
-					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation),
-					&(virtualEvent->data.keyboard.keycode));
+			virtualEvent->data.keyboard.keycode = 
+					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
 			break;
 
 		// FIXME Implement!

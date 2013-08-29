@@ -45,12 +45,12 @@
 
 /* Begin Virtual Event Types and Data Structures */
 typedef enum _EventType {
-	EVENT_KEY_PRESSED = 1,
+	EVENT_KEY_TYPED = 1,
+	EVENT_KEY_PRESSED,
 	EVENT_KEY_RELEASED,
-	EVENT_KEY_TYPED,
+	EVENT_MOUSE_CLICKED,
 	EVENT_MOUSE_PRESSED,
 	EVENT_MOUSE_RELEASED,
-	EVENT_MOUSE_CLICKED,
 	EVENT_MOUSE_MOVED,
 	EVENT_MOUSE_DRAGGED,
 	EVENT_MOUSE_WHEEL
@@ -58,7 +58,7 @@ typedef enum _EventType {
 
 typedef struct _KeyboardEventData {
 	unsigned short keycode;
-	unsigned short scancode;
+	unsigned short rawcode;
 	wchar_t keychar;
 } KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
 
@@ -126,7 +126,7 @@ typedef struct _VritualEvent {
 
 
 // Begin Alphanumeric Zone
-#define VC_BACK_QUOTE							0x0029
+#define VC_BACKQUOTE							0x0029
 
 #define VC_1									0x0002
 #define VC_2									0x0003
@@ -140,8 +140,8 @@ typedef struct _VritualEvent {
 #define VC_0									0x000B
 
 #define VC_MINUS								0x000C	// '-'
-#define VC_EQUALS								0x003D	// '='
-#define VC_BACK_SPACE							0x000E
+#define VC_EQUALS								0x000D	// '='
+#define VC_BACKSPACE							0x000E
 
 #define VC_TAB									0x000F
 #define VC_CAPS_LOCK							0x003A
@@ -177,7 +177,7 @@ typedef struct _VritualEvent {
 #define VC_CLOSE_BRACKET						0x001B	// ']'
 #define VC_BACK_SLASH							0x002B	// '\'
 
-#define VC_SEMICOLON							0x003B	// ';'
+#define VC_SEMICOLON							0x0027	// ';'
 #define VC_QUOTE								0x0028
 #define VC_ENTER								0x001C
 
@@ -191,7 +191,7 @@ typedef struct _VritualEvent {
 
 #define VC_PRINTSCREEN							0x0E37
 #define VC_SCROLL_LOCK							0x0046
-//FIXME #define VC_PAUSE								0x13
+//FIXME #define VC_PAUSE								0x0045
 
 
 // Begin Edit Key Zone
@@ -302,6 +302,7 @@ typedef struct _VritualEvent {
 */
 
 // For input method support on Asian Keyboards.
+/*
 #define VC_FINAL								0x0018	// Unknown Win32 API
 #define VC_CONVERT								0x001C
 #define VC_NONCONVERT							0x001D
@@ -310,9 +311,9 @@ typedef struct _VritualEvent {
 #define VC_KANA									0x0015
 
 #define VC_ALPHANUMERIC							0x00F0
+*/
 
-
-
+/*
 #define VC_FULL_WIDTH							0x00F3
 #define VC_HALF_WIDTH							0x00F4
 #define VC_ROMAN_CHARACTERS						0x00F5
@@ -324,6 +325,7 @@ typedef struct _VritualEvent {
 #define VC_JAPANESE_ROMAN						0x0105
 #define VC_KANA_LOCK							0x0106
 #define VC_INPUT_METHOD_ON_OFF					0x0107
+*/
 
 // For Sun keyboards.
 /*

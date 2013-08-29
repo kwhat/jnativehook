@@ -26,8 +26,6 @@ extern jint jni_ConvertToJavaType(EventType nativeType, jint *javaType);
 
 extern jint jni_ConvertToNativeType(jint javaType, EventType *nativeType);
 
-extern jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short int *nativeKeyCode);
-
-extern jint jni_ConvertToJavaKeyCode(unsigned short int nativeKeyCode, jint *javaKeyCode, jint *javaKeyLocation);
+extern jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLocation);
 
 #endif

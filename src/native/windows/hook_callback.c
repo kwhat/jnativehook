@@ -208,7 +208,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.mask = get_modifiers();
 
 			event.data.keyboard.keycode = convert_to_virtual_key(kbhook->vkCode);
-			event.data.keyboard.scancode = kbhook->scanCode;
+			event.data.keyboard.rawcode = kbhook->scanCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
 			dispatch_event(&event);
@@ -288,7 +288,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.mask = get_modifiers();
 
 			event.data.keyboard.keycode = convert_to_virtual_key(kbhook->vkCode);
-			event.data.keyboard.scancode = kbhook->scanCode;
+			event.data.keyboard.rawcode = kbhook->scanCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
 			dispatch_event(&event);

@@ -39,7 +39,6 @@ AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 AC_PREREQ(2.64)
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
-	demo/Makefile \
 	pc/nativehook.pc \
 	Makefile
 ])
@@ -242,7 +241,7 @@ AS_IF(
 		AS_IF([test "x$enable_debug" = "xyes"], [
 			CFLAGS="$CFLAGS -Wno-format"
 		])
-		
+
 		#LIBS="${LIBS} -lsetupapi"
 	])
 

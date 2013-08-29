@@ -39,7 +39,7 @@ import java.util.EventObject;
  */
 public class NativeInputEvent extends EventObject {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -4115869356455095225L;
+	private static final long serialVersionUID = 4090734094523119531L;
 
 	/** The type of event. */
 	private int id;
@@ -50,35 +50,77 @@ public class NativeInputEvent extends EventObject {
 	/** The modifier keys down during event. */
 	private int modifiers;
 	
-	/** Flag to prevent native event propagation. */
+	/** Flag to prevent native event propagation. 
+	 * @since 1.2
+	 */
 	private boolean propagate;
 
-	/** The Shift key modifier constant. */
-	public static final int SHIFT_MASK		= 1 << 0;
+	/** The left shift key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int SHIFT_L_MASK		= 1 << 0;
 
-	/** The Ctrl key modifier constant. */
-	public static final int CTRL_MASK		= 1 << 1;
+	/** The left ctrl key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int CTRL_L_MASK		= 1 << 1;
 
-	/** The Meta key modifier constant. */
-	public static final int META_MASK		= 1 << 2;
+	/** The left meta key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int META_L_MASK		= 1 << 2;
 
-	/** The Alt key modifier constant. */
-	public static final int ALT_MASK		= 1 << 3;
+	/** The left alt key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int ALT_L_MASK		= 1 << 3;
 
+	/** The right shift key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int SHIFT_R_MASK		= 1 << 4;
+
+	/** The right ctrl key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int CTRL_R_MASK		= 1 << 5;
+
+	/** The right meta key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int META_R_MASK		= 1 << 6;
+
+	/** The right alt key modifier constant. 
+	 * @since 1.2
+	 */
+	public static final int ALT_R_MASK		= 1 << 7;
+	
+	/** Either the right or left shift key modifier constant. */
+	public static final int SHIFT_MASK		= SHIFT_L_MASK | SHIFT_R_MASK;
+	
+	/** Either the right or left ctrl key modifier constant. */
+	public static final int CTRL_MASK		= CTRL_L_MASK  | CTRL_R_MASK;
+	
+	/** Either the right or left meta key modifier constant. */
+	public static final int META_MASK		= META_L_MASK  | META_R_MASK;
+
+	/** Either the right or left alt key modifier constant. */
+	public static final int ALT_MASK		= ALT_L_MASK   | ALT_R_MASK;
+	
 	/** The Button1 modifier constant. */
-	public static final int BUTTON1_MASK	= 1 << 4;
+	public static final int BUTTON1_MASK	= 1 << 8;
 
 	/** The Button2 modifier constant. */
-	public static final int BUTTON2_MASK	= 1 << 5;
+	public static final int BUTTON2_MASK	= 1 << 9;
 
 	/** The Button3 modifier constant. */
-	public static final int BUTTON3_MASK	= 1 << 6;
+	public static final int BUTTON3_MASK	= 1 << 10;
 
 	/** The Button4 modifier constant. */
-	public static final int BUTTON4_MASK	= 1 << 7;
+	public static final int BUTTON4_MASK	= 1 << 11;
 
 	/** The Button5 modifier constant. */
-	public static final int BUTTON5_MASK	= 1 << 8;
+	public static final int BUTTON5_MASK	= 1 << 12;
 
 
 	/**

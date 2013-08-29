@@ -23,6 +23,10 @@
 
 	<!-- Project Settings -->
 	<property file="build.num" />
+	<property name="build.compiler" value="modern" />
+	<property name="ant.build.javac.source" value="1.5" />
+	<property name="ant.build.javac.target" value="1.5" />
+
 	<property name="project.name"		value="${ant.project.name}" />
 	<property name="project.vendor" 	value="Alexander Barker (alex@1stleg.com)" />
 	<property name="project.version"	value="${build.major}.${build.minor}.${build.revision}" />

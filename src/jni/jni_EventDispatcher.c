@@ -40,11 +40,11 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 
 		if (GlobalScreen_object != NULL) {
 			jobject NativeInputEvent_object = NULL;
-			jint keycode, location;
+			jint location;
 
 			switch (event->type) {
 				case EVENT_KEY_PRESSED:
-					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
+					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -53,14 +53,14 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.scancode,
-											keycode,
+											(jint) event->data.keyboard.rawcode,
+											(jint) event->data.keyboard.keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
 					break;
 
 				case EVENT_KEY_RELEASED:
-					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
+					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -69,14 +69,14 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.scancode,
-											keycode,
+											(jint) event->data.keyboard.rawcode,
+											(jint) event->data.keyboard.keycode,
 											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
 											location);
 					break;
 
 				case EVENT_KEY_TYPED:
-					jni_ConvertToJavaKeyCode(event->data.keyboard.keycode, &keycode, &location);
+					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
 
 					NativeInputEvent_object = (*env)->NewObject(
 											env,
@@ -85,7 +85,7 @@ void jni_EventDispatcher(VirtualEvent *const event) {
 											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.scancode,
+											(jint) event->data.keyboard.rawcode,
 											(jint) org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
 											(jchar) event->data.keyboard.keychar,
 											location);
