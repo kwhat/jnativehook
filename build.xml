@@ -5,8 +5,8 @@
 	Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
 
 	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
+	it under the terms of the GNU Lesser General Public License as published
+	by the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
 	This program is distributed in the hope that it will be useful,
@@ -75,9 +75,41 @@
 	</target>
 
 
-	<target name="configure" unless="project.isConfigured" description="Automatically generates a properties file for your environment.">
+	<target name="init" description="Initialize local build environment.">
+		<echo>Cleaning all build related items...</echo>
+		
+		<!-- Determine if the native source should be downloaded. -->
+		<available file="${dir.src}/native/configure" property="project.check.downloaded" />
+		
+		<!-- Determine if the project has been configured. -->
+		<available file="build.properties" property="project.check.configured" />
 		<property file="build.properties" />
+	</target>
 
+
+	<target name="download-native" depends="init" unless="project.check.downloaded" description="Download and initialize the native library.">
+		<!-- FIXME Should be downloaded form hosting site -->
+		<!--
+		<echo>Downloading libNativeHook srouce...</echo>
+		<mkdir dir="${dir.src}/native" />
+		<get src="http://code.google.com/p/libnativehook" dest="${dir.src}/native" verbose="true" />
+		-->
+		
+		<echo>Bootstrapping autoconf build process...</echo>
+		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
+			<arg value="--install" />
+			<arg value="--verbose" />
+			<arg value="--force" />
+		</exec>
+
+		<exec executable="sh" dir="${dir.src}/native" failonerror="true" osfamily="windows">
+			<arg value="-c" />
+			<arg value="autoreconf --install --verbose --force" />
+		</exec>
+	</target>
+	
+	
+	<target name="configure" depends="download-native" unless="project.check.configured" description="Automatically generates a properties file for your environment.">
 		<echo>Checking environment sanity...</echo>
 
 		<fail message="Could not determine ${project.name} version.  Please check the build.num file.">
@@ -307,20 +339,8 @@
 		<condition property="native.cc" value="gcc">
 			<available filepath="${native.path}" file="gcc" type="file" />
 		</condition>
-		<condition property="native.cc" value="clang">
-			<available filepath="${native.path}" file="clang" type="file" />
-		</condition>
 		<condition property="native.cc" value="gcc.exe">
 			<available filepath="${native.path}" file="gcc.exe" type="file" />
-		</condition>
-		<condition property="native.cc" value="mingw32-gcc.exe">
-			<available filepath="${native.path}" file="mingw32-gcc.exe" />
-		</condition>
-		<condition property="native.cc" value="mingw64-gcc.exe">
-			<available filepath="${native.path}" file="mingw64-gcc.exe" />
-		</condition>
-		<condition property="native.cc" value="clang.exe">
-			<available filepath="${native.path}" file="clang.exe" type="file" />
 		</condition>
 
 		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
@@ -460,9 +480,29 @@
 			<entry key="native.ld.args2"		value="${native.ld.args2}" />
 		</propertyfile>
 
+		<echo>Configuring...</echo>
+		<mkdir dir="${dir.bin}/native" />
+		
+		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
+			<arg line="CFLAGS='-std=c99'" />
+			<arg line="LDFLAGS='-Wl,--as-needed,-O1'" />
+			<arg value="--enable-debug" />
+			<arg value="--enable-static" />
+			<arg value="--with-pic" />
+			<arg value="--prefix=${dir.bin}" />
+		</exec>
 
-		<!-- Set a flag to let our tasks know we have configured successfully -->
-		<property name="project.isConfigured" value="true" />
+		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/native" /-->
+		<pathconvert property="dir.base.unix" targetos="unix">
+			<path location="${basedir}" />
+			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
+			<map from="${basedir}" to="${basedir}" />
+		</pathconvert>
+		
+		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
+			<arg value="-c" />
+			<arg value="${dir.base.unix}/src/native/configure --enable-debug --enable-static --prefix=${dir.base.unix}/bin" />
+		</exec>
 	</target>
 
 
@@ -496,53 +536,9 @@
 	</target>
 
 
+
 	<target name="compile-native" depends="configure" description="Compiles C source files.">
 		<echo>Compiling native source...</echo>
-		<mkdir dir="${dir.bin}/native" />
-
-		<!-- FIXME Should be downloaded form hosting site -->
-		<!--
-		<echo>Downloading libNativeHook srouce...</echo>
-		<mkdir dir="${dir.src}/native" />
-		<get src="http://code.google.com/p/libnativehook" dest="${dir.src}/native" verbose="true" />
-		-->
-
-
-		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/native" /-->
-		<pathconvert property="dir.base.unix" targetos="unix">
-			<path location="${basedir}" />
-			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
-			<map from="${basedir}" to="${basedir}" />
-		</pathconvert>
-
-		<echo>Bootstrapping autoconf build process...</echo>
-		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
-			<arg value="--install" />
-			<arg value="--verbose" />
-			<arg value="--force" />
-		</exec>
-
-		<exec executable="sh" dir="${dir.src}/native" failonerror="true" osfamily="windows">
-			<arg value="-c" />
-			<arg value="autoreconf --install --verbose --force" />
-		</exec>
-
-		<echo>Configuring...</echo>
-		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
-			<arg line="CFLAGS='-std=c99'" />
-			<arg line="LDFLAGS='-Wl,--as-needed,-O1'" />
-			<arg value="--enable-debug" />
-			<arg value="--enable-static" />
-			<arg value="--with-pic" />
-			<arg value="--prefix=${dir.bin}" />
-		</exec>
-
-		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
-			<arg value="-c" />
-			<arg value="${dir.base.unix}/src/native/configure --enable-debug --enable-static --prefix=${dir.base.unix}/bin" />
-		</exec>
-
-		<echo>Building...</echo>
 		<exec executable="make" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
 			<!-- arg value="- -jobs=4" /-->
 			<arg value="install" />

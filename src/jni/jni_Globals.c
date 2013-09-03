@@ -31,6 +31,7 @@ NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
 NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = NULL;
 NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = NULL;
 NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
+Logger *java_util_logging_Logger = NULL;
 
 int jni_CreateGlobals(JNIEnv *env) {
 	int status = JNI_ERR;
@@ -41,13 +42,15 @@ int jni_CreateGlobals(JNIEnv *env) {
 	org_jnativehook_keyboard_NativeKeyEvent = malloc(sizeof(NativeKeyEvent));
 	org_jnativehook_mouse_NativeMouseEvent = malloc(sizeof(NativeMouseEvent));
 	org_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
+	java_util_logging_Logger = malloc(sizeof(Logger));
 
 	// Check to make sure memory was allocated properly.
 	if (org_jnativehook_GlobalScreen != NULL
 			&& org_jnativehook_NativeInputEvent != NULL
 			&& org_jnativehook_keyboard_NativeKeyEvent != NULL
 			&& org_jnativehook_mouse_NativeMouseEvent != NULL
-			&& org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
+			&& org_jnativehook_mouse_NativeMouseWheelEvent != NULL
+			&& java_util_logging_Logger != NULL) {
 
 		// Lookup a local reference for the GlobalScreen class and create a global reference.
 		jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
@@ -60,13 +63,11 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"getInstance",
 					"()Lorg/jnativehook/GlobalScreen;");
 
+			#ifdef DEBUG
 			if (org_jnativehook_GlobalScreen->getInstance == NULL) {
-				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals()Lorg/jnativehook/GlobalScreen: Failed to acquire the method ID for GlobalScreen.getInstance()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("getInstance()Lorg/jnativehook/GlobalScreen;")
 			}
+			#endif
 
 
 			// Get the method ID for GlobalScreen.dispatchEvent().
@@ -76,45 +77,11 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"dispatchEvent",
 					"(Lorg/jnativehook/NativeInputEvent;)V");
 
+			#ifdef DEBUG
 			if (org_jnativehook_GlobalScreen->dispatchEvent == NULL) {
-				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("dispatchEvent(Lorg/jnativehook/NativeInputEvent;)V")
 			}
-
-
-			// Get the method ID for GlobalScreen.startEventDispatcher().
-			org_jnativehook_GlobalScreen->startEventDispatcher = (*env)->GetMethodID(
-					env,
-					org_jnativehook_GlobalScreen->cls,
-					"startEventDispatcher",
-					"()V");
-
-			if (org_jnativehook_GlobalScreen->startEventDispatcher == NULL) {
-				#ifdef DEBUG
-				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.startEventDispatcher()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("startEventDispatcher()V")
-			}
-
-
-			// Get the method ID for GlobalScreen.stopEventDispatcher().
-			org_jnativehook_GlobalScreen->stopEventDispatcher = (*env)->GetMethodID(
-					env,
-					org_jnativehook_GlobalScreen->cls,
-					"stopEventDispatcher",
-					"()V");
-
-			if (org_jnativehook_GlobalScreen->stopEventDispatcher == NULL) {
-				#ifdef DEBUG
-				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.stopEventDispatcher()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("stopEventDispatcher()V")
-			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -127,6 +94,20 @@ int jni_CreateGlobals(JNIEnv *env) {
 		jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
 		org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
 		if (org_jnativehook_NativeInputEvent->cls != NULL) {
+			// Get the field ID for NativeInputEvent.propagate.
+			org_jnativehook_NativeInputEvent->propagate = (*env)->GetFieldID(
+					env,
+					org_jnativehook_NativeInputEvent->cls,
+					"propagate",
+					"Z");
+
+			#ifdef DEBUG
+			if (org_jnativehook_NativeInputEvent->propagate == NULL) {
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the field ID for NativeInputEvent.propagate!\n");
+			}
+			#endif
+
+
 			// Get the method ID for NativeInputEvent constructor.
 			org_jnativehook_NativeInputEvent->init = (*env)->GetMethodID(
 					env,
@@ -134,13 +115,11 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"<init>",
 					"(Lorg/jnativehook/GlobalScreen;IJI)V");
 
+			#ifdef DEBUG
 			if (org_jnativehook_NativeInputEvent->init == NULL) {
-				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V")
 			}
+			#endif
 
 
 			// Get the method ID for NativeInputEvent.getID().
@@ -150,29 +129,25 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"getID",
 					"()I");
 
+			#ifdef DEBUG
 			if (org_jnativehook_NativeInputEvent->getID == NULL) {
-				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("getID()I")
 			}
+			#endif
 
 
-			// Get the method ID for GlobalScreen.dispatchEvent().
+			// Get the method ID for NativeInputEvent.getModifiers().
 			org_jnativehook_NativeInputEvent->getModifiers = (*env)->GetMethodID(
 					env,
 					org_jnativehook_NativeInputEvent->cls,
 					"getModifiers",
 					"()I");
 
+			#ifdef DEBUG
 			if (org_jnativehook_NativeInputEvent->getModifiers == NULL) {
-				#ifdef DEBUG
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for GlobalScreen.dispatchEvent()!\n");
-				#endif
-
-				// FIXME Throw java.lang.NoSuchMethodError("getModifiers()I")
 			}
+			#endif
 		}
 		#ifdef DEBUG
 		else {
@@ -196,13 +171,11 @@ int jni_CreateGlobals(JNIEnv *env) {
 						"getKeyCode",
 						"()I");
 
+				#ifdef DEBUG
 				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyCode == NULL) {
-					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyCode()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("getKeyCode()I")
 				}
+				#endif
 
 				// Get the method ID for NativeKeyEvent.getKeyLocation().
 				org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation = (*env)->GetMethodID(
@@ -211,13 +184,11 @@ int jni_CreateGlobals(JNIEnv *env) {
 						"getKeyLocation",
 						"()I");
 
+				#ifdef DEBUG
 				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation == NULL) {
-					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyLocation()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("getKeyLocation()I")
 				}
+				#endif
 
 				// Get the method ID for NativeKeyEvent.getKeyChar().
 				org_jnativehook_keyboard_NativeKeyEvent->getKeyChar = (*env)->GetMethodID(
@@ -226,16 +197,13 @@ int jni_CreateGlobals(JNIEnv *env) {
 						"getKeyChar",
 						"()C");
 
+				#ifdef DEBUG
 				if (org_jnativehook_keyboard_NativeKeyEvent->getKeyChar == NULL) {
-					#ifdef DEBUG
 					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.getKeyChar()!\n");
-					#endif
-
-					// FIXME Throw java.lang.NoSuchMethodError("getKeyChar()C")
 				}
+				#endif
 			}
 
-			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
 			if (org_jnativehook_keyboard_NativeKeyEvent->cls == NULL || org_jnativehook_keyboard_NativeKeyEvent->init == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeKeyEvent.<init>(IJIIICI)V!\n");
@@ -256,7 +224,6 @@ int jni_CreateGlobals(JNIEnv *env) {
 			org_jnativehook_mouse_NativeMouseEvent->init = (*env)->GetMethodID(env, org_jnativehook_mouse_NativeMouseEvent->cls, "<init>", "(IJIIIII)V");
 			org_jnativehook_mouse_NativeMouseEvent->parent = org_jnativehook_NativeInputEvent;
 
-			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
 			if (org_jnativehook_mouse_NativeMouseEvent->cls || org_jnativehook_mouse_NativeMouseEvent->init == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseEvent.NativeMouseEvent(int, long, int, int, int, int)!\n");
@@ -277,7 +244,6 @@ int jni_CreateGlobals(JNIEnv *env) {
 			org_jnativehook_mouse_NativeMouseWheelEvent->init = (*env)->GetMethodID(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls, "<init>", "(IJIIIIIII)V");
 			org_jnativehook_mouse_NativeMouseWheelEvent->parent = org_jnativehook_mouse_NativeMouseEvent;
 
-			// FIXME better checking and exception throwing needs to be included.
 			#ifdef DEBUG
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->cls == NULL || org_jnativehook_mouse_NativeMouseWheelEvent->init == NULL) {
 				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for NativeMouseWheelEvent.NativeMouseWheelEvent(int, long, int, int, int, int, int, int)!\n");
@@ -289,6 +255,84 @@ int jni_CreateGlobals(JNIEnv *env) {
 			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the NativeMouseWheelEvent class!\n");
 		}
 		#endif
+
+		
+		// Class and Constructor for the Logger Object.
+		jclass Logger_class = (*env)->FindClass(env, "java/util/logging/Logger");
+		if (Logger_class != NULL) {
+			java_util_logging_Logger->cls = (jclass) (*env)->NewGlobalRef(env, Logger_class);
+			if (java_util_logging_Logger->cls != NULL) {
+				java_util_logging_Logger->getLogger = (*env)->GetStaticMethodID(
+						env, 
+						java_util_logging_Logger->cls, 
+						"getLogger", 
+						"(Ljava/lang/String;)Ljava/util/logging/Logger;");
+
+				#ifdef DEBUG
+				if (java_util_logging_Logger->getLogger == NULL) {
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.getLogger()!\n");
+				}
+				#endif
+
+				java_util_logging_Logger->fine = (*env)->GetMethodID(
+						env, 
+						java_util_logging_Logger->cls, 
+						"fine", 
+						"(Ljava/lang/String;)V");
+
+				#ifdef DEBUG
+				if (java_util_logging_Logger->fine == NULL) {
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.fine()!\n");
+				}
+				#endif
+
+				java_util_logging_Logger->info = (*env)->GetMethodID(
+						env, 
+						java_util_logging_Logger->cls, 
+						"info", 
+						"(Ljava/lang/String;)V");
+
+				#ifdef DEBUG
+				if (java_util_logging_Logger->info == NULL) {
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.info()!\n");
+				}
+				#endif
+
+				java_util_logging_Logger->warning = (*env)->GetMethodID(
+						env, 
+						java_util_logging_Logger->cls, 
+						"warning",
+						"(Ljava/lang/String;)V");
+
+				#ifdef DEBUG
+				if (java_util_logging_Logger->warning == NULL) {
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.warning()!\n");
+				}
+				#endif
+
+				java_util_logging_Logger->severe = (*env)->GetMethodID(
+						env, 
+						java_util_logging_Logger->cls, 
+						"severe", 
+						"(Ljava/lang/String;)V");
+				
+				#ifdef DEBUG
+				if (java_util_logging_Logger->severe == NULL) {
+					fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.severe()!\n");
+				}
+				#endif
+			}
+			#ifdef DEBUG
+			if (java_util_logging_Logger->cls || java_util_logging_Logger->getLogger == NULL) {
+				fprintf(stderr, "CreateJNIGlobals(): Failed to acquire the method ID for Logger.getLogger(String)!\n");
+			}
+			#endif
+		}
+		#ifdef DEBUG
+		else {
+			fprintf(stderr, "CreateJNIGlobals(): Failed to locate the Logger class!\n");
+		}
+		#endif
 	}
 	else {
 		status = JNI_ENOMEM;
@@ -297,7 +341,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 		fprintf(stderr, "CreateJNIGlobals(): Failed to allocate memory for JNI structures!\n");
 		#endif
 
-		// FIXME Throw java.lang.OutOfMemoryError
+		// FIXME Throw java.lang.OutOfMemoryError ?
 	}
 
 	// Check and make sure everything is correct.
@@ -338,6 +382,12 @@ int jni_DestroyGlobals(JNIEnv *env) {
 		(*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls);
 		free(org_jnativehook_mouse_NativeMouseWheelEvent);
 		org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
+	}
+
+	if (java_util_logging_Logger != NULL) {
+		(*env)->DeleteGlobalRef(env, java_util_logging_Logger->cls);
+		free(java_util_logging_Logger);
+		java_util_logging_Logger = NULL;
 	}
 
 	return JNI_OK;

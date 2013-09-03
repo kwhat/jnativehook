@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -46,14 +46,14 @@ static DWORD click_time = 0;
 static POINT last_click;
 
 // Virtual event pointer.
-static VirtualEvent event;
+static virtual_event event;
 
-// Event dispatch callback
-static void (*current_dispatch_proc)(VirtualEvent *const) = NULL;
+// Event dispatch callback.
+static void (*current_dispatch_proc)(virtual_event * const) = NULL;
 
 extern HHOOK keyboard_event_hhook, mouse_event_hhook;
 
-NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const)) {
+NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const)) {
 	#ifdef USE_DEBUG
 	fprintf(stdout, "hook_set_dispatch_proc(): Setting new dispatch callback.\n");
 	#endif
@@ -62,7 +62,7 @@ NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * 
 }
 
 // Send out an event if a dispatcher was set.
-static inline void dispatch_event(VirtualEvent *const event) {
+static inline void dispatch_event(virtual_event * const event) {
 	if (current_dispatch_proc != NULL) {
 		#ifdef USE_DEBUG
 		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
@@ -141,11 +141,15 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	// Convert Windows epoch to Unix epoch (1970 - 1601 in milliseconds)
 	event.time = system_time - 11644473600000;
 
+	// Set the event to propagate.  The dispatcher will set this to false if needed.
+	event.propagate = true;
+
 	switch(wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 			#ifdef USE_DEBUG
-			fprintf(stdout, "keyboard_event_proc(): Key pressed. (%i)\n",
+			fprintf(stdout, "keyboard_event_proc(): 0x%X key pressed. (0x%X)\n",
+					(unsigned int) kbhook->scanCode,
 					(unsigned int) kbhook->vkCode);
 			#endif
 
@@ -200,15 +204,15 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 			*/
 			#ifdef USE_DEBUG
-			fprintf(stdout, "Test kbhook->flags = 0x%X\n", (unsigned int) kbhook->flags);
+			fprintf(stdout, "Test kbhook->flags = 0x%X 0x%X\n", (unsigned int) kbhook->flags, (unsigned int) kbhook->scanCode);
 			#endif
 
 			// Fire key pressed event.
 			event.type = EVENT_KEY_PRESSED;
 			event.mask = get_modifiers();
 
-			event.data.keyboard.keycode = convert_to_virtual_key(kbhook->vkCode);
-			event.data.keyboard.rawcode = kbhook->scanCode;
+			event.data.keyboard.keycode = (~kbhook->flags << 20) | kbhook->scanCode;
+			event.data.keyboard.rawcode = kbhook->vkCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
 			dispatch_event(&event);
@@ -216,11 +220,10 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (convert_vk_to_wchar(kbhook->vkCode, &keywchar, &keydead) > 0) {
 				// Fire key typed event.
 				event.type = EVENT_KEY_TYPED;
-				// TODO This shouldn't be necessary but double check that the
-				//		ptr const makes this value immutable.
-				//event.mask = get_modifiers();
+				event.mask = get_modifiers();
 
 				event.data.keyboard.keycode = VC_UNDEFINED;
+				event.data.keyboard.rawcode = kbhook->vkCode;
 				event.data.keyboard.keychar = keywchar;
 
 				dispatch_event(&event);
@@ -230,7 +233,9 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 			#ifdef USE_DEBUG
-			fprintf(stdout, "keyboard_event_proc(): Key released. (%i)\n", (unsigned int) kbhook->vkCode);
+			fprintf(stdout, "keyboard_event_proc(): 0x%X key released. (0x%X)\n",
+					(unsigned int) kbhook->scanCode,
+					(unsigned int) kbhook->vkCode);
 			#endif
 
 			// Check and setup modifiers.
@@ -287,8 +292,8 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.type = EVENT_KEY_RELEASED;
 			event.mask = get_modifiers();
 
-			event.data.keyboard.keycode = convert_to_virtual_key(kbhook->vkCode);
-			event.data.keyboard.rawcode = kbhook->scanCode;
+			event.data.keyboard.keycode = (~kbhook->flags << 20) | kbhook->scanCode;
+			event.data.keyboard.rawcode = kbhook->vkCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
 			dispatch_event(&event);
@@ -301,7 +306,20 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 		#endif
 	}
 
-	return CallNextHookEx(keyboard_event_hhook, nCode, wParam, lParam);
+	#ifdef USE_DEBUG
+	fprintf(stdout, "Test: event.propagate %u\n", (unsigned int) event.propagate);
+	#endif
+	
+	LRESULT hook_result = -1;
+	if (nCode < 0 || event.propagate != false) {
+		hook_result = CallNextHookEx(keyboard_event_hhook, nCode, wParam, lParam);
+	}
+	
+	#ifdef USE_DEBUG
+	fprintf(stdout, "Test: hook_result! %u\n", (unsigned int) hook_result);
+	#endif
+
+	return hook_result;
 }
 
 LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -437,7 +455,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 		case WM_MOUSEMOVE:
 			#ifdef USE_DEBUG
-			fprintf(stdout, "mouse_event_proc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
+			//fprintf(stdout, "mouse_event_proc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
 			#endif
 
 			// Reset the click count.

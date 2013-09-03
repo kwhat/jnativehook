@@ -1,10 +1,10 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2012 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -42,9 +42,16 @@
 #define NATIVEHOOK_ERROR_SET_WINDOWS_HOOK_EX		0x30
 /* End Error Codes */
 
+typedef enum _log_level {
+	LOG_LEVEL_DEBUG = 1,
+	LOG_LEVEL_INFO,
+	LOG_LEVEL_WARN,
+	LOG_LEVEL_ERROR
+} log_level;
+
 
 /* Begin Virtual Event Types and Data Structures */
-typedef enum _EventType {
+typedef enum _event_type {
 	EVENT_KEY_TYPED = 1,
 	EVENT_KEY_PRESSED,
 	EVENT_KEY_RELEASED,
@@ -54,20 +61,26 @@ typedef enum _EventType {
 	EVENT_MOUSE_MOVED,
 	EVENT_MOUSE_DRAGGED,
 	EVENT_MOUSE_WHEEL
-} EventType;
+} event_type;
 
-typedef struct _KeyboardEventData {
+typedef struct _keyboard_event_data {
 	unsigned short keycode;
 	unsigned short rawcode;
 	wchar_t keychar;
-} KeyboardEventData, KeyPressedEventData, KeyReleasedEventData, KeyTypedEventData;
+} keyboard_event_data, 
+		key_pressed_event_data, 
+		key_released_event_data, 
+		key_typed_event_data;
 
 typedef struct _MouseEventData {
 	unsigned short button;
 	unsigned short clicks;
 	unsigned short x;
 	unsigned short y;
-} MouseEventData, MousePressedEventData, MouseReleasedEventData, MouseClickedEventData;
+} mouse_event_data, 
+		mouse_pressed_event_data, 
+		mouse_released_event_data, 
+		mouse_clicked_event_data;
 
 typedef struct _MouseWheelEventData {
 	unsigned short clicks;
@@ -76,19 +89,19 @@ typedef struct _MouseWheelEventData {
 	unsigned short type;
 	unsigned short amount;
 	signed short rotation;
-} MouseWheelEventData;
+} mouse_wheel_event_data;
 
-typedef struct _VritualEvent {
-	EventType type;
+typedef struct _virtual_event {
+	event_type type;
 	unsigned long long time;
 	unsigned short mask;
-	bool propagate;
+	bool propagate;	// Please note this flag is unsupported.
 	union {
-		KeyboardEventData keyboard;
-		MouseEventData mouse;
-		MouseWheelEventData wheel;
+		keyboard_event_data keyboard;
+		mouse_event_data mouse;
+		mouse_wheel_event_data wheel;
 	} data;
-} VirtualEvent;
+} virtual_event;
 /* End Virtual Event Types and Data Structures */
 
 
@@ -388,11 +401,14 @@ typedef struct _VritualEvent {
 extern "C" {
 #endif
 
+	// Set the logger callback functions.
+	NATIVEHOOK_API bool hook_set_logger_proc(log_level level, bool (*logger_proc)(const char *));
+	
 	// Send a virtual event back to the system.
-	NATIVEHOOK_API void hook_post_event(VirtualEvent * const event);
+	NATIVEHOOK_API void hook_post_event(virtual_event * const event);
 
 	// Set the event callback function.
-	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const));
+	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const));
 
 	// Insert the event hook.
 	NATIVEHOOK_API int hook_enable();

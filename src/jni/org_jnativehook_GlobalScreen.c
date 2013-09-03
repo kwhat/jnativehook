@@ -27,13 +27,42 @@
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 #include "org_jnativehook_GlobalScreen.h"
 
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
+	// Request an instance of the GlobalScreen.
+	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
+			env,
+			org_jnativehook_GlobalScreen->cls,
+			org_jnativehook_GlobalScreen->getInstance);
+
+	if (GlobalScreen_object != NULL) {
+		hook_enable();
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
+	// Request an instance of the GlobalScreen.
+	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
+			env,
+			org_jnativehook_GlobalScreen->cls,
+			org_jnativehook_GlobalScreen->getInstance);
+
+	if (GlobalScreen_object != NULL) {
+		hook_disable();
+	}
+}
+
+JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *env, jclass cls) {
+	// Simple wrapper to return the hook status.
+	return (jboolean) hook_is_enabled();
+}
+
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
 	// Convert the event type.
 	unsigned int nativeType;
 	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
-	VirtualEvent *virtualEvent = (VirtualEvent *) malloc(sizeof(VirtualEvent));
+	virtual_event *virtualEvent = (virtual_event *) malloc(sizeof(virtual_event));
 	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
 
 	// Convert Java event to virtual event.
@@ -66,39 +95,4 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	}
 
 	hook_post_event(virtualEvent);
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
-	// Request an instance of the GlobalScreen.
-	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-			env,
-			org_jnativehook_GlobalScreen->cls,
-			org_jnativehook_GlobalScreen->getInstance);
-
-	if (GlobalScreen_object != NULL) {
-		// Start the java event dispatch thread.
-		(*env)->CallVoidMethod(env, GlobalScreen_object, org_jnativehook_GlobalScreen->startEventDispatcher);
-
-		hook_enable();
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
-	// Request an instance of the GlobalScreen.
-	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-			env,
-			org_jnativehook_GlobalScreen->cls,
-			org_jnativehook_GlobalScreen->getInstance);
-
-	if (GlobalScreen_object != NULL) {
-		hook_disable();
-
-		// Start the java event dispatch thread.
-		(*env)->CallVoidMethod(env, GlobalScreen_object, org_jnativehook_GlobalScreen->stopEventDispatcher);
-	}
-}
-
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *env, jclass cls) {
-	// Simple wrapper to return the hook status.
-	return (jboolean) hook_is_enabled();
 }

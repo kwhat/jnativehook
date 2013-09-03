@@ -37,12 +37,11 @@ typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
 	jmethodID getInstance;
 	jmethodID dispatchEvent;
-	jmethodID startEventDispatcher;
-	jmethodID stopEventDispatcher;
 } GlobalScreen;
 
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
+	jfieldID propagate;
 	jmethodID init;
 	jmethodID getID;
 	jmethodID getModifiers;
@@ -69,12 +68,22 @@ typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
 	NativeMouseEvent *parent;
 } NativeMouseWheelEvent;
 
+typedef struct _java_util_logging_Logger {
+	jclass cls;
+	jmethodID getLogger;
+	jmethodID fine;
+	jmethodID info;
+	jmethodID warning;
+	jmethodID severe;
+} Logger;
+
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
 extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;
+extern Logger *java_util_logging_Logger;
 
 // Create all of the JNI global references used throughout the native library.
 extern int jni_CreateGlobals(JNIEnv *env);

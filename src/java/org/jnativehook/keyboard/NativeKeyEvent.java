@@ -157,7 +157,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_TAB							= 0x000F;
 	public static final int VC_CAPS_LOCK					= 0x003A;
 	
-	/** VC_A thru VC_Z are the same as ASCII 'A' thru 'Z' (0x41 - 0x5A). */
+	/** VC_A thru VC_Z */
 	public static final int VC_A								= 0x001E;
 	public static final int VC_B							= 0x0030;
 	public static final int VC_C							= 0x002E;
@@ -354,9 +354,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * Returns the native code associated with the native key in this event.
 	 * This is an arbitrary number between 0 and 255 (inclusive) used by the
 	 * operating system to represent a physical key on the keyboard.  This
-	 * code does not necessarily represent the native key's scan code or ascii
+	 * code does not necessarily represent the native key's scan code or ASCII
 	 * representation.  To maintain platform independence, you should not rely
-	 * on the consistancy of this value from platform to platform.
+	 * on the consistency of this value from platform to platform.
 	 *
 	 * @return the native key code for this event.
 	 */

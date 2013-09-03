@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -38,7 +38,7 @@ static UINT keymask_lookup[8] = {
 	VK_RMENU
 };
 
-NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
+NATIVEHOOK_API void hook_post_event(virtual_event * const event) {
 	unsigned char events_size = 0, events_max = 28;
 	INPUT *events = malloc(sizeof(INPUT) * events_max);
 

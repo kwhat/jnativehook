@@ -156,6 +156,13 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		scrollPane.setPreferredSize(new Dimension(375, 125));
 		add(scrollPane, BorderLayout.CENTER);
 
+		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
+		 * Because Swing components must be accessed on the event dispatching
+		 * thread, you *MUST* wrap access to Swing components using the
+		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
+		 */
+		GlobalScreen.getInstance().setEventDispatcher(new SwingExecutorService());
+		
 		setVisible(true);
 	}
 
@@ -303,28 +310,19 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 * @param e the native input event to display.
 	 */
 	private void displayEventInfo(final NativeInputEvent e) {
-		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
-		 * Because Swing components must be accessed on the event dispatching
-		 * thread, you *MUST* wrap access to Swing components using the
-		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
-		 */
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				txtEventInfo.append("\n" + e.paramString());
+		txtEventInfo.append("\n" + e.paramString());
 
-				try {
-					//Clean up the history to reduce memory consumption.
-					if (txtEventInfo.getLineCount() > 100) {
-						txtEventInfo.replaceRange("", 0, txtEventInfo.getLineEndOffset(txtEventInfo.getLineCount() - 1 - 100));
-					}
-
-					txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
-				}
-				catch (BadLocationException ex) {
-					txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
-				}
+		try {
+			//Clean up the history to reduce memory consumption.
+			if (txtEventInfo.getLineCount() > 100) {
+				txtEventInfo.replaceRange("", 0, txtEventInfo.getLineEndOffset(txtEventInfo.getLineCount() - 1 - 100));
 			}
-		});
+
+			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
+		}
+		catch (BadLocationException ex) {
+			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
+		}
 	}
 
 	/**

@@ -53,12 +53,13 @@ public class NativeInputEvent extends EventObject {
 	/** Flag to prevent native event propagation. 
 	 * @since 1.2
 	 */
+	@SuppressWarnings("unused")
 	private boolean propagate;
 
 	/** The left shift key modifier constant. 
 	 * @since 1.2
 	 */
-	public static final int SHIFT_L_MASK		= 1 << 0;
+	public static final int SHIFT_L_MASK	= 1 << 0;
 
 	/** The left ctrl key modifier constant. 
 	 * @since 1.2
@@ -78,7 +79,7 @@ public class NativeInputEvent extends EventObject {
 	/** The right shift key modifier constant. 
 	 * @since 1.2
 	 */
-	public static final int SHIFT_R_MASK		= 1 << 4;
+	public static final int SHIFT_R_MASK	= 1 << 4;
 
 	/** The right ctrl key modifier constant. 
 	 * @since 1.2
@@ -181,13 +182,30 @@ public class NativeInputEvent extends EventObject {
 	}
 
 	/**
+	 * Sets the propagate flags for this event.
+	 * <p>
+	 * Note that this method will only work for Windows and Darwin guests.  
+	 * Support for X11 cannot be provided due to an oversight in the way that 
+	 * XRecord currently operates.  This method will be marked private until a
+	 * cross-platform working solution can be provided.
+	 * 
+	 * @param propagate Whether or not the event should continue to propagate.
+	 * 
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unused")
+	private void setPropagate(boolean propagate) {
+		this.propagate = propagate;
+	}
+	
+	/**
 	 * Gets a <code>String</code> describing the modifier flags, such as
 	 * "Button1", or "Ctrl+Alt". These strings can be localized by changing the
 	 * awt.properties file.
 	 *
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons of an event.
-	 * @return the modifier mask's textual representation
+	 * @return the modifier mask's textual representation.
 	 */
 	public static String getModifiersText(int modifiers) {
 		StringBuilder param = new StringBuilder(255);

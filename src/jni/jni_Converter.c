@@ -26,7 +26,7 @@
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
 
-jint jni_ConvertToJavaType(EventType nativeType, jint *javaType) {
+jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
 	jint status = JNI_OK;
 
 	if (nativeType < EVENT_MOUSE_PRESSED) {
@@ -44,7 +44,7 @@ jint jni_ConvertToJavaType(EventType nativeType, jint *javaType) {
 }
 
 
-jint jni_ConvertToNativeType(jint javaType, EventType *nativeType) {
+jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 	jint status = JNI_OK;
 
 	if (javaType < org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST) {
@@ -63,17 +63,6 @@ jint jni_ConvertToNativeType(jint javaType, EventType *nativeType) {
 
 	return status;
 }
-
-
-jint jni_ConvertToNativeKeyCode(jint javaKeyCode, jint javaKeyLocation, unsigned short *nativeKeyCode) {
-	jint status = JNI_OK;
-
-	// FIXME There should be range checking on this.
-	*nativeKeyCode = (unsigned short) javaKeyCode;
-
-	return status;
-}
-
 
 jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLocation) {
 	jint status = JNI_OK;

@@ -16,16 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _Included_jni_Converter_h
-#define _Included_jni_Converter_h
+#ifndef _Included_jni_Logger_h
+#define _Included_jni_Logger_h
 
-#include <jni.h>
-#include <nativehook.h>
-
-extern jint jni_ConvertToJavaType(event_type nativeType, jint *javaType);
-
-extern jint jni_ConvertToNativeType(jint javaType, event_type *nativeType);
-
-extern jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLocation);
+extern void jni_SetLogger(JNIEnv *env);
 
 #endif

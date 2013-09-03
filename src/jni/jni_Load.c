@@ -19,15 +19,16 @@
 #include <jni.h>
 #include <nativehook.h>
 
-#include "jni_Globals.h"
 #include "jni_Errors.h"
+#include "jni_Globals.h"
+#include "jni_Logger.h"
 #include "jni_Properties.h"
 
 // JNI Related global references.
 JavaVM *jvm;
 jint jni_version = JNI_VERSION_1_4;
 
-extern void jni_EventDispatcher(VirtualEvent *const event);
+extern void jni_EventDispatcher(virtual_event *const event);
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -54,6 +55,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		// Set java properties from native sources.
 		jni_SetProperties(env);
 
+		// Set java logger for native code messages.
+		jni_SetLogger(env);
+		
 		// Set the hook callback function to dispatch events.
 		hook_set_dispatch_proc(&jni_EventDispatcher);
 	}
