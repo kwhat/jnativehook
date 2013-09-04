@@ -307,7 +307,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	}
 
 	#ifdef USE_DEBUG
-	fprintf(stdout, "Test: event.propagate %u\n", (unsigned int) event.propagate);
+	fprintf(stdout, "Test: event.propagate %u, nCode %d, \n", (unsigned int) event.propagate);
 	#endif
 	
 	LRESULT hook_result = -1;

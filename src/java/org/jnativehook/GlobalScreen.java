@@ -277,22 +277,15 @@ public class GlobalScreen {
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
 		if (eventExecutor != null) {
-			// The event cannot be modified beyond this point!  This is both a 
-			// Java restriction and a native code restriction.
-			final NativeInputEvent event = e;
-			eventExecutor.execute(new Runnable() {
-				public void run() {
-					if (event instanceof NativeKeyEvent) {
-						processKeyEvent((NativeKeyEvent) event);
-					}
-					else if (event instanceof NativeMouseWheelEvent) {
-						processMouseWheelEvent((NativeMouseWheelEvent) event);
-					}
-					else if (event instanceof NativeMouseEvent) {
-						processMouseEvent((NativeMouseEvent) event);
-					}
-				}
-			});
+			if (e instanceof NativeKeyEvent) {
+				processKeyEvent((NativeKeyEvent) e);
+			}
+			else if (e instanceof NativeMouseWheelEvent) {
+				processMouseWheelEvent((NativeMouseWheelEvent) e);
+			}
+			else if (e instanceof NativeMouseEvent) {
+				processMouseEvent((NativeMouseEvent) e);
+			}
 		}
 	}
 
@@ -306,24 +299,42 @@ public class GlobalScreen {
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	private void processKeyEvent(NativeKeyEvent e) {
-		int id = e.getID();
-		EventListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-
-		for (int i = 0; i < listeners.length; i++) {
-			switch (id) {
-				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					((NativeKeyListener) listeners[i]).nativeKeyPressed(e);
-					break;
-
-				case NativeKeyEvent.NATIVE_KEY_TYPED:
-					((NativeKeyListener) listeners[i]).nativeKeyTyped(e);
-					break;
-
-				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					((NativeKeyListener) listeners[i]).nativeKeyReleased(e);
-					break;
-			}
+		/*
+		try {
+			Field f = NativeInputEvent.class.getDeclaredField("propagate");
+			f.setAccessible(true);
+			f.setBoolean(e, false);
 		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		*/
+		
+		// The event cannot be modified beyond this point!  This is both a 
+		// Java restriction and a native code restriction.
+		final NativeKeyEvent event = e;
+		eventExecutor.execute(new Runnable() {
+			public void run() {
+				int id = event.getID();
+				EventListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
+
+				for (int i = 0; i < listeners.length; i++) {
+					switch (id) {
+						case NativeKeyEvent.NATIVE_KEY_PRESSED:
+							((NativeKeyListener) listeners[i]).nativeKeyPressed(event);
+							break;
+
+						case NativeKeyEvent.NATIVE_KEY_TYPED:
+							((NativeKeyListener) listeners[i]).nativeKeyTyped(event);
+							break;
+
+						case NativeKeyEvent.NATIVE_KEY_RELEASED:
+							((NativeKeyListener) listeners[i]).nativeKeyReleased(event);
+							break;
+					}
+				}
+			}
+		});
 	}
 
 	/**
@@ -336,39 +347,46 @@ public class GlobalScreen {
 	 * @see #addNativeMouseListener(NativeMouseListener)
 	 */
 	private void processMouseEvent(NativeMouseEvent e) {
-		int id = e.getID();
+		// The event cannot be modified beyond this point!  This is both a 
+		// Java restriction and a native code restriction.
+		final NativeMouseEvent event = e;
+		eventExecutor.execute(new Runnable() {
+			public void run() {
+				int id = event.getID();
 
-		EventListener[] listeners;
-		if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED || id == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
-			listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-		}
-		else {
-			listeners = eventListeners.getListeners(NativeMouseListener.class);
-		}
+				EventListener[] listeners;
+				if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED || id == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
+					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+				}
+				else {
+					listeners = eventListeners.getListeners(NativeMouseListener.class);
+				}
 
-		for (int i = 0; i < listeners.length; i++) {
-			switch (id) {
-				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-					((NativeMouseListener) listeners[i]).nativeMouseClicked(e);
-					break;
+				for (int i = 0; i < listeners.length; i++) {
+					switch (id) {
+						case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+							((NativeMouseListener) listeners[i]).nativeMouseClicked(event);
+							break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					((NativeMouseListener) listeners[i]).nativeMousePressed(e);
-					break;
+						case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+							((NativeMouseListener) listeners[i]).nativeMousePressed(event);
+							break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					((NativeMouseListener) listeners[i]).nativeMouseReleased(e);
-					break;
+						case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+							((NativeMouseListener) listeners[i]).nativeMouseReleased(event);
+							break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					((NativeMouseMotionListener) listeners[i]).nativeMouseMoved(e);
-					break;
+						case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+							((NativeMouseMotionListener) listeners[i]).nativeMouseMoved(event);
+							break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-					((NativeMouseMotionListener) listeners[i]).nativeMouseDragged(e);
-					break;
+						case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+							((NativeMouseMotionListener) listeners[i]).nativeMouseDragged(event);
+							break;
+					}
+				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -383,11 +401,18 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	private void processMouseWheelEvent(NativeMouseWheelEvent e) {
-		EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
+		// The event cannot be modified beyond this point!  This is both a 
+		// Java restriction and a native code restriction.
+		final NativeMouseWheelEvent event = e;
+		eventExecutor.execute(new Runnable() {
+			public void run() {
+				EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
-		for (int i = 0; i < listeners.length; i++) {
-			((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(e);
-		}
+				for (int i = 0; i < listeners.length; i++) {
+					((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(event);
+				}
+			}
+		});
 	}
 
 	/**
