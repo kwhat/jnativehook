@@ -59,7 +59,7 @@ static unsigned int btnmask_lookup[5] = {
 };
 #endif
 
-NATIVEHOOK_API void hook_post_event(VirtualEvent * const event) {
+NATIVEHOOK_API void hook_post_event(virtual_event * const event) {
 	char buffer[4];
 
 	#ifdef USE_XTEST

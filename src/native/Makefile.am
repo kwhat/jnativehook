@@ -17,7 +17,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-#DARWIN_SRC =
+DARWIN_SRC =
 UNIX_SRC = unix/x_input_helper.c unix/x_unicode_helper.c
 WINDOWS_SRC = windows/hook_callback.c windows/win_unicode_helper.c
 
@@ -34,6 +34,7 @@ OS_SRC = $(WINDOWS_SRC)
 endif
 
 pkgconfigdir = $(libdir)/pc
+pkgconfig_DATA = $(top_builddir)/pc/nativehook.pc
 
 include_HEADERS = include/nativehook.h
 

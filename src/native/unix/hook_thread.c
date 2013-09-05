@@ -38,6 +38,7 @@
 #include <X11/extensions/record.h>
 
 #include "hook_callback.h"
+#include "x_input_helper.h"
 
 // The pointer to the X11 display accessed by the callback.
 static Display *disp_ctrl;
@@ -96,62 +97,45 @@ static void *hook_thread_proc(void *arg) {
 				// Initialize Native Input Functions.
 				load_input_helper();
 
-				// Allocate memory for the virtual events only once.
-				event = (VirtualEvent *) malloc(sizeof(VirtualEvent));
+				#ifdef USE_XRECORD_ASYNC
+				// Allow the thread loop to block.
+				running = true;
 
-				// Check and make sure we didn't run out of memory.
-				if (event != NULL) {
-					#ifdef USE_XRECORD_ASYNC
-					// Allow the thread loop to block.
-					running = true;
+				// Async requires that we loop so that our thread does not return.
+				if (XRecordEnableContextAsync(disp_data, context, hook_event_proc, NULL) != 0) {
+					// Set the exit status.
+					*status = NATIVEHOOK_SUCCESS;
 
-					// Async requires that we loop so that our thread does not return.
-					if (XRecordEnableContextAsync(disp_data, context, hook_event_proc, NULL) != 0) {
-						// Set the exit status.
-						*status = NATIVEHOOK_SUCCESS;
+					while (running) {
+						XRecordProcessReplies(disp_data);
 
-						while (running) {
-							XRecordProcessReplies(disp_data);
-
-							// Prevent 100% CPU utilization.
-							#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE  >= 199309L
-							nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
-							#else
-							#pragma message "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
-							#endif
-						}
-					}
-					#else
-					// Sync blocks until XRecordDisableContext() is called.
-					if (XRecordEnableContext(disp_data, context, hook_event_proc, NULL) != 0) {
-						// Set the exit status.
-						*status = NATIVEHOOK_SUCCESS;
-					}
-					#endif
-					else {
-						#ifdef USE_DEBUG
-						fprintf (stderr, "hook_thread_proc(): XRecordEnableContext failure!\n");
+						// Prevent 100% CPU utilization.
+						#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE  >= 199309L
+						nanosleep((struct timespec[]) {{0, 100 * 1000000}}, NULL);
+						#else
+						#pragma message "You should define _POSIX_C_SOURCE  >= 199309L with USE_XRECORD_ASYNC to prevent 100% CPU utilization!"
 						#endif
-
-						#ifdef USE_XRECORD_ASYNC
-						// Reset the running state.
-						running = false;
-						#endif
-
-						// Set the exit status.
-						*status = NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT;
 					}
-
-					// Free up memory used for virtual events.
-					free(event);
 				}
+				#else
+				// Sync blocks until XRecordDisableContext() is called.
+				if (XRecordEnableContext(disp_data, context, hook_event_proc, NULL) != 0) {
+					// Set the exit status.
+					*status = NATIVEHOOK_SUCCESS;
+				}
+				#endif
 				else {
 					#ifdef USE_DEBUG
-					fprintf(stderr, "hook_thread_proc(): malloc failure!\n");
+					fprintf (stderr, "hook_thread_proc(): XRecordEnableContext failure!\n");
+					#endif
+
+					#ifdef USE_XRECORD_ASYNC
+					// Reset the running state.
+					running = false;
 					#endif
 
 					// Set the exit status.
-					*status = NATIVEHOOK_ERROR_OUT_OF_MEMORY;
+					*status = NATIVEHOOK_ERROR_X_RECORD_ENABLE_CONTEXT;
 				}
 
 				// Free up the context after the run loop terminates.

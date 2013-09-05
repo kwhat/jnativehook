@@ -468,8 +468,16 @@ public class GlobalScreen {
 				String libNativePrefix = libNativeName.substring(0, i) + '_';
 				String libNativeSuffix = libNativeName.substring(i);
 
+				// Determin if the user specified temp directory should be used.
+				String tmpDir = System.getProperty("jnativehook.tmpdir", null);
+
+				File libDir = null;
+				if (tmpDir != null) {
+					libDir = new File(tmpDir);
+				}
+
 				// Create the temp file for this instance of the library.
-				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
+				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix, libDir);
 
 				// Check and see if a copy of the native lib already exists.
 				FileOutputStream libOutputStream = new FileOutputStream(libFile);
@@ -499,7 +507,7 @@ public class GlobalScreen {
 			}
 			catch(IOException e) {
 				// Tried and Failed to manually setup the java.library.path.
-				throw new RuntimeException(e.getMessage());
+				throw new RuntimeException(e.getMessage(), e);
 			}
 		}
 	}

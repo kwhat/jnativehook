@@ -20,6 +20,8 @@
 #include <config.h>
 #endif
 
+#include <nativehook.h>
+
 #include "x_input_helper.h"
 #include "x_unicode_helper.h"
 #include "x_wheel_codes.h"
@@ -43,14 +45,14 @@ static bool mouse_dragged = false;
 static struct timeval system_time;
 
 // Virtual event pointer.
-static VirtualEvent event;
+static virtual_event event;
 
-// Event dispatch callback
-static void (*current_dispatch_proc)(VirtualEvent *const) = NULL;
+// Event dispatch callback.
+static void (*current_dispatch_proc)(virtual_event *const) = NULL;
 
 extern HHOOK hook_running_mutex, hook_control_mutex;
 
-NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * const)) {
+NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const)) {
 	#ifdef USE_DEBUG
 	fprintf(stdout, "hook_set_dispatch_proc(): Setting new dispatch callback.\n");
 	#endif
@@ -59,7 +61,7 @@ NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(VirtualEvent * 
 }
 
 // Send out an event if a dispatcher was set.
-static inline void dispatch_event(VirtualEvent *const event) {
+static inline void dispatch_event(virtual_event *const event) {
 	if (current_dispatch_proc != NULL) {
 		#ifdef USE_DEBUG
 		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);

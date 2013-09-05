@@ -23,6 +23,8 @@ m4_define([NATIVEHOOK_RC],		[_M1])
 m4_define([NATIVEHOOK_BUGS],	[alex@1stleg.com])
 m4_define([NATIVEHOOK_VERSION_STRING], NATIVEHOOK_MAJOR[.]NATIVEHOOK_MINOR[.]NATIVEHOOK_PATCH[]NATIVEHOOK_RC)
 
+m4_pattern_allow([AM_PROG_AR])
+
 # Library versioning
 # These numbers should be tweaked on every release. Read carefully:
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
@@ -47,6 +49,7 @@ AC_CONFIG_HEADERS([include/config.h:include/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Initialize automake.
+# FIXME This should use subdir-objects, but the makefile needs work.
 AM_INIT_AUTOMAKE([1.9 foreign -Wall])
 
 # Checks for language.
@@ -55,6 +58,7 @@ AC_LANG([C])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CC_C99
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 # Checks for header files
 AC_C_CONST

@@ -19,9 +19,10 @@
 #ifndef _included_hook_callback
 #define _included_hook_callback
 
-#include <windows.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/record.h>
 
 // Callback used by hook_thead for all events.
-extern hook_event_proc(XPointer pointer, XRecordInterceptData *hook);
+extern void hook_event_proc(XPointer pointer, XRecordInterceptData *hook);
 
 #endif
