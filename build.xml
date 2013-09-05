@@ -70,6 +70,12 @@
 			<fileset dir="${dir.jar}" />
 			<fileset dir="${dir.lib}" />
 
+			<fileset dir="${dir.src}/native/autom4te.cache" />
+			<fileset dir="${dir.src}/native/config" />
+			<fileset dir="${dir.src}/native/m4" excludes="ax_pthread.m4" />
+			
+			<fileset dir="${dir.src}/native" includes="Makefile.in,aclocal.m4,configure" />
+			
 			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>
@@ -84,6 +90,92 @@
 		<!-- Determine if the project has been configured. -->
 		<available file="build.properties" property="project.check.configured" />
 		<property file="build.properties" />
+		
+		<!-- Determin the operating system -->
+		<condition property="native.os" value="freebsd">
+			<os family="unix" name="FreeBSD" />
+		</condition>
+		<condition property="native.os" value="openbsd">
+			<os family="unix" name="OpenBSD" />
+		</condition>
+		<condition property="native.os" value="osx">
+			<and>
+				<os family="mac" />
+				<os family="unix" />
+			</and>
+		</condition>
+		<condition property="native.os" value="solaris">
+			<or>
+				<os family="unix" name="Solaris" />
+				<os family="unix" name="SunOS" />
+			</or>
+		</condition>
+		<condition property="native.os" value="linux">
+			<os family="unix" name="Linux" />
+		</condition>
+		<condition property="native.os" value="windows">
+			<os family="winnt" />
+		</condition>
+		
+		
+		<!-- Set the system arch name used for orginizing native libraries -->
+		<condition property="native.arch" value="x86">
+			<or>
+				<os arch="x86" />
+				<os arch="i386" />
+				<os arch="i486" />
+				<os arch="i586" />
+				<os arch="i686" />
+			</or>
+		</condition>
+		<condition property="native.arch" value="x86_64">
+			<or>
+				<os arch="x86-64" />
+				<os arch="x86_64" />
+				<os arch="amd64" />
+				<os arch="k8" />
+			</or>
+		</condition>
+		<condition property="native.arch" value="ppc">
+			<or>
+				<os arch="ppc" />
+				<os arch="PowerPC" />
+			</or>
+		</condition>
+		<condition property="native.arch" value="ppc64">
+			<or>
+				<os arch="ppc64" />
+				<os arch="PowerPC64" />
+			</or>
+		</condition>
+		<property name="native.arch" value="${os.arch}" />
+		<!-- TODO Testing Needed
+		<condition property="native.arch" value="sparc">
+			<os arch="sparc" />
+		</condition>
+		-->
+		
+<!-- set system specific src/lib directory -->
+		<condition property="dir.src.platform" value="osx">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="dir.src.platform" value="unix">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="dir.src.platform" value="windows">
+			<istrue value="${native.os.isWindows}" />
+		</condition>
+		
+		<!-- Set system specific library name -->
+		<condition property="native.executable" value="lib${project.name}.dylib">
+			<istrue value="${native.os.isApple}" />
+		</condition>
+		<condition property="native.executable" value="lib${project.name}.so">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="native.executable" value="${project.name}.dll">
+			<istrue value="${native.os.isWindows}" />
+		</condition>
 	</target>
 
 
@@ -145,31 +237,6 @@
 		<echo level="info">Build stripped: ${project.strip}</echo>
 
 
-		<!-- Determin the operating system -->
-		<condition property="native.os" value="freebsd">
-			<os family="unix" name="FreeBSD" />
-		</condition>
-		<condition property="native.os" value="openbsd">
-			<os family="unix" name="OpenBSD" />
-		</condition>
-		<condition property="native.os" value="osx">
-			<and>
-				<os family="mac" />
-				<os family="unix" />
-			</and>
-		</condition>
-		<condition property="native.os" value="solaris">
-			<or>
-				<os family="unix" name="Solaris" />
-				<os family="unix" name="SunOS" />
-			</or>
-		</condition>
-		<condition property="native.os" value="linux">
-			<os family="unix" name="Linux" />
-		</condition>
-		<condition property="native.os" value="windows">
-			<os family="winnt" />
-		</condition>
 
 		<!-- Figure out the source family we are building -->
 		<condition property="native.os.isApple" value="true">
@@ -194,16 +261,7 @@
 			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
 		</condition>
 
-		<!-- set system specific src/lib directory -->
-		<condition property="dir.src.platform" value="osx">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="dir.src.platform" value="unix">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="dir.src.platform" value="windows">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
+		
 
 		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
 			<condition>
@@ -292,44 +350,6 @@
 			</condition>
 		</fail>
 		<echo level="info">Found environment path: ${native.path}</echo>
-
-
-		<!-- Set the system arch name used for orginizing native libraries -->
-		<condition property="native.arch" value="x86">
-			<or>
-				<os arch="x86" />
-				<os arch="i386" />
-				<os arch="i486" />
-				<os arch="i586" />
-				<os arch="i686" />
-			</or>
-		</condition>
-		<condition property="native.arch" value="x86_64">
-			<or>
-				<os arch="x86-64" />
-				<os arch="x86_64" />
-				<os arch="amd64" />
-				<os arch="k8" />
-			</or>
-		</condition>
-		<condition property="native.arch" value="ppc">
-			<or>
-				<os arch="ppc" />
-				<os arch="PowerPC" />
-			</or>
-		</condition>
-		<condition property="native.arch" value="ppc64">
-			<or>
-				<os arch="ppc64" />
-				<os arch="PowerPC64" />
-			</or>
-		</condition>
-		<property name="native.arch" value="${os.arch}" />
-		<!-- TODO Testing Needed
-		<condition property="native.arch" value="sparc">
-			<os arch="sparc" />
-		</condition>
-		-->
 
 
 		<!-- Try to locate a compiler -->
@@ -427,16 +447,7 @@
 		<property name="native.cc.args2" value="-o" />
 
 
-		<!-- Set system specific library name -->
-		<condition property="native.executable" value="lib${project.name}.dylib">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.executable" value="lib${project.name}.so">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.executable" value="${project.name}.dll">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
+		
 
 		<!-- Set system specific ldflags -->
 		<condition property="native.ld.flags" value="${env.LDFLAGS}">
@@ -445,7 +456,7 @@
 		<condition property="native.ld.flags" value="-Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}">
 			<istrue value="${native.os.isApple}" />
 		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,-soname=${native.executable}.${build.major}.${build.minor}">
+		<condition property="native.ld.flags" value="-Wl,--as-needed">
 			<istrue value="${native.os.isUnix}" />
 		</condition>
 		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at">

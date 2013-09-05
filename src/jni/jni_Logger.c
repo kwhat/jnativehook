@@ -24,7 +24,7 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 
-static jobject logger = NULL;;
+static jobject logger = NULL;
 
 bool jni_LogDebug(const char * message) {
 	bool status = false;
