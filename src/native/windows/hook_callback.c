@@ -133,7 +133,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	// MS Keyboard event struct data.
 	KBDLLHOOKSTRUCT *kbhook = (KBDLLHOOKSTRUCT *) lParam;
 
-	// Set the event_time.
+	// Set the event time.
 	GetSystemTimeAsFileTime(&ft);
 	// Convert to milliseconds = 100-nanoseconds / 10000
 	__int64 system_time = (((__int64) ft.dwHighDateTime << 32) | ft.dwLowDateTime) / 10000;
@@ -309,12 +309,12 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	#ifdef USE_DEBUG
 	fprintf(stdout, "Test: event.propagate %u, nCode %d, \n", (unsigned int) event.propagate);
 	#endif
-	
+
 	LRESULT hook_result = -1;
 	if (nCode < 0 || event.propagate != false) {
 		hook_result = CallNextHookEx(keyboard_event_hhook, nCode, wParam, lParam);
 	}
-	
+
 	#ifdef USE_DEBUG
 	fprintf(stdout, "Test: hook_result! %u\n", (unsigned int) hook_result);
 	#endif
@@ -370,13 +370,13 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#endif
 
 			// Track the number of clicks.
-			if ((long) (mshook->time - click_time) <= hook_get_multi_click_time()) {
+			if ((long) (event.time - click_time) <= hook_get_multi_click_time()) {
 				click_count++;
 			}
 			else {
 				click_count = 1;
 			}
-			click_time = mshook->time;
+			click_time = event.time;
 
 			// Store the last click point.
 			last_click.x = mshook->pt.x;
@@ -459,7 +459,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#endif
 
 			// Reset the click count.
-			if (click_count != 0 && (long) (mshook->time - click_time) > hook_get_multi_click_time()) {
+			if (click_count != 0 && (long) (event.time - click_time) > hook_get_multi_click_time()) {
 				click_count = 0;
 			}
 
@@ -497,13 +497,13 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			#endif
 
 			// Track the number of clicks.
-			if ((long) (mshook->time - click_time) <= hook_get_multi_click_time()) {
+			if ((long) (event.time - click_time) <= hook_get_multi_click_time()) {
 				click_count++;
 			}
 			else {
 				click_count = 1;
 			}
-			click_time = mshook->time;
+			click_time = event.time;
 
 			// Fire mouse wheel event.
 			event.type = EVENT_MOUSE_WHEEL;

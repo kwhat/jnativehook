@@ -20,13 +20,22 @@
 #include <config.h>
 #endif
 
+#ifdef USE_DEBUG
+#include <stdio.h>
+#endif
 #include <nativehook.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <X11/Xlibint.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/record.h>
 
+#include "input_converter.h"
 #include "x_input_helper.h"
 #include "x_unicode_helper.h"
 #include "x_wheel_codes.h"
 
-// For this struct, refer to libxnee.
+// For this struct, refer to libxnee, requires Xlibint.h
 typedef union {
 	unsigned char		type;
 	xEvent				event;
@@ -50,7 +59,7 @@ static virtual_event event;
 // Event dispatch callback.
 static void (*current_dispatch_proc)(virtual_event *const) = NULL;
 
-extern HHOOK hook_running_mutex, hook_control_mutex;
+extern pthread_mutex_t hook_running_mutex, hook_control_mutex;
 
 NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const)) {
 	#ifdef USE_DEBUG
@@ -109,27 +118,26 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				#endif
 
 				// Fire key pressed event.
-				event->type = EVENT_KEY_PRESSED;
-				event->time = event_time;
-				event->mask = convert_to_virtual_mask(event_mask);
+				event.type = EVENT_KEY_PRESSED;
+				event.mask = convert_to_virtual_mask(event_mask);
 
 				keysym = keycode_to_keysym(event_code, event_mask);
-				event->data.keyboard.keycode = convert_to_virtual_key(keysym);
-				event->data.keyboard.scancode = keycode_to_scancode(event_code);
-				event->data.keyboard.keychar = CHAR_UNDEFINED;
+				event.data.keyboard.keycode = keycode_to_scancode(event_code);
+				event.data.keyboard.rawcode = keysym;
+				event.data.keyboard.keychar = CHAR_UNDEFINED;
 
-				dispatch_event(event);
+				dispatch_event(&event);
 
 				// Check to make sure the key is printable.
 				wchar_t keychar = keysym_to_unicode(keysym);
 				if (keychar != 0x0000) {
 					// Fire key typed event.
-					event->type = EVENT_KEY_TYPED;
+					event.type = EVENT_KEY_TYPED;
 
-					event->data.keyboard.keycode = VC_UNDEFINED;
-					event->data.keyboard.keychar = keychar;
+					event.data.keyboard.keycode = VC_UNDEFINED;
+					event.data.keyboard.keychar = keychar;
 
-					dispatch_event(event);
+					dispatch_event(&event);
 				}
 				break;
 
@@ -139,16 +147,15 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				#endif
 
 				// Fire key released event.
-				event->type = EVENT_KEY_RELEASED;
-				event->time = event_time;
-				event->mask = convert_to_virtual_mask(event_mask);
+				event.type = EVENT_KEY_RELEASED;
+				event.mask = convert_to_virtual_mask(event_mask);
 
 				keysym = keycode_to_keysym(event_code, event_mask);
-				event->data.keyboard.keycode = convert_to_virtual_key(keysym);
-				event->data.keyboard.scancode = keycode_to_scancode(event_code);
-				event->data.keyboard.keychar = CHAR_UNDEFINED;
+				event.data.keyboard.keycode = keycode_to_scancode(event_code);
+				event.data.keyboard.rawcode = keysym;
+				event.data.keyboard.keychar = CHAR_UNDEFINED;
 
-				dispatch_event(event);
+				dispatch_event(&event);
 				break;
 
 			case ButtonPress:
@@ -157,13 +164,13 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				#endif
 
 				// Track the number of clicks.
-				if ((long) (event_time - click_time) <= hook_get_multi_click_time()) {
+				if ((long) (event.time - click_time) <= hook_get_multi_click_time()) {
 					click_count++;
 				}
 				else {
 					click_count = 1;
 				}
-				click_time = event_time;
+				click_time = event.time;
 
 				/* This information is all static for X11, its up to the WM to
 				* decide how to interpret the wheel events.
@@ -173,16 +180,15 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					unsigned int button = convert_to_virtual_button(event_code);
 
 					// Fire mouse pressed event.
-					event->type = EVENT_MOUSE_PRESSED;
-					event->time = event_time;
-					event->mask = convert_to_virtual_mask(event_mask);
+					event.type = EVENT_MOUSE_PRESSED;
+					event.mask = convert_to_virtual_mask(event_mask);
 
-					event->data.mouse.button = button;
-					event->data.mouse.clicks = click_count;
-					event->data.mouse.x = event_x;
-					event->data.mouse.y = event_y;
+					event.data.mouse.button = button;
+					event.data.mouse.clicks = click_count;
+					event.data.mouse.x = event_x;
+					event.data.mouse.y = event_y;
 
-					dispatch_event(event);
+					dispatch_event(&event);
 				}
 				else if (event_code == WheelUp || event_code == WheelDown) {
 					/* Scroll wheel release events.
@@ -214,15 +220,14 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					}
 
 					// Fire mouse wheel event.
-					event->type = EVENT_MOUSE_WHEEL;
-					event->time = event_time;
-					event->mask = convert_to_virtual_mask(event_mask);
+					event.type = EVENT_MOUSE_WHEEL;
+					event.mask = convert_to_virtual_mask(event_mask);
 
-					event->data.wheel.type = scroll_type;
-					event->data.wheel.amount = scroll_amount;
-					event->data.wheel.rotation = wheel_rotation;
+					event.data.wheel.type = scroll_type;
+					event.data.wheel.amount = scroll_amount;
+					event.data.wheel.rotation = wheel_rotation;
 
-					dispatch_event(event);
+					dispatch_event(&event);
 				}
 				break;
 
@@ -236,30 +241,28 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					// Handle button release events.
 
 					// Fire mouse released event.
-					event->type = EVENT_MOUSE_RELEASED;
-					event->time = event_time;
-					event->mask = convert_to_virtual_mask(event_mask);
+					event.type = EVENT_MOUSE_RELEASED;
+					event.mask = convert_to_virtual_mask(event_mask);
 
 					button = convert_to_virtual_button(event_code);
-					event->data.mouse.button = button;
-					event->data.mouse.clicks = click_count;
-					event->data.mouse.x = event_x;
-					event->data.mouse.y = event_y;
+					event.data.mouse.button = button;
+					event.data.mouse.clicks = click_count;
+					event.data.mouse.x = event_x;
+					event.data.mouse.y = event_y;
 
-					dispatch_event(event);
+					dispatch_event(&event);
 
 					if (mouse_dragged != true) {
 						// Fire mouse clicked event.
-						event->type = EVENT_MOUSE_CLICKED;
-						event->time = event_time;
-						event->mask = convert_to_virtual_mask(event_mask);
+						event.type = EVENT_MOUSE_CLICKED;
+						event.mask = convert_to_virtual_mask(event_mask);
 
-						event->data.mouse.button = button;
-						event->data.mouse.clicks = click_count;
-						event->data.mouse.x = event_x;
-						event->data.mouse.y = event_y;
+						event.data.mouse.button = button;
+						event.data.mouse.clicks = click_count;
+						event.data.mouse.x = event_x;
+						event.data.mouse.y = event_y;
 
-						dispatch_event(event);
+						dispatch_event(&event);
 					}
 				}
 				break;
@@ -270,7 +273,7 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				#endif
 
 				// Reset the click count.
-				if (click_count != 0 && (long) (event_time - click_time) > hook_get_multi_click_time()) {
+				if (click_count != 0 && (long) (event.time - click_time) > hook_get_multi_click_time()) {
 					click_count = 0;
 				}
 				unsigned int modifiers = convert_to_virtual_mask(event_mask);
@@ -280,24 +283,23 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				mouse_dragged = modifiers >> 4 > 0;
 				if (mouse_dragged) {
 					// Create Mouse Dragged event.
-					event->type = EVENT_MOUSE_DRAGGED;
+					event.type = EVENT_MOUSE_DRAGGED;
 				}
 				else {
 					// Create a Mouse Moved event.
-					event->type = EVENT_MOUSE_MOVED;
+					event.type = EVENT_MOUSE_MOVED;
 				}
 
 				// Populate common event info.
-				event->time = event_time;
-				event->mask = modifiers;
+				event.mask = modifiers;
 
-				event->data.mouse.button = MOUSE_NOBUTTON;
-				event->data.mouse.clicks = click_count;
-				event->data.mouse.x = event_x;
-				event->data.mouse.y = event_y;
+				event.data.mouse.button = MOUSE_NOBUTTON;
+				event.data.mouse.clicks = click_count;
+				event.data.mouse.x = event_x;
+				event.data.mouse.y = event_y;
 
 				// Fire mouse moved event.
-				dispatch_event(event);
+				dispatch_event(&event);
 				break;
 
 			#ifdef USE_DEBUG
@@ -306,12 +308,12 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				break;
 			#endif
 		}
-		#ifdef USE_DEBUG
-		else {
-			fprintf(stderr, "hook_event_proc(): Unhandled Hook Category: 0x%X\n", hook->category);
-		}
-		#endif
 	}
+	#ifdef USE_DEBUG
+	else {
+		fprintf(stderr, "hook_event_proc(): Unhandled Hook Category: 0x%X\n", hook->category);
+	}
+	#endif
 
 	XRecordFreeData(hook);
 }

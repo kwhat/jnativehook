@@ -3,18 +3,19 @@
 <!--
 	JNativeHook: Global keyboard and mouse hooking for Java.
 	Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+	http://code.google.com/p/jnativehook/
 
-	This program is free software: you can redistribute it and/or modify
+	JNativeHook is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published
 	by the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
+	JNativeHook is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
+	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
@@ -73,24 +74,24 @@
 			<fileset dir="${dir.src}/native/autom4te.cache" />
 			<fileset dir="${dir.src}/native/config" />
 			<fileset dir="${dir.src}/native/m4" excludes="ax_pthread.m4" />
-			
+
 			<fileset dir="${dir.src}/native" includes="Makefile.in,aclocal.m4,configure" />
-			
+
 			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>
 
 
 	<target name="init" description="Initialize local build environment.">
-		<echo>Cleaning all build related items...</echo>
-		
+		<echo>Initializing local build enviroment...</echo>
+
 		<!-- Determine if the native source should be downloaded. -->
 		<available file="${dir.src}/native/configure" property="project.check.downloaded" />
-		
+
 		<!-- Determine if the project has been configured. -->
 		<available file="build.properties" property="project.check.configured" />
 		<property file="build.properties" />
-		
+
 		<!-- Determin the operating system -->
 		<condition property="native.os" value="freebsd">
 			<os family="unix" name="FreeBSD" />
@@ -116,8 +117,8 @@
 		<condition property="native.os" value="windows">
 			<os family="winnt" />
 		</condition>
-		
-		
+
+
 		<!-- Set the system arch name used for orginizing native libraries -->
 		<condition property="native.arch" value="x86">
 			<or>
@@ -154,8 +155,32 @@
 			<os arch="sparc" />
 		</condition>
 		-->
-		
-<!-- set system specific src/lib directory -->
+
+
+		<!-- Figure out the source family we are building -->
+		<condition property="native.os.isApple" value="true">
+			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
+		</condition>
+		<!-- TODO Testing Needed.
+		<condition property="native.os.isSolaris" value="true">
+			<or>
+				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
+			</or>
+		</condition>
+		-->
+		<condition property="native.os.isUnix" value="true">
+			<or>
+				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="openbsd" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
+				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true" />
+			</or>
+		</condition>
+		<condition property="native.os.isWindows" value="true">
+			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
+		</condition>
+
+		<!-- set system specific src/lib directory -->
 		<condition property="dir.src.platform" value="osx">
 			<istrue value="${native.os.isApple}" />
 		</condition>
@@ -165,7 +190,7 @@
 		<condition property="dir.src.platform" value="windows">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
-		
+
 		<!-- Set system specific library name -->
 		<condition property="native.executable" value="lib${project.name}.dylib">
 			<istrue value="${native.os.isApple}" />
@@ -186,7 +211,7 @@
 		<mkdir dir="${dir.src}/native" />
 		<get src="http://code.google.com/p/libnativehook" dest="${dir.src}/native" verbose="true" />
 		-->
-		
+
 		<echo>Bootstrapping autoconf build process...</echo>
 		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
 			<arg value="--install" />
@@ -199,8 +224,8 @@
 			<arg value="autoreconf --install --verbose --force" />
 		</exec>
 	</target>
-	
-	
+
+
 	<target name="configure" depends="download-native" unless="project.check.configured" description="Automatically generates a properties file for your environment.">
 		<echo>Checking environment sanity...</echo>
 
@@ -236,32 +261,6 @@
 		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
 
-
-
-		<!-- Figure out the source family we are building -->
-		<condition property="native.os.isApple" value="true">
-			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
-		</condition>
-		<!-- TODO Testing Needed.
-		<condition property="native.os.isSolaris" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
-			</or>
-		</condition>
-		-->
-		<condition property="native.os.isUnix" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="openbsd" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true" />
-			</or>
-		</condition>
-		<condition property="native.os.isWindows" value="true">
-			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
-		</condition>
-
-		
 
 		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
 			<condition>
@@ -447,7 +446,7 @@
 		<property name="native.cc.args2" value="-o" />
 
 
-		
+
 
 		<!-- Set system specific ldflags -->
 		<condition property="native.ld.flags" value="${env.LDFLAGS}">
@@ -463,8 +462,6 @@
 			<istrue value="${native.os.isWindows}" />
 		</condition>
 
-		<!-- Guess what system specific libraries to link against -->
-		<property name="native.ld.libs" value="-L${dir.bin}/lib -Wl,-Bstatic -lnativehook" />
 
 		<!-- Set system specific linker arguments -->
 		<condition property="native.ld.args" value="-dynamiclib ${native.ld.flags}">
@@ -476,7 +473,7 @@
 		<condition property="native.ld.args" value="-shared ${native.ld.flags}">
 			<istrue value="${native.os.isWindows}" />
 		</condition>
-		<property name="native.ld.args2" value="${native.ld.libs} -o" />
+		<property name="native.ld.args2" value="-o" />
 
 
 		<!-- Create property file for the descovered values -->
@@ -493,10 +490,10 @@
 
 		<echo>Configuring...</echo>
 		<mkdir dir="${dir.bin}/native" />
-		
+
 		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
-			<arg line="CFLAGS='-std=c99'" />
-			<arg line="LDFLAGS='-Wl,--as-needed,-O1'" />
+			<!-- arg line="CFLAGS='-std=c99'" />
+			<arg line="LDFLAGS='-Wl,- -as-needed,-O1'" /-->
 			<arg value="--enable-debug" />
 			<arg value="--enable-static" />
 			<arg value="--with-pic" />
@@ -509,7 +506,7 @@
 			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
 			<map from="${basedir}" to="${basedir}" />
 		</pathconvert>
-		
+
 		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
 			<arg value="-c" />
 			<arg value="${dir.base.unix}/src/native/configure --enable-debug --enable-static --prefix=${dir.base.unix}/bin" />
@@ -570,6 +567,20 @@
 			<bootclasspath path="${java.bootclasspath}" />
 		</javah>
 
+
+		<!-- Call pkg-config to determin what libraries to link against. -->
+		<exec executable="pkg-config" failonerror="true" outputproperty="native.ld.libs" osfamily="unix">
+			<env key="PKG_CONFIG_PATH" value="${dir.bin}/native/pc" />
+
+			<arg value="--libs" />
+			<arg value="nativehook" />
+		</exec>
+		<!-- FIXME Temporary hack for Windows because automake installs dll's
+		to ${prefix}/bin instead of ${prefix}/lib and the nativehook dll is not
+		needed for linking, only its dependencies are. -->
+		<property name="native.ld.libs" value="" />
+
+
 		<echo>Compiling C source...</echo>
 		<!-- Create required directories for compiling -->
 		<mkdir dir="${dir.bin}/obj/jni" />
@@ -590,7 +601,7 @@
 
 				<arg line="${native.cc.args}" />
 				<srcfile />
-				<arg value="${native.cc.args2}" />
+				<arg line="${native.cc.args2}" />
 				<targetfile />
 
 				<mapper type="glob" from="*.c" to="${dir.bin}/obj/jni/*.o" />
@@ -601,38 +612,34 @@
 		<!-- Create required directory for linking -->
 		<mkdir dir="${dir.lib}/${native.os}/${native.arch}" />
 
-		<!-- FIXME This is an ugly hack that should be replaced with custom tasks -->
+		<!-- Create a couple of filesets for obj and archive files. -->
+		<!-- NOTE The order of these files is critical! -->
+		<fileset dir="${dir.bin}" id="file.obj">
+			<include name="obj/jni/**/*.o" />
+		</fileset>
+		<fileset dir="${dir.bin}" id="file.ar">
+			<include name="lib/*.a" />
+			<include name="lib/*.dll.a" />
+		</fileset>
 
-
+		<!-- Convert the fileset to something that can be printed for the user -->
+		<!-- TODO This should be replaced by a custom task -->
 		<pathconvert pathsep="${line.separator}" property="file.obj.txt">
-			<sort>
-				<fileset dir="${dir.bin}" id="file.obj">
-					<include name="obj/jni/**/*.o" />
-					<!-- include name="lib/*.a" /-->
-				</fileset>
-
-				<reverse xmlns="antlib:org.apache.tools.ant.types.resources.comparators">
-					<name />
-				</reverse>
-			</sort>
+			<fileset refid="file.obj" />
+			<fileset refid="file.ar" />
 		</pathconvert>
-
 
 		<echo>Applying ${native.ld} on the following files:</echo>
 		<echo>${file.obj.txt}</echo>
 
 		<!-- Execute the native linker on the object files -->
 		<apply executable="${native.ld}" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
-			<sort>
-				<fileset refid="file.obj" />
-
-				<reverse xmlns="antlib:org.apache.tools.ant.types.resources.comparators">
-					<name />
-				</reverse>
-			</sort>
+			<fileset refid="file.obj" />
+			<fileset refid="file.ar" />
 
 			<arg line="${native.ld.args}" />
 			<srcfile />
+			<arg line="${native.ld.libs}" />
 			<arg line="${native.ld.args2}" />
 			<arg file="${dir.lib}/${native.os}/${native.arch}/${native.executable}" />
 		</apply>

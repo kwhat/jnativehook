@@ -5,5 +5,6 @@ includedir=${prefix}/include
 Name: nativehook
 Description: nativehook library
 Version: @VERSION@
-Libs: -L${libdir} -lnativehook  
+Libs: -L${libdir} -lnativehook
 Cflags: -I${includedir}
+Requires: @REQUIRE@

@@ -1,17 +1,18 @@
 # JNativeHook: Global keyboard and mouse hooking for Java.
 # Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
+# http://code.google.com/p/jnativehook/
+
+# JNativeHook is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
+# JNativeHook is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
@@ -162,10 +163,16 @@ AS_IF(
 	[test "x$backend" = "xunix"], [
 		# Checks for libraries.
 		PKG_PROG_PKG_CONFIG
-		PKG_CHECK_MODULES([X11], [x11])
 
+		PKG_CHECK_MODULES([X11], [x11])
 		LIBS="$X11_LIBS $LIBS"
 		CFLAGS="$X11_CFLAGS $CFLAGS"
+		REQUIRE="$REQUIRE x11"
+
+		PKG_CHECK_MODULES([XTST], [xtst])
+		LIBS="$XTST_LIBS $LIBS"
+		CFLAGS="$XTST_CFLAGS $CFLAGS"
+		REQUIRE="$REQUIRE xtst"
 
 		# Check for XRecord.
 		AC_CHECK_LIB([Xtst], [XRecordQueryVersion], [],
@@ -183,17 +190,17 @@ AS_IF(
 		AS_IF([test "x$enable_xt" = "xyes"], [
 			AC_DEFINE([USE_XT], 1, [Enable X Toolkit Intrinsics])
 			PKG_CHECK_MODULES([XT], [xt])
-
 			LIBS="$XT_LIBS $LIBS"
 			CFLAGS="$XT_CFLAGS $CFLAGS"
+			REQUIRE="$REQUIRE xt"
 		])
 
 		AS_IF([test "x$enable_xf86misc" = "xyes"], [
 			AC_DEFINE([USE_XF86MISC], 1, [Enable XFree86-Misc X Extension])
 			PKG_CHECK_MODULES([XF86MISC], [xxf86misc])
-
 			LIBS="$XF86MISC_LIBS $LIBS"
 			CFLAGS="$XF86MISC_CFLAGS $CFLAGS"
+			REQUIRE="$REQUIRE xxf86misc"
 		])
 
 		AS_IF([test "x$enable_xrecord_async" = "xyes"], [
@@ -214,7 +221,6 @@ AS_IF(
 		AX_PTHREAD([found_pthreads=yes], [found_pthreads=no])
 		LIBS="$PTHREAD_LIBS $LIBS"
 		CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
-		#CC="$PTHREAD_CC"
 	],
 	[test "x$backend" = "xdarwin"], [
 		if test "x$enable_corefoundation" = "xyes" ; then
@@ -246,25 +252,26 @@ AS_IF(
 			CFLAGS="$CFLAGS -Wno-format"
 		])
 
+		#EXTRA_LIBS="-lmsvcrt -luser32 -lkernel32"
+
 		#LIBS="${LIBS} -lsetupapi"
 	])
 
 # OS info for Automake
 AC_SUBST([backend])
 
+# Requires for pkg-config
+AC_SUBST([REQUIRE])
+#AC_SUBST([EXTRA_LIBS])
+
 # Should the demo application be built?
 AM_CONDITIONAL([BUILD_DEMO], [test "x$enable_demo" = "xyes"])
 
 # Department of redundancy department.  We have already checked the platform 3
-# times!  I am sure there is a technical reason for this, however, it is
-# functionally stupid.
+# times!  I am sure there is a technical reason for this...
 AM_CONDITIONAL(BUILD_DARWIN, test "x$backend" = "xdarwin")
 AM_CONDITIONAL(BUILD_UNIX, test "x$backend" = "xunix")
 AM_CONDITIONAL(BUILD_WINDOWS, test "x$backend" = "xwindows")
-
-#AC_SUBST([BUILD_DARWIN])
-#AC_SUBST([BUILD_UNIX])
-#AC_SUBST([BUILD_WINDOWS])
 
 # Generate the "configure" script
 AC_OUTPUT

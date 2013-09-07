@@ -21,8 +21,9 @@
 #endif
 
 #include <nativehook.h>
-
 #include <X11/X.h>
+
+#include "x_input_helper.h"
 
 unsigned int convert_to_virtual_key(unsigned int native_keycode) {
 	unsigned int virtual_keycode = keycode_to_scancode(native_keycode);

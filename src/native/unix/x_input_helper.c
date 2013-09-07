@@ -248,6 +248,10 @@ uint16_t keycode_to_scancode(KeyCode keycode) {
 	return scancode;
 }
 
+KeyCode scancode_to_keycode(uint16_t scancode) {
+	// FIXME Implement!
+}
+
 // Faster more flexible alternative to XKeycodeToKeysym...
 KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 	KeySym keysym = NoSymbol;
