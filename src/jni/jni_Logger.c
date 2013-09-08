@@ -25,83 +25,57 @@
 #include "jni_Globals.h"
 
 static jobject logger = NULL;
+static char log_buffer[1024];
 
-bool jni_LogDebug(const char * message) {
-	bool status = false;
-	
-	JNIEnv *env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		(*env)->CallVoidMethod(
-				env, 
-				logger, 
-				java_util_logging_Logger->fine, 
-				(*env)->NewStringUTF(env, message));
-		
-		status = true;
-	}
-	
-	return status;
-}
-
-bool jni_LogInfo(const char * message) {
-	bool status = false;
-	
-	JNIEnv *env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		(*env)->CallVoidMethod(
-				env, 
-				logger, 
-				java_util_logging_Logger->info, 
-				(*env)->NewStringUTF(env, message));
-		
-		status = true;
-	}
-	
-	return status;
-}
-
-bool jni_LogWarn(const char * message) {
-	bool status = false;
-	
-	JNIEnv *env = NULL;
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		(*env)->CallVoidMethod(
-				env, 
-				logger, 
-				java_util_logging_Logger->warning, 
-				(*env)->NewStringUTF(env, message));
-	}
-	
-	return status;
-}
-
-bool jni_LogError(const char * message) {
+bool jni_Logger(unsigned int level, const char *format, ...) {
 	bool status = false;
 
 	JNIEnv *env = NULL;
 	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		(*env)->CallVoidMethod(
-				env, 
-				logger, 
-				java_util_logging_Logger->severe, 
-				(*env)->NewStringUTF(env, message));
+		va_list args;
+		va_start(args, format);
+		int log_size = vsnprintf(log_buffer, sizeof(log_buffer), format, args);
+		va_end(args);
+	
+		if (log_size >= 0) {
+			jstring message = (*env)->NewStringUTF(env, log_buffer);
+
+			switch (level) {
+				case LOG_LEVEL_DEBUG:
+					(*env)->CallVoidMethod(
+						env, 
+						logger, 
+						java_util_logging_Logger->fine, 
+						message);
+					break;
+				case LOG_LEVEL_INFO:
+					(*env)->CallVoidMethod(
+						env, 
+						logger, 
+						java_util_logging_Logger->info, 
+						message);
+					break;
+
+				case LOG_LEVEL_WARN:
+					(*env)->CallVoidMethod(
+						env, 
+						logger, 
+						java_util_logging_Logger->warning, 
+						message);
+					break;
+
+				case LOG_LEVEL_ERROR:
+					(*env)->CallVoidMethod(
+						env, 
+						logger, 
+						java_util_logging_Logger->severe, 
+						message);
+					break;
+			}
+
+			status = true;
+		}
 	}
 	
 	return status;
-}
-
-void jni_SetLogger(JNIEnv *env) {
-	bool hook_set_logger_proc(log_level level, bool (*logger_proc)(const char *));
-
-	logger = (*env)->CallStaticObjectMethod(
-			env, 
-			java_util_logging_Logger->cls, 
-			java_util_logging_Logger->getLogger, 
-			(*env)->NewStringUTF(env, "GlobalScreen"));
-	
-	// TODO Verify return values.
-	hook_set_logger_proc(LOG_LEVEL_DEBUG, &jni_LogDebug);
-	hook_set_logger_proc(LOG_LEVEL_INFO, &jni_LogInfo);
-	hook_set_logger_proc(LOG_LEVEL_WARN, &jni_LogWarn);
-	hook_set_logger_proc(LOG_LEVEL_ERROR, &jni_LogError);
 }

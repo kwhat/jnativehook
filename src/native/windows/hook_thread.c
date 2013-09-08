@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -21,12 +21,10 @@
 #endif
 
 #include <nativehook.h>
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
 #include <windows.h>
 
 #include "hook_callback.h"
+#include "logger.h"
 
 // The handle to the DLL module pulled in DllMain on DLL_PROCESS_ATTACH.
 extern HINSTANCE hInst;
@@ -45,9 +43,8 @@ static DWORD WINAPI hook_thread_proc(LPVOID lpParameter) {
 
 	// If we did not encounter a problem, start processing events.
 	if (keyboard_event_hhook != NULL && mouse_event_hhook != NULL) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_thread_proc(): SetWindowsHookEx() successful.\n");
-		#endif
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: SetWindowsHookEx() successful.\n", 
+				__FUNCTION__, __LINE__);
 
 		// Check and setup modifiers.
 		initialize_modifiers();
@@ -66,10 +63,9 @@ static DWORD WINAPI hook_thread_proc(LPVOID lpParameter) {
 		}
 	}
 	else {
-		#ifdef USE_DEBUG
 		// TODO Print the error message.
-		fprintf(stderr, "hook_thread_proc(): SetWindowsHookEx() failed!\n");
-		#endif
+		logger(LOG_LEVEL_ERROR,	"%s [%u]: SetWindowsHookEx() failed! (%#X)\n", 
+				__FUNCTION__, __LINE__, (unsigned long) GetLastError());
 
 		status = NATIVEHOOK_ERROR_SET_WINDOWS_HOOK_EX;
 	}
@@ -85,9 +81,8 @@ static DWORD WINAPI hook_thread_proc(LPVOID lpParameter) {
 		mouse_event_hhook = NULL;
 	}
 
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_thread_proc(): complete.\n");
-	#endif
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: Something, something, something, complete.\n", 
+			__FUNCTION__, __LINE__);
 
 	// Make sure we signal that we have passed any exception throwing code.
 	// This should only make a difference if we had an initialization exception.
@@ -104,21 +99,35 @@ NATIVEHOOK_API int hook_enable() {
 		// Create event handle for the thread hook.
 		hook_control_handle = CreateEvent(NULL, TRUE, FALSE, "hook_control_handle");
 
-		LPTHREAD_START_ROUTINE lpStartAddress = hook_thread_proc;
+		LPTHREAD_START_ROUTINE lpStartAddress = &hook_thread_proc;
 		hook_thread_handle = CreateThread(NULL, 0, lpStartAddress, NULL, 0, &hook_thread_id);
 		if (hook_thread_handle != INVALID_HANDLE_VALUE) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_enable(): start successful.\n");
-			#endif
+			logger(LOG_LEVEL_DEBUG,	"%s [%u]: Start successful\n", 
+							__FUNCTION__, __LINE__);
 
-			#ifdef USE_DEBUG
-			if (SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS) && SetThreadPriority(hook_thread_handle, THREAD_PRIORITY_TIME_CRITICAL)) {
-				fprintf(stderr, "enable_hook(): Could not set thread priority %i for thread 0x%X.\n", THREAD_PRIORITY_TIME_CRITICAL, (unsigned int) hook_thread_handle);
+			// Set the status class to real time.
+			BOOL status_class = 
+					SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS);
+			if (!status_class) {
+				logger(LOG_LEVEL_WARN,	
+						"%s [%u]: Could not set thread class %ld for thread %#lX!\n", 
+						__FUNCTION__, __LINE__, 
+						(long) REALTIME_PRIORITY_CLASS, 
+						(long) hook_thread_handle);
 			}
-			#else
-			SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS);
-			SetThreadPriority(hook_thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
-			#endif
+			
+			// Attempt to set the thread priority to time critical.
+			// TODO This maybe a little overkill, re-evaluate.
+			BOOL status_priority = 
+					SetThreadPriority(hook_thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
+			
+			if (!status_priority) {
+				logger(LOG_LEVEL_WARN,	
+						"%s [%u]: Could not set thread priority %ld for thread %#lX!\n", 
+						__FUNCTION__, __LINE__, 
+						(long) THREAD_PRIORITY_TIME_CRITICAL, 
+						(long) hook_thread_handle);
+			}
 			
 			// Wait for any possible thread exceptions to get thrown into
 			// the queue
@@ -126,16 +135,14 @@ NATIVEHOOK_API int hook_enable() {
 
 			// TODO Set the return status to the thread exit code.
 			if (hook_is_enabled()) {
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_enable(): initialization successful.\n");
-				#endif
+				logger(LOG_LEVEL_DEBUG,	"%s [%u]: Start successful\n", 
+						__FUNCTION__, __LINE__);
 
 				status = NATIVEHOOK_SUCCESS;
 			}
 			else {
-				#ifdef USE_DEBUG
-				fprintf(stderr, "hook_enable(): initialization failure!\n");
-				#endif
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: Initialization failure!\n", 
+						__FUNCTION__, __LINE__);
 
 				// Wait for the thread to die.
 				WaitForSingleObject(hook_thread_handle,  INFINITE);
@@ -144,15 +151,13 @@ NATIVEHOOK_API int hook_enable() {
 				GetExitCodeThread(hook_thread_handle, &thread_status);
 				status = (int) thread_status;
 
-				#ifdef USE_DEBUG
-				fprintf(stderr, "hook_enable(): thread result (%i)\n", status);
-				#endif
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread Result: (%i)!\n", 
+						__FUNCTION__, __LINE__, status);
 			}
 		}
 		else {
-			#ifdef USE_DEBUG
-			fprintf(stderr, "enable_hook(): Thread create failure!\n");
-			#endif
+			logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread create failure!\n", 
+					__FUNCTION__, __LINE__);
 
 			status = NATIVEHOOK_ERROR_THREAD_CREATE;
 		}
@@ -179,9 +184,8 @@ NATIVEHOOK_API int hook_disable() {
 		CloseHandle(hook_control_handle);
 		hook_control_handle = NULL;
 
-		#ifdef USE_DEBUG
-		fprintf(stdout, "StopNativeThread(): Thread Result (%i)\n", status);
-		#endif
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Thread Result (%i).\n", 
+				__FUNCTION__, __LINE__, status);
 	}
 
 	return status;
@@ -197,9 +201,8 @@ NATIVEHOOK_API bool hook_is_enabled() {
 		is_running = true;
 	}
 
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_is_enabled(): State (%i)\n", is_running);
-	#endif
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: State (%i).\n", 
+			__FUNCTION__, __LINE__, is_running);
 
 	return is_running;
 }

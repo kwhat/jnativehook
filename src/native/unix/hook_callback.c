@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -20,9 +20,6 @@
 #include <config.h>
 #endif
 
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
 #include <nativehook.h>
 #include <pthread.h>
 #include <sys/time.h>
@@ -31,6 +28,7 @@
 #include <X11/extensions/record.h>
 
 #include "input_converter.h"
+#include "logger.h"
 #include "x_input_helper.h"
 #include "x_unicode_helper.h"
 #include "x_wheel_codes.h"
@@ -57,32 +55,29 @@ static struct timeval system_time;
 static virtual_event event;
 
 // Event dispatch callback.
-static void (*current_dispatch_proc)(virtual_event *const) = NULL;
+static dispatcher_t dispatcher = NULL;
 
 extern pthread_mutex_t hook_running_mutex, hook_control_mutex;
 
-NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const)) {
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_set_dispatch_proc(): Setting new dispatch callback.\n");
-	#endif
+NATIVEHOOK_API void hook_set_dispatch_proc(dispatcher_t dispatch_proc) {
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: Setting new dispatch callback to %#p.\n", 
+			__FUNCTION__, __LINE__, dispatch_proc);
 
-	current_dispatch_proc = dispatch_proc;
+	dispatcher = dispatch_proc;
 }
 
 // Send out an event if a dispatcher was set.
 static inline void dispatch_event(virtual_event *const event) {
-	if (current_dispatch_proc != NULL) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
-		#endif
+	if (dispatcher != NULL) {
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Dispatching event type %u.\n", 
+				__FUNCTION__, __LINE__, event->type);
 
-		current_dispatch_proc(event);
+		dispatcher(event);
 	}
-	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "dispatch_event(): No dispatch proc set! (%d)\n", event->type);
+		logger(LOG_LEVEL_WARN,	"%s [%u]: No dispatch callback set!\n", 
+				__FUNCTION__, __LINE__);
 	}
-	#endif
 }
 
 void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
@@ -113,10 +108,6 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 		unsigned short int button;
 		switch (event_type) {
 			case KeyPress:
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_event_proc(): Key pressed. (%i)\n", event_code);
-				#endif
-
 				// Fire key pressed event.
 				event.type = EVENT_KEY_PRESSED;
 				event.mask = convert_to_virtual_mask(event_mask);
@@ -126,6 +117,8 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				event.data.keyboard.rawcode = keysym;
 				event.data.keyboard.keychar = CHAR_UNDEFINED;
 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X pressed. (%#X)\n", 
+					__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 				dispatch_event(&event);
 
 				// Check to make sure the key is printable.
@@ -137,15 +130,13 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					event.data.keyboard.keycode = VC_UNDEFINED;
 					event.data.keyboard.keychar = keychar;
 
+					logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X typed. (%ls)\n", 
+						__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.keychar);
 					dispatch_event(&event);
 				}
 				break;
 
 			case KeyRelease:
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_event_proc(): Key released. (%i)\n", event_code);
-				#endif
-
 				// Fire key released event.
 				event.type = EVENT_KEY_RELEASED;
 				event.mask = convert_to_virtual_mask(event_mask);
@@ -155,6 +146,8 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				event.data.keyboard.rawcode = keysym;
 				event.data.keyboard.keychar = CHAR_UNDEFINED;
 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X released. (%#X)\n", 
+					__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 				dispatch_event(&event);
 				break;
 
@@ -188,6 +181,8 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					event.data.mouse.x = event_x;
 					event.data.mouse.y = event_y;
 
+					logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X  pressed %u time(s). (%u, %u)\n", 
+							__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 					dispatch_event(&event);
 				}
 				else if (event_code == WheelUp || event_code == WheelDown) {
@@ -227,15 +222,13 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					event.data.wheel.amount = scroll_amount;
 					event.data.wheel.rotation = wheel_rotation;
 
+					logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %d units. (%u)\n", 
+							__FUNCTION__, __LINE__, event.data.wheel.amount * event.data.wheel.rotation, event.data.wheel.type);
 					dispatch_event(&event);
 				}
 				break;
 
 			case ButtonRelease:
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_event_proc(): Button released. (%i)\n", event_code);
-				#endif
-
 				// TODO Should use constants for button codes.
 				if (event_code > 0 && (event_code <= 3 || event_code == 8 || event_code == 9)) {
 					// Handle button release events.
@@ -250,6 +243,8 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					event.data.mouse.x = event_x;
 					event.data.mouse.y = event_y;
 
+					logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X released %u time(s). (%u, %u)\n", 
+							__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 					dispatch_event(&event);
 
 					if (mouse_dragged != true) {
@@ -262,6 +257,8 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 						event.data.mouse.x = event_x;
 						event.data.mouse.y = event_y;
 
+						logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X clicked %u time(s). (%u, %u)\n", 
+								__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 						dispatch_event(&event);
 					}
 				}
@@ -298,22 +295,22 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 				event.data.mouse.x = event_x;
 				event.data.mouse.y = event_y;
 
-				// Fire mouse moved event.
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse moved to %u, %u.\n", 
+						__FUNCTION__, __LINE__, event.data.mouse.x, event.data.mouse.y);
 				dispatch_event(&event);
 				break;
 
-			#ifdef USE_DEBUG
 			default:
-				fprintf(stderr, "hook_event_proc(): Unhandled Event Type: 0x%X\n", event_type);
+				// In theory this *should* never execute.
+				logger(LOG_LEVEL_WARN,	"%s [%u]: Unhandled Unix event! (%#X)\n", 
+						__FUNCTION__, __LINE__, (unsigned int) event_type);
 				break;
-			#endif
 		}
 	}
-	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "hook_event_proc(): Unhandled Hook Category: 0x%X\n", hook->category);
+		logger(LOG_LEVEL_WARN,	"%s [%u]: Unhandled Unix hook category! (%#X)\n", 
+				__FUNCTION__, __LINE__, hook->category);
 	}
-	#endif
 
 	XRecordFreeData(hook);
 }

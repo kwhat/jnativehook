@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -21,11 +21,6 @@
 #endif
 
 #include <nativehook.h>
-
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
-
 #include <X11/Xlib.h>
 
 #ifdef USE_XKB
@@ -39,6 +34,7 @@ XtAppContext xt_context;
 Display *xt_disp;
 #endif
 
+#include "logger.h"
 #include "library_load.h"
 
 Display *disp;
@@ -48,19 +44,22 @@ void __attribute__ ((constructor)) on_library_load(void);
 void __attribute__ ((destructor)) on_library_unload(void);
 
 void on_library_load() {
+	// Display the copywrite on library load.
+	COPYWRITE();
+	
 	// Tell X Threads are OK.
 	XInitThreads();
 
 	// Open local display.
 	disp = XOpenDisplay(XDisplayName(NULL));
-	#ifdef USE_DEBUG
-	if (disp != NULL) {
-		fprintf(stdout, "on_library_load(): XOpenDisplay successful.\n");
+	if (disp == NULL) {
+		logger(LOG_LEVEL_ERROR,	"%s [%u]: %s\n", 
+				__FUNCTION__, __LINE__, "XOpenDisplay failure!");
 	}
 	else {
-		fprintf(stderr, "on_library_load(): XOpenDisplay failure!\n");
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: %s\n", 
+				__FUNCTION__, __LINE__, "XOpenDisplay success.");
 	}
-	#endif
 
 	#ifdef USE_XT
 	XtToolkitInitialize();
@@ -85,14 +84,14 @@ void on_library_load() {
 	is_auto_repeat = (kb_state.global_auto_repeat == AutoRepeatModeOn);
 	#endif
 
-	#ifdef USE_DEBUG
-	if (is_auto_repeat) {
-		fprintf(stdout, "on_library_load(): Successfully enabled detectable autorepeat.\n");
+	if (is_auto_repeat == False) {
+		logger(LOG_LEVEL_ERROR,	"%s [%u]: %s\n", 
+				__FUNCTION__, __LINE__, "Could not enable detectable auto-repeat!");
 	}
 	else {
-		fprintf(stderr, "on_library_load(): Could not enable detectable auto-repeat!\n");
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Successfully enabled detectable autorepeat.\n", 
+				__FUNCTION__, __LINE__);
 	}
-	#endif
 }
 
 void on_library_unload() {

@@ -19,6 +19,6 @@
 #ifndef _Included_jni_Logger_h
 #define _Included_jni_Logger_h
 
-extern void jni_SetLogger(JNIEnv *env);
+extern bool jni_Logger(unsigned int level, const char *format, ...);
 
 #endif

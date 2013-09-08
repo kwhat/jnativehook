@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -25,10 +25,6 @@
 #include <string.h>
 #include <X11/Xlib.h>
 
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
-
 #ifdef USE_XKB
 #include <X11/XKBlib.h>
 static XkbDescPtr keyboard_map;
@@ -39,6 +35,8 @@ static KeySym *keyboard_map;
 static int keysym_per_keycode;
 static bool is_caps_lock = false, is_shift_lock = false;
 #endif
+
+#include "logger.h"
 
 // Unicode-Remapse the NativeHelpers display.
 extern Display *disp;
@@ -250,6 +248,7 @@ uint16_t keycode_to_scancode(KeyCode keycode) {
 
 KeyCode scancode_to_keycode(uint16_t scancode) {
 	// FIXME Implement!
+	(void) 0;
 }
 
 // Faster more flexible alternative to XKeycodeToKeysym...
@@ -396,11 +395,10 @@ KeySym keycode_to_keysym(KeyCode keycode, unsigned int modifier_mask) {
 			// index = 1
 			keysym = keyboard_map[keycode *keysym_per_keycode + 1];
 		}
-		#ifdef USE_DEBUG
 		else {
-			fprintf(stderr, "keycode_to_keysym(): Unable to determine the KeySym index.\n");
+			logger(LOG_LEVEL_ERROR,	"%s [%u]: Unable to determine the KeySym index!\n", 
+					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
 	#endif
 
@@ -420,33 +418,35 @@ void load_input_helper() {
 	XkbDescPtr desc = XkbGetKeyboard(disp, XkbGBN_AllComponentsMask, XkbUseCoreKbd);
 	if (desc != NULL && desc->names != NULL) {
 		const char *layout_name = XGetAtomName(disp, desc->names->keycodes);
-		#ifdef USE_DEBUG
-		fprintf(stdout, "keycode_to_keysym(): Found keycode atom '%s' (%i).\n", layout_name, (unsigned int) desc->names->keycodes);
-		#endif
+		logger(LOG_LEVEL_INFO, 
+				"%s [%u]: Found keycode atom '%s' (%i)!\n", 
+				__FUNCTION__, __LINE__, layout_name, 
+				(unsigned int) desc->names->keycodes);
 
-		#ifdef USE_DEBUG
 		const char *prefix_xfree86 = "xfree86_";
-		#endif
 		const char *prefix_evdev = "evdev_";
 		if (strncmp(layout_name, prefix_evdev, strlen(prefix_evdev))) {
 			is_evdev = true;
 		}
-		#ifdef USE_DEBUG
 		else if (layout_name == NULL) {
-			fprintf(stderr, "keycode_to_keysym(): Unable to determine the keycode name.\n");
+			logger(LOG_LEVEL_ERROR, 
+					"%s [%u]: X atom name failure for desc->names->keycodes!\n", 
+					__FUNCTION__, __LINE__);
 		}
 		else if (!strncmp(layout_name, prefix_xfree86, strlen(prefix_xfree86))) {
-			fprintf(stderr, "keycode_to_keysym(): Unknown keycode name '%s', please file a bug report.\n", layout_name);
+			logger(LOG_LEVEL_ERROR, 
+					"%s [%u]: Unknown keycode name '%s', please file a bug report!\n", 
+					__FUNCTION__, __LINE__, layout_name);
 		}
-		#endif
 
 		XkbFreeClientMap(desc, XkbGBN_AllComponentsMask, True);
 	}
-	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "keycode_to_keysym(): XkbGetKeyboard failed to locate a valid keyboard!\n");
+		logger(LOG_LEVEL_ERROR, 
+				"%s [%u]: XkbGetKeyboard failed to locate a valid keyboard!\n", 
+				__FUNCTION__, __LINE__);
+		fprintf(stderr, "keycode_to_keysym(): !\n");
 	}
-	#endif
 
 	// Get the map.
 	keyboard_map = XkbGetMap(disp, XkbAllClientInfoMask, XkbUseCoreKbd);
@@ -455,6 +455,13 @@ void load_input_helper() {
 	#pragma message("*** Warning: XKB support is required to accuratly determine keyboard scancodes!")
 	#pragma message("... Assuming XFree86 keyboard layout.")
 
+	logger(LOG_LEVEL_WARN, 
+				"%s [%u]: XKB support is required to accuratly determine keyboard scancodes!\n", 
+				__FUNCTION__, __LINE__);
+	logger(LOG_LEVEL_WARN, 
+				"%s [%u]: Assuming XFree86 keyboard layout.\n", 
+				__FUNCTION__, __LINE__);
+	
 	int minKeyCode, maxKeyCode;
 	XDisplayKeycodes(disp, &minKeyCode, &maxKeyCode);
 
@@ -492,16 +499,16 @@ void load_input_helper() {
 		else {
 			XFree(keyboard_map);
 
-			#ifdef USE_DEBUG
-			fprintf(stderr, "Initialize(): Unable to get modifier mapping table.\n");
-			#endif
+			logger(LOG_LEVEL_ERROR, 
+					"%s [%u]: Unable to get modifier mapping table!\n", 
+					__FUNCTION__, __LINE__);
 		}
 	}
-	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "Initialize(): Unable to get keyboard mapping table.\n");
+		logger(LOG_LEVEL_ERROR, 
+				"%s [%u]: Unable to get keyboard mapping table!\n", 
+				__FUNCTION__, __LINE__);
 	}
-	#endif
 	#endif
 }
 

@@ -55,9 +55,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		// Set java properties from native sources.
 		jni_SetProperties(env);
 
-		// Set java logger for native code messages.
-		jni_SetLogger(env);
-		
+		// Set Java logger for native code messages.
+		hook_set_logger_proc(&jni_Logger);
+
 		// Set the hook callback function to dispatch events.
 		hook_set_dispatch_proc(&jni_EventDispatcher);
 	}

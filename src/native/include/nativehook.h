@@ -19,6 +19,7 @@
 #ifndef __NATIVEHOOK_H
 #define __NATIVEHOOK_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -49,6 +50,7 @@ typedef enum _log_level {
 	LOG_LEVEL_ERROR
 } log_level;
 
+typedef bool (*logger_t)(unsigned int, const char *, ...);
 
 /* Begin Virtual Event Types and Data Structures */
 typedef enum _event_type {
@@ -102,6 +104,8 @@ typedef struct _virtual_event {
 		mouse_wheel_event_data wheel;
 	} data;
 } virtual_event;
+
+typedef void (*dispatcher_t)(virtual_event *const);
 /* End Virtual Event Types and Data Structures */
 
 
@@ -402,13 +406,13 @@ extern "C" {
 #endif
 
 	// Set the logger callback functions.
-	NATIVEHOOK_API bool hook_set_logger_proc(log_level level, bool (*logger_proc)(const char *));
-	
+	NATIVEHOOK_API void hook_set_logger_proc(logger_t logger_proc);
+
 	// Send a virtual event back to the system.
 	NATIVEHOOK_API void hook_post_event(virtual_event * const event);
 
 	// Set the event callback function.
-	NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const));
+	NATIVEHOOK_API void hook_set_dispatch_proc(dispatcher_t dispatch_proc);
 
 	// Insert the event hook.
 	NATIVEHOOK_API int hook_enable();

@@ -21,80 +21,49 @@
 #endif
 
 #include <nativehook.h>
+#include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "logger.h"
 
-static bool (*current_info_proc)(const char *) = &info;
-static bool (*current_warn_proc)(const char *) = &warn;
-static bool (*current_error_proc)(const char *) = &error;
-
-#ifdef USE_DEBUG
-static bool (*current_debug_proc)(const char *) = &debug;
-
-bool debug(const char * message) {
-	return fprintf(stdout, "%s\n", message) >= 0;
-}
-#endif
-
-bool info(const char * message) {
-	// Discard info level messages.
-	return false;
-}
-
-bool warn(const char * message) {
-	return fprintf(stdout, "%s\n", message) >= 0;
-}
-
-bool error(const char * message) {
-	return fprintf(stderr, "%s\n", message) >= 0;
-}
-
-NATIVEHOOK_API bool hook_set_logger_proc(log_level level, bool (*logger_proc)(const char *)) {
-	bool status = true;
+static bool default_logger(unsigned int level, const char *format, ...) {
+	bool status = false;
 	
+	#ifndef USE_QUIET
+	va_list args;
 	switch (level) {
 		#ifdef USE_DEBUG
 		case LOG_LEVEL_DEBUG:
-			if (logger_proc == NULL) {
-				current_debug_proc = &debug;
-			}
-			else {
-				current_debug_proc = logger_proc;
-			}
-			break;
 		#endif
 		case LOG_LEVEL_INFO:
-			if (logger_proc == NULL) {
-				current_info_proc = &info;
-			}
-			else {
-				current_info_proc = logger_proc;
-			}
+			va_start(args, format);
+  			status = vfprintf(stdout, format, args) >= 0;
+			va_end(args);
 			break;
 			
 		case LOG_LEVEL_WARN:
-			if (logger_proc == NULL) {
-				current_warn_proc = &warn;
-			}
-			else {
-				current_warn_proc = logger_proc;
-			}
-			break;
 		case LOG_LEVEL_ERROR:
-			if (logger_proc == NULL) {
-				current_error_proc = &error;
-			}
-			else {
-				current_error_proc = logger_proc;
-			}
-			break;
-			
-		default:
-			status = false;
+			va_start(args, format);
+  			status = vfprintf(stderr, format, args) >= 0;
+			va_end(args);
 			break;
 	}
+	#endif
 	
 	return status;
+}
+
+// Current logger function pointer, this should never be null.
+logger_t logger = &default_logger;
+
+
+NATIVEHOOK_API void hook_set_logger_proc(logger_t logger_proc) {
+	if (logger_proc == NULL) {
+		logger = &default_logger;
+	}
+	else {
+		logger = logger_proc;
+	}
 }

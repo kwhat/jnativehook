@@ -21,9 +21,6 @@
 #endif
 #include <limits.h>
 #include <nativehook.h>
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
 #include <time.h>
 #include <windows.h>
 
@@ -49,32 +46,29 @@ static POINT last_click;
 static virtual_event event;
 
 // Event dispatch callback.
-static void (*current_dispatch_proc)(virtual_event * const) = NULL;
+static dispatcher_t dispatcher = NULL;
 
 extern HHOOK keyboard_event_hhook, mouse_event_hhook;
 
-NATIVEHOOK_API void hook_set_dispatch_proc(void (*dispatch_proc)(virtual_event * const)) {
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_set_dispatch_proc(): Setting new dispatch callback.\n");
-	#endif
+NATIVEHOOK_API void hook_set_dispatch_proc(dispatcher_t dispatch_proc) {
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: Setting new dispatch callback to %#p.\n", 
+			__FUNCTION__, __LINE__, dispatch_proc);
 
-	current_dispatch_proc = dispatch_proc;
+	dispatcher = dispatch_proc;
 }
 
 // Send out an event if a dispatcher was set.
-static inline void dispatch_event(virtual_event * const event) {
-	if (current_dispatch_proc != NULL) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "dispatch_event(): Dispatching event. (%d)\n", event->type);
-		#endif
+static inline void dispatch_event(virtual_event *const event) {
+	if (dispatcher != NULL) {
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Dispatching event type %u.\n", 
+				__FUNCTION__, __LINE__, event->type);
 
-		current_dispatch_proc(event);
+		dispatcher(event);
 	}
-	#ifdef USE_DEBUG
 	else {
-		fprintf(stderr, "dispatch_event(): No dispatch proc set! (%d)\n", event->type);
+		logger(LOG_LEVEL_WARN,	"%s [%u]: No dispatch callback set!\n", 
+				__FUNCTION__, __LINE__);
 	}
-	#endif
 }
 
 // Set the native modifier mask for future events.
@@ -147,12 +141,6 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 	switch(wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			#ifdef USE_DEBUG
-			fprintf(stdout, "keyboard_event_proc(): 0x%X key pressed. (0x%X)\n",
-					(unsigned int) kbhook->scanCode,
-					(unsigned int) kbhook->vkCode);
-			#endif
-
 			// Check and setup modifiers.
 			if (kbhook->vkCode == VK_LSHIFT)		set_modifier_mask(MASK_SHIFT_L);
 			else if (kbhook->vkCode == VK_RSHIFT)	set_modifier_mask(MASK_SHIFT_R);
@@ -203,9 +191,10 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				jkey = NativeToJKey(kbhook->vkCode);
 			}
 			*/
-			#ifdef USE_DEBUG
-			fprintf(stdout, "Test kbhook->flags = 0x%X 0x%X\n", (unsigned int) kbhook->flags, (unsigned int) kbhook->scanCode);
-			#endif
+			
+			// FIXME Remove this log entry as it is only for testing.
+			logger(LOG_LEVEL_DEBUG,	"%s [%u]: kbhook->flags == %#X; kbhook->scanCode == %#X\n", 
+					__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 
 			// Fire key pressed event.
 			event.type = EVENT_KEY_PRESSED;
@@ -215,6 +204,8 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.data.keyboard.rawcode = kbhook->vkCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X pressed. (%#X)\n", 
+					__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 			dispatch_event(&event);
 
 			if (convert_vk_to_wchar(kbhook->vkCode, &keywchar, &keydead) > 0) {
@@ -226,18 +217,14 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				event.data.keyboard.rawcode = kbhook->vkCode;
 				event.data.keyboard.keychar = keywchar;
 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X typed. (%ls)\n", 
+						__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.keychar);
 				dispatch_event(&event);
 			}
 			break;
 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			#ifdef USE_DEBUG
-			fprintf(stdout, "keyboard_event_proc(): 0x%X key released. (0x%X)\n",
-					(unsigned int) kbhook->scanCode,
-					(unsigned int) kbhook->vkCode);
-			#endif
-
 			// Check and setup modifiers.
 			if (kbhook->vkCode == VK_LSHIFT)		unset_modifier_mask(MASK_SHIFT_L);
 			else if (kbhook->vkCode == VK_RSHIFT)	unset_modifier_mask(MASK_SHIFT_R);
@@ -296,28 +283,26 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.data.keyboard.rawcode = kbhook->vkCode;
 			event.data.keyboard.keychar = CHAR_UNDEFINED;
 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Key %#X released. (%#X)\n", 
+					__FUNCTION__, __LINE__, event.data.keyboard.keycode, event.data.keyboard.rawcode);
 			dispatch_event(&event);
 			break;
 
-		#ifdef USE_DEBUG
 		default:
-			fprintf(stdout, "keyboard_event_proc(): Unhandled keyboard event: 0x%X\n", (unsigned int) wParam);
+			// In theory this *should* never execute.
+			logger(LOG_LEVEL_WARN,	"%s [%u]: Unhandled Windows event! (%#X)\n", 
+					__FUNCTION__, __LINE__, (unsigned int) wParam);
 			break;
-		#endif
 	}
-
-	#ifdef USE_DEBUG
-	fprintf(stdout, "Test: event.propagate %u, nCode %d, \n", (unsigned int) event.propagate);
-	#endif
 
 	LRESULT hook_result = -1;
 	if (nCode < 0 || event.propagate != false) {
 		hook_result = CallNextHookEx(keyboard_event_hhook, nCode, wParam, lParam);
 	}
-
-	#ifdef USE_DEBUG
-	fprintf(stdout, "Test: hook_result! %u\n", (unsigned int) hook_result);
-	#endif
+	else {
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Consuming the current event. (%ld)\n", 
+				__FUNCTION__, __LINE__, (long) hook_result);
+	}
 
 	return hook_result;
 }
@@ -365,10 +350,6 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 		BUTTONDOWN:
-			#ifdef USE_DEBUG
-			fprintf(stdout, "mouse_event_proc(): Button pressed. (%u)\n", event.data.mouse.button);
-			#endif
-
 			// Track the number of clicks.
 			if ((long) (event.time - click_time) <= hook_get_multi_click_time()) {
 				click_count++;
@@ -390,6 +371,8 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.data.mouse.x = mshook->pt.x;
 			event.data.mouse.y = mshook->pt.y;
 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X  pressed %u time(s). (%u, %u)\n", 
+					__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 			dispatch_event(&event);
 			break;
 
@@ -423,10 +406,6 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 
 		BUTTONUP:
-			#ifdef USE_DEBUG
-			fprintf(stdout, "mouse_event_proc(): Button released. (%u)\n", event.data.mouse.button);
-			#endif
-
 			// Fire mouse released event.
 			event.type = EVENT_MOUSE_RELEASED;
 			event.mask = get_modifiers();
@@ -435,6 +414,8 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			event.data.mouse.x = mshook->pt.x;
 			event.data.mouse.y = mshook->pt.y;
 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X released %u time(s). (%u, %u)\n", 
+					__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 			dispatch_event(&event);
 
 			if (last_click.x == mshook->pt.x && last_click.y == mshook->pt.y) {
@@ -449,15 +430,13 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				event.data.mouse.x = mshook->pt.x;
 				event.data.mouse.y = mshook->pt.y;
 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Button%#X clicked %u time(s). (%u, %u)\n", 
+						__FUNCTION__, __LINE__, event.data.mouse.button, event.data.mouse.clicks, event.data.mouse.x, event.data.mouse.y);
 				dispatch_event(&event);
 			}
 			break;
 
 		case WM_MOUSEMOVE:
-			#ifdef USE_DEBUG
-			//fprintf(stdout, "mouse_event_proc(): Motion Notified. (%li, %li)\n", mshook->pt.x, mshook->pt.y);
-			#endif
-
 			// Reset the click count.
 			if (click_count != 0 && (long) (event.time - click_time) > hook_get_multi_click_time()) {
 				click_count = 0;
@@ -471,7 +450,6 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (get_modifiers() >> 8) {
 					// Create Mouse Dragged event.
 					event.type = EVENT_MOUSE_DRAGGED;
-
 				}
 				else {
 					// Create a Mouse Moved event.
@@ -486,16 +464,13 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 				event.data.mouse.x = mshook->pt.x;
 				event.data.mouse.y = mshook->pt.y;
 
-				// Fire mouse moved event.
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse moved to %u, %u.\n", 
+						__FUNCTION__, __LINE__, event.data.mouse.x, event.data.mouse.y);
 				dispatch_event(&event);
 			}
 			break;
 
 		case WM_MOUSEWHEEL:
-			#ifdef USE_DEBUG
-			fprintf(stdout, "mouse_event_proc(): WM_MOUSEWHEEL. (%i / %i)\n", HIWORD(mshook->mouseData), WHEEL_DELTA);
-			#endif
-
 			// Track the number of clicks.
 			if ((long) (event.time - click_time) <= hook_get_multi_click_time()) {
 				click_count++;
@@ -519,14 +494,16 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			 * click is defined as WHEEL_DELTA, which is 120. */
 			event.data.wheel.rotation = ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %d units. (%u)\n", 
+					__FUNCTION__, __LINE__, event.data.wheel.amount * event.data.wheel.rotation, event.data.wheel.type);
 			dispatch_event(&event);
 			break;
 
-		#ifdef USE_DEBUG
 		default:
-			fprintf(stdout, "mouse_event_proc(): Unhandled mouse event: 0x%X\n", (unsigned int) wParam);
+			// In theory this *should* never execute.
+			logger(LOG_LEVEL_WARN,	"%s [%u]: Unhandled Windows event! (%#X)\n", 
+					__FUNCTION__, __LINE__, (unsigned int) wParam);
 			break;
-		#endif
 	}
 
 

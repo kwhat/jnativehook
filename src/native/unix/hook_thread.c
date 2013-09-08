@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -24,18 +24,16 @@
 #include <time.h>
 #endif
 
-#ifdef USE_DEBUG
-#include <stdio.h>
-#endif
-
 #include <nativehook.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/record.h>
 
 #include "hook_callback.h"
+#include "logger.h"
 #include "x_input_helper.h"
 
 // The pointer to the X11 display accessed by the callback.
@@ -61,9 +59,8 @@ static void *hook_thread_proc(void *arg) {
 
 	Display *disp_data = XOpenDisplay(NULL);
 	if (disp_data != NULL) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_thread_proc(): XOpenDisplay successful.\n");
-		#endif
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: XOpenDisplay successful.\n", 
+				__FUNCTION__, __LINE__);
 
 		// Make sure the data display is synchronized to prevent late event delivery!
 		// See Bug 42356 for more information.
@@ -74,9 +71,8 @@ static void *hook_thread_proc(void *arg) {
 		XRecordClientSpec clients = XRecordAllClients;
 		XRecordRange *range = XRecordAllocRange();
 		if (range != NULL) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_thread_proc(): XRecordAllocRange successful.\n");
-			#endif
+			logger(LOG_LEVEL_DEBUG,	"%s [%u]: XRecordAllocRange successful.\n", 
+					__FUNCTION__, __LINE__);
 
 			// Create XRecord Context.
 			range->device_events.first = KeyPress;
@@ -88,9 +84,8 @@ static void *hook_thread_proc(void *arg) {
 			 */
 			context = XRecordCreateContext(disp_data, 0, &clients, 1, &range, 1);
 			if (context != 0) {
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_thread_proc(): XRecordCreateContext successful.\n");
-				#endif
+				logger(LOG_LEVEL_DEBUG,	"%s [%u]: XRecordCreateContext successful.\n", 
+						__FUNCTION__, __LINE__);
 
 				// Initialize Native Input Functions.
 				load_input_helper();
@@ -123,9 +118,8 @@ static void *hook_thread_proc(void *arg) {
 				}
 				#endif
 				else {
-					#ifdef USE_DEBUG
-					fprintf (stderr, "hook_thread_proc(): XRecordEnableContext failure!\n");
-					#endif
+					logger(LOG_LEVEL_ERROR,	"%s [%u]: XRecordEnableContext failure!\n", 
+						__FUNCTION__, __LINE__);
 
 					#ifdef USE_XRECORD_ASYNC
 					// Reset the running state.
@@ -143,9 +137,8 @@ static void *hook_thread_proc(void *arg) {
 				unload_input_helper();
 			}
 			else {
-				#ifdef USE_DEBUG
-				fprintf(stderr, "hook_thread_proc(): XRecordCreateContext failure!\n");
-				#endif
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: XRecordCreateContext failure!\n", 
+						__FUNCTION__, __LINE__);
 
 				// Set the exit status.
 				*status = NATIVEHOOK_ERROR_X_RECORD_CREATE_CONTEXT;
@@ -155,9 +148,8 @@ static void *hook_thread_proc(void *arg) {
 			XFree(range);
 		}
 		else {
-			#ifdef USE_DEBUG
-			fprintf(stderr, "hook_thread_proc(): XRecordAllocRange failure!\n");
-			#endif
+			logger(LOG_LEVEL_ERROR,	"%s [%u]: XRecordAllocRange failure!\n", 
+					__FUNCTION__, __LINE__);
 
 			// Set the exit status.
 			*status = NATIVEHOOK_ERROR_X_RECORD_ALLOC_RANGE;
@@ -167,17 +159,15 @@ static void *hook_thread_proc(void *arg) {
 		disp_data = NULL;
 	}
 	else {
-		#ifdef USE_DEBUG
-		fprintf(stderr, "hook_thread_proc(): XOpenDisplay failure!\n");
-		#endif
+		logger(LOG_LEVEL_ERROR,	"%s [%u]: XOpenDisplay failure!\n", 
+				__FUNCTION__, __LINE__);
 
 		// Set the exit status.
 		*status = NATIVEHOOK_ERROR_X_OPEN_DISPLAY;
 	}
 
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_thread_proc(): complete.\n");
-	#endif
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: Something, something, something, complete.\n", 
+			__FUNCTION__, __LINE__);
 
 	// Make sure we signal that we have passed any exception throwing code.
 	pthread_mutex_unlock(&hook_control_mutex);
@@ -205,9 +195,8 @@ NATIVEHOOK_API int hook_enable() {
 			// Check to make sure XRecord is installed and enabled.
 			int major, minor;
 			if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
-				#ifdef USE_DEBUG
-				fprintf(stdout, "hook_thread_proc(): XRecord version: %d.%d.\n", major, minor);
-				#endif
+				logger(LOG_LEVEL_INFO,	"%s [%u]: XRecord version: %d.%d.\n", 
+						__FUNCTION__, __LINE__, major, minor);
 
 				// Create the thread attribute.
 				int policy = 0;
@@ -217,19 +206,16 @@ NATIVEHOOK_API int hook_enable() {
 				pthread_attr_getschedpolicy(&hook_thread_attr, &policy);
 				priority = sched_get_priority_max(policy);
 
+				// FIXME FIX THIS
 				if (pthread_create(&hook_thread_id, &hook_thread_attr, hook_thread_proc, malloc(sizeof(int))) == 0) {
-					#ifdef USE_DEBUG
-					fprintf(stdout, "enable_hook(): start successful.\n");
-					#endif
+					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Start successful\n", 
+							__FUNCTION__, __LINE__);
 
-					#ifdef USE_DEBUG
 					if (pthread_setschedprio(hook_thread_id, priority) != 0) {
-						fprintf(stderr, "enable_hook(): Could not set thread priority %i for thread 0x%X.\n", priority, (unsigned int) hook_thread_id);
+						logger(LOG_LEVEL_ERROR,	"%s [%u]: Could not set thread priority %i for thread 0x%lX!\n", 
+								__FUNCTION__, __LINE__, priority, (unsigned long) hook_thread_id);
 					}
-					#else
-					pthread_setschedprio(hook_thread_id, priority);
-					#endif
-
+					
 					// Wait for the thread to unlock the control mutex indicating
 					// that it has started or failed.
 					if (pthread_mutex_lock(&hook_control_mutex) == 0) {
@@ -238,49 +224,43 @@ NATIVEHOOK_API int hook_enable() {
 
 					// Handle any possible JNI issue that may have occurred.
 					if (hook_is_enabled()) {
-						#ifdef USE_DEBUG
-						fprintf(stdout, "enable_hook(): initialization successful.\n");
-						#endif
+						logger(LOG_LEVEL_DEBUG,	"%s [%u]: Initialization successful.\n", 
+								__FUNCTION__, __LINE__);
 
 						status = NATIVEHOOK_SUCCESS;
 					}
 					else {
-						#ifdef USE_DEBUG
-						fprintf(stderr, "enable_hook(): initialization failure!\n");
-						#endif
-
+						logger(LOG_LEVEL_ERROR,	"%s [%u]: Initialization failure!\n", 
+								__FUNCTION__, __LINE__);
+						
 						// Wait for the thread to die.
 						void *thread_status;
 						pthread_join(hook_thread_id, (void *) &thread_status);
 						status = *(int *) thread_status;
 						free(thread_status);
 
-						#ifdef USE_DEBUG
-						fprintf(stderr, "enable_hook(): Thread Result (%i)\n", status);
-						#endif
+						logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread Result: (%i)!\n", 
+								__FUNCTION__, __LINE__, status);
 					}
 				}
 				else {
-					#ifdef USE_DEBUG
-					fprintf(stderr, "enable_hook(): Thread create failure!\n");
-					#endif
+					logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread create failure!\n", 
+							__FUNCTION__, __LINE__);
 
 					status = NATIVEHOOK_ERROR_THREAD_CREATE;
 				}
 			}
 			else {
-				#ifdef USE_DEBUG
-				fprintf (stderr, "hook_thread_proc(): XRecord is not currently available!\n");
-				#endif
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: XRecord is not currently available!\n", 
+							__FUNCTION__, __LINE__);
 
 				status = NATIVEHOOK_ERROR_X_RECORD_NOT_FOUND;
 			}
 		}
 		else {
-			#ifdef USE_DEBUG
-			fprintf(stderr, "hook_thread_proc(): XOpenDisplay failure!\n");
-			#endif
-
+			logger(LOG_LEVEL_ERROR,	"%s [%u]: XOpenDisplay failure!\n", 
+					__FUNCTION__, __LINE__);
+			
 			// Close down any open displays.
 			if (disp_ctrl != NULL) {
 				XCloseDisplay(disp_ctrl);
@@ -330,9 +310,8 @@ NATIVEHOOK_API int hook_disable() {
 			disp_ctrl = NULL;
 		}
 
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_disable(): Thread Result (%i)\n", status);
-		#endif
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Thread Result (%i).\n", 
+				__FUNCTION__, __LINE__, status);
 	}
 
 	// Clean up the mutex.
@@ -356,9 +335,8 @@ NATIVEHOOK_API bool hook_is_enabled() {
 		is_running = true;
 	}
 
-	#ifdef USE_DEBUG
-	fprintf(stdout, "hook_is_enabled(): State (%i)\n", is_running);
-	#endif
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: State (%i).\n", 
+			__FUNCTION__, __LINE__, is_running);
 
 	return is_running;
 }

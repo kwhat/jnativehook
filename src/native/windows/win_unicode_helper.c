@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -74,14 +74,17 @@ static short int ptr_padding = 0;
 static BOOL is_wow64() {
 	BOOL status = FALSE;
 
-	LPFN_ISWOW64PROCESS pIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(GetModuleHandle("kernel32"), "IsWow64Process");
+	LPFN_ISWOW64PROCESS pIsWow64Process = (LPFN_ISWOW64PROCESS) 
+			GetProcAddress(GetModuleHandle("kernel32"), "IsWow64Process");
 
 	if(pIsWow64Process != NULL) {
-		if (!pIsWow64Process(GetCurrentProcess(), &status)) {
+		HANDLE current_proc = GetCurrentProcess();
+				
+		if (!pIsWow64Process(current_proc, &status)) {
 			status = FALSE;
-			#ifdef USE_DEBUG
-			fprintf(stderr, "is_wow64(): pIsWow64Process(GetCurrentProcess(), &status) failed!\n");
-			#endif
+			
+			logger(LOG_LEVEL_DEBUG,	"%s [%u]: pIsWow64Process(%#p, (%#p) failed!\n", 
+				__FUNCTION__, __LINE__, current_proc, &status);
 		}
 	}
 
@@ -117,9 +120,8 @@ static int refresh_locale_list() {
 	// Get the number of layouts the user has activated.
 	int hkl_size = GetKeyboardLayoutList(0, NULL);
 	if (hkl_size > 0) {
-		#ifdef USE_DEBUG
-		fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() found %d.\n", hkl_size);
-		#endif
+		logger(LOG_LEVEL_INFO,	"%s [%u]: GetKeyboardLayoutList(0, NULL) found %d layouts.\n", 
+				__FUNCTION__, __LINE__, hkl_size);
 
 		// Get the thread id that currently has focus for our default.
 		DWORD focus_pid = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
@@ -129,19 +131,21 @@ static int refresh_locale_list() {
 
 		int new_size = GetKeyboardLayoutList(hkl_size, hkl_list);
 		if (new_size > 0) {
-			#ifdef USE_DEBUG
 			if (new_size != hkl_size) {
-				fprintf(stderr, "refresh_locale_list(): Locale size mismatch!  Expected %d, received %d.\n", hkl_size, new_size);
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: Locale size mismatch!  "
+						"Expected %d, received %d!\n", 
+						__FUNCTION__, __LINE__, hkl_size, new_size);
 			}
 			else {
-				fprintf(stdout, "refresh_locale_list(): Received %d locales.\n", new_size);
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Received %d locales.\n", 
+						__FUNCTION__, __LINE__, new_size);
 			}
-			#endif
 
 			KeyboardLocale* locale_previous = NULL;
 			KeyboardLocale* locale_item = locale_first;
 
-			// Go though the linked list and remove KeyboardLocale's that are no longer loaded.
+			// Go though the linked list and remove KeyboardLocale's that are
+			// no longer loaded.
 			while (locale_item != NULL) {
 				// Check to see if the old HKL is in the new list.
 				bool is_loaded = false;
@@ -155,9 +159,8 @@ static int refresh_locale_list() {
 
 
 				if (is_loaded) {
-					#ifdef USE_DEBUG
-					fprintf(stdout, "refresh_locale_list(): Found loacle ID 0x%X in the cache..\n", (unsigned int) locale_item->id);
-					#endif
+					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Found loacle ID %#X in the cache.\n", 
+							__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
 
 					// Set the previous local to the current locale.
 					locale_previous = locale_item;
@@ -170,10 +173,9 @@ static int refresh_locale_list() {
 					count++;
 				}
 				else {
-					#ifdef USE_DEBUG
-					fprintf(stdout, "refresh_locale_list(): Removing loacle ID 0x%X from the cache.\n", (unsigned int) locale_item->id);
-					#endif
-
+					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Removing loacle ID %#X from the cache.\n", 
+							__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
+					
 					// If the old id is not in the new list, remove it.
 					locale_previous->next = locale_item->next;
 
@@ -198,6 +200,8 @@ static int refresh_locale_list() {
 			for (int i = 0; i < new_size; i++) {
 				// Check to see if the item was already in the list.
 				if (hkl_list[i] != NULL) {
+					// TODO Unload this to a function, See else clause.
+					
 					// Set the active keyboard layout for this thread to the HKL.
 					ActivateKeyboardLayout(hkl_list[i], 0x00);
 
@@ -210,9 +214,9 @@ static int refresh_locale_list() {
 							char kbdLayoutFilePath[MAX_PATH];
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
 
-							#ifdef USE_DEBUG
-							fprintf(stdout, "refresh_locale_list(): Loading layout for 0x%X: %s.\n", (unsigned int) hkl_list[i], layoutFile);
-							#endif
+							logger(LOG_LEVEL_DEBUG,	"%s [%u]: Loading layout for %#X: %s.\n", 
+									__FUNCTION__, __LINE__, 
+									(unsigned int) hkl_list[i], layoutFile);
 
 							// Create the new locale item.
 							locale_item = malloc(sizeof(KeyboardLocale));
@@ -261,36 +265,37 @@ static int refresh_locale_list() {
 								count++;
 							}
 							else {
-								#ifdef USE_DEBUG
-								fprintf(stderr, "refresh_locale_list(): GetProcAddress() failed for KbdLayerDescriptor!\n");
-								#endif
+								logger(LOG_LEVEL_ERROR,	
+										"%s [%u]: GetProcAddress() failed for KbdLayerDescriptor!\n", 
+										__FUNCTION__, __LINE__);
 
 								FreeLibrary(locale_item->library);
 								free(locale_item);
 								locale_item = NULL;
 							}
 						}
-						#ifdef USE_DEBUG
 						else {
-							fprintf(stderr, "refresh_locale_list(): GetSystemDirectory() failed!\n");
+							logger(LOG_LEVEL_ERROR,	
+									"%s [%u]: GetSystemDirectory() failed!\n", 
+									__FUNCTION__, __LINE__);
 						}
-						#endif
 					}
-					#ifdef USE_DEBUG
 					else {
-						fprintf(stderr, "refresh_locale_list(): Could not find keyboard map for locale 0x%X!\n", (unsigned int) hkl_list[i]);
+						logger(LOG_LEVEL_ERROR,	
+								"%s [%u]: Could not find keyboard map for locale %#X!\n", 
+								__FUNCTION__, __LINE__, 
+								(unsigned int) hkl_list[i]);
 					}
-					#endif
-				}
-			}
+				} // End NULL Check.
+			} // for (...)
 		}
 		else {
-			#ifdef USE_DEBUG
-			fprintf(stderr, "refresh_locale_list(): GetKeyboardLayoutList() failed!\n");
-			#endif
+			logger(LOG_LEVEL_ERROR,	
+					"%s [%u]: GetKeyboardLayoutList() failed!\n", 
+					__FUNCTION__, __LINE__);
 
-			// Try and recover by using the current layout.
-			//locale_id
+			// TODO Try and recover by using the current layout.
+			// Hint: Use locale_id instead of hkl_list[i] in the loop above.
 		}
 
 		free(hkl_list);
@@ -311,9 +316,9 @@ int load_unicode_helper() {
 
 	count = refresh_locale_list();
 
-	#ifdef USE_DEBUG
-	fprintf(stdout, "load_unicode_helper(): refresh_locale_list found %d.\n", count);
-	#endif
+	logger(LOG_LEVEL_INFO,	
+			"%s [%u]: refresh_locale_lis() found %d locale(s).\n", 
+			__FUNCTION__, __LINE__, count);
 
 	return count;
 }
@@ -352,9 +357,9 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 		while (locale_item != NULL) {
 			// Search the linked list.
 			if (locale_item->id == locale_id) {
-				#ifdef USE_DEBUG
-				fprintf(stdout, "convert_vk_to_wchar(): Activating keyboard layout 0x%X.\n", (unsigned int) locale_item->id);
-				#endif
+				logger(LOG_LEVEL_INFO,	
+					"%s [%u]: Activating keyboard layout %#X.\n", 
+					__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
 
 				// If they layout changes the dead key state needs to be reset.
 				// This is consistent with the way Windows handles locale changes.
@@ -369,9 +374,9 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 
 		// If we were unable to find the locale in the list, refresh the list.
 		if (locale_current == NULL) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "convert_vk_to_wchar(): Refreshing locale cache.\n");
-			#endif
+			logger(LOG_LEVEL_DEBUG,	
+					"%s [%u]: Refreshing locale cache.\n", 
+					__FUNCTION__, __LINE__);
 
 			refresh_locale_list();
 		}
@@ -383,9 +388,9 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 
 	// Check and make sure the unicode helper was loaded.
 	if (locale_current != NULL) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "convert_vk_to_wchar(): Using keyboard layout 0x%X.\n", (unsigned int) locale_current->id);
-		#endif
+		logger(LOG_LEVEL_INFO,	
+				"%s [%u]: Using keyboard layout %#X.\n", 
+				__FUNCTION__, __LINE__, (unsigned int) locale_current->id);
 
 		short state = 0;
 		int shift = -1;

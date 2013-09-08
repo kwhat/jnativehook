@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -40,6 +40,8 @@
 extern Display *xt_disp;
 #endif
 
+#include "logger.h"
+
 extern Display *disp;
 
 NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
@@ -52,11 +54,10 @@ NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &delay, &rate);
 
-		#ifdef USE_DEBUG
 		if (successful) {
-			fprintf(stdout, "hook_get_auto_repeat_rate(): XkbGetAutoRepeatRate success. (%d)\n", rate);
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %d.\n", 
+					__FUNCTION__, __LINE__, rate);
 		}
-		#endif
 	}
 	#endif
 
@@ -66,9 +67,8 @@ NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 		if (successful) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_get_auto_repeat_rate(): XF86MiscGetKbdSettings success. (%d)\n", kbdinfo.rate);
-			#endif
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %d.\n", 
+					__FUNCTION__, __LINE__, kbdinfo.rate);
 
 			delay = (unsigned int) kbdinfo.delay;
 			rate = (unsigned int) kbdinfo.rate;
@@ -93,11 +93,10 @@ NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 	if (!successful) {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &delay, &rate);
 
-		#ifdef USE_DEBUG
 		if (successful) {
-			fprintf(stdout, "hook_get_auto_repeat_delay(): XkbGetAutoRepeatRate success. (%d)\n", delay);
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %d.\n", 
+					__FUNCTION__, __LINE__, delay);
 		}
-		#endif
 	}
 	#endif
 
@@ -107,9 +106,8 @@ NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 		if (successful) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_get_auto_repeat_delay(): XF86MiscGetKbdSettings success. (%d)\n", kbdinfo.delay);
-			#endif
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %d.\n", 
+					__FUNCTION__, __LINE__, kbdinfo.delay);
 
 			delay = (unsigned int) kbdinfo.delay;
 			rate = (unsigned int) kbdinfo.rate;
@@ -130,9 +128,8 @@ NATIVEHOOK_API long int hook_get_pointer_acceleration_multiplier() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_denominator >= 0) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_get_multi_click_time(): XGetPointerControl success. (%d)\n", accel_denominator);
-		#endif
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+				__FUNCTION__, __LINE__, accel_denominator);
 
 		value = (long int) accel_denominator;
 	}
@@ -146,9 +143,8 @@ NATIVEHOOK_API long int hook_get_pointer_acceleration_threshold() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (threshold >= 0) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_get_multi_click_time(): XGetPointerControl success. (%d)\n", threshold);
-		#endif
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+				__FUNCTION__, __LINE__, threshold);
 
 		value = (long int) threshold;
 	}
@@ -162,9 +158,8 @@ NATIVEHOOK_API long int hook_get_pointer_sensitivity() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_numerator >= 0) {
-		#ifdef USE_DEBUG
-		fprintf(stdout, "hook_get_multi_click_time(): XGetPointerControl success. (%d)\n", accel_numerator);
-		#endif
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+				__FUNCTION__, __LINE__, accel_numerator);
 
 		value = (long int) accel_numerator;
 	}
@@ -183,9 +178,8 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 		// Fall back to the X Toolkit extension if available and other efforts failed.
 		click_time = XtGetMultiClickTime(xt_disp);
 		if (click_time >= 0) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_get_multi_click_time(): XtGetMultiClickTime success. (%d)\n", click_time);
-			#endif
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XtGetMultiClickTime: %d.\n", 
+					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;
 		}
@@ -196,9 +190,8 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "*", "multiClickTime");
 		if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_get_multi_click_time(): Found multiClickTime property. (%d)\n", click_time);
-			#endif
+			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'multiClickTime' property: %d.\n", 
+					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;
 		}
@@ -207,9 +200,8 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "OpenWindows", "MultiClickTimeout");
 		if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
-			#ifdef USE_DEBUG
-			fprintf(stdout, "hook_get_multi_click_time(): Found MultiClickTimeout property. (%d)\n", click_time);
-			#endif
+			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'MultiClickTimeout' property: %d.\n", 
+					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;
 		}
