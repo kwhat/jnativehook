@@ -40,6 +40,7 @@ LTLDFLAGS="-version-info ${lt_current}:${lt_revision}:${lt_age}"
 AC_INIT([nativehook], [NATIVEHOOK_VERSION_STRING], [NATIVEHOOK_BUGS])
 
 AC_PREREQ(2.64)
+#AC_CANONICAL_SYSTEM requires src/native/install.sh
 AC_CONFIG_SRCDIR([include/nativehook.h])
 AC_CONFIG_FILES([
 	pc/nativehook.pc \
@@ -84,7 +85,7 @@ AS_CASE([$host],
 
 		#LT_INIT
 	],
-	[*-mingw* | *-cygwin*], [
+	[*-mingw* | *-cygwin* | *-msys* ], [
 		AC_MSG_RESULT([$host (Windows Compatible)])
 		backend="windows"
 
@@ -251,6 +252,8 @@ AS_IF(
 		AS_IF([test "x$enable_debug" = "xyes"], [
 			CFLAGS="$CFLAGS -Wno-format"
 		])
+
+		#REQUIRE="$REQUIRE -lmsvcrt -luser32 -lkernel32"
 
 		#EXTRA_LIBS="-lmsvcrt -luser32 -lkernel32"
 

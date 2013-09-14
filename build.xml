@@ -416,7 +416,7 @@
 		</condition>
 
 		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="${env.CFLAGS}" else="-O2 -pipe">
+		<condition property="native.cc.flags" value="${env.CFLAGS}" else="-O2 -pipe -DDEBUG">
 			<isset property="${env.CFLAGS}" />
 		</condition>
 
@@ -503,7 +503,7 @@
 		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/native" /-->
 		<pathconvert property="dir.base.unix" targetos="unix">
 			<path location="${basedir}" />
-			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/\1\2"/>
+			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/cygdrive/\1\2"/>
 			<map from="${basedir}" to="${basedir}" />
 		</pathconvert>
 

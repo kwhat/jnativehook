@@ -55,7 +55,7 @@ NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &delay, &rate);
 
 		if (successful) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %u.\n", 
 					__FUNCTION__, __LINE__, rate);
 		}
 	}
@@ -67,7 +67,7 @@ NATIVEHOOK_API long int hook_get_auto_repeat_rate() {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 		if (successful) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %i.\n", 
 					__FUNCTION__, __LINE__, kbdinfo.rate);
 
 			delay = (unsigned int) kbdinfo.delay;
@@ -94,7 +94,7 @@ NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 		successful = XkbGetAutoRepeatRate(disp, XkbUseCoreKbd, &delay, &rate);
 
 		if (successful) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XkbGetAutoRepeatRate: %u.\n", 
 					__FUNCTION__, __LINE__, delay);
 		}
 	}
@@ -106,7 +106,7 @@ NATIVEHOOK_API long int hook_get_auto_repeat_delay() {
 		XF86MiscKbdSettings kb_info;
 		successful = (bool) XF86MiscGetKbdSettings(disp, &kb_info);
 		if (successful) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XF86MiscGetKbdSettings: %i.\n", 
 					__FUNCTION__, __LINE__, kbdinfo.delay);
 
 			delay = (unsigned int) kbdinfo.delay;
@@ -128,7 +128,7 @@ NATIVEHOOK_API long int hook_get_pointer_acceleration_multiplier() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_denominator >= 0) {
-		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %i.\n", 
 				__FUNCTION__, __LINE__, accel_denominator);
 
 		value = (long int) accel_denominator;
@@ -143,7 +143,7 @@ NATIVEHOOK_API long int hook_get_pointer_acceleration_threshold() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (threshold >= 0) {
-		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %i.\n", 
 				__FUNCTION__, __LINE__, threshold);
 
 		value = (long int) threshold;
@@ -158,7 +158,7 @@ NATIVEHOOK_API long int hook_get_pointer_sensitivity() {
 
 	XGetPointerControl(disp, &accel_numerator, &accel_denominator, &threshold);
 	if (accel_numerator >= 0) {
-		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %d.\n", 
+		logger(LOG_LEVEL_INFO,	"%s [%u]: XGetPointerControl: %i.\n", 
 				__FUNCTION__, __LINE__, accel_numerator);
 
 		value = (long int) accel_numerator;
@@ -178,7 +178,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 		// Fall back to the X Toolkit extension if available and other efforts failed.
 		click_time = XtGetMultiClickTime(xt_disp);
 		if (click_time >= 0) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: XtGetMultiClickTime: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: XtGetMultiClickTime: %i.\n", 
 					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;
@@ -190,7 +190,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "*", "multiClickTime");
 		if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'multiClickTime' property: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'multiClickTime' property: %i.\n", 
 					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;
@@ -200,7 +200,7 @@ NATIVEHOOK_API long int hook_get_multi_click_time() {
 	if (!successful) {
 		char *xprop = XGetDefault(disp, "OpenWindows", "MultiClickTimeout");
 		if (xprop != NULL && sscanf(xprop, "%4i", &click_time) != EOF) {
-			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'MultiClickTimeout' property: %d.\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: X default 'MultiClickTimeout' property: %i.\n", 
 					__FUNCTION__, __LINE__, click_time);
 
 			successful = true;

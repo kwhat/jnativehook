@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -24,7 +24,6 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 
-static jobject logger = NULL;
 static char log_buffer[1024];
 
 bool jni_Logger(unsigned int level, const char *format, ...) {
@@ -38,20 +37,28 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
 		va_end(args);
 	
 		if (log_size >= 0) {
+			jstring name = (*env)->NewStringUTF(env, "org.jnativehook");
 			jstring message = (*env)->NewStringUTF(env, log_buffer);
-
+			
+			jobject Logger_object = (*env)->CallStaticObjectMethod(
+					env, 
+					java_util_logging_Logger->cls, 
+					java_util_logging_Logger->getLogger,
+					name);
+			
 			switch (level) {
 				case LOG_LEVEL_DEBUG:
 					(*env)->CallVoidMethod(
 						env, 
-						logger, 
+						Logger_object, 
 						java_util_logging_Logger->fine, 
 						message);
 					break;
+
 				case LOG_LEVEL_INFO:
 					(*env)->CallVoidMethod(
 						env, 
-						logger, 
+						Logger_object, 
 						java_util_logging_Logger->info, 
 						message);
 					break;
@@ -59,7 +66,7 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
 				case LOG_LEVEL_WARN:
 					(*env)->CallVoidMethod(
 						env, 
-						logger, 
+						Logger_object, 
 						java_util_logging_Logger->warning, 
 						message);
 					break;
@@ -67,12 +74,16 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
 				case LOG_LEVEL_ERROR:
 					(*env)->CallVoidMethod(
 						env, 
-						logger, 
+						Logger_object, 
 						java_util_logging_Logger->severe, 
 						message);
 					break;
 			}
-
+			
+			(*env)->DeleteLocalRef(env, name);
+			(*env)->DeleteLocalRef(env, message);
+			(*env)->DeleteLocalRef(env, Logger_object);
+			
 			status = true;
 		}
 	}

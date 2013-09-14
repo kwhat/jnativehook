@@ -34,10 +34,10 @@ static bool running = false;
 // please do so on another thread with your own event dispatcher implementation.
 void dispatch_proc(VirtualEvent * const event) {
 	#if defined(_WIN32) && !defined(_WIN64)
-	fprintf(stdout,	"id=%d,when=%I64u,mask=0x%X",
+	fprintf(stdout,	"id=%i,when=%I64u,mask=0x%X",
 					event->type, event->time, event->mask);
 	#else
-	fprintf(stdout,	"id=%d,when=%llu,mask=0x%X",
+	fprintf(stdout,	"id=%i,when=%llu,mask=0x%X",
 					event->type, event->time, event->mask);
 	#endif
 
@@ -64,13 +64,13 @@ void dispatch_proc(VirtualEvent * const event) {
 		case EVENT_MOUSE_CLICKED:
 		case EVENT_MOUSE_MOVED:
 		case EVENT_MOUSE_DRAGGED:
-			fprintf(stdout, ",x=%d,y=%d,button=%d,clicks=%d",
+			fprintf(stdout, ",x=%i,y=%i,button=%i,clicks=%i",
 							event->data.mouse.x, event->data.mouse.y,
 							event->data.mouse.button, event->data.mouse.clicks);
 			break;
 
 		case EVENT_MOUSE_WHEEL:
-			fprintf(stdout, ",type=%d,amount=%d,rotation=%d",
+			fprintf(stdout, ",type=%i,amount=%i,rotation=%i",
 							event->data.wheel.type, event->data.wheel.amount,
 							event->data.wheel.rotation);
 			break;

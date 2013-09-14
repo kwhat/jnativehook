@@ -29,10 +29,10 @@
 #endif
 
 #ifdef USE_QUIET
-#define COPYWRITE() (void) 0;
+#define COPYRIGHT() (void) 0;
 #else
 #include <stdio.h>
-#define COPYWRITE()	fprintf(stdout, \
+#define COPYRIGHT()	fprintf(stdout, \
 		"JNativeHook: Global keyboard and mouse hooking for Java.\n" \
 		"Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.\n" \
 		"http://code.google.com/p/jnativehook/\n" \

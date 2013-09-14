@@ -63,8 +63,7 @@ static DWORD WINAPI hook_thread_proc(LPVOID lpParameter) {
 		}
 	}
 	else {
-		// TODO Print the error message.
-		logger(LOG_LEVEL_ERROR,	"%s [%u]: SetWindowsHookEx() failed! (%#X)\n", 
+		logger(LOG_LEVEL_ERROR,	"%s [%u]: SetWindowsHookEx() failed! (%#lX)\n", 
 				__FUNCTION__, __LINE__, (unsigned long) GetLastError());
 
 		status = NATIVEHOOK_ERROR_SET_WINDOWS_HOOK_EX;
@@ -104,29 +103,18 @@ NATIVEHOOK_API int hook_enable() {
 		if (hook_thread_handle != INVALID_HANDLE_VALUE) {
 			logger(LOG_LEVEL_DEBUG,	"%s [%u]: Start successful\n", 
 							__FUNCTION__, __LINE__);
-
-			// Set the status class to real time.
-			BOOL status_class = 
-					SetPriorityClass(hook_thread_handle, REALTIME_PRIORITY_CLASS);
-			if (!status_class) {
-				logger(LOG_LEVEL_WARN,	
-						"%s [%u]: Could not set thread class %ld for thread %#lX!\n", 
-						__FUNCTION__, __LINE__, 
-						(long) REALTIME_PRIORITY_CLASS, 
-						(long) hook_thread_handle);
-			}
 			
 			// Attempt to set the thread priority to time critical.
 			// TODO This maybe a little overkill, re-evaluate.
 			BOOL status_priority = 
 					SetThreadPriority(hook_thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
-			
 			if (!status_priority) {
 				logger(LOG_LEVEL_WARN,	
-						"%s [%u]: Could not set thread priority %ld for thread %#lX!\n", 
+						"%s [%u]: Could not set thread priority %li for thread %#p! (%#lX)\n", 
 						__FUNCTION__, __LINE__, 
 						(long) THREAD_PRIORITY_TIME_CRITICAL, 
-						(long) hook_thread_handle);
+						hook_thread_handle,
+						(unsigned long) GetLastError());
 			}
 			
 			// Wait for any possible thread exceptions to get thrown into
@@ -151,7 +139,7 @@ NATIVEHOOK_API int hook_enable() {
 				GetExitCodeThread(hook_thread_handle, &thread_status);
 				status = (int) thread_status;
 
-				logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread Result: (%i)!\n", 
+				logger(LOG_LEVEL_ERROR,	"%s [%u]: Thread Result: %i!\n", 
 						__FUNCTION__, __LINE__, status);
 			}
 		}
@@ -184,7 +172,7 @@ NATIVEHOOK_API int hook_disable() {
 		CloseHandle(hook_control_handle);
 		hook_control_handle = NULL;
 
-		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Thread Result (%i).\n", 
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Thread Result: %i.\n", 
 				__FUNCTION__, __LINE__, status);
 	}
 
@@ -201,7 +189,7 @@ NATIVEHOOK_API bool hook_is_enabled() {
 		is_running = true;
 	}
 
-	logger(LOG_LEVEL_DEBUG,	"%s [%u]: State (%i).\n", 
+	logger(LOG_LEVEL_DEBUG,	"%s [%u]: State: %i.\n", 
 			__FUNCTION__, __LINE__, is_running);
 
 	return is_running;

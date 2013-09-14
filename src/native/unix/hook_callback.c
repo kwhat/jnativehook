@@ -222,7 +222,7 @@ void hook_event_proc(XPointer pointer, XRecordInterceptData *hook) {
 					event.data.wheel.amount = scroll_amount;
 					event.data.wheel.rotation = wheel_rotation;
 
-					logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %d units. (%u)\n", 
+					logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %i units. (%u)\n", 
 							__FUNCTION__, __LINE__, event.data.wheel.amount * event.data.wheel.rotation, event.data.wheel.type);
 					dispatch_event(&event);
 				}

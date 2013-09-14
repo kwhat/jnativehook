@@ -3,8 +3,8 @@
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -20,6 +20,7 @@
 #include <nativehook.h>
 
 #include "jni_Errors.h"
+#include "jni_EventDispathcer.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 #include "jni_Properties.h"
@@ -27,8 +28,6 @@
 // JNI Related global references.
 JavaVM *jvm;
 jint jni_version = JNI_VERSION_1_4;
-
-extern void jni_EventDispatcher(virtual_event *const event);
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -39,14 +38,17 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		#ifdef DEBUG
-		fprintf(stdout, "JNI_OnLoad(): GetEnv() successful.\n");
+		fprintf(stdout, "%s [%u]: GetEnv() successful.\n", 
+				__FUNCTION__, __LINE__);
 		#endif
 
 		// Create all the global class references onload to prevent class loader
 		// issues with JNLP and some IDE's.
+		// FIXME Change to take jvm, not env!
 		if (jni_CreateGlobals(env) != JNI_OK) {
 			#ifdef DEBUG
-			fprintf(stderr, "JNI_OnLoad(): CreateJNIGlobals() failed!\n");
+			fprintf(stderr, "%s [%u]: CreateJNIGlobals() failed!\n", 
+					__FUNCTION__, __LINE__);
 			#endif
 
 			ThrowFatalError("Failed to locate one or more required classes.");
@@ -63,14 +65,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	}
 	else {
 		#ifdef DEBUG
-		fprintf(stderr, "JNI_OnLoad(): GetEnv() failed!\n");
+		fprintf(stderr, "%s [%u]: GetEnv() failed!\n", 
+				__FUNCTION__, __LINE__);
 		#endif
 
 		ThrowFatalError("Failed to aquire JNI interface pointer");
 	}
 
 	#ifdef DEBUG
-	fprintf(stdout, "JNI_Load(): JNI Loaded.\n");
+	fprintf(stdout, "%s [%u]: JNI Loaded.\n", 
+			__FUNCTION__, __LINE__);
 	#endif
 
     return jni_version;
@@ -83,13 +87,15 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Clear java properties from native sources.
+		// FIXME Change to take jvm, not env!
 		jni_ClearProperties(env);
 	}
 	#ifdef DEBUG
 	else {
 		// It is not critical that these values are cleared so no exception
 		// will be thrown.
-		fprintf(stderr, "JNI_OnUnload(): GetEnv() failed!\n");
+		fprintf(stdout, "%s [%u]: GetEnv() failed!\n", 
+				__FUNCTION__, __LINE__);
 	}
 	#endif
 

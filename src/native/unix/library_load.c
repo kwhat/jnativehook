@@ -34,8 +34,8 @@ XtAppContext xt_context;
 Display *xt_disp;
 #endif
 
-#include "logger.h"
 #include "library_load.h"
+#include "logger.h"
 
 Display *disp;
 
@@ -44,8 +44,8 @@ void __attribute__ ((constructor)) on_library_load(void);
 void __attribute__ ((destructor)) on_library_unload(void);
 
 void on_library_load() {
-	// Display the copywrite on library load.
-	COPYWRITE();
+	// Display the copyright on library load.
+	COPYRIGHT();
 	
 	// Tell X Threads are OK.
 	XInitThreads();

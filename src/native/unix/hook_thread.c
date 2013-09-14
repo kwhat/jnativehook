@@ -195,7 +195,7 @@ NATIVEHOOK_API int hook_enable() {
 			// Check to make sure XRecord is installed and enabled.
 			int major, minor;
 			if (XRecordQueryVersion(disp_ctrl, &major, &minor) != 0) {
-				logger(LOG_LEVEL_INFO,	"%s [%u]: XRecord version: %d.%d.\n", 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: XRecord version: %i.%i.\n", 
 						__FUNCTION__, __LINE__, major, minor);
 
 				// Create the thread attribute.

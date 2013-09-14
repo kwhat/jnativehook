@@ -24,6 +24,7 @@
 #include <windows.h>
 
 #include "library_load.h"
+#include "logger.h"
 #include "win_unicode_helper.h"
 
 // Global Variables.
@@ -32,6 +33,7 @@ HINSTANCE hInst = NULL;
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 	switch (fdwReason) {
 		case DLL_PROCESS_ATTACH:
+			//hInst = hinstDLL;
 			on_library_load();
 			break;
 		case DLL_PROCESS_DETACH:
@@ -43,9 +45,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved) {
 }
 
 void on_library_load() {
-	//hInst = (HINSTANCE) _hInst;
 	hInst = GetModuleHandle(NULL);
 
+	// Display the copyright on library load.
+	COPYRIGHT();
+	
 	load_unicode_helper();
 }
 

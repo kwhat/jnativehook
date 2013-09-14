@@ -51,6 +51,7 @@
 #include <nativehook.h>
 #include <windows.h>
 
+#include "logger.h"
 #include "win_unicode_helper.h"
 
 // Structure and pointers for the keyboard locale cache.
@@ -120,7 +121,7 @@ static int refresh_locale_list() {
 	// Get the number of layouts the user has activated.
 	int hkl_size = GetKeyboardLayoutList(0, NULL);
 	if (hkl_size > 0) {
-		logger(LOG_LEVEL_INFO,	"%s [%u]: GetKeyboardLayoutList(0, NULL) found %d layouts.\n", 
+		logger(LOG_LEVEL_INFO,	"%s [%u]: GetKeyboardLayoutList(0, NULL) found %i layouts.\n", 
 				__FUNCTION__, __LINE__, hkl_size);
 
 		// Get the thread id that currently has focus for our default.
@@ -133,11 +134,11 @@ static int refresh_locale_list() {
 		if (new_size > 0) {
 			if (new_size != hkl_size) {
 				logger(LOG_LEVEL_ERROR,	"%s [%u]: Locale size mismatch!  "
-						"Expected %d, received %d!\n", 
+						"Expected %i, received %i!\n", 
 						__FUNCTION__, __LINE__, hkl_size, new_size);
 			}
 			else {
-				logger(LOG_LEVEL_INFO,	"%s [%u]: Received %d locales.\n", 
+				logger(LOG_LEVEL_INFO,	"%s [%u]: Received %i locales.\n", 
 						__FUNCTION__, __LINE__, new_size);
 			}
 
@@ -159,8 +160,8 @@ static int refresh_locale_list() {
 
 
 				if (is_loaded) {
-					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Found loacle ID %#X in the cache.\n", 
-							__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
+					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Found loacle ID %#p in the cache.\n", 
+							__FUNCTION__, __LINE__, locale_item->id);
 
 					// Set the previous local to the current locale.
 					locale_previous = locale_item;
@@ -173,8 +174,8 @@ static int refresh_locale_list() {
 					count++;
 				}
 				else {
-					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Removing loacle ID %#X from the cache.\n", 
-							__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
+					logger(LOG_LEVEL_DEBUG,	"%s [%u]: Removing loacle ID %#p from the cache.\n", 
+							__FUNCTION__, __LINE__, locale_item->id);
 					
 					// If the old id is not in the new list, remove it.
 					locale_previous->next = locale_item->next;
@@ -214,9 +215,8 @@ static int refresh_locale_list() {
 							char kbdLayoutFilePath[MAX_PATH];
 							snprintf(kbdLayoutFilePath, MAX_PATH, "%s\\%s", systemDirectory, layoutFile);
 
-							logger(LOG_LEVEL_DEBUG,	"%s [%u]: Loading layout for %#X: %s.\n", 
-									__FUNCTION__, __LINE__, 
-									(unsigned int) hkl_list[i], layoutFile);
+							logger(LOG_LEVEL_DEBUG,	"%s [%u]: Loading layout for %#p: %s.\n", 
+									__FUNCTION__, __LINE__, hkl_list[i], layoutFile);
 
 							// Create the new locale item.
 							locale_item = malloc(sizeof(KeyboardLocale));
@@ -282,9 +282,8 @@ static int refresh_locale_list() {
 					}
 					else {
 						logger(LOG_LEVEL_ERROR,	
-								"%s [%u]: Could not find keyboard map for locale %#X!\n", 
-								__FUNCTION__, __LINE__, 
-								(unsigned int) hkl_list[i]);
+								"%s [%u]: Could not find keyboard map for locale %#p!\n", 
+								__FUNCTION__, __LINE__, hkl_list[i]);
 					}
 				} // End NULL Check.
 			} // for (...)
@@ -317,7 +316,7 @@ int load_unicode_helper() {
 	count = refresh_locale_list();
 
 	logger(LOG_LEVEL_INFO,	
-			"%s [%u]: refresh_locale_lis() found %d locale(s).\n", 
+			"%s [%u]: refresh_locale_lis() found %i locale(s).\n", 
 			__FUNCTION__, __LINE__, count);
 
 	return count;
@@ -358,8 +357,8 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 			// Search the linked list.
 			if (locale_item->id == locale_id) {
 				logger(LOG_LEVEL_INFO,	
-					"%s [%u]: Activating keyboard layout %#X.\n", 
-					__FUNCTION__, __LINE__, (unsigned int) locale_item->id);
+					"%s [%u]: Activating keyboard layout %#p.\n", 
+					__FUNCTION__, __LINE__, locale_item->id);
 
 				// If they layout changes the dead key state needs to be reset.
 				// This is consistent with the way Windows handles locale changes.
@@ -386,11 +385,11 @@ int convert_vk_to_wchar(int virtualKey, PWCHAR outputChar, PWCHAR deadChar) {
 	int charCount = 0;
 	*outputChar = 0;
 
-	// Check and make sure the unicode helper was loaded.
+	// Check and make sure the Unicode helper was loaded.
 	if (locale_current != NULL) {
 		logger(LOG_LEVEL_INFO,	
-				"%s [%u]: Using keyboard layout %#X.\n", 
-				__FUNCTION__, __LINE__, (unsigned int) locale_current->id);
+				"%s [%u]: Using keyboard layout %#p.\n", 
+				__FUNCTION__, __LINE__, locale_current->id);
 
 		short state = 0;
 		int shift = -1;

@@ -24,8 +24,9 @@
 #include <time.h>
 #include <windows.h>
 
-#include "input_converter.h"
 #include "hook_callback.h"
+#include "input_converter.h"
+#include "logger.h"
 #include "win_unicode_helper.h"
 
 // Modifiers for tracking key masks.
@@ -300,7 +301,7 @@ LRESULT CALLBACK keyboard_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 		hook_result = CallNextHookEx(keyboard_event_hhook, nCode, wParam, lParam);
 	}
 	else {
-		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Consuming the current event. (%ld)\n", 
+		logger(LOG_LEVEL_DEBUG,	"%s [%u]: Consuming the current event. (%li)\n", 
 				__FUNCTION__, __LINE__, (long) hook_result);
 	}
 
@@ -494,7 +495,7 @@ LRESULT CALLBACK mouse_event_proc(int nCode, WPARAM wParam, LPARAM lParam) {
 			 * click is defined as WHEEL_DELTA, which is 120. */
 			event.data.wheel.rotation = ((signed short) HIWORD(mshook->mouseData) / WHEEL_DELTA) * -1;
 
-			logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %d units. (%u)\n", 
+			logger(LOG_LEVEL_INFO,	"%s [%u]: Mouse wheel rotated %i units. (%u)\n", 
 					__FUNCTION__, __LINE__, event.data.wheel.amount * event.data.wheel.rotation, event.data.wheel.type);
 			dispatch_event(&event);
 			break;
