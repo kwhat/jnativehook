@@ -30,6 +30,7 @@ import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
 import org.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
 import org.jnativehook.mouse.listeners.NativeMouseWheelListenerImpl;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,19 +42,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class GlobalScreenTest {
-	@BeforeClass
-	public static void setUpClass() {
-		GlobalScreen.loadNativeLibrary();
-
-		// TODO review the generated test code and remove the default call to fail.
-		//fail("The test case is a prototype.");
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws NativeHookException {
-		GlobalScreen.unloadNativeLibrary();
-	}
-
     @Test
     public void testProperties() {
 		System.out.println("properties");

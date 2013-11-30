@@ -17,7 +17,7 @@
  */
 
 #include <jni.h>
-#include <nativehook.h>
+#include <uiohook.h>
 
 #include "jni_Converter.h"
 #include "org_jnativehook_NativeInputEvent.h"

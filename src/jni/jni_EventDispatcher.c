@@ -18,7 +18,7 @@
 
 #include <jni.h>
 #include <stdbool.h>
-#include <nativehook.h>
+#include <uiohook.h>
 
 #include "jni_Converter.h"
 #include "jni_Globals.h"
@@ -187,10 +187,10 @@ void jni_EventDispatcher(virtual_event * const event) {
 						NativeInputEvent_object);
 
 				// Set the propagate flag from java.
-				event->propagate = (bool) (*env)->GetBooleanField(
+				event->reserved = (unsigned short) (*env)->GetShortField(
 						env, 
 						NativeInputEvent_object, 
-						org_jnativehook_NativeInputEvent->propagate);
+						org_jnativehook_NativeInputEvent->reserved);
 				
 				(*env)->DeleteLocalRef(env, NativeInputEvent_object);
 			}

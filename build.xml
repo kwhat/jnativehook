@@ -20,17 +20,14 @@
 -->
 
 <project name="JNativeHook" default="all" basedir=".">
-	<property environment="env" />
-
 	<!-- Project Settings -->
 	<property file="build.num" />
-	<property name="build.compiler" value="modern" />
-	<property name="ant.build.javac.source" value="1.5" />
-	<property name="ant.build.javac.target" value="1.5" />
 
-	<property name="project.name"		value="${ant.project.name}" />
-	<property name="project.vendor" 	value="Alexander Barker (alex@1stleg.com)" />
-	<property name="project.version"	value="${build.major}.${build.minor}.${build.revision}" />
+	<property name="ant.project.vendor" 	value="Alexander Barker (alex@1stleg.com)" />
+	<property name="ant.project.version"	value="${build.major}.${build.minor}.${build.revision}" />
+
+
+    <property environment="env" />
 
 	<!-- Path Settings -->
 	<property name="dir.src"	value="${basedir}${file.separator}src" />
@@ -71,11 +68,10 @@
 			<fileset dir="${dir.jar}" />
 			<fileset dir="${dir.lib}" />
 
-			<fileset dir="${dir.src}/native/autom4te.cache" />
-			<fileset dir="${dir.src}/native/config" />
-			<fileset dir="${dir.src}/native/m4" excludes="ax_pthread.m4" />
-
-			<fileset dir="${dir.src}/native" includes="Makefile.in,aclocal.m4,configure" />
+            <!-- Brilliant!
+            <fileset dir="${dir.src}/jnitasks" />
+            <fileset dir="${dir.src}/libuiohook" />
+            -->
 
 			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen.h" />
 		</delete>
@@ -83,16 +79,39 @@
 
 
 	<target name="init" description="Initialize local build environment.">
-		<echo>Initializing local build enviroment...</echo>
+        <!-- property name="build.compiler" value="modern" />
+        <property name="ant.build.javac.source" value="1.5" />
+        <property name="ant.build.javac.target" value="1.5" /-->
 
-		<!-- Determine if the native source should be downloaded. -->
-		<available file="${dir.src}/native/configure" property="project.check.downloaded" />
 
-		<!-- Determine if the project has been configured. -->
+        <echo>Initializing local build environment...</echo>
+
+        <mkdir dir="${dir.bin}" />
+
+        <fail message="Could not determine ${ant.project.name} version.  Please check the build.num file.">
+            <condition>
+                <not>
+                    <and>
+                        <isset property="build.major" />
+                        <isset property="build.minor" />
+                        <isset property="build.revision" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+        <echo level="info">${ant.project.name} version ${ant.project.version}</echo>
+
+        <!-- Determine if jnitasks source should be downloaded. -->
+        <available file="${dir.src}/jnitasks" property="project.check.jnitasks" />
+
+        <!-- Determine if libuiohook source should be downloaded. -->
+		<available file="${dir.src}/libuiohook" property="project.check.libuiohook" />
+
+    	<!-- Determine if the project has been configured. -->
 		<available file="build.properties" property="project.check.configured" />
 		<property file="build.properties" />
 
-		<!-- Determin the operating system -->
+		<!-- Determine the operating system -->
 		<condition property="native.os" value="freebsd">
 			<os family="unix" name="FreeBSD" />
 		</condition>
@@ -157,91 +176,76 @@
 		-->
 
 
-		<!-- Figure out the source family we are building -->
-		<condition property="native.os.isApple" value="true">
-			<equals arg1="${native.os}" arg2="osx" casesensitive="false" trim="true" />
+
+		<!-- Set system specific library name
+		<condition property="native.executable" value="lib${ant.project.name}.dylib">
+			<istrue value="${native.os.isApple}" />
 		</condition>
-		<!-- TODO Testing Needed.
-		<condition property="native.os.isSolaris" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
-			</or>
+		<condition property="native.executable" value="lib${ant.project.name}.so">
+			<istrue value="${native.os.isUnix}" />
+		</condition>
+		<condition property="native.executable" value="${ant.project.name}.dll">
+			<istrue value="${native.os.isWindows}" />
 		</condition>
 		-->
-		<condition property="native.os.isUnix" value="true">
-			<or>
-				<equals arg1="${native.os}" arg2="freebsd" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="openbsd" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="solaris" casesensitive="false" trim="true" />
-				<equals arg1="${native.os}" arg2="linux" casesensitive="false" trim="true" />
-			</or>
-		</condition>
-		<condition property="native.os.isWindows" value="true">
-			<equals arg1="${native.os}" arg2="windows" casesensitive="false" trim="true" />
-		</condition>
-
-		<!-- set system specific src/lib directory -->
-		<condition property="dir.src.platform" value="osx">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="dir.src.platform" value="unix">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="dir.src.platform" value="windows">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-
-		<!-- Set system specific library name -->
-		<condition property="native.executable" value="lib${project.name}.dylib">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.executable" value="lib${project.name}.so">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.executable" value="${project.name}.dll">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
 	</target>
 
 
-	<target name="download-native" depends="init" unless="project.check.downloaded" description="Download and initialize the native library.">
-		<!-- FIXME Should be downloaded form hosting site -->
-		<!--
-		<echo>Downloading libNativeHook srouce...</echo>
-		<mkdir dir="${dir.src}/native" />
-		<get src="http://code.google.com/p/libnativehook" dest="${dir.src}/native" verbose="true" />
-		-->
+    <target name="download-jnitasks" depends="init" unless="project.check.jnitasks" description="Download and initialize the native library.">
+        <echo>Downloading JNITasks source...</echo>
 
-		<echo>Bootstrapping autoconf build process...</echo>
-		<exec executable="autoreconf" dir="${dir.src}/native" failonerror="true" osfamily="unix">
-			<arg value="--install" />
-			<arg value="--verbose" />
-			<arg value="--force" />
-		</exec>
+        <mkdir dir="${dir.src}/jnitasks" />
+        <get src="https://github.com/kwhat/jnitasks/archive/master.zip" dest="${dir.bin}/jnitasks-master.zip" verbose="true" />
+        <unzip src="${dir.bin}/jnitasks-master.zip" dest="${dir.src}/jnitasks">
+            <mapper type="glob" from="jnitasks-master/*" to="*"/>
+        </unzip>
+    </target>
 
-		<exec executable="sh" dir="${dir.src}/native" failonerror="true" osfamily="windows">
-			<arg value="-c" />
-			<arg value="autoreconf --install --verbose --force" />
-		</exec>
+    <target name="compile-jnitasks" depends="download-jnitasks" description="Download and initialize the native library.">
+        <echo>Compiling JNITasks source...</echo>
+        <ant antfile="${dir.src}/jnitasks/build.xml" dir="${dir.src}/jnitasks" target="compile">
+            <property name="dir.bin" value="${dir.bin}/jnitasks" />
+            <property name="dir.src" value="${dir.src}/jnitasks/src" />
+        </ant>
+
+        <typedef file="${dir.src}/jnitasks/src/org/jnitasks/antlib.xml" classpath="${dir.bin}/jnitasks" />
+    </target>
+
+
+	<target name="download-libuiohook" depends="init" unless="project.check.libuiohook" description="Download and initialize the native library.">
+        <echo>Downloading libUIOHook source...</echo>
+        <mkdir dir="${dir.src}/libuiohook" />
+        <get src="https://github.com/kwhat/libuiohook/archive/master.zip" dest="${dir.bin}/libuiohook-master.zip" verbose="true" />
+        <unzip src="${dir.bin}/libuiohook-master.zip" dest="${dir.src}/libuiohook">
+            <mapper type="glob" from="libuiohook-master/*" to="*"/>
+        </unzip>
 	</target>
 
+    <target name="configure-libuiohook" depends="compile-jnitasks,download-libuiohook" description="Download and initialize the native library.">
+        <echo>Bootstrapping libUIOHook...</echo>
+        <mkdir dir="${dir.bin}/libuiohook" />
 
-	<target name="configure" depends="download-native" unless="project.check.configured" description="Automatically generates a properties file for your environment.">
+        <autoreconf dir="${dir.src}/libuiohook" force="true" install="true">
+            <include path="/opt/local/share/aclocal" os="darwin" />
+        </autoreconf>
+
+        <echo>Configuring libUIOHook source...</echo>
+        <configure dir="${dir.bin}/libuiohook" path="${dir.src}/libuiohook" prefix="${dir.bin}">
+            <enable>debug</enable>
+            <enable>static</enable>
+            <with>pic</with>
+        </configure>
+    </target>
+
+    <target name="compile-libuiohook" depends="configure-libuiohook" description="Download and initialize the native library.">
+        <echo>Compiling libUIOHook source...</echo>
+
+        <make dir="${dir.bin}/libuiohook" jobs="auto" target="install" />
+    </target>
+
+
+	<target name="configure" depends="" unless="project.check.configured" description="Automatically generates a properties file for your environment.">
 		<echo>Checking environment sanity...</echo>
-
-		<fail message="Could not determine ${project.name} version.  Please check the build.num file.">
-			<condition>
-				<not>
-					<and>
-						<isset property="build.major" />
-						<isset property="build.minor" />
-						<isset property="build.revision" />
-					</and>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">${project.name} version ${project.version}</echo>
-
 
 		<!-- Set the project flags to their default values -->
 		<property name="project.debug" value="false" />
@@ -261,52 +265,6 @@
 		</condition>
 		<echo level="info">Build stripped: ${project.strip}</echo>
 
-
-		<fail message="The ${os.name} ${os.version} operating system is not currently supported.">
-			<condition>
-				<not>
-					<or>
-						<istrue value="${native.os.isApple}" />
-						<istrue value="${native.os.isUnix}" />
-						<istrue value="${native.os.isWindows}" />
-					</or>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Operating system: ${os.name} ${os.version} (${dir.src.platform} compatible)</echo>
-
-
-		<!-- Try to locate the include folder for java headers -->
-		<condition property="java.include" value="${java.home}${file.separator}include">
-			<available file="${java.home}${file.separator}include" type="dir" />
-		</condition>
-		<condition property="java.include" value="${env.JAVA_HOME}${file.separator}include">
-			<available file="${env.JAVA_HOME}${file.separator}include" type="dir" />
-		</condition>
-		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}include">
-			<available file="${java.home}${file.separator}..${file.separator}include" type="dir" />
-		</condition>
-		<condition property="java.include" value="${java.home}${file.separator}..${file.separator}Headers">
-			<available file="${java.home}${file.separator}..${file.separator}Headers" type="dir" />
-		</condition>
-		<condition property="java.include" value="/System/Library/Frameworks/JavaVM.framework/Headers">
-			<available file="/System/Library/Frameworks/JavaVM.framework/Headers" type="dir" />
-		</condition>
-		<condition property="java.include" value="${java.home}${file.separator}Headers">
-			<available file="${java.home}${file.separator}Headers" type="dir" />
-		</condition>
-
-		<fail message="Could not determine java.include location.  Please set your JAVA_HOME environment variable or manually set java.include to the location of your java header files in the build.properties file.">
-			<condition>
-				<not>
-					<or>
-						<isset property="java.include" />
-						<available file="${java.include}" type="dir" />
-					</or>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Found Java include location: ${java.include}</echo>
 
 
 		<!-- Try to locate the rt.jar location for java.bootclasspath -->
@@ -351,56 +309,6 @@
 		<echo level="info">Found environment path: ${native.path}</echo>
 
 
-		<!-- Try to locate a compiler -->
-		<condition property="native.cc" value="${env.CC}">
-			<available filepath="${native.path}" file="${env.CC}" type="file" />
-		</condition>
-		<condition property="native.cc" value="gcc">
-			<available filepath="${native.path}" file="gcc" type="file" />
-		</condition>
-		<condition property="native.cc" value="gcc.exe">
-			<available filepath="${native.path}" file="gcc.exe" type="file" />
-		</condition>
-
-		<fail message="Could not locate a suitable compiler.  Please make sure your compiler is in your PATH or manually specify your native.cc value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.cc" />
-						<or>
-							<available filepath="${native.path}" file="${native.cc}" />
-							<available file="${native.cc}" />
-						</or>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Native compiler: ${native.cc}</echo>
-
-
-		<!-- Try to locate the linker -->
-		<condition property="native.ld" value="${env.LD}">
-			<available filepath="${native.path}" file="${env.LD}" type="file" />
-		</condition>
-		<property name="native.ld" value="${native.cc}" />
-		<!-- Using gcc for linking does a much better job at passing all the correct libraries to the linker -->
-
-		<fail message="Could not locate a suitable linker.  Please make sure your linker is in your PATH or manually specify your native.ld value.">
-			<condition>
-				<not>
-					<and>
-						<isset property="native.ld" />
-						<or>
-							<available filepath="${native.path}" file="${native.ld}" />
-							<available file="${native.ld}" />
-						</or>
-					</and>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Native linker: ${native.ld}</echo>
-
-
 		<!-- Set the java compiler -->
 		<property name="java.cc" value="modern" />
 		<echo level="info">Java compiler: ${java.cc}</echo>
@@ -410,111 +318,18 @@
 		<echo level="info">Java compatibility: ${java.target}</echo>
 
 
-		<!-- Set compiler debug flags -->
-		<condition property="native.cc.flags.debug" value="-g -DDEBUG" else="-Werror -Wno-unused-parameter -Wno-unused-variable">
-			<istrue value="${project.debug}" />
-		</condition>
 
-		<!-- Set the compiler flags. -->
-		<condition property="native.cc.flags" value="${env.CFLAGS}" else="-O2 -pipe -DDEBUG">
-			<isset property="${env.CFLAGS}" />
-		</condition>
-
-		<!-- Set system specific includes locations -->
-		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}obj${file.separator}native${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${file.separator}usr${file.separator}lib -I${java.include} -I${java.include}${file.separator}darwin">
-			<!-- -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks -->
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}linux -I${file.separator}usr${file.separator}include -I${file.separator}usr${file.separator}local${file.separator}include">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.cc.includes" value="-I${dir.bin}${file.separator}include -I${dir.src}${file.separator}jni${file.separator}include -I${java.include} -I${java.include}${file.separator}win32">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-
-		<!-- Set the compiler arguments for compiling. -->
-		<!-- TODO Test without  -fno-strict-aliasing -->
-		<condition property="native.cc.args" value="-c ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.cc.args" value="-c ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.cc.args" value="-c ${native.cc.flags} -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-		<property name="native.cc.args2" value="-o" />
-
-
-
-
-		<!-- Set system specific ldflags -->
-		<condition property="native.ld.flags" value="${env.LDFLAGS}">
-			<isset property="${env.LDFLAGS}" />
-		</condition>
-		<condition property="native.ld.flags" value="-Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.ld.flags" value="-Wl,--as-needed,--kill-at">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-
-
-		<!-- Set system specific linker arguments -->
-		<condition property="native.ld.args" value="-dynamiclib ${native.ld.flags}">
-			<istrue value="${native.os.isApple}" />
-		</condition>
-		<condition property="native.ld.args" value="-shared ${native.ld.flags}">
-			<istrue value="${native.os.isUnix}" />
-		</condition>
-		<condition property="native.ld.args" value="-shared ${native.ld.flags}">
-			<istrue value="${native.os.isWindows}" />
-		</condition>
-		<property name="native.ld.args2" value="-o" />
 
 
 		<!-- Create property file for the descovered values -->
 		<propertyfile file="build.properties" comment="auto-generated by ant configure">
 			<entry key="java.cc"				value="${java.cc}" />
 			<entry key="java.target"			value="${java.target}" />
-			<entry key="native.cc"				value="${native.cc}" />
-			<entry key="native.cc.args"			value="${native.cc.args}" />
-			<entry key="native.cc.args2"		value="${native.cc.args2}" />
-			<entry key="native.ld"				value="${native.ld}" />
-			<entry key="native.ld.args"			value="${native.ld.args}" />
-			<entry key="native.ld.args2"		value="${native.ld.args2}" />
 		</propertyfile>
-
-		<echo>Configuring...</echo>
-		<mkdir dir="${dir.bin}/native" />
-
-		<exec executable="${dir.src}/native/configure" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
-			<!-- arg line="CFLAGS='-std=c99'" />
-			<arg line="LDFLAGS='-Wl,- -as-needed,-O1'" /-->
-			<arg value="--enable-debug" />
-			<arg value="--enable-static" />
-			<arg value="--with-pic" />
-			<arg value="--prefix=${dir.bin}" />
-		</exec>
-
-		<!-- property name="rel.src" value="${dir.src}" relative="true" basedir="${dir.bin}/native" /-->
-		<pathconvert property="dir.base.unix" targetos="unix">
-			<path location="${basedir}" />
-			<mapper type="regexp" from="^([a-zA-Z]{1}):(.*)$" to="/cygdrive/\1\2"/>
-			<map from="${basedir}" to="${basedir}" />
-		</pathconvert>
-
-		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
-			<arg value="-c" />
-			<arg value="${dir.base.unix}/src/native/configure --enable-debug --enable-static --prefix=${dir.base.unix}/bin" />
-		</exec>
 	</target>
 
 
-	<target name="compile" depends="configure,compile-java,compile-native,compile-jni" description="Compiles both Java and C source files.">
+	<target name="compile" depends="compile-java,compile-jni" description="Compiles both Java and C source files.">
 	</target>
 
 
@@ -545,21 +360,7 @@
 
 
 
-	<target name="compile-native" depends="configure" description="Compiles C source files.">
-		<echo>Compiling native source...</echo>
-		<exec executable="make" dir="${dir.bin}/native" failonerror="true" osfamily="unix">
-			<!-- arg value="- -jobs=4" /-->
-			<arg value="install" />
-		</exec>
-
-		<exec executable="sh" dir="${dir.bin}/native" failonerror="true" osfamily="windows">
-			<arg value="-c" />
-			<arg value="make install" />
-		</exec>
-	</target>
-
-
-	<target name="compile-jni" depends="configure" description="Compiles JNI source files.">
+	<target name="compile-jni" depends="compile-libuiohook,compile-java" description="Compiles JNI source files.">
 		<echo>Creating JNI Headers...</echo>
 		<javah destdir="${dir.src}/jni/include" verbose="true">
 			<class name="org.jnativehook.GlobalScreen"/>
@@ -570,10 +371,10 @@
 
 		<!-- Call pkg-config to determin what libraries to link against. -->
 		<exec executable="pkg-config" failonerror="true" outputproperty="native.ld.libs" osfamily="unix">
-			<env key="PKG_CONFIG_PATH" value="${dir.bin}/native/pc" />
+			<env key="PKG_CONFIG_PATH" value="${dir.bin}/lib/pc" />
 
 			<arg value="--libs" />
-			<arg value="nativehook" />
+			<arg value="uiohook" />
 		</exec>
 		<!-- FIXME Temporary hack for Windows because automake installs dll's
 		to ${prefix}/bin instead of ${prefix}/lib and the nativehook dll is not
@@ -594,14 +395,48 @@
 		<echo>Applying ${native.cc} on the following files:</echo>
 		<echo>${file.src.txt}</echo>
 
+
+
+        <!-- Set compiler debug flags -->
+        <condition property="native.cc.flags.debug" value="-g -DDEBUG" else="-Werror -Wno-unused-parameter -Wno-unused-variable">
+            <istrue value="${project.debug}" />
+        </condition>
+
+        <!-- Set the compiler flags. -->
+        <condition property="native.cc.flags" value="${env.CFLAGS}" else="-O2 -pipe -DDEBUG">
+            <isset property="${env.CFLAGS}" />
+        </condition>
+
+
+        <!--
+        TODO Test without  -fno-strict-aliasing
+
+        Darwin
+        -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
+        -I${dir.bin}/obj/native/include -I${dir.src}/jni/include -I/usr/lib -I${java.include} -I${java.include}/darwin
+        -c ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}
+        -dynamiclib -Wl,-dead_strip,-dead_strip_dylibs,-install_name,${native.executable}.${build.major}.${build.minor},-compatibility_version,${build.major}.${build.minor},-current_version,${build.major}.${build.minor}.${build.revision}
+
+        Unix
+        -c ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}
+        -I${dir.bin}/include -I${dir.src}/jni/include -I${java.include} -I${java.include}/linux
+        -shared -Wl,- -as-needed
+
+        Windows
+        -I${dir.bin}/include -I${dir.src}/jni/include -I${java.include} -I${java.include}/win32
+        -c ${native.cc.flags} -Wall -Wextra ${native.cc.flags.debug} ${native.cc.includes}
+        -shared -Wl,- -as-needed,- -kill-at
+        -->
+        <property name="java.include" value="/home/kwhat/.gentoo/java-config-2/current-user-vm/include" />
+
 		<!-- Execute the native compiler on the soruce files -->
 		<parallel threadsPerProcessor="4" failonany="true">
-			<apply executable="${native.cc}" failonerror="true" verbose="true" ignoremissing="false">
+			<apply executable="gcc" failonerror="true" verbose="true" ignoremissing="false">
 				<fileset refid="file.src" />
 
-				<arg line="${native.cc.args}" />
+				<arg line="-c ${native.cc.flags} -fPIC -Wall -Wextra ${native.cc.flags.debug} -I${dir.bin}/include -I${dir.src}/jni/include -I${java.include} -I${java.include}/linux" />
 				<srcfile />
-				<arg line="${native.cc.args2}" />
+				<arg line="-o" />
 				<targetfile />
 
 				<mapper type="glob" from="*.c" to="${dir.bin}/obj/jni/*.o" />
@@ -633,15 +468,15 @@
 		<echo>${file.obj.txt}</echo>
 
 		<!-- Execute the native linker on the object files -->
-		<apply executable="${native.ld}" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
+		<apply executable="gcc" failonerror="true" verbose="true" ignoremissing="false" parallel="true">
 			<fileset refid="file.obj" />
 			<fileset refid="file.ar" />
 
-			<arg line="${native.ld.args}" />
+			<arg line="-shared -Wl,--as-needed" />
 			<srcfile />
 			<arg line="${native.ld.libs}" />
-			<arg line="${native.ld.args2}" />
-			<arg file="${dir.lib}/${native.os}/${native.arch}/${native.executable}" />
+			<arg line="-o" />
+			<arg file="${dir.lib}/${native.os}/${native.arch}/lib${ant.project.name}.so" />
 		</apply>
 	</target>
 
@@ -695,17 +530,17 @@
 			<fileset dir="${dir.lib}" includes="**/*" />
 		</copy>
 
-		<echo>Creating ${project.name}.jar...</echo>
+		<echo>Creating ${ant.project.name}.jar...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin}/class/java">
+		<jar jarfile="${dir.jar}/${ant.project.name}.jar" basedir="${dir.bin}/class/java">
 			<include name="org/jnativehook/**" />
 			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
 				<section name="org/jnativehook">
-					<attribute name="Implementation-Title" value="${project.name} Library" />
-					<attribute name="Implementation-Version" value="${project.version}" />
-					<attribute name="Implementation-Vendor" value="${project.vendor}" />
+					<attribute name="Implementation-Title" value="${ant.project.name} Library" />
+					<attribute name="Implementation-Version" value="${ant.project.version}" />
+					<attribute name="Implementation-Vendor" value="${ant.project.vendor}" />
 				</section>
 			</manifest>
 		</jar>
@@ -716,7 +551,7 @@
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch}" />
 			<classpath>
-				<pathelement location="${dir.jar}/${project.name}.jar" />
+				<pathelement location="${dir.jar}/${ant.project.name}.jar" />
 				<pathelement path="${dir.bin}/class/java" />
 				<pathelement path="${java.class.path}" />
 			</classpath>
@@ -728,13 +563,13 @@
 		<echo level="info">Generating API Documenation...</echo>
 		<mkdir dir="${dir.doc}" />
 
-		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
+		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
 			<packageset dir="${dir.src}/java" defaultexcludes="yes">
 				<include name="org/jnativehook/**" />
 				<exclude name="org/jnativehook/example/**" />
 			</packageset>
 
-			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
+			<doctitle><![CDATA[<h1>${ant.project.name} API Documentation</h1>]]></doctitle>
 			<bottom><![CDATA[<i>Copyright &#169; 2006-2013 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<!--
@@ -752,25 +587,25 @@
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
 
-		<zip destfile="${dir.dist}/${project.name}-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.jar}" prefix="${project.name}/jar">
+		<zip destfile="${dir.dist}/${ant.project.name}-${ant.project.version}.zip" duplicate="add" level="9">
+			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
 				<include name="*.jar" />
 			</zipfileset>
 
-			<zipfileset dir="${basedir}" prefix="${project.name}">
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
 				<include name="license*.txt" />
 				<include name="readme.txt" />
 			</zipfileset>
 		</zip>
 
-		<zip destfile="${dir.dist}/${project.name}-doc-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
+		<zip destfile="${dir.dist}/${ant.project.name}-doc-${ant.project.version}.zip" duplicate="add" level="9">
+			<zipfileset dir="${dir.doc}" prefix="${ant.project.name}/doc">
 				<exclude name="**/.*" />
 			</zipfileset>
 		</zip>
 
-		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${basedir}" prefix="${project.name}">
+		<zip destfile="${dir.dist}/${ant.project.name}-src-${ant.project.version}.zip" duplicate="add" level="9">
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
 				<exclude name="**/.*" />
 
 				<include name="*.txt" />
@@ -778,7 +613,7 @@
 				<exclude name="build.properties*" />
 			</zipfileset>
 
-			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
+			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
 				<exclude name="**/.*" />
 
 				<exclude name="native/jni/org_jnativehook_GlobalScreen.h" />

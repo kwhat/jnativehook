@@ -20,7 +20,7 @@
 #define _Included_jni_Converter_h
 
 #include <jni.h>
-#include <nativehook.h>
+#include <uiohook.h>
 
 extern jint jni_ConvertToJavaType(event_type nativeType, jint *javaType);
 

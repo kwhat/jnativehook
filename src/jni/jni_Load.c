@@ -17,7 +17,7 @@
  */
 
 #include <jni.h>
-#include <nativehook.h>
+#include <uiohook.h>
 
 #include "jni_Errors.h"
 #include "jni_EventDispathcer.h"

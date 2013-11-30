@@ -50,11 +50,11 @@ public class NativeInputEvent extends EventObject {
 	/** The modifier keys down during event. */
 	private int modifiers;
 	
-	/** Flag to prevent native event propagation. 
+	/** Flag to prevent native event propagation.
 	 * @since 1.2
 	 */
 	@SuppressWarnings("unused")
-	private boolean propagate;
+	private short reserved;
 
 	/** The left shift key modifier constant. 
 	 * @since 1.2
@@ -141,7 +141,7 @@ public class NativeInputEvent extends EventObject {
 		this.id = id;
 		this.when = when;
 		this.modifiers = modifiers;
-		this.propagate = true;
+		this.reserved = 0x00;
 	}
 
 	/**
@@ -182,20 +182,21 @@ public class NativeInputEvent extends EventObject {
 	}
 
 	/**
-	 * Sets the propagate flags for this event.
+	 * Sets the reserved flags for this event.
 	 * <p>
-	 * Note that this method will only work for Windows and Darwin guests.  
-	 * Support for X11 cannot be provided due to an oversight in the way that 
-	 * XRecord currently operates.  This method will be marked private until a
-	 * cross-platform working solution can be provided.
+	 * Note the use of this method may not be supported by all native platforms.
+	 *
+	 * Event propagation support for X11 cannot be provided due to an oversight
+	 * in the way that XRecord currently operates.  No public method will be
+	 * available until a working cross-platform solution can be provided.
 	 * 
-	 * @param propagate Whether or not the event should continue to propagate.
+	 * @param reserved Non-portable flags for undocumented functionality.
 	 * 
 	 * @since 1.1
 	 */
 	@SuppressWarnings("unused")
-	private void setPropagate(boolean propagate) {
-		this.propagate = propagate;
+	private void setReserved(short reserved) {
+		this.reserved = reserved;
 	}
 	
 	/**

@@ -17,7 +17,7 @@
  */
 
 #include <jni.h>
-#include <nativehook.h>
+#include <uiohook.h>
 #include <stdbool.h>
 #include <stdlib.h>
 

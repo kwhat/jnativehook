@@ -41,7 +41,7 @@ typedef struct _org_jnativehook_GlobalScreen {
 
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
-	jfieldID propagate;
+	jfieldID reserved;
 	jmethodID init;
 	jmethodID getID;
 	jmethodID getModifiers;

@@ -18,6 +18,11 @@
 package org.jnativehook;
 
 // Imports.
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
+import org.jnativehook.mouse.*;
+
+import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,36 +31,34 @@ import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import javax.swing.event.EventListenerList;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
-import org.jnativehook.mouse.NativeMouseEvent;
-import org.jnativehook.mouse.NativeMouseListener;
-import org.jnativehook.mouse.NativeMouseMotionListener;
-import org.jnativehook.mouse.NativeMouseWheelEvent;
-import org.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
  * GlobalScreen is used to represent the native screen area that Java does not
  * usually have access to. This class can be thought of as the source component
  * for native input events.
- * <p />
+ * <p/>
  * This class also handles the loading, unpacking and communication with the
- * native library. That includes registering and unregistering the native hook
+ * native library. That includes registering and un-registering the native hook
  * with the underlying operating system and adding global keyboard and mouse
  * listeners.
  *
- * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version 1.1
  */
 public class GlobalScreen {
-	/** The GlobalScreen singleton. */
+	/**
+	 * The GlobalScreen singleton.
+	 */
 	private static final GlobalScreen instance = new GlobalScreen();
 
-	/** The list of event listeners to notify. */
+	/**
+	 * The list of event listeners to notify.
+	 */
 	private static final EventListenerList eventListeners = new EventListenerList();
 
-	/** The service to dispatch events. */
+	/**
+	 * The service to dispatch events.
+	 */
 	private static ExecutorService eventExecutor;
 
 	/**
@@ -83,7 +86,7 @@ public class GlobalScreen {
 	 * class is garbage collected.
 	 *
 	 * @throws Throwable a <code>NativeHookException</code> raised by calling
-	 * {@link #unloadNativeLibrary()}
+	 *                   {@link #unloadNativeLibrary()}
 	 * @see Object#finalize
 	 */
 	@Override
@@ -196,7 +199,6 @@ public class GlobalScreen {
 	 * thrown and no action is performed.
 	 *
 	 * @param listener a native mouse wheel listener object
-	 *
 	 * @since 1.1
 	 */
 	public void addNativeMouseWheelListener(NativeMouseWheelListener listener) {
@@ -213,7 +215,6 @@ public class GlobalScreen {
 	 * performed.
 	 *
 	 * @param listener a native mouse wheel listener object
-	 *
 	 * @since 1.1
 	 */
 	public void removeNativeMouseWheelListener(NativeMouseWheelListener listener) {
@@ -225,7 +226,7 @@ public class GlobalScreen {
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
 	 * the function has no effect.
-	 * <p />
+	 * <p/>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
 	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
@@ -234,8 +235,7 @@ public class GlobalScreen {
 	 * Unix/Linux/Solaris platforms.
 	 *
 	 * @throws NativeHookException problem registering the native hook with
-	 * the underlying operating system.
-	 *
+	 *                             the underlying operating system.
 	 * @since 1.1
 	 */
 	public static native void registerNativeHook() throws NativeHookException;
@@ -253,7 +253,6 @@ public class GlobalScreen {
 	 *
 	 * @return true if the native hook is currently registered.
 	 * @throws NativeHookException the native hook exception
-	 *
 	 * @since 1.1
 	 */
 	public static native boolean isNativeHookRegistered();
@@ -269,10 +268,10 @@ public class GlobalScreen {
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but maybe used to synthesize
 	 * native events from Java.
-	 * <p />
-	 * <b>Note:</b> This method executes on the native systems event queue.  
-	 * It is imperative that all processing be offloaeded to other threads.  
-	 * Failure to do so may result in the delay of user input and the automatic 
+	 * <p/>
+	 * <b>Note:</b> This method executes on the native systems event queue.
+	 * It is imperative that all processing be off-loaded to other threads.
+	 * Failure to do so may result in the delay of user input and the automatic
 	 * removal of the native hook.
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
@@ -309,7 +308,7 @@ public class GlobalScreen {
 			ex.printStackTrace();
 		}
 		*/
-		
+
 		// The event cannot be modified beyond this point!  This is both a 
 		// Java restriction and a native code restriction.
 		final NativeKeyEvent event = e;
@@ -397,7 +396,6 @@ public class GlobalScreen {
 	 * @see NativeMouseWheelEvent
 	 * @see NativeMouseWheelListener
 	 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
-	 *
 	 * @since 1.1
 	 */
 	private void processMouseWheelEvent(NativeMouseWheelEvent e) {
@@ -416,19 +414,18 @@ public class GlobalScreen {
 	}
 
 	/**
-	 * Set a different executor service for native event delivery.  By default, 
-	 * JNativeHook utilizes a single thread executor to dispatch events from 
-	 * the native event queue.  You may choose to use an alternative approach 
+	 * Set a different executor service for native event delivery.  By default,
+	 * JNativeHook utilizes a single thread executor to dispatch events from
+	 * the native event queue.  You may choose to use an alternative approach
 	 * for event delivery by implementing an <code>ExecutorService</code>.
-	 * <p />
-	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all 
-	 * delivered events to be discard until a valid <code>ExecutorService</code> 
+	 * <p/>
+	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
+	 * delivered events to be discard until a valid <code>ExecutorService</code>
 	 * is set.
-	 * 
+	 *
 	 * @param dispatcher The <code>ExecutorService</code> used to dispatch native events.
 	 * @see java.util.concurrent.ExecutorService
 	 * @see java.util.concurrent.Executors#newSingleThreadExecutor()
-	 * 
 	 * @since 1.2
 	 */
 	public final void setEventDispatcher(ExecutorService dispatcher) {
@@ -454,8 +451,8 @@ public class GlobalScreen {
 		catch (UnsatisfiedLinkError linkError) {
 			// The library is not in the java.library.path so try to extract it.
 			try {
-				String libResourcePath = "/org/jnativehook/lib/" + 
-						NativeSystem.getFamily() + "/" + 
+				String libResourcePath = "/org/jnativehook/lib/" +
+						NativeSystem.getFamily() + "/" +
 						NativeSystem.getArchitecture() + "/";
 
 				// Get what the system "thinks" the library name should be.
@@ -468,7 +465,7 @@ public class GlobalScreen {
 				String libNativePrefix = libNativeName.substring(0, i) + '_';
 				String libNativeSuffix = libNativeName.substring(i);
 
-				// Determin if the user specified temp directory should be used.
+				// Determine if the user specified temp directory should be used.
 				String tmpDir = System.getProperty("jnativehook.tmpdir", null);
 
 				File libDir = null;
@@ -479,20 +476,20 @@ public class GlobalScreen {
 				// Create the temp file for this instance of the library.
 				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix, libDir);
 
-				// Check and see if a copy of the native lib already exists.
-				FileOutputStream libOutputStream = new FileOutputStream(libFile);
-				byte[] buffer = new byte[4 * 1024];
-
 				// This may return null in some circumstances.
 				InputStream libInputStream =
-								GlobalScreen.class.getResourceAsStream(
-									libResourcePath.toLowerCase()
+						GlobalScreen.class.getResourceAsStream(
+								libResourcePath.toLowerCase()
 										+ libNativeName
-								);
+						);
 
 				if (libInputStream == null) {
 					throw new IOException("Unable to locate the native library.");
 				}
+
+				// Check and see if a copy of the native lib already exists.
+				FileOutputStream libOutputStream = new FileOutputStream(libFile);
+				byte[] buffer = new byte[4 * 1024];
 
 				int size;
 				while ((size = libInputStream.read(buffer)) != -1) {
@@ -505,7 +502,7 @@ public class GlobalScreen {
 
 				System.load(libFile.getPath());
 			}
-			catch(IOException e) {
+			catch (IOException e) {
 				// Tried and Failed to manually setup the java.library.path.
 				throw new RuntimeException(e.getMessage(), e);
 			}

@@ -102,16 +102,16 @@ int jni_CreateGlobals(JNIEnv *env) {
 		if (org_jnativehook_NativeInputEvent->cls != NULL) {
 			org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
 			
-			// Get the field ID for NativeInputEvent.propagate.
-			org_jnativehook_NativeInputEvent->propagate = (*env)->GetFieldID(
+			// Get the field ID for NativeInputEvent.reserved.
+			org_jnativehook_NativeInputEvent->reserved = (*env)->GetFieldID(
 					env,
 					org_jnativehook_NativeInputEvent->cls,
-					"propagate",
-					"Z");
+					"reserved",
+					"S");
 
 			#ifdef DEBUG
-			if (org_jnativehook_NativeInputEvent->propagate == NULL) {
-				fprintf(stderr, "%s [%u]: Failed to acquire the field ID for NativeInputEvent.propagate Z!\n", 
+			if (org_jnativehook_NativeInputEvent->reserved == NULL) {
+				fprintf(stderr, "%s [%u]: Failed to acquire the field ID for NativeInputEvent.reserved S!\n",
 						__FUNCTION__, __LINE__);
 			}
 			#endif
