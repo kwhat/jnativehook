@@ -28,28 +28,28 @@ guarantee that any of these properties will be available.
 ...jnativehook.pointerAccelerationThreshold
 
 ## Software and Hardware Requirements
-...Linux
-......i586 or amd64
-.........64 MB of RAM
-.........Java 1.5 - 1.7
-.........x11-libs/libX11 1.0 - 1.5
-.........x11-libs/libXt 1.0 - 1.3
-.........x11-libs/libXtst 1.0 - 1.2
-.........x11-libs/libxcb 1.7 - 1.8
+####Linux
+  * i586 or amd64
+  * 64 MB of RAM
+  * Java 1.5 - 1.7
+  * x11-libs/libX11 1.0 - 1.5
+  * x11-libs/libXt 1.0 - 1.3
+  * x11-libs/libXtst 1.0 - 1.2
+  * x11-libs/libxcb 1.7 - 1.8
 
-...Mac OS X
-.........i586, amd64, powerpc or powerpc64
-.........256 MB of RAM
-.........Java 1.5 - 1.7
-.........Apple Mac OS X 10.5 - 10.9
-.........Access for Assistive Devices Enabled
+####Mac OS X
+  * i586, amd64, powerpc or powerpc64
+  * 256 MB of RAM
+  * Java 1.5 - 1.7
+  * Apple Mac OS X 10.5 - 10.9
+  * Access for Assistive Devices Enabled
 
-...Windows
-......i586 or amd64
-.........32-bit 64 MB of RAM
-.........64-bit 128 MB of RAM
-.........Microsoft Windows 2000 - 8.1
-.........Java 1.5 - 1.7
+####Windows
+  * i586 or amd64
+  * 32-bit 64 MB of RAM
+  * 64-bit 128 MB of RAM
+  * Java 1.5 - 1.7
+  * Microsoft Windows 2000 - 8.1
 
 ## Sample Code
 The graphical example application was created to provided a real-time

@@ -89,6 +89,9 @@
         <property name="ant.build.javac.source" value="1.5" />
         <!-- property name="ant.build.javac.args" value="" /-->
 
+        <property name="ant.build.native.compiler" value="gcc" />
+        <property name="ant.build.native.jobs" value="auto" />
+
         <echo>Initializing local build environment...</echo>
         <mkdir dir="${dir.bin}" />
 
@@ -319,7 +322,7 @@
 
     <target name="compile-libuiohook" depends="configure-libuiohook" description="Compile the native library.">
         <echo>Compiling libUIOHook source...</echo>
-        <make dir="${dir.bin}/libuiohook" jobs="auto" target="install" />
+        <make dir="${dir.bin}/libuiohook" jobs="${ant.build.native.jobs}" target="install" />
     </target>
 
 
@@ -400,7 +403,7 @@
         -->
 
 		<!-- Execute the native compiler on the soruce files -->
-        <cc toolchain="gcc" jobs="auto" objdir="${dir.bin}/obj/jni">
+        <cc toolchain="${ant.build.native.compiler}" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
             <arg value="-Wall -Wextra -Wno-unused-parameter ${env.CFLAGS} -fPIC" />
 
             <include path="${dir.bin}/include" />
@@ -428,8 +431,8 @@
         </condition>
 
 		<ld toolchain="gcc" outfile="${dir.lib}/${build.native.os}/${build.native.arch}/lib${ant.project.name}.so">
-            <arg value="-dynamiclib -Wl,--as-needed ${env.LDFLAGS}" osfamily="mac" />
-            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" osfamily="unix" />
+            <arg value="-dynamiclib -Wl,-flat_namespace,-undefined,dynamic_lookup ${env.LDFLAGS}" osfamily="mac" />
+            <!-- arg value="-shared -Wl,- -as-needed ${env.LDFLAGS}" osfamily="unix" /-->
             <arg value="-shared -Wl,--as-needed,--kill-at ${env.LDFLAGS}" osfamily="windows" />
 
             <fileset dir="${dir.bin}">
