@@ -20,12 +20,12 @@ The following events are available via their respective listeners.
 In addition to global keyboard and mouse events, the following system
 properties are exposed by the native library.  Please note that there is no
 guarantee that any of these properties will be available.
-...jnativehook.autoRepeatRate
-...jnativehook.autoRepeatDelay
-...jnativehook.multiClickInterval
-...jnativehook.pointerSensitivity
-...jnativehook.pointerAccelerationMultiplier
-...jnativehook.pointerAccelerationThreshold
+* jnativehook.autoRepeatRate
+* jnativehook.autoRepeatDelay
+* jnativehook.multiClickInterval
+* jnativehook.pointerSensitivity
+* jnativehook.pointerAccelerationMultiplier
+* jnativehook.pointerAccelerationThreshold
 
 ## Software and Hardware Requirements
 ####Linux
