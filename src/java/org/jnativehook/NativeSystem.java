@@ -41,7 +41,7 @@ public class NativeSystem {
 		OPENBSD,
 
 		/** The Apple OS X operating system family. */
-		OSX,
+		DARWIN,
 
 		/** The Solaris operating system family. */
 		SOLARIS,
@@ -115,7 +115,7 @@ public class NativeSystem {
 			family = Family.OPENBSD;
 		}
 		else if (osName.equalsIgnoreCase("mac os x")) {
-			family = Family.OSX;
+			family = Family.DARWIN;
 		}
 		else if (osName.equalsIgnoreCase("solaris") ||
 				osName.equalsIgnoreCase("sunos")) {

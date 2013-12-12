@@ -430,7 +430,7 @@
             <isset property="${env.LDFLAGS}" />
         </condition>
 
-		<ld toolchain="gcc" outfile="${dir.lib}/${build.native.os}/${build.native.arch}/lib${ant.project.name}.so">
+		<ld toolchain="gcc" outfile="${dir.lib}/${build.native.os}/${build.native.arch}/${build.native.executable}">
             <arg value="-dynamiclib -Wl,-flat_namespace,-undefined,dynamic_lookup ${env.LDFLAGS}" osfamily="mac" />
             <!-- arg value="-shared -Wl,- -as-needed ${env.LDFLAGS}" osfamily="unix" /-->
             <arg value="-shared -Wl,--as-needed,--kill-at ${env.LDFLAGS}" osfamily="windows" />
