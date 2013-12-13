@@ -77,6 +77,24 @@
             <fileset dir="${dir.src}/libuiohook" />
             -->
 
+            <fileset dir="${dir.src}/libuiohook" casesensitive="yes">
+                <include name="autom4te.cache/*" />
+                <include name="config/*" />
+
+                <include name="include/*" />
+                <exclude name="include/uiohook.h"/>
+
+                <include name="m4/*" />
+                <exclude name="m4/ax_pthread.m4"/>
+
+                <include name="pc/*" />
+                <exclude name="pc/uiohook.pc.in" />
+
+                <include name="Makefile.in" />
+                <include name="aclocal.m4" />
+                <include name="configure" />
+            </fileset>
+
 			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen.h" />
 		</delete>
 	</target>
