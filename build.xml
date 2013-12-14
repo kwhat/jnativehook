@@ -30,6 +30,16 @@
     <property name="ant.project.debug" value="true" />
     <property name="ant.build.javac.args" value="" />
 
+    <!-- property name="build.compiler" value="modern" /-->
+    <!-- property name="ant.build.javac.compiler" value="modern" /-->
+
+    <!-- property name="ant.build.javac.target" value="1.5" /-->
+    <property name="ant.build.javac.source" value="1.5" />
+    <!-- property name="ant.build.javac.args" value="" /-->
+
+    <property name="ant.build.native.toolchain" value="gcc" />
+    <property name="ant.build.native.jobs" value="auto" />
+
     <property environment="env" />
 
 	<!-- Path Settings -->
@@ -101,15 +111,6 @@
 
 
 	<target name="init" description="Initialize local build environment.">
-        <!-- property name="build.compiler" value="modern" /-->
-        <!-- property name="ant.build.javac.compiler" value="modern" /-->
-        <!-- property name="ant.build.javac.target" value="1.5" /-->
-        <property name="ant.build.javac.source" value="1.5" />
-        <!-- property name="ant.build.javac.args" value="" /-->
-
-        <property name="ant.build.native.compiler" value="gcc" />
-        <property name="ant.build.native.jobs" value="auto" />
-
         <echo>Initializing local build environment...</echo>
         <mkdir dir="${dir.bin}" />
 
@@ -421,7 +422,7 @@
         -->
 
 		<!-- Execute the native compiler on the soruce files -->
-        <cc toolchain="${ant.build.native.compiler}" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
+        <cc toolchain="gcc" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
             <arg value="-Wall -Wextra -Wno-unused-parameter ${env.CFLAGS} -fPIC" />
 
             <include path="${dir.bin}/include" />
@@ -430,6 +431,7 @@
             <include path="${ant.build.javac.include}" />
             <include path="${ant.build.javac.include}/darwin" osfamily="mac" />
             <include path="${ant.build.javac.include}/linux" os="linux" />
+            <include path="${ant.build.javac.include}/solaris" os="solaris" />
             <include path="${ant.build.javac.include}/unix" os="unix" />
             <include path="${ant.build.javac.include}/win32" osfamily="windows" />
 
@@ -449,8 +451,11 @@
         </condition>
 
 		<ld toolchain="gcc" outfile="${dir.lib}/${build.native.os}/${build.native.arch}/${build.native.executable}">
-            <arg value="-dynamiclib -Wl,-flat_namespace,-undefined,dynamic_lookup ${env.LDFLAGS}" osfamily="mac" />
-            <!-- arg value="-shared -Wl,- -as-needed ${env.LDFLAGS}" osfamily="unix" /-->
+            <!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
+            <arg value="-dynamiclib ${env.LDFLAGS}" osfamily="mac" />
+            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="linux" />
+            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="solaris" />
+            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="unix" />
             <arg value="-shared -Wl,--as-needed,--kill-at ${env.LDFLAGS}" osfamily="windows" />
 
             <fileset dir="${dir.bin}">
