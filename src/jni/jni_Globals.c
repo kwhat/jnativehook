@@ -57,7 +57,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 		// Lookup a local reference for the GlobalScreen class and create a global reference.
 		jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
-		if (org_jnativehook_GlobalScreen->cls != NULL) {
+		if (GlobalScreen_class != NULL) {
 			org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
 			
 			// Get the method ID for GlobalScreen.getInstance()
@@ -99,7 +99,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 		// Class and Constructor for the NativeInputEvent Object.
 		jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
-		if (org_jnativehook_NativeInputEvent->cls != NULL) {
+		if (NativeInputEvent_class != NULL) {
 			org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
 			
 			// Get the field ID for NativeInputEvent.reserved.
@@ -141,7 +141,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 			#ifdef DEBUG
 			if (org_jnativehook_NativeInputEvent->getID == NULL) {
-				fprintf(stderr, "%s [%u]: Failed to acquire the method ID for GlobalScreen.getID()I!\n", 
+				fprintf(stderr, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getID()I!\n",
 						__FUNCTION__, __LINE__);
 			}
 			#endif
@@ -156,14 +156,14 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 			#ifdef DEBUG
 			if (org_jnativehook_NativeInputEvent->getModifiers == NULL) {
-				fprintf(stderr, "%s [%u]: Failed to acquire the method ID for GlobalScreen.getModifiers()I!\n", 
+				fprintf(stderr, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getModifiers()I!\n",
 						__FUNCTION__, __LINE__);
 			}
 			#endif
 		}
 		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to locate the NativeInputEvent class!\n", 
+			fprintf(stderr, "%s [%u]: Failed to locate the NativeInputEvent class!\n",
 						__FUNCTION__, __LINE__);
 		}
 		#endif

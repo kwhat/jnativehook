@@ -191,7 +191,6 @@ void jni_EventDispatcher(virtual_event * const event) {
 						env, 
 						NativeInputEvent_object, 
 						org_jnativehook_NativeInputEvent->reserved);
-				
 				(*env)->DeleteLocalRef(env, NativeInputEvent_object);
 			}
 		}
@@ -199,7 +198,7 @@ void jni_EventDispatcher(virtual_event * const event) {
 			// FIXME an exception should be thrown!
 
 			#ifdef DEBUG
-			fprintf(stderr, "jni_EventDispatcher(): Failed to aquire GlobalScreen singleton!\n");
+			fprintf(stderr, "jni_EventDispatcher(): Failed to acquire GlobalScreen singleton!\n");
 			#endif
 		}
 	}

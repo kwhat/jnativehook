@@ -335,6 +335,7 @@
         <configure dir="${dir.bin}/libuiohook" path="${dir.src}/libuiohook" prefix="${dir.bin}">
             <enable>debug</enable>
             <enable>static</enable>
+            <disable>shared</disable>
             <with>pic</with>
         </configure>
     </target>
@@ -423,7 +424,11 @@
 
 		<!-- Execute the native compiler on the soruce files -->
         <cc toolchain="gcc" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
-            <arg value="-Wall -Wextra -Wno-unused-parameter ${env.CFLAGS} -fPIC" />
+            <arg value="-Wall -Wextra -Wno-unused-parameter" />
+            <arg value="-fPIC"  osfamily="unix" />
+            <arg value="${env.CFLAGS}" />
+
+            <define name="DEBUG"/>
 
             <include path="${dir.bin}/include" />
             <include path="${dir.src}/jni/include" />
@@ -452,20 +457,23 @@
 
 		<ld toolchain="gcc" outfile="${dir.lib}/${build.native.os}/${build.native.arch}/${build.native.executable}">
             <!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
-            <arg value="-dynamiclib ${env.LDFLAGS}" osfamily="mac" />
-            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="linux" />
-            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="solaris" />
-            <arg value="-shared -Wl,--as-needed ${env.LDFLAGS}" os="unix" />
-            <arg value="-shared -Wl,--as-needed,--kill-at ${env.LDFLAGS}" osfamily="windows" />
+            <!-- -Wl,- -as-needed -->
+            <arg value="-dynamiclib" osfamily="mac" />
+            <arg value="-shared -Wl,--as-needed" os="linux" />
+            <arg value="-shared" os="solaris" />
+            <arg value="-shared" os="unix" />
+            <arg value="-shared -Wl,--kill-at" osfamily="windows" />
+            <arg value="${env.LDFLAGS}" />
 
             <fileset dir="${dir.bin}">
                 <include name="obj/jni/**/*.o" />
             </fileset>
 
-            <fileset dir="${dir.bin}">
+
+            <!-- fileset dir="${dir.bin}">
                 <include name="lib/*.a" />
                 <include name="lib/*.dll.a" />
-            </fileset>
+            </fileset -->
 
             <!-- Linking order matters and libraries should come after obj files. -->
             <arg value="${build.native.ld.libs}" />
