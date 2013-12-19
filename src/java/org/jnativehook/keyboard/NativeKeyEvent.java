@@ -18,9 +18,10 @@
 package org.jnativehook.keyboard;
 
 //Imports
-import java.awt.Toolkit;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
+
+import java.awt.*;
 
 /**
  * An event which indicates that a keystroke occurred at global scope.
@@ -435,72 +436,148 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 */
 	//FIXME This needs to turn into a method that access a lookup table.
 	public static String getKeyText(int keyCode) {
-		String param = "";
+		StringBuilder text = new StringBuilder();
 		
 		switch (keyCode) {
 			case VC_A:
+				text.append('A');
+				break;
 			case VC_B:
+				text.append('B');
+				break;
 			case VC_C:
+				text.append('C');
+				break;
 			case VC_D:
+				text.append('D');
+				break;
 			case VC_E:
+				text.append('E');
+				break;
 			case VC_F:
+				text.append('F');
+				break;
 			case VC_G:
+				text.append('G');
+				break;
 			case VC_H:
+				text.append('H');
+				break;
 			case VC_I:
+				text.append('I');
+				break;
 			case VC_J:
+				text.append('J');
+				break;
 			case VC_K:
+				text.append('K');
+				break;
 			case VC_L:
+				text.append('L');
+				break;
 			case VC_M:
+				text.append('M');
+				break;
 			case VC_N:
+				text.append('N');
+				break;
 			case VC_O:
+				text.append('O');
+				break;
 			case VC_P:
+				text.append('P');
+				break;
 			case VC_Q:
+				text.append('Q');
+				break;
 			case VC_R:
+				text.append('R');
+				break;
 			case VC_S:
+				text.append('S');
+				break;
 			case VC_T:
+				text.append('T');
+				break;
 			case VC_U:
+				text.append('U');
+				break;
 			case VC_V:
+				text.append('V');
+				break;
 			case VC_W:
+				text.append('W');
+				break;
 			case VC_X:
+				text.append('X');
+				break;
 			case VC_Y:
+				text.append('Y');
+				break;
 			case VC_Z:
-				return String.valueOf((char) keyCode);
+				text.append('Z');
+				break;
 
-			/*
-			case VC_NUMPAD0:
-			case VC_NUMPAD1:
-			case VC_NUMPAD2:
-			case VC_NUMPAD3:
-			case VC_NUMPAD4:
-			case VC_NUMPAD5:
-			case VC_NUMPAD6:
-			case VC_NUMPAD7:
-			case VC_NUMPAD8:
-			case VC_NUMPAD9:
-				param += Toolkit.getProperty("AWT.numpad", "NumPad") + " ";
-				keyCode -= VC_NUMPAD0 - VC_0; //subtraction to bring us back in range.
-				//NOTE This should work as long as the VC_0 to VC_9 and VC_NUMPAD0
-				//to VC_NUMPAD9 are ordered consecutively.
-			*/
+			case VC_KP_0:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_0:
+				text.append(" 0");
+				break;
+			case VC_KP_1:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_1:
+				text.append(" 1");
+				break;
+			case VC_KP_2:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_2:
+				text.append(" 2");
+				break;
+			case VC_KP_3:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_3:
+				text.append(" 3");
+			case VC_KP_4:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_4:
+				text.append(" 4");
+				break;
+			case VC_KP_5:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_5:
+				text.append(" 5");
+				break;
+			case VC_KP_6:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_6:
+				text.append(" 6");
+				break;
+			case VC_KP_7:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_7:
+				text.append(" 7");
+				break;
+			case VC_KP_8:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_8:
+				text.append(" 8");
+				break;
+			case VC_KP_9:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_9:
-				return param + String.valueOf((char) keyCode);
+				text.append(" 9");
+				break;
 
 
 			case VC_ENTER:
-				return Toolkit.getProperty("AWT.enter", "Enter");
+				text.append(Toolkit.getProperty("AWT.enter", "Enter"));
+				break;
 			case VC_BACKSPACE:
-				return Toolkit.getProperty("AWT.backSpace", "Backspace");
+				text.append(Toolkit.getProperty("AWT.backSpace", "Backspace"));
+				break;
 			case VC_TAB:
-				return Toolkit.getProperty("AWT.tab", "Tab");
+				text.append(Toolkit.getProperty("AWT.tab", "Tab"));
+				break;
 
 /*
 			case VC_SHIFT:
@@ -528,38 +605,50 @@ public class NativeKeyEvent extends NativeInputEvent {
 */
 
 			case VC_UP:
-				return Toolkit.getProperty("AWT.up", "Up");
+				text.append(Toolkit.getProperty("AWT.up", "Up"));
+				break;
 			case VC_DOWN:
-				return Toolkit.getProperty("AWT.down", "Down");
+				text.append(Toolkit.getProperty("AWT.down", "Down"));
+				break;
 			case VC_LEFT:
-				return Toolkit.getProperty("AWT.left", "Left");
+				text.append(Toolkit.getProperty("AWT.left", "Left"));
+				break;
 			case VC_RIGHT:
-				return Toolkit.getProperty("AWT.right", "Right");
+				text.append(Toolkit.getProperty("AWT.right", "Right"));
+				break;
 
 
 			case VC_COMMA:
-				return Toolkit.getProperty("AWT.comma", "Comma");
+				text.append(Toolkit.getProperty("AWT.comma", "Comma"));
+				break;
 			case VC_MINUS:
-				return Toolkit.getProperty("AWT.minus", "Minus");
+				text.append(Toolkit.getProperty("AWT.minus", "Minus"));
+				break;
 			case VC_PERIOD:
-				return Toolkit.getProperty("AWT.period", "Period");
+				text.append(Toolkit.getProperty("AWT.period", "Period"));
+				break;
 			case VC_SLASH:
-				return Toolkit.getProperty("AWT.slash", "Slash");
-
+				text.append(Toolkit.getProperty("AWT.slash", "Slash"));
+				break;
 
 			case VC_EQUALS:
-				return Toolkit.getProperty("AWT.equals", "Equals");
+				text.append(Toolkit.getProperty("AWT.equals", "Equals"));
+				break;
 			case VC_SEMICOLON:
-				return Toolkit.getProperty("AWT.semicolon", "Semicolon");
+				text.append(Toolkit.getProperty("AWT.semicolon", "Semicolon"));
+				break;
+
 
 
 			case VC_OPEN_BRACKET:
-				return Toolkit.getProperty("AWT.openBracket", "Open Bracket");
+				text.append(Toolkit.getProperty("AWT.openBracket", "Open Bracket"));
+				break;
 			case VC_BACK_SLASH:
-				return Toolkit.getProperty("AWT.backSlash", "Back Slash");
+				text.append(Toolkit.getProperty("AWT.backSlash", "Back Slash"));
+				break;
 			case VC_CLOSE_BRACKET:
-				return Toolkit.getProperty("AWT.closeBracket", "Close Bracket");
-
+				text.append(Toolkit.getProperty("AWT.closeBracket", "Close Bracket"));
+				break;
 
 
 
@@ -586,78 +675,111 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			/* F1 through F24 function keys. */
 			case VC_F1:
-				return Toolkit.getProperty("AWT.f1", "F1");
+				text.append(Toolkit.getProperty("AWT.f1", "F1"));
+				break;
 			case VC_F2:
-				return Toolkit.getProperty("AWT.f2", "F2");
+				text.append(Toolkit.getProperty("AWT.f2", "F2"));
+				break;
 			case VC_F3:
-				return Toolkit.getProperty("AWT.f3", "F3");
+				text.append(Toolkit.getProperty("AWT.f3", "F3"));
+				break;
 			case VC_F4:
-				return Toolkit.getProperty("AWT.f4", "F4");
+				text.append(Toolkit.getProperty("AWT.f4", "F4"));
+				break;
 			case VC_F5:
-				return Toolkit.getProperty("AWT.f5", "F5");
+				text.append(Toolkit.getProperty("AWT.f5", "F5"));
+				break;
 			case VC_F6:
-				return Toolkit.getProperty("AWT.f6", "F6");
+				text.append(Toolkit.getProperty("AWT.f6", "F6"));
+				break;
 			case VC_F7:
-				return Toolkit.getProperty("AWT.f7", "F7");
+				text.append(Toolkit.getProperty("AWT.f7", "F7"));
+				break;
 			case VC_F8:
-				return Toolkit.getProperty("AWT.f8", "F8");
+				text.append(Toolkit.getProperty("AWT.f8", "F8"));
+				break;
 			case VC_F9:
-				return Toolkit.getProperty("AWT.f9", "F9");
+				text.append(Toolkit.getProperty("AWT.f9", "F9"));
+				break;
 			case VC_F10:
-				return Toolkit.getProperty("AWT.f10", "F10");
+				text.append(Toolkit.getProperty("AWT.f10", "F10"));
+				break;
 			case VC_F11:
-				return Toolkit.getProperty("AWT.f11", "F11");
+				text.append(Toolkit.getProperty("AWT.f11", "F11"));
+				break;
 			case VC_F12:
-				return Toolkit.getProperty("AWT.f12", "F12");
+				text.append(Toolkit.getProperty("AWT.f12", "F12"));
+				break;
 
 			case VC_F13:
-				return Toolkit.getProperty("AWT.f13", "F13");
+				text.append(Toolkit.getProperty("AWT.f13", "F13"));
+				break;
 			case VC_F14:
-				return Toolkit.getProperty("AWT.f14", "F14");
+				text.append(Toolkit.getProperty("AWT.f14", "F14"));
+				break;
 			case VC_F15:
-				return Toolkit.getProperty("AWT.f15", "F15");
+				text.append(Toolkit.getProperty("AWT.f15", "F15"));
+				break;
 			case VC_F16:
-				return Toolkit.getProperty("AWT.f16", "F16");
+				text.append(Toolkit.getProperty("AWT.f16", "F16"));
+				break;
 			case VC_F17:
-				return Toolkit.getProperty("AWT.f17", "F17");
+				text.append(Toolkit.getProperty("AWT.f17", "F17"));
+				break;
 			case VC_F18:
-				return Toolkit.getProperty("AWT.f18", "F18");
+				text.append(Toolkit.getProperty("AWT.f18", "F18"));
+				break;
 			case VC_F19:
-				return Toolkit.getProperty("AWT.f19", "F19");
+				text.append(Toolkit.getProperty("AWT.f19", "F19"));
+				break;
 			case VC_F20:
-				return Toolkit.getProperty("AWT.f20", "F20");
+				text.append(Toolkit.getProperty("AWT.f20", "F20"));
+				break;
 			case VC_F21:
-				return Toolkit.getProperty("AWT.f21", "F21");
+				text.append(Toolkit.getProperty("AWT.f21", "F21"));
+				break;
 			case VC_F22:
-				return Toolkit.getProperty("AWT.f22", "F22");
+				text.append(Toolkit.getProperty("AWT.f22", "F22"));
+				break;
 			case VC_F23:
-				return Toolkit.getProperty("AWT.f23", "F23");
+				text.append(Toolkit.getProperty("AWT.f23", "F23"));
+				break;
 			case VC_F24:
-				return Toolkit.getProperty("AWT.f24", "F24");
+				text.append(Toolkit.getProperty("AWT.f24", "F24"));
+				break;
 
 
 			case VC_PRINTSCREEN:
-				return Toolkit.getProperty("AWT.printScreen", "Print Screen");
+				text.append(Toolkit.getProperty("AWT.printScreen", "Print Screen"));
+				break;
 			case VC_INSERT:
-				return Toolkit.getProperty("AWT.insert", "Insert");
+				text.append(Toolkit.getProperty("AWT.insert", "Insert"));
+				break;
 			case VC_HELP:
-				return Toolkit.getProperty("AWT.help", "Help");
+				text.append(Toolkit.getProperty("AWT.help", "Help"));
+				break;
 
 
 			case VC_PAGE_UP:
-				return Toolkit.getProperty("AWT.pgup", "Page Up");
+				text.append(Toolkit.getProperty("AWT.pgup", "Page Up"));
+				break;
 			case VC_PAGE_DOWN:
-				return Toolkit.getProperty("AWT.pgdn", "Page Down");
+				text.append(Toolkit.getProperty("AWT.pgdn", "Page Down"));
+				break;
 			case VC_HOME:
-				return Toolkit.getProperty("AWT.home", "Home");
+				text.append(Toolkit.getProperty("AWT.home", "Home"));
+				break;
 			case VC_END:
-				return Toolkit.getProperty("AWT.end", "End");
+				text.append(Toolkit.getProperty("AWT.end", "End"));
+				break;
 
 
 			case VC_QUOTE:
-				return Toolkit.getProperty("AWT.quote", "Quote");
+				text.append(Toolkit.getProperty("AWT.quote", "Quote"));
+				break;
 			case VC_BACKQUOTE:
-				return Toolkit.getProperty("AWT.backQuote", "Back Quote");
+				text.append(Toolkit.getProperty("AWT.backQuote", "Back Quote"));
+				break;
 
 
 
@@ -812,10 +934,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.begin", "Begin");
 */
 			case VC_UNDEFINED:
-				return Toolkit.getProperty("AWT.undefined", "Undefined");
+				text.append(Toolkit.getProperty("AWT.undefined", "Undefined"));
+
+			default:
+				text.append(Toolkit.getProperty("AWT.unknown", "Unknown") + " keyCode: 0x" + Integer.toString(keyCode, 16));
 		}
 
-		return Toolkit.getProperty("AWT.unknown", "Unknown") + " keyCode: 0x" + Integer.toString(keyCode, 16);
+		return text.toString();
 	}
 
 
