@@ -93,6 +93,7 @@ jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLo
 		case VC_KP_8:
 		case VC_KP_9:
 
+		case VC_NUM_LOCK:
 		case VC_KP_ENTER:
 		case VC_KP_MULTIPLY:
 		case VC_KP_ADD:

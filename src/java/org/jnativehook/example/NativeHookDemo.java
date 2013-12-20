@@ -18,6 +18,28 @@
 package org.jnativehook.example;
 
 //Imports
+
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseInputListener;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+import org.jnativehook.mouse.NativeMouseWheelListener;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.text.BadLocationException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,30 +53,19 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import javax.swing.text.BadLocationException;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.NativeInputEvent;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
-import org.jnativehook.mouse.NativeMouseEvent;
-import org.jnativehook.mouse.NativeMouseInputListener;
-import org.jnativehook.mouse.NativeMouseWheelEvent;
-import org.jnativehook.mouse.NativeMouseWheelListener;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * A demonstration of how to use the JNativeHook library.
@@ -151,7 +162,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
 		setJMenuBar(menuBar);
 
-		//Create feedback area
+		// Create feedback area.
 		txtEventInfo = new JTextArea();
 		txtEventInfo.setEditable(false);
 		txtEventInfo.setBackground(new Color(0xFF, 0xFF, 0xFF));
@@ -161,6 +172,19 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		JScrollPane scrollPane = new JScrollPane(txtEventInfo);
 		scrollPane.setPreferredSize(new Dimension(375, 125));
 		add(scrollPane, BorderLayout.CENTER);
+
+
+		// Create custom logger and level.
+		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+		LogManager.getLogManager().reset();
+		logger.setLevel(Level.ALL);
+
+		// Add formatter and console logger.
+		ConsoleHandler handler = new ConsoleHandler();
+		handler.setFormatter(new LogFormatter());
+		handler.setLevel(Level.ALL);
+		logger.addHandler(handler);
+
 
 		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
 		 * Because Swing components must be accessed on the event dispatching
@@ -426,7 +450,34 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 			}
 		});
 	}
-	
+
+	private final class LogFormatter extends Formatter {
+		@Override
+		public String format(LogRecord record) {
+			StringBuilder line = new StringBuilder();
+
+			line.append(new Date(record.getMillis()))
+				.append(" ")
+				.append(record.getLevel().getLocalizedName())
+				.append(":\t")
+				.append(formatMessage(record));
+
+			if (record.getThrown() != null) {
+				try {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					record.getThrown().printStackTrace(pw);
+					pw.close();
+					line.append(sw.toString());
+					sw.close();
+				}
+				catch (Exception ex) { /* Do Nothing */ }
+			}
+
+			return line.toString();
+		}
+	}
+
 	private class SwingExecutorService extends AbstractExecutorService {
 		private EventQueue queue;
 
