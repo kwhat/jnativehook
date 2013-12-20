@@ -141,15 +141,15 @@ public class NativeKeyEvent extends NativeInputEvent {
 		
 	/** VC_0 thru VC_9 are the same as ASCII '0' thru '9' (0x30 - 0x39). */
 	public static final int VC_1							= 0x0002;
-	public static final int VC_2								= 0x0003;
+	public static final int VC_2							= 0x0003;
 	public static final int VC_3							= 0x0004;
 	public static final int VC_4							= 0x0005;
 	public static final int VC_5							= 0x0006;
 	public static final int VC_6							= 0x0007;
 	public static final int VC_7							= 0x0008;
-	public static final int VC_8								= 0x0009;
+	public static final int VC_8							= 0x0009;
 	public static final int VC_9							= 0x000A;
-	public static final int VC_0								= 0x000B;
+	public static final int VC_0							= 0x000B;
 	
 	public static final int VC_MINUS						= 0x000C;	// '-'
 	public static final int VC_EQUALS						= 0x000D;	// '='
@@ -159,7 +159,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_CAPS_LOCK					= 0x003A;
 	
 	/** VC_A thru VC_Z */
-	public static final int VC_A								= 0x001E;
+	public static final int VC_A							= 0x001E;
 	public static final int VC_B							= 0x0030;
 	public static final int VC_C							= 0x002E;
 	public static final int VC_D							= 0x0020;
@@ -167,13 +167,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_F							= 0x0021;
 	public static final int VC_G							= 0x0022;
 	public static final int VC_H							= 0x0023;
-	public static final int VC_I								= 0x0017;
+	public static final int VC_I							= 0x0017;
 	public static final int VC_J							= 0x0024;
 	public static final int VC_K							= 0x0025;
-	public static final int VC_L								= 0x0026;
+	public static final int VC_L							= 0x0026;
 	public static final int VC_M							= 0x0032;
 	public static final int VC_N							= 0x0031;
-	public static final int VC_O								= 0x0018;
+	public static final int VC_O							= 0x0018;
 	public static final int VC_P							= 0x0019;
 	public static final int VC_Q							= 0x0010;
 	public static final int VC_R							= 0x0013;
@@ -194,7 +194,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_QUOTE						= 0x0028;
 	public static final int VC_ENTER						= 0x001C;
 
-	public static final int VC_COMMA							= 0x0033;	// ','
+	public static final int VC_COMMA						= 0x0033;	// ','
 	public static final int VC_PERIOD						= 0x0034;	// '.'
 	public static final int VC_SLASH						= 0x0035;	// '/'
 	
@@ -223,7 +223,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 
 	/** Begin Numeric Zone */
-	public static final int VC_CLEAR						= 0x0E45;	// 0x76?? OSX: Number Lock
 	public static final int VC_NUM_LOCK						= 0x0E45;
 	public static final int VC_KP_DIVIDE					= 0x0E35;
 	public static final int VC_KP_MULTIPLY					= 0x0037;
@@ -248,9 +247,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/**  Modifier and Control Keys */
 	public static final int VC_SHIFT_L						= 0x002A;
 	public static final int VC_SHIFT_R						= 0x0E36;
-	public static final int VC_CONTROL_L						= 0x001D;
+	public static final int VC_CONTROL_L					= 0x001D;
 	public static final int VC_CONTROL_R					= 0x0E1D;
-	public static final int VC_ALT_L							= 0xD038;	// Option or Alt Key
+	public static final int VC_ALT_L						= 0xD038;	// Option or Alt Key
 	public static final int VC_ALT_R						= 0xDE38;	// Option or Alt Key
 	public static final int VC_META_L						= 0x0E5B;	// Windows or Command Key
 	public static final int VC_META_R						= 0x0E5C;	// Windows or Command Key
@@ -279,12 +278,12 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_WEB							= 0xE032;
 	public static final int VC_MUSIC						= 0xE03C;
 	public static final int VC_PICTURES						= 0xE064;
-	public static final int VC_VIDEO							= 0xE06D;
+	public static final int VC_VIDEO						= 0xE06D;
 
 
 	public static final int VC_KATAKANA						= 0x0070;
 	public static final int VC_FURIGANA						= 0x0077;
-	public static final int VC_KANJI							= 0x0079;
+	public static final int VC_KANJI						= 0x0079;
 	public static final int VC_HIRAGANA						= 0x007B;
 
 	/** This value is used to indicate that the keyCode is unknown. */
@@ -434,10 +433,47 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * @return a string containing a text description for a physical key,
 	 * identified by its keyCode.
 	 */
-	//FIXME This needs to turn into a method that access a lookup table.
 	public static String getKeyText(int keyCode) {
 		StringBuilder text = new StringBuilder();
-		
+
+		// Lookup prefixes.
+		switch (keyCode) {
+			case VC_KP_0:
+			case VC_KP_1:
+			case VC_KP_2:
+			case VC_KP_3:
+			case VC_KP_4:
+			case VC_KP_6:
+			case VC_KP_7:
+			case VC_KP_8:
+			case VC_KP_9:
+			case VC_KP_MULTIPLY:
+			case VC_KP_ADD:
+			case VC_KP_SUBTRACT:
+			case VC_KP_SEPARATOR:
+			case VC_KP_DIVIDE:
+				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"))
+					.append(' ');
+				break;
+
+			case VC_SHIFT_L:
+			case VC_CONTROL_L:
+			case VC_ALT_L:
+			case VC_META_L:
+				text.append(Toolkit.getProperty("AWT.left", "Left"))
+						.append(' ');
+				break;
+
+			case VC_SHIFT_R:
+			case VC_CONTROL_R:
+			case VC_ALT_R:
+			case VC_META_R:
+				text.append(Toolkit.getProperty("AWT.right", "Right"))
+						.append(' ');
+				break;
+		}
+
+		// Lookup text values.
 		switch (keyCode) {
 			case VC_A:
 				text.append('A');
@@ -519,53 +555,44 @@ public class NativeKeyEvent extends NativeInputEvent {
 				break;
 
 			case VC_KP_0:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_0:
-				text.append(" 0");
+				text.append('0');
 				break;
 			case VC_KP_1:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_1:
-				text.append(" 1");
+				text.append('1');
 				break;
 			case VC_KP_2:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_2:
-				text.append(" 2");
+				text.append('2');
 				break;
 			case VC_KP_3:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_3:
-				text.append(" 3");
+				text.append('3');
+				break;
 			case VC_KP_4:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_4:
-				text.append(" 4");
+				text.append('4');
 				break;
 			case VC_KP_5:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_5:
-				text.append(" 5");
+				text.append('5');
 				break;
 			case VC_KP_6:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_6:
-				text.append(" 6");
+				text.append('6');
 				break;
 			case VC_KP_7:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_7:
-				text.append(" 7");
+				text.append('7');
 				break;
 			case VC_KP_8:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_8:
-				text.append(" 8");
+				text.append('8');
 				break;
 			case VC_KP_9:
-				text.append(Toolkit.getProperty("AWT.numpad", "NumPad"));
 			case VC_9:
-				text.append(" 9");
+				text.append('9');
 				break;
 
 
@@ -579,30 +606,40 @@ public class NativeKeyEvent extends NativeInputEvent {
 				text.append(Toolkit.getProperty("AWT.tab", "Tab"));
 				break;
 
-/*
-			case VC_SHIFT:
-				return Toolkit.getProperty("AWT.shift", "Shift");
-			case VC_CONTROL:
-				return Toolkit.getProperty("AWT.control", "Control");
-			case VC_ALT:
-				return Toolkit.getProperty("AWT.alt", "Alt");
-			case VC_META:
-				return Toolkit.getProperty("AWT.meta", "Meta");
-			case VC_WINDOWS:
-				return Toolkit.getProperty("AWT.windows", "Windows");
+
+			case VC_SHIFT_L:
+			case VC_SHIFT_R:
+				text.append(Toolkit.getProperty("AWT.shift", "Shift"));
+				break;
+			case VC_CONTROL_L:
+			case VC_CONTROL_R:
+				text.append(Toolkit.getProperty("AWT.control", "Control"));
+				break;
+			case VC_ALT_L:
+			case VC_ALT_R:
+				text.append(Toolkit.getProperty("AWT.alt", "Alt"));
+				break;
+			case VC_META_L:
+			case VC_META_R:
+				text.append(Toolkit.getProperty("AWT.meta", "Meta"));
+				break;
 			case VC_CONTEXT_MENU:
-				return Toolkit.getProperty("AWT.context", "Context Menu");
+				text.append(Toolkit.getProperty("AWT.context", "Context Menu"));
+				break;
 
-
+			/* FIXME
 			case VC_PAUSE:
-				return Toolkit.getProperty("AWT.pause", "Pause");
+				text.append(Toolkit.getProperty("AWT.pause", "Pause"));
+				break; */
 			case VC_CAPS_LOCK:
-				return Toolkit.getProperty("AWT.capsLock", "Caps Lock");
+				text.append(Toolkit.getProperty("AWT.capsLock", "Caps Lock"));
+				break;
 			case VC_ESCAPE:
-				return Toolkit.getProperty("AWT.escape", "Escape");
+				text.append(Toolkit.getProperty("AWT.escape", "Escape"));
+				break;
 			case VC_SPACE:
-				return Toolkit.getProperty("AWT.space", "Space");
-*/
+				text.append(Toolkit.getProperty("AWT.space", "Space"));
+				break;
 
 			case VC_UP:
 				text.append(Toolkit.getProperty("AWT.up", "Up"));
@@ -652,26 +689,31 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 
 
-/*
-			case VC_MULTIPLY:
-				return Toolkit.getProperty("AWT.multiply", "NumPad *");
-			case VC_ADD:
-				return Toolkit.getProperty("AWT.add", "NumPad +");
-			case VC_SUBTRACT:
-				return Toolkit.getProperty("AWT.subtract", "NumPad -");
-			case VC_DECIMAL:
-				return Toolkit.getProperty("AWT.decimal", "NumPad .");
-			case VC_DIVIDE:
-				return Toolkit.getProperty("AWT.divide", "NumPad /");
+			case VC_KP_MULTIPLY:
+				text.append(Toolkit.getProperty("AWT.multiply", "Multiply"));
+				break;
+			case VC_KP_ADD:
+				text.append(Toolkit.getProperty("AWT.add", "Add"));
+				break;
+			case VC_KP_SUBTRACT:
+				text.append(Toolkit.getProperty("AWT.subtract", "Subtract"));
+				break;
+			case VC_KP_SEPARATOR:
+				text.append(Toolkit.getProperty("AWT.separator", "Separator"));
+				break;
+			case VC_KP_DIVIDE:
+				text.append(Toolkit.getProperty("AWT.divide", "Divide"));
+				break;
 			case VC_DELETE:
-				return Toolkit.getProperty("AWT.delete", "Delete");
+				text.append(Toolkit.getProperty("AWT.delete", "Delete"));
+				break;
 			case VC_NUM_LOCK:
-				return Toolkit.getProperty("AWT.numLock", "Num Lock");
-			case VC_CLEAR:
-				return Toolkit.getProperty("AWT.clear", "Clear");
+				text.append(Toolkit.getProperty("AWT.numLock", "Num Lock"));
+				break;
 			case VC_SCROLL_LOCK:
-				return Toolkit.getProperty("AWT.scrollLock", "Scroll Lock");
-*/
+				text.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
+				break;
+
 
 			/* F1 through F24 function keys. */
 			case VC_F1:
@@ -935,9 +977,13 @@ public class NativeKeyEvent extends NativeInputEvent {
 */
 			case VC_UNDEFINED:
 				text.append(Toolkit.getProperty("AWT.undefined", "Undefined"));
+				break;
 
 			default:
-				text.append(Toolkit.getProperty("AWT.unknown", "Unknown") + " keyCode: 0x" + Integer.toString(keyCode, 16));
+				text.append(Toolkit.getProperty("AWT.unknown", "Unknown"))
+					.append(" keyCode: 0x")
+					.append(Integer.toString(keyCode, 16));
+				break;
 		}
 
 		return text.toString();
@@ -955,13 +1001,14 @@ public class NativeKeyEvent extends NativeInputEvent {
      */
     public boolean isActionKey() {
         switch (keyCode) {
-			/*
-			case VC_SHIFT:
-			case VC_CONTROL:
-			case VC_ALT:
-			case VC_META:
-			case VC_WINDOWS:
-			*/
+			case VC_SHIFT_L:
+			case VC_SHIFT_R:
+			case VC_CONTROL_L:
+			case VC_CONTROL_R:
+			case VC_ALT_L:
+			case VC_ALT_R:
+			case VC_META_L:
+			case VC_META_R:
 			case VC_CONTEXT_MENU:
 
 			case VC_UP:
