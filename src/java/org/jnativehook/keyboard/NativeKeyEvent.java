@@ -449,6 +449,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_KP_9:
 			case VC_KP_MULTIPLY:
 			case VC_KP_ADD:
+			case VC_KP_ENTER:
 			case VC_KP_SUBTRACT:
 			case VC_KP_SEPARATOR:
 			case VC_KP_DIVIDE:
@@ -476,126 +477,103 @@ public class NativeKeyEvent extends NativeInputEvent {
 		// Lookup text values.
 		switch (keyCode) {
 			case VC_A:
-				text.append('A');
-				break;
+				return "A";
 			case VC_B:
-				text.append('B');
-				break;
+				return "B";
 			case VC_C:
-				text.append('C');
-				break;
+				return "C";
 			case VC_D:
-				text.append('D');
-				break;
+				return "D";
 			case VC_E:
-				text.append('E');
-				break;
+				return "E";
 			case VC_F:
-				text.append('F');
-				break;
+				return "F";
 			case VC_G:
-				text.append('G');
-				break;
+				return "G";
 			case VC_H:
-				text.append('H');
-				break;
+				return "H";
 			case VC_I:
-				text.append('I');
-				break;
+				return "I";
 			case VC_J:
-				text.append('J');
-				break;
+				return "J";
 			case VC_K:
-				text.append('K');
-				break;
+				return "K";
 			case VC_L:
-				text.append('L');
-				break;
+				return "L";
 			case VC_M:
-				text.append('M');
-				break;
+				return "M";
 			case VC_N:
-				text.append('N');
-				break;
+				return "N";
 			case VC_O:
-				text.append('O');
-				break;
+				return "O";
 			case VC_P:
-				text.append('P');
-				break;
+				return "P";
 			case VC_Q:
-				text.append('Q');
-				break;
+				return "Q";
 			case VC_R:
-				text.append('R');
-				break;
+				return "R";
 			case VC_S:
-				text.append('S');
-				break;
+				return "S";
 			case VC_T:
-				text.append('T');
-				break;
+				return "T";
 			case VC_U:
-				text.append('U');
-				break;
+				return "U";
 			case VC_V:
-				text.append('V');
-				break;
+				return "V";
 			case VC_W:
-				text.append('W');
-				break;
+				return "W";
 			case VC_X:
-				text.append('X');
-				break;
+				return "X";
 			case VC_Y:
-				text.append('Y');
-				break;
+				return "Y";
 			case VC_Z:
-				text.append('Z');
-				break;
+				return "Z";
 
 			case VC_KP_0:
-			case VC_0:
-				text.append('0');
-				break;
+				return Toolkit.getProperty("AWT.numpad0", "NumPad 0");
 			case VC_KP_1:
-			case VC_1:
-				text.append('1');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 1");
 			case VC_KP_2:
-			case VC_2:
-				text.append('2');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 2");
 			case VC_KP_3:
-			case VC_3:
-				text.append('3');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 3");
 			case VC_KP_4:
-			case VC_4:
-				text.append('4');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 4");
 			case VC_KP_5:
-			case VC_5:
-				text.append('5');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 5");
 			case VC_KP_6:
-			case VC_6:
-				text.append('6');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 6");
 			case VC_KP_7:
-			case VC_7:
-				text.append('7');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 7");
 			case VC_KP_8:
-			case VC_8:
-				text.append('8');
-				break;
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 8");
 			case VC_KP_9:
+				return Toolkit.getProperty("AWT.numpad1", "NumPad 9");
+
+
+			case VC_0:
+				return "0";
+			case VC_1:
+				return "1";
+			case VC_2:
+				return "2";
+			case VC_3:
+				return "3";
+			case VC_4:
+				return "4";
+			case VC_5:
+				return "5";
+			case VC_6:
+				return "6";
+			case VC_7:
+				return "7";
+			case VC_8:
+				return "8";
 			case VC_9:
-				text.append('9');
-				break;
+				return "9";
 
 
+			case VC_KP_ENTER:
 			case VC_ENTER:
 				text.append(Toolkit.getProperty("AWT.enter", "Enter"));
 				break;
@@ -690,22 +668,22 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 
 			case VC_KP_MULTIPLY:
-				text.append(Toolkit.getProperty("AWT.multiply", "Multiply"));
+				text.append(Toolkit.getProperty("AWT.multiply", "NumPad Multiply"));
 				break;
 			case VC_KP_ADD:
-				text.append(Toolkit.getProperty("AWT.add", "Add"));
+				text.append(Toolkit.getProperty("AWT.add", "NumPad Add"));
 				break;
 			case VC_KP_SUBTRACT:
-				text.append(Toolkit.getProperty("AWT.subtract", "Subtract"));
+				text.append(Toolkit.getProperty("AWT.subtract", "NumPad Subtract"));
 				break;
 			case VC_KP_SEPARATOR:
-				text.append(Toolkit.getProperty("AWT.separator", "Separator"));
+				text.append(Toolkit.getProperty("AWT.separator", "NumPad Separator"));
 				break;
 			case VC_KP_DIVIDE:
-				text.append(Toolkit.getProperty("AWT.divide", "Divide"));
+				text.append(Toolkit.getProperty("AWT.divide", "NumPad Divide"));
 				break;
 			case VC_DELETE:
-				text.append(Toolkit.getProperty("AWT.delete", "Delete"));
+				text.append(Toolkit.getProperty("AWT.delete", "NumPad Delete"));
 				break;
 			case VC_NUM_LOCK:
 				text.append(Toolkit.getProperty("AWT.numLock", "Num Lock"));
