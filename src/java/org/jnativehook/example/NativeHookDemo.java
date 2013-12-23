@@ -88,6 +88,9 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
 
+	/** Logging */
+	private Logger logger;
+
 	/**
 	 * Instantiates a new native hook demo.
 	 */
@@ -175,7 +178,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
 
 		// Create custom logger and level.
-		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+		logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 		LogManager.getLogManager().reset();
 		logger.setLevel(Level.ALL);
 
