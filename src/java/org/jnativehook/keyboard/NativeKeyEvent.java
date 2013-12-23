@@ -204,7 +204,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 	public static final int VC_PRINTSCREEN					= 0x0E37;
 	public static final int VC_SCROLL_LOCK					= 0x0046;
-	public static final int VC_PAUSE						= 0x0045;
+	public static final int VC_PAUSE						= 0x0E45;
 
 
 	// Begin Edit Key Zone
@@ -224,11 +224,11 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 
 	/** Begin Numeric Zone */
-	public static final int VC_NUM_LOCK						= 0x0E45;
+	public static final int VC_NUM_LOCK						= 0x0045;
 	public static final int VC_KP_DIVIDE					= 0x0E35;
 	public static final int VC_KP_MULTIPLY					= 0x0037;
 	public static final int VC_KP_SUBTRACT					= 0x004A;
-
+	public static final int VC_KP_EQUALS					= 0x0E0D;
 	public static final int VC_KP_ADD						= 0x004E;
 	public static final int VC_KP_ENTER						= 0x0E1C;
 	public static final int VC_KP_SEPARATOR					= 0x0053;
@@ -247,7 +247,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 	/**  Modifier and Control Keys */
 	public static final int VC_SHIFT_L						= 0x002A;
-	public static final int VC_SHIFT_R						= 0x0E36;
+	public static final int VC_SHIFT_R						= 0x0036;
 	public static final int VC_CONTROL_L					= 0x001D;
 	public static final int VC_CONTROL_R					= 0x0E1D;
 	public static final int VC_ALT_L						= 0x0038;	// Option or Alt Key
@@ -585,6 +585,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_SLASH:
 				return Toolkit.getProperty("AWT.slash", "Slash");
 
+			case VC_KP_EQUALS:
+				// TODO Not sure if apple defines an AWT property for this key.
 			case VC_EQUALS:
 				return Toolkit.getProperty("AWT.equals", "Equals");
 			case VC_SEMICOLON:
