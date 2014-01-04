@@ -336,6 +336,7 @@
             <enable>debug</enable>
             <enable>static</enable>
             <disable>shared</disable>
+            <enable>demo</enable>
             <with>pic</with>
         </configure>
     </target>
@@ -428,7 +429,8 @@
             <arg value="-fPIC"  osfamily="unix" />
             <arg value="${env.CFLAGS}" />
 
-            <define name="DEBUG"/>
+            <define name="DEBUG" />
+            <define name="__int64" value="int64_t" />
 
             <include path="${dir.bin}/include" />
             <include path="${dir.src}/jni/include" />
