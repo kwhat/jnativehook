@@ -25,12 +25,38 @@
 #include "jni_Logger.h"
 #include "jni_Properties.h"
 
+#ifdef USE_QUIET
+#define COPYRIGHT() (void) 0;
+#else
+#include <stdio.h>
+#define COPYRIGHT()	fprintf(stdout, \
+		"JNativeHook: Global keyboard and mouse hooking for Java.\n" \
+		"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n" \
+		"https://github.com/kwhat/libuiohook/\n" \
+		"\n" \
+		"JNativeHook is free software: you can redistribute it and/or modify\n" \
+		"it under the terms of the GNU Lesser General Public License as published\n" \
+		"by the Free Software Foundation, either version 3 of the License, or\n" \
+		"(at your option) any later version.\n" \
+		"\n" \
+		"JNativeHook is distributed in the hope that it will be useful,\n" \
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n" \
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" \
+		"GNU General Public License for more details.\n" \
+		"\n" \
+		"You should have received a copy of the GNU Lesser General Public License\n" \
+		"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n");
+#endif
+
 // JNI Related global references.
 JavaVM *jvm;
 jint jni_version = JNI_VERSION_1_4;
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+	// Display the copyright on library load.
+	COPYRIGHT();
+
 	/* Grab the currently running virtual machine so we can attach to it in
 	 * functions that are not called from java.
 	 */

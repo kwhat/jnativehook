@@ -334,6 +334,7 @@
         <mkdir dir="${dir.bin}/libuiohook" />
         <configure dir="${dir.bin}/libuiohook" path="${dir.src}/libuiohook" prefix="${dir.bin}">
             <enable>debug</enable>
+            <enable>quiet</enable>
             <enable>static</enable>
             <disable>shared</disable>
             <enable>demo</enable>
