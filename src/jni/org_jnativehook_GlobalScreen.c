@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -58,7 +58,6 @@ JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegiste
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
 	// Convert the event type.
-	unsigned int nativeType;
 	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
@@ -80,14 +79,16 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 					(*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
 			break;
 
-		// FIXME Implement!
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
+			virtualEvent->data.mouse.button =
+            		(*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getButton);
+			break;
+
+        // FIXME Implement!
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
 
 		default:

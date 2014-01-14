@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 
 #include "jni_Converter.h"
 #include "jni_Globals.h"
+#include "jni_Logger.h"
 #include "org_jnativehook_NativeInputEvent.h"
 #include "org_jnativehook_keyboard_NativeKeyEvent.h"
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
@@ -197,16 +198,14 @@ void jni_EventDispatcher(virtual_event * const event) {
 		else {
 			// FIXME an exception should be thrown!
 
-			#ifdef DEBUG
-			fprintf(stderr, "jni_EventDispatcher(): Failed to acquire GlobalScreen singleton!\n");
-			#endif
+			jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
+					__FUNCTION__, __LINE__);
 		}
 	}
 	else {
 		// FIXME an exception should be thrown!
 
-		#ifdef DEBUG
-		fprintf(stderr, "jni_EventDispatcher(): AttachCurrentThread() failed!\n");
-		#endif
+		jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: AttachCurrentThread() failed!\n",
+				__FUNCTION__, __LINE__);
 	}
 }

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,9 +18,10 @@
 package org.jnativehook.mouse;
 
 //Imports
-import java.awt.Point;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
+
+import java.awt.*;
 
 /**
  * An event which indicates that a mouse action occurred on the system.

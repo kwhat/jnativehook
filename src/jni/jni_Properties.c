@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #include <uiohook.h>
 
 #include "jni_Globals.h"
+#include "jni_Logger.h"
 
 void jni_SetProperties(JNIEnv *env) {
 	// Create a buffer for converting numbers to strings.
@@ -28,6 +29,9 @@ void jni_SetProperties(JNIEnv *env) {
 	// Set the native keyboard auto repeat rate.
 	long rate = hook_get_auto_repeat_rate();
 	if (rate >= 0) {
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_auto_repeat_rate(): successful. (%li)\n",
+    				__FUNCTION__, __LINE__, rate);
+
 		if (snprintf(buffer, sizeof(buffer), "%li", rate) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate");
 			jstring value = (*env)->NewStringUTF(env, buffer);
@@ -42,23 +46,22 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert auto repeat rate to string!\n", 
-					__FUNCTION__, __LINE__);
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert auto repeat rate to string!\n",
+        			__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_auto_repeat_rate()!\n", 
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_auto_repeat_rate()!\n",
 				__FUNCTION__, __LINE__);
 	}
-	#endif
 
 
 	long delay = hook_get_auto_repeat_delay();
 	if (delay >= 0) {
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_auto_repeat_delay(): successful. (%li)\n",
+    				__FUNCTION__, __LINE__, delay);
+
 		if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay");
 			jstring value = (*env)->NewStringUTF(env, buffer);
@@ -73,24 +76,23 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert auto repeat delay to string!\n", 
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert auto repeat delay to string!\n",
 					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n", 
-				__FUNCTION__, __LINE__);
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n",
+        		__FUNCTION__, __LINE__);
 	}
-	#endif
 
 
 	// 0-Threshold X, 1-Threshold Y and 2-Speed.
 	long multiplier = hook_get_pointer_acceleration_multiplier();
 	if (multiplier >= 0) {
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_acceleration_multiplier(): successful. (%li)\n",
+				__FUNCTION__, __LINE__, multiplier);
+
 		if (snprintf(buffer, sizeof(buffer), "%li", multiplier) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier");
 			jstring value = (*env)->NewStringUTF(env, buffer);
@@ -105,24 +107,23 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert pointer acceleration multiplier to string!\n", 
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert pointer acceleration multiplier to string!\n",
 					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_multiplier()!\n", 
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_acceleration_multiplier()!\n",
 				__FUNCTION__, __LINE__);
 	}
-	#endif
 
 
 	// 0-Threshold X, 1-Threshold Y and 2-Speed.
 	long threshold = hook_get_pointer_acceleration_threshold();
 	if (threshold >= 0) {
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_acceleration_threshold(): successful. (%li)\n",
+				__FUNCTION__, __LINE__, threshold);
+
 		if (snprintf(buffer, sizeof(buffer), "%li", threshold) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold");
 			jstring value = (*env)->NewStringUTF(env, buffer);
@@ -137,23 +138,22 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert pointer acceleration threshold to string!\n", 
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert pointer acceleration threshold to string!\n",
 					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_threshold()!\n", 
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_acceleration_threshold()!\n",
 				__FUNCTION__, __LINE__);
 	}
-	#endif
 
 
 	long sensitivity = hook_get_pointer_sensitivity();
 	if (sensitivity >= 0) {
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_sensitivity(): successful. (%li)\n",
+				__FUNCTION__, __LINE__, sensitivity);
+
 		if (snprintf(buffer, sizeof(buffer), "%li", sensitivity) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity");
 			jstring value = (*env)->NewStringUTF(env, buffer);
@@ -168,26 +168,21 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert pointer sensitivity to string!\n", 
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert pointer sensitivity to string!\n",
 					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_pointer_sensitivity()!\n", 
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_sensitivity()!\n",
 				__FUNCTION__, __LINE__);
 	}
-	#endif
 
 
 	long clicktime = hook_get_multi_click_time();
 	if (clicktime >= 0) {
-		#ifdef DEBUG
-		fprintf(stdout, "GetMultiClickTime(): successful. (time: %li)\n", clicktime);
-		#endif
+		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_multi_click_time(): successful. (%li)\n",
+        		__FUNCTION__, __LINE__, clicktime);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.multiClickInterval");
@@ -203,19 +198,15 @@ void jni_SetProperties(JNIEnv *env) {
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, value);
 		}
-		#ifdef DEBUG
 		else {
-			fprintf(stderr, "%s [%u]: Failed to convert multi click time to string!\n", 
+			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert multi click time to string!\n",
 					__FUNCTION__, __LINE__);
 		}
-		#endif
 	}
-	#ifdef DEBUG
 	else {
-		fprintf(stderr, "%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n", 
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
 				__FUNCTION__, __LINE__);
 	}
-	#endif
 }
 
 
