@@ -1,5 +1,5 @@
 #Build Number for ANT. Do not edit!
 
-build.major=1
-build.minor=2
-build.revision=0
+ant.build.major=1
+ant.build.minor=2
+ant.build.revision=0

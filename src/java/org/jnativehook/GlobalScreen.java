@@ -445,7 +445,7 @@ public class GlobalScreen {
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
 	private static void loadNativeLibrary() {
-		System.out.println(
+		System.out.println("\n" +
 			"JNativeHook: Global keyboard and mouse hooking for Java.\n" +
 			"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n" +
 			"https://github.com/kwhat/libuiohook/\n" +
