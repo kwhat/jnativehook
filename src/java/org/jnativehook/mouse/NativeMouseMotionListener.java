@@ -19,7 +19,6 @@ package org.jnativehook.mouse;
 
 //Imports
 import org.jnativehook.GlobalScreen;
-
 import java.util.EventListener;
 
 /**
