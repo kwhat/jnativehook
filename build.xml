@@ -446,7 +446,7 @@
         -->
 
 		<!-- Execute the native compiler on the soruce files -->
-        <cc toolchain="gcc" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
+        <cc toolchain="${ant.build.native.toolchain}" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
             <arg value="-Wall -Wextra -Wno-unused-parameter" />
             <arg value="-fPIC" unless="native.os.isWindows" />
             <arg value="${ant.build.native.cflags}" />
@@ -471,7 +471,7 @@
 		<!-- Create required directory for linking -->
 		<mkdir dir="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}" />
 
-		<ld toolchain="gcc" outfile="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}/${ant.build.native.executable}">
+		<ld toolchain="${ant.build.native.toolchain}" outfile="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}/${ant.build.native.executable}">
             <!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
             <arg value="-dynamiclib" if="native.os.isApple" />
             <arg value="-shared" unless="native.os.isApple" />
