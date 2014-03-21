@@ -18,8 +18,7 @@
 package org.jnativehook;
 
 // Imports
-import java.lang.reflect.Field;
-import javax.swing.event.EventListenerList;
+
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.keyboard.listeners.NativeKeyListenerImpl;
@@ -30,15 +29,17 @@ import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
 import org.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
 import org.jnativehook.mouse.listeners.NativeMouseWheelListenerImpl;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
+import javax.swing.event.EventListenerList;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class GlobalScreenTest {
@@ -342,7 +343,7 @@ public class GlobalScreenTest {
 	 * Test of dispatchEvent method, of class GlobalScreen.
 	 */
 	@Test
-	public void testPostNativeEvent() throws InterruptedException {
+	public void testPostNativeEvent() throws InterruptedException, NativeHookException {
 		System.out.println("dispatchEvent");
 
 		// Setup and event listener.
@@ -355,8 +356,8 @@ public class GlobalScreenTest {
 		NativeMouseWheelListenerImpl wheelListener = new NativeMouseWheelListenerImpl();
 		GlobalScreen.getInstance().addNativeMouseWheelListener(wheelListener);
 
-		// Make sure the dispatcher is running!
-		GlobalScreen.getInstance().startEventDispatcher();
+		// Make sure the native thread is running!
+		GlobalScreen.getInstance().registerNativeHook();
 
 		// Dispatch a key event and check to see if it was sent.
 		NativeKeyEvent keyEvent = new NativeKeyEvent(
@@ -364,7 +365,7 @@ public class GlobalScreenTest {
 				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_A,
+				NativeKeyEvent.VC_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
@@ -409,8 +410,8 @@ public class GlobalScreenTest {
 			assertEquals(wheelEvent, wheelListener.getLastEvent());
 		}
 */
-		// Stop the event dispatcher.
-		GlobalScreen.getInstance().stopEventDispatcher();
+		// Stop the native thread.
+		GlobalScreen.getInstance().unregisterNativeHook();
 
 		// Remove all added listeners.
 		GlobalScreen.getInstance().removeNativeKeyListener(keyListener);
@@ -422,7 +423,7 @@ public class GlobalScreenTest {
 	 * Test of dispatchEvent method, of class GlobalScreen.
 	 */
 	@Test
-	public void testDispatchEvent() throws InterruptedException {
+	public void testDispatchEvent() throws InterruptedException, NativeHookException {
 		System.out.println("dispatchEvent");
 
 		// Setup and event listener.
@@ -435,8 +436,8 @@ public class GlobalScreenTest {
 		NativeMouseWheelListenerImpl wheelListener = new NativeMouseWheelListenerImpl();
 		GlobalScreen.getInstance().addNativeMouseWheelListener(wheelListener);
 
-		// Make sure the dispatcher is running!
-		GlobalScreen.getInstance().startEventDispatcher();
+		// Make sure the native thread is running!
+		GlobalScreen.getInstance().registerNativeHook();
 
 		// Dispatch a key event and check to see if it was sent.
 		NativeKeyEvent keyEvent = new NativeKeyEvent(
@@ -444,7 +445,7 @@ public class GlobalScreenTest {
 				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_A,
+				NativeKeyEvent.VC_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
@@ -489,8 +490,8 @@ public class GlobalScreenTest {
 			assertEquals(wheelEvent, wheelListener.getLastEvent());
 		}
 
-		// Stop the event dispatcher.
-		GlobalScreen.getInstance().stopEventDispatcher();
+		// Stop the native thread.
+		GlobalScreen.getInstance().unregisterNativeHook();
 
 		// Remove all added listeners.
 		GlobalScreen.getInstance().removeNativeKeyListener(keyListener);
@@ -502,7 +503,7 @@ public class GlobalScreenTest {
 	 * Test of processKeyEvent method, of class GlobalScreen.
 	 */
 	@Test
-	public void testProcessKeyEvent() {
+	public void testProcessKeyEvent() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		System.out.println("processKeyEvent");
 
 		// Setup and event listener.
@@ -515,11 +516,14 @@ public class GlobalScreenTest {
 				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_UNDEFINED,
+				NativeKeyEvent.VC_UNDEFINED,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
-		GlobalScreen.getInstance().processKeyEvent(event);
+		Method method = GlobalScreen.class.getDeclaredMethod("processKeyEvent", new Class[] { NativeKeyEvent.class });
+		method.setAccessible(true);
+		method.invoke(GlobalScreen.getInstance(), event);
+
 		assertEquals(event, listener.getLastEvent());
 
 		GlobalScreen.getInstance().removeNativeKeyListener(listener);
@@ -529,7 +533,7 @@ public class GlobalScreenTest {
 	 * Test of processMouseEvent method, of class GlobalScreen.
 	 */
 	@Test
-	public void testProcessMouseEvent() {
+	public void testProcessMouseEvent() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		System.out.println("processMouseEvent");
 
 		// Setup and event listener.
@@ -546,7 +550,10 @@ public class GlobalScreenTest {
 				1,		// Click Count
 				NativeMouseEvent.BUTTON1);
 
-		GlobalScreen.getInstance().processMouseEvent(event);
+		Method method = GlobalScreen.class.getDeclaredMethod("processMouseEvent", new Class[] { NativeKeyEvent.class });
+		method.setAccessible(true);
+		method.invoke(GlobalScreen.getInstance(), event);
+
 		assertEquals(event, listener.getLastEvent());
 
 		GlobalScreen.getInstance().removeNativeMouseListener(listener);
@@ -556,7 +563,7 @@ public class GlobalScreenTest {
 	 * Test of processMouseWheelEvent method, of class GlobalScreen.
 	 */
 	@Test
-	public void testProcessMouseWheelEvent() {
+	public void testProcessMouseWheelEvent() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		System.out.println("processMouseWheelEvent");
 
 		// Setup and event listener.
@@ -575,7 +582,10 @@ public class GlobalScreenTest {
 				3,		// Scroll Amount
 				-1);	// Wheel Rotation
 
-		GlobalScreen.getInstance().processMouseWheelEvent(event);
+		Method method = GlobalScreen.class.getDeclaredMethod("processMouseWheelEvent", new Class[] { NativeKeyEvent.class });
+		method.setAccessible(true);
+		method.invoke(GlobalScreen.getInstance(), event);
+
 		assertEquals(event, listener.getLastEvent());
 
 		GlobalScreen.getInstance().removeNativeMouseWheelListener(listener);
@@ -588,7 +598,8 @@ public class GlobalScreenTest {
 	public void testStartEventDispatcher() throws IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		System.out.println("startEventDispatcher");
 
-		GlobalScreen.getInstance().startEventDispatcher();
+		// Make sure the eventExecutor is created!
+		GlobalScreen.getInstance();
 
 		Field eventExecutor = GlobalScreen.class.getDeclaredField("eventExecutor");
 		eventExecutor.setAccessible(true);
@@ -598,6 +609,7 @@ public class GlobalScreenTest {
 	/**
 	 * Test of stopEventDispatcher method, of class GlobalScreen.
 	 */
+	/* We cannot force finalize.
 	@Test
 	public void testStopEventDispatcher() throws IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		System.out.println("stopEventDispatcher");
@@ -608,4 +620,5 @@ public class GlobalScreenTest {
 		eventExecutor.setAccessible(true);
 		assertNull(eventExecutor.get(GlobalScreen.getInstance()));
 	}
+	*/
 }

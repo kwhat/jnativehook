@@ -56,7 +56,7 @@
 	<property name="dir.bin"	value="${basedir}/bin" />
 
 	<!-- Class Path Settings -->
-	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p ant-junit,junit-4)" ant test` -->
+	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p hamcrest-core-1.3,ant-junit,junit-4)" ant test` -->
 	<path id="ant.project.class.path">
 		<pathelement location="${dir.bin}/class/java" />
 		<pathelement location="${dir.bin}/class/test" />

@@ -34,7 +34,7 @@ public class NativeKeyListenerTest {
 				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_A,
+				NativeKeyEvent.VC_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
@@ -56,7 +56,7 @@ public class NativeKeyListenerTest {
 				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_A,
+				NativeKeyEvent.VC_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
@@ -78,7 +78,7 @@ public class NativeKeyListenerTest {
 				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
-				NativeKeyEvent.VK_UNDEFINED,
+				NativeKeyEvent.VC_UNDEFINED,
 				'A',
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
