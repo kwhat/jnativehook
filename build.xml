@@ -38,7 +38,7 @@
         <isset property="${env.CFLAGS}" />
     </condition>
     <!-- Set the linker flags. -->
-    <condition property="ant.build.native.ldflags" value="${env.LDFLAGS}" else="-Wl,-O1">
+    <condition property="ant.build.native.ldflags" value="${env.LDFLAGS}" else="">
         <isset property="${env.LDFLAGS}" />
     </condition>
 

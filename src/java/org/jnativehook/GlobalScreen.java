@@ -448,7 +448,7 @@ public class GlobalScreen {
 		System.out.println("\n" +
 			"JNativeHook: Global keyboard and mouse hooking for Java.\n" +
 			"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n" +
-			"https://github.com/kwhat/libuiohook/\n" +
+			"https://github.com/kwhat/jnativehook/\n" +
 			"\n" +
 			"JNativeHook is free software: you can redistribute it and/or modify\n" +
 			"it under the terms of the GNU Lesser General Public License as published\n" +
