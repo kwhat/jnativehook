@@ -61,12 +61,18 @@ typedef struct _org_jnativehook_mouse_NativeMouseEvent {
 	jmethodID init;
 	NativeInputEvent *parent;
 	jmethodID getButton;
+	jmethodID getClickCount;
+	jmethodID getX;
+	jmethodID getY;
 } NativeMouseEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
 	jclass cls;
 	jmethodID init;
 	NativeMouseEvent *parent;
+	jmethodID getScrollAmount;
+	jmethodID getScrollType;
+	jmethodID getWheelRotation;
 } NativeMouseWheelEvent;
 
 typedef struct _java_lang_System {

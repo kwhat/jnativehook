@@ -550,7 +550,7 @@ public class GlobalScreenTest {
 				1,		// Click Count
 				NativeMouseEvent.BUTTON1);
 
-		Method method = GlobalScreen.class.getDeclaredMethod("processMouseEvent", new Class[] { NativeKeyEvent.class });
+		Method method = GlobalScreen.class.getDeclaredMethod("processMouseEvent", new Class[] { NativeMouseEvent.class });
 		method.setAccessible(true);
 		method.invoke(GlobalScreen.getInstance(), event);
 
@@ -582,7 +582,7 @@ public class GlobalScreenTest {
 				3,		// Scroll Amount
 				-1);	// Wheel Rotation
 
-		Method method = GlobalScreen.class.getDeclaredMethod("processMouseWheelEvent", new Class[] { NativeKeyEvent.class });
+		Method method = GlobalScreen.class.getDeclaredMethod("processMouseWheelEvent", new Class[] { NativeMouseWheelEvent.class });
 		method.setAccessible(true);
 		method.invoke(GlobalScreen.getInstance(), event);
 

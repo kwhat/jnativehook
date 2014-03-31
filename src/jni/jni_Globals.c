@@ -236,15 +236,54 @@ int jni_CreateGlobals(JNIEnv *env) {
 			}
 
 
-			// Get the method ID for NativeKeyEvent.getKeyCode().
+			// Get the method ID for NativeMouseEvent.getButton().
 			org_jnativehook_mouse_NativeMouseEvent->getButton = (*env)->GetMethodID(
 					env,
 					org_jnativehook_mouse_NativeMouseEvent->cls,
 					"getButton",
 					"()I");
 
-			if (org_jnativehook_keyboard_NativeKeyEvent->getKeyCode == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyCode()!\n",
+			if (org_jnativehook_mouse_NativeMouseEvent->getButton == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getButton()!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getClickCount().
+			org_jnativehook_mouse_NativeMouseEvent->getClickCount = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseEvent->cls,
+					"getClickCount",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseEvent->getClickCount == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getClickCount()!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getX().
+			org_jnativehook_mouse_NativeMouseEvent->getX = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseEvent->cls,
+					"getX",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseEvent->getX == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getX()!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getY().
+			org_jnativehook_mouse_NativeMouseEvent->getY = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseEvent->cls,
+					"getY",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseEvent->getY == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getY()!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
@@ -271,6 +310,45 @@ int jni_CreateGlobals(JNIEnv *env) {
 			
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->init == NULL) {
 				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.<init>(IJIIIIIII)V!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getButton().
+			org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseWheelEvent->cls,
+					"getScrollAmount",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollAmount()!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getScrollType().
+			org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseWheelEvent->cls,
+					"getScrollType",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollType()!\n",
+						__FUNCTION__, __LINE__);
+			}
+
+
+			// Get the method ID for NativeMouseEvent.getWheelRotation().
+			org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation = (*env)->GetMethodID(
+					env,
+					org_jnativehook_mouse_NativeMouseWheelEvent->cls,
+					"getWheelRotation",
+					"()I");
+
+			if (org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation == NULL) {
+				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getWheelRotation()!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
