@@ -24,10 +24,10 @@ public class NativeMouseWheelListenerImpl implements NativeMouseWheelListener {
 	private NativeMouseWheelEvent lastEvent;
 
 	public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseWheelEvent.NATIVE_MOUSE_WHEEL) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeMouseWheelMoved!");
+			throw new IllegalArgumentException("Invalid event type received for nativeMouseWheelMoved!");
 		}
 
 		lastEvent = e;

@@ -24,10 +24,10 @@ public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
 	private NativeMouseEvent lastEvent;
 
 	public void nativeMouseClicked(NativeMouseEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseEvent.NATIVE_MOUSE_CLICKED) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeMouseClicked!");
+			throw new IllegalArgumentException("Invalid event type received for nativeMouseClicked!");
 		}
 
 		lastEvent = e;
@@ -38,10 +38,10 @@ public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
 	}
 
 	public void nativeMousePressed(NativeMouseEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseEvent.NATIVE_MOUSE_PRESSED) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeKeyPressed!");
+			throw new IllegalArgumentException("Invalid event type received for nativeKeyPressed!");
 		}
 
 		lastEvent = e;
@@ -52,10 +52,10 @@ public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
 	}
 
 	public void nativeMouseReleased(NativeMouseEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseEvent.NATIVE_MOUSE_RELEASED) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeMouseReleased!");
+			throw new IllegalArgumentException("Invalid event type received for nativeMouseReleased!");
 		}
 
 		lastEvent = e;
@@ -66,10 +66,10 @@ public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
 	}
 
 	public void nativeMouseMoved(NativeMouseEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseEvent.NATIVE_MOUSE_MOVED) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeMouseMoved!");
+			throw new IllegalArgumentException("Invalid event type received for nativeMouseMoved!");
 		}
 
 		lastEvent = e;
@@ -80,10 +80,12 @@ public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
 	}
 
 	public void nativeMouseDragged(NativeMouseEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
-			throw new IllegalArgumentException("Invalid event type recieved for nativeMouseDragged!");
+			throw new IllegalArgumentException("Invalid event type received" +
+					"" +
+					" for nativeMouseDragged!");
 		}
 
 		lastEvent = e;

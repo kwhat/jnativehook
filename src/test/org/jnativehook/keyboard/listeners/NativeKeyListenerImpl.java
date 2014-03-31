@@ -25,10 +25,10 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 	private NativeKeyEvent lastEvent;
 
 	public void nativeKeyPressed(NativeKeyEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeKeyEvent.NATIVE_KEY_PRESSED) {
-			fail("Invalid event type recieved for nativeKeyPressed!");
+			fail("Invalid event type received for nativeKeyPressed!");
 		}
 
 		lastEvent = e;
@@ -39,10 +39,10 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 	}
 
 	public void nativeKeyReleased(NativeKeyEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeKeyEvent.NATIVE_KEY_RELEASED) {
-			fail("Invalid event type recieved for nativeKeyPressed!");
+			fail("Invalid event type received for nativeKeyPressed!");
 		}
 
 		lastEvent = e;
@@ -53,10 +53,10 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 	}
 
 	public void nativeKeyTyped(NativeKeyEvent e) {
-		System.out.println("Recieved " + e.paramString());
+		System.out.println("Received " + e.paramString());
 
 		if (e.getID() != NativeKeyEvent.NATIVE_KEY_TYPED) {
-			fail("Invalid event type recieved for nativeKeyPressed!");
+			fail("Invalid event type received for nativeKeyPressed!");
 		}
 
 		lastEvent = e;
