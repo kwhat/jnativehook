@@ -220,7 +220,6 @@
 		<available file="${dir.src}/libuiohook" property="project.check.libuiohook.download" />
         <available file="${dir.src}/libuiohook/configure" property="project.check.libuiohook.bootstrap" />
         <available file="${dir.bin}/libuiohook/Makefile" property="project.check.libuiohook.configure" />
-        <available file="${dir.jar}/${ant.project.name}.jar" property="project.check.jar" />
         <available file="${dir.doc}/" property="project.check.javadoc" />
 
 		<!-- Set the operating system name used for organizing native libraries -->
@@ -531,7 +530,7 @@
 	</target>
 
 
-	<target name="jar" unless="project.check.jar" description="Creates the jar library.">
+	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.bin}/class/java/org/jnativehook/lib" />
 		<copy overwrite="true" todir="${dir.bin}/class/java/org/jnativehook/lib">
@@ -540,7 +539,7 @@
 
 		<echo>Creating ${ant.project.name}.jar...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/${ant.project.name}.jar" basedir="${dir.bin}/class/java">
+		<jar jarfile="${dir.jar}/${ant.project.name}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
 			<include name="org/jnativehook/**" />
 			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
 			<manifest>
