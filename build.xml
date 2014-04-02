@@ -520,8 +520,10 @@
 			<classpath refid="ant.project.class.path" />
 
 			<formatter type="brief" usefile="false" />
-			<!-- test name="TestExample" / -->
-			<batchtest> <!-- todir="${reports.tests}" -->
+			<!-- test name="org.jnativehook.GlobalScreenTest" /-->
+
+			<!-- todir="${reports.tests}" -->
+			<batchtest>
 				<fileset dir="${dir.src}/test">
 					<include name="**/*Test.java"/>
 				</fileset>

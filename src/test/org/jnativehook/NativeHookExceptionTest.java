@@ -18,21 +18,32 @@
 package org.jnativehook;
 
 import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 public class NativeHookExceptionTest {
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
+	//@Rule
+	//public ExpectedException thrown = ExpectedException.none();
 
 	@Test
-	public void testNativeHookException() throws NativeHookException {
+	public void testNativeHookException() {
 		System.out.println("NativeHookException");
 
 		String message = "Test NativeHookException";
-		thrown.expect(NativeHookException.class);
-		thrown.expectMessage(message);
+		//thrown.expect(NativeHookException.class);
+		//thrown.expectMessage(message);
 
-		throw new NativeHookException(message);
+		// Cannot support @rule at this time due to macport junit min version 4.6
+		//throw new NativeHookException(message);
+
+		try {
+			throw new NativeHookException(message);
+		}
+		catch (NativeHookException e) {
+			assertEquals(message, e.getMessage());
+		}
+		catch (Exception e) {
+			fail("Invalid exception type: " + e.getClass());
+		}
 	}
 }
