@@ -140,7 +140,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	
 	public static final int VC_BACKQUOTE					= 0x0029;
 		
-	/** VC_0 thru VC_9 are the same as ASCII '0' thru '9' (0x30 - 0x39). */
+	/** VC_0 thru VC_9 */
 	public static final int VC_1							= 0x0002;
 	public static final int VC_2							= 0x0003;
 	public static final int VC_3							= 0x0004;
@@ -586,7 +586,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.slash", "Slash");
 
 			case VC_KP_EQUALS:
-				// TODO Not sure if apple defines an AWT property for this key.
+				// TODO Not sure if Apple defines an AWT property for this key.
 			case VC_EQUALS:
 				return Toolkit.getProperty("AWT.equals", "Equals");
 			case VC_SEMICOLON:
@@ -675,8 +675,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.printScreen", "Print Screen");
 			case VC_INSERT:
 				return Toolkit.getProperty("AWT.insert", "Insert");
-			case VC_HELP:
-				return Toolkit.getProperty("AWT.help", "Help");
 
 
 			case VC_PAGE_UP:
@@ -827,14 +825,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 /*
 			case VC_AGAIN:
 				return Toolkit.getProperty("AWT.again", "Again");
-			case VC_UNDO:
-				return Toolkit.getProperty("AWT.undo", "Undo");
-			case VC_COPY:
-				return Toolkit.getProperty("AWT.copy", "Copy");
-			case VC_PASTE:
-				return Toolkit.getProperty("AWT.paste", "Paste");
-			case VC_CUT:
-				return Toolkit.getProperty("AWT.cut", "Cut");
+
 			case VC_FIND:
 				return Toolkit.getProperty("AWT.find", "Find");
 			case VC_PROPS:
@@ -846,6 +837,51 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_BEGIN:
 				return Toolkit.getProperty("AWT.begin", "Begin");
 */
+
+			/* Media Control Keys */
+			case VC_POWER:
+				return Toolkit.getProperty("AWT.power", "Power");
+			case VC_SLEEP:
+				return Toolkit.getProperty("AWT.sleep", "Sleep");
+			case VC_WAKE:
+				return Toolkit.getProperty("AWT.wake", "Wake");
+			case VC_MUTE:
+				return Toolkit.getProperty("AWT.mute", "Mute");
+			case VC_VOLUME_UP:
+				return Toolkit.getProperty("AWT.volup", "Volume Up");
+			case VC_VOLUME_DOWN:
+				return Toolkit.getProperty("AWT.voldn", "Volume Down");
+			case VC_CUT:
+				return Toolkit.getProperty("AWT.cut", "Cut");
+			case VC_COPY:
+				return Toolkit.getProperty("AWT.copy", "Copy");
+			case VC_PASTE:
+				return Toolkit.getProperty("AWT.paste", "Paste");
+			case VC_UNDO:
+				return Toolkit.getProperty("AWT.undo", "Undo");
+			case VC_REDO:
+				return Toolkit.getProperty("AWT.redo", "Redo");
+			case VC_PLAY:
+				return Toolkit.getProperty("AWT.play", "Play");
+			case VC_STOP:
+				return Toolkit.getProperty("AWT.stop", "Stop");
+			case VC_REWIND:
+				return Toolkit.getProperty("AWT.rewind", "Rewind");
+			case VC_FAST_FORWARD:
+				return Toolkit.getProperty("AWT.fastfwrd", "Fast Forward");
+			case VC_EJECT:
+				return Toolkit.getProperty("AWT.eject", "Eject");
+			case VC_MAIL:
+				return Toolkit.getProperty("AWT.mail", "Mail");
+			case VC_WEB:
+				return Toolkit.getProperty("AWT.web", "Web");
+			case VC_MUSIC:
+				return Toolkit.getProperty("AWT.music", "Music");
+			case VC_PICTURES:
+				return Toolkit.getProperty("AWT.pictures", "Pictures");
+			case VC_VIDEO:
+				return Toolkit.getProperty("AWT.video", "Video");
+
 			case VC_UNDEFINED:
 				return Toolkit.getProperty("AWT.undefined", "Undefined");
 		}
@@ -860,7 +896,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * action key does not fire a unicode character and is not a modifier key.
      *
      * @return <code>true</code> if the key is an "action" key,
-	 * <code>false</code> otherwise
+	 * <code>false</code> otherwise.
 	 *
 	 * @since 1.1
      */
@@ -909,7 +945,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			case VC_PRINTSCREEN:
 			case VC_INSERT:
-			case VC_HELP:
 
 			case VC_PAGE_UP:
 			case VC_PAGE_DOWN:
@@ -917,24 +952,39 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_END:
 
 
-
-
 			case VC_SCROLL_LOCK:
 			case VC_CAPS_LOCK:
 			case VC_NUM_LOCK:
 
 
-			/* Sun Keyboard keys */
-			case VC_UNDO:
-			case VC_COPY:
-			case VC_PASTE:
-			case VC_CUT:
-			case VC_STOP:
-
 			/* For input method support on Asian Keyboards */
 			case VC_KANJI:
 			case VC_KATAKANA:
 			case VC_HIRAGANA:
+
+
+			case VC_POWER:
+			case VC_SLEEP:
+			case VC_WAKE:
+			case VC_MUTE:
+			case VC_VOLUME_UP:
+			case VC_VOLUME_DOWN:
+			case VC_CUT:
+			case VC_COPY:
+			case VC_PASTE:
+			case VC_UNDO:
+			case VC_REDO:
+			case VC_PLAY:
+			case VC_STOP:
+			case VC_REWIND:
+			case VC_FAST_FORWARD:
+			case VC_EJECT:
+			case VC_MAIL:
+			case VC_WEB:
+			case VC_MUSIC:
+			case VC_PICTURES:
+			case VC_VIDEO:
+
 				return true;
         }
 
