@@ -472,7 +472,7 @@
 
 		<ld toolchain="${ant.build.native.toolchain}" outfile="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}/${ant.build.native.executable}">
             <!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
-            <arg value="-dynamic" if="native.os.isApple" />
+            <arg value="-c" if="native.os.isApple" />
             <arg value="-shared" unless="native.os.isApple" />
 
             <arg value="${ant.build.native.ldflags}" />

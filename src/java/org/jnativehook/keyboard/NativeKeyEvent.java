@@ -261,25 +261,38 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_POWER						= 0xE05E;
 	public static final int VC_SLEEP						= 0xE05F;
 	public static final int VC_WAKE							= 0xE063;
-	public static final int VC_MUTE							= 0xE020;
+
+	public static final int VC_MEDIA_PLAY					= 0xE022;
+	public static final int VC_MEDIA_STOP					= 0xE024;
+	public static final int VC_MEDIA_PREVIOUS				= 0xE010;
+	public static final int VC_MEDIA_NEXT					= 0xE019;
+	public static final int VC_MEDIA_SELECT					= 0xE06D;
+
+	public static final int VC_VOLUME_MUTE					= 0xE020;
 	public static final int VC_VOLUME_UP					= 0xE030;
 	public static final int VC_VOLUME_DOWN					= 0xE02E;
+
 	public static final int VC_CUT							= 0xE017;
 	public static final int VC_COPY							= 0xE018;
 	public static final int VC_PASTE						= 0xE00A;
 	public static final int VC_HELP							= 0xE03B;
 	public static final int VC_UNDO							= 0xE008;
 	public static final int VC_REDO							= 0xE007;
-	public static final int VC_PLAY							= 0xE022;
-	public static final int VC_STOP							= 0xE024;
-	public static final int VC_REWIND						= 0xE010;
-	public static final int VC_FAST_FORWARD					= 0xE019;
-	public static final int VC_EJECT						= 0xE02C;
-	public static final int VC_MAIL							= 0xE01E;
-	public static final int VC_WEB							= 0xE032;
-	public static final int VC_MUSIC						= 0xE03C;
-	public static final int VC_PICTURES						= 0xE064;
-	public static final int VC_VIDEO						= 0xE06D;
+
+	//public static final int VC_EJECT						= 0xE02C;
+	//public static final int VC_MAIL							= 0xE01E;
+	//public static final int VC_WEB							= 0xE032;
+
+	public static final int VC_APP_MAIL						= 0xE06C;
+	public static final int VC_APP_CALCULATOR				= 0xE021;
+
+	public static final int VC_BROWSER_SEARCH				= 0xE065;
+	public static final int VC_BROWSER_HOME					= 0xE032;
+	public static final int VC_BROWSER_BACK					= 0xE06A;
+	public static final int VC_BROWSER_FORWARD				= 0xE069;
+	public static final int VC_BROWSER_STOP					= 0xE068;
+	public static final int VC_BROWSER_REFRESH				= 0xE067;
+	public static final int VC_BROWSER_FAVORITES			= 0xE066;
 
 
 	public static final int VC_KATAKANA						= 0x0070;
@@ -845,7 +858,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.sleep", "Sleep");
 			case VC_WAKE:
 				return Toolkit.getProperty("AWT.wake", "Wake");
-			case VC_MUTE:
+			case VC_VOLUME_MUTE:
 				return Toolkit.getProperty("AWT.mute", "Mute");
 			case VC_VOLUME_UP:
 				return Toolkit.getProperty("AWT.volup", "Volume Up");
@@ -861,18 +874,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.undo", "Undo");
 			case VC_REDO:
 				return Toolkit.getProperty("AWT.redo", "Redo");
-			case VC_PLAY:
+			case VC_MEDIA_PLAY:
 				return Toolkit.getProperty("AWT.play", "Play");
-			case VC_STOP:
+			case VC_MEDIA_STOP:
 				return Toolkit.getProperty("AWT.stop", "Stop");
-			case VC_REWIND:
-				return Toolkit.getProperty("AWT.rewind", "Rewind");
-			case VC_FAST_FORWARD:
-				return Toolkit.getProperty("AWT.fastfwrd", "Fast Forward");
+			case VC_MEDIA_PREVIOUS:
+				return Toolkit.getProperty("AWT.previous", "Previous");
+			case VC_MEDIA_NEXT:
+				return Toolkit.getProperty("AWT.next", "Next");
+			/*
 			case VC_EJECT:
 				return Toolkit.getProperty("AWT.eject", "Eject");
-			case VC_MAIL:
-				return Toolkit.getProperty("AWT.mail", "Mail");
 			case VC_WEB:
 				return Toolkit.getProperty("AWT.web", "Web");
 			case VC_MUSIC:
@@ -881,6 +893,34 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.pictures", "Pictures");
 			case VC_VIDEO:
 				return Toolkit.getProperty("AWT.video", "Video");
+			*/
+
+			case VC_APP_MAIL:
+				return Toolkit.getProperty("AWT.mail", "Mail");
+
+			case VC_APP_CALCULATOR:
+				return Toolkit.getProperty("AWT.calculator", "Calculator");
+
+			case VC_BROWSER_SEARCH:
+				return Toolkit.getProperty("AWT.search", "Search");
+
+			case VC_BROWSER_HOME:
+				return Toolkit.getProperty("AWT.home", "Home");
+
+			case VC_BROWSER_BACK:
+				return Toolkit.getProperty("AWT.back", "Back");
+
+			case VC_BROWSER_FORWARD:
+				return Toolkit.getProperty("AWT.forward", "Forward");
+
+			case VC_BROWSER_STOP:
+				return Toolkit.getProperty("AWT.stop", "Stop");
+
+			case VC_BROWSER_REFRESH:
+				return Toolkit.getProperty("AWT.refresh", "Refresh");
+
+			case VC_BROWSER_FAVORITES:
+				return Toolkit.getProperty("AWT.favorites", "Favorites");
 
 			case VC_UNDEFINED:
 				return Toolkit.getProperty("AWT.undefined", "Undefined");
@@ -966,24 +1006,44 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_POWER:
 			case VC_SLEEP:
 			case VC_WAKE:
-			case VC_MUTE:
+
+			case VC_VOLUME_MUTE:
 			case VC_VOLUME_UP:
 			case VC_VOLUME_DOWN:
+
 			case VC_CUT:
 			case VC_COPY:
 			case VC_PASTE:
 			case VC_UNDO:
 			case VC_REDO:
-			case VC_PLAY:
-			case VC_STOP:
-			case VC_REWIND:
-			case VC_FAST_FORWARD:
+
+			case VC_MEDIA_PLAY:
+			case VC_MEDIA_STOP:
+			case VC_MEDIA_PREVIOUS:
+			case VC_MEDIA_NEXT:
+
+			/*
 			case VC_EJECT:
-			case VC_MAIL:
+				return Toolkit.getProperty("AWT.eject", "Eject");
 			case VC_WEB:
+				return Toolkit.getProperty("AWT.web", "Web");
 			case VC_MUSIC:
+				return Toolkit.getProperty("AWT.music", "Music");
 			case VC_PICTURES:
+				return Toolkit.getProperty("AWT.pictures", "Pictures");
 			case VC_VIDEO:
+				return Toolkit.getProperty("AWT.video", "Video");
+			*/
+
+			case VC_APP_MAIL:
+			case VC_APP_CALCULATOR:
+			case VC_BROWSER_SEARCH:
+			case VC_BROWSER_HOME:
+			case VC_BROWSER_BACK:
+			case VC_BROWSER_FORWARD:
+			case VC_BROWSER_STOP:
+			case VC_BROWSER_REFRESH:
+			case VC_BROWSER_FAVORITES:
 
 				return true;
         }
