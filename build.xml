@@ -471,18 +471,18 @@
 		<mkdir dir="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}" />
 
 		<ld toolchain="${ant.build.native.toolchain}" outfile="${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}/${ant.build.native.executable}">
-            <!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
-            <arg value="-dynamic" if="native.os.isApple" />
-            <arg value="-shared" unless="native.os.isApple" />
+			<!-- weak linker options for darwin: -Wl,-flat_namespace,-undefined,dynamic_lookup -->
+			<arg value="-dynamiclib" if="native.os.isApple" />
+			<arg value="-shared" unless="native.os.isApple" />
 
-            <arg value="${ant.build.native.ldflags}" />
+			<arg value="${ant.build.native.ldflags}" />
 
-            <fileset dir="${dir.bin}">
-                <include name="obj/jni/**/*.o" />
-            </fileset>
+			<fileset dir="${dir.bin}">
+				<include name="obj/jni/**/*.o" />
+			</fileset>
 
-            <!-- Linking order matters and libraries should come after obj files. -->
-            <arg value="${ant.build.native.ld.libs}" />
+			<!-- Linking order matters and libraries should come after obj files. -->
+			<arg value="${ant.build.native.ld.libs}" />
 		</ld>
 	</target>
 
