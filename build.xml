@@ -451,7 +451,6 @@
             <arg value="${ant.build.native.cflags}" />
 
             <define name="DEBUG" if="ant.build.debug"/>
-            <define name="__int64" value="int64_t" if="native.os.isWindows" />
 
             <include path="${dir.bin}/include" />
             <include path="${dir.src}/jni/include" />
@@ -475,6 +474,7 @@
 			<arg value="-dynamiclib" if="native.os.isApple" />
 			<arg value="-shared" unless="native.os.isApple" />
 
+            <arg value="-static-libgcc" if="native.os.isWindows" />
 			<arg value="${ant.build.native.ldflags}" />
 
 			<fileset dir="${dir.bin}">
