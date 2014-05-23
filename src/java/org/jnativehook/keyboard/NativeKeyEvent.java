@@ -279,9 +279,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_UNDO							= 0xE008;
 	public static final int VC_REDO							= 0xE007;
 
-	//public static final int VC_EJECT						= 0xE02C;
-	//public static final int VC_MAIL							= 0xE01E;
-	//public static final int VC_WEB							= 0xE032;
+	public static final int VC_EJECT						= 0xE02C;
+	public static final int VC_WEB							= 0xE032;
+	public static final int VC_MUSIC						= 0xE03C;
+	public static final int VC_PICTURES						= 0xE064;
 
 	public static final int VC_APP_MAIL						= 0xE06C;
 	public static final int VC_APP_CALCULATOR				= 0xE021;
@@ -294,11 +295,12 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_BROWSER_REFRESH				= 0xE067;
 	public static final int VC_BROWSER_FAVORITES			= 0xE066;
 
-
 	public static final int VC_KATAKANA						= 0x0070;
 	public static final int VC_FURIGANA						= 0x0077;
 	public static final int VC_KANJI						= 0x0079;
 	public static final int VC_HIRAGANA						= 0x007B;
+	public static final int VC_YEN							= 0x007D;
+	public static final int VC_KP_COMMA						= 0x007E;
 
 	/** This value is used to indicate that the keyCode is unknown. */
 	public static final int VC_UNDEFINED					= 0x0000;
