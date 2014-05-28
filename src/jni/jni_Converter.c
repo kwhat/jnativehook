@@ -121,6 +121,7 @@ jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLo
 		case VC_KP_SEPARATOR:
 		case VC_KP_SUBTRACT:
 		case VC_KP_DIVIDE:
+		case VC_KP_COMMA:
 			*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 			break;
 
