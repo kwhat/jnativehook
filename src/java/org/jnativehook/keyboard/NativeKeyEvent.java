@@ -207,7 +207,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_PAUSE						= 0x0E45;
 
 
-	// Begin Edit Key Zone
+	/** Edit Key Zone */
 	public static final int VC_INSERT						= 0x0E52;
 	public static final int VC_DELETE						= 0x0E53;
 	public static final int VC_HOME							= 0x0E47;
@@ -216,7 +216,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_PAGE_DOWN					= 0x0E51;
 
 
-	// Begin Cursor Key Zone
+	/** Begin Cursor Key Zone */
 	public static final int VC_UP							= 0xE048;
 	public static final int VC_LEFT							= 0xE04B;
 	public static final int VC_RIGHT						= 0xE04D;
@@ -272,17 +272,12 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_VOLUME_UP					= 0xE030;
 	public static final int VC_VOLUME_DOWN					= 0xE02E;
 
-	public static final int VC_CUT							= 0xE017;
-	public static final int VC_COPY							= 0xE018;
-	public static final int VC_PASTE						= 0xE00A;
-	public static final int VC_HELP							= 0xE03B;
-	public static final int VC_UNDO							= 0xE008;
-	public static final int VC_REDO							= 0xE007;
-
-	public static final int VC_EJECT						= 0xE02C;
-	public static final int VC_WEB							= 0xE032;
-	public static final int VC_MUSIC						= 0xE03C;
-	public static final int VC_PICTURES						= 0xE064;
+	// Need to verify these codes.
+	//public static final int VC_EJECT						= 0xE02C;
+	//public static final int VC_WEB						= 0xE032;
+	//public static final int VC_MUSIC						= 0xE03C;
+	//public static final int VC_PICTURES					= 0xE064;
+	//public static final int VC_VIDEO						= 0x????;
 
 	public static final int VC_APP_MAIL						= 0xE06C;
 	public static final int VC_APP_CALCULATOR				= 0xE021;
@@ -295,12 +290,28 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_BROWSER_REFRESH				= 0xE067;
 	public static final int VC_BROWSER_FAVORITES			= 0xE066;
 
+	/** Japanese Language Keys */
 	public static final int VC_KATAKANA						= 0x0070;
+	public static final int VC_UNDERSCORE                   = 0x0073;
 	public static final int VC_FURIGANA						= 0x0077;
 	public static final int VC_KANJI						= 0x0079;
 	public static final int VC_HIRAGANA						= 0x007B;
 	public static final int VC_YEN							= 0x007D;
 	public static final int VC_KP_COMMA						= 0x007E;
+
+	/** Sun keyboards */
+	public static final int VC_CUT							= 0xE017;
+	public static final int VC_COPY							= 0xE018;
+	public static final int VC_PASTE						= 0xE00A;
+	public static final int VC_HELP							= 0xE03B;
+	public static final int VC_UNDO							= 0xE008;
+	public static final int VC_REDO							= 0xE007;
+
+	// TODO Verify the following scancodes.
+	public static final int VC_FIND							= 0xE012;
+	public static final int VC_PROPS						= 0xFFCA;
+	public static final int VC_COMPOSE						= 0xFF20;
+	public static final int VC_ALT_GRAPH					= 0xFF7E;
 
 	/** This value is used to indicate that the keyCode is unknown. */
 	public static final int VC_UNDEFINED					= 0x0000;
@@ -452,6 +463,99 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static String getKeyText(int keyCode) {
 		// Lookup text values.
 		switch (keyCode) {
+			case VC_ESCAPE:
+				return Toolkit.getProperty("AWT.escape", "Escape");
+
+			// Begin Function Keys
+			case VC_F1:
+				return Toolkit.getProperty("AWT.f1", "F1");
+			case VC_F2:
+				return Toolkit.getProperty("AWT.f2", "F2");
+			case VC_F3:
+				return Toolkit.getProperty("AWT.f3", "F3");
+			case VC_F4:
+				return Toolkit.getProperty("AWT.f4", "F4");
+			case VC_F5:
+				return Toolkit.getProperty("AWT.f5", "F5");
+			case VC_F6:
+				return Toolkit.getProperty("AWT.f6", "F6");
+			case VC_F7:
+				return Toolkit.getProperty("AWT.f7", "F7");
+			case VC_F8:
+				return Toolkit.getProperty("AWT.f8", "F8");
+			case VC_F9:
+				return Toolkit.getProperty("AWT.f9", "F9");
+			case VC_F10:
+				return Toolkit.getProperty("AWT.f10", "F10");
+			case VC_F11:
+				return Toolkit.getProperty("AWT.f11", "F11");
+			case VC_F12:
+				return Toolkit.getProperty("AWT.f12", "F12");
+
+			case VC_F13:
+				return Toolkit.getProperty("AWT.f13", "F13");
+			case VC_F14:
+				return Toolkit.getProperty("AWT.f14", "F14");
+			case VC_F15:
+				return Toolkit.getProperty("AWT.f15", "F15");
+			case VC_F16:
+				return Toolkit.getProperty("AWT.f16", "F16");
+			case VC_F17:
+				return Toolkit.getProperty("AWT.f17", "F17");
+			case VC_F18:
+				return Toolkit.getProperty("AWT.f18", "F18");
+			case VC_F19:
+				return Toolkit.getProperty("AWT.f19", "F19");
+			case VC_F20:
+				return Toolkit.getProperty("AWT.f20", "F20");
+			case VC_F21:
+				return Toolkit.getProperty("AWT.f21", "F21");
+			case VC_F22:
+				return Toolkit.getProperty("AWT.f22", "F22");
+			case VC_F23:
+				return Toolkit.getProperty("AWT.f23", "F23");
+			case VC_F24:
+				return Toolkit.getProperty("AWT.f24", "F24");
+			// End Function Keys
+
+			// Begin Alphanumeric Zone
+			case VC_BACKQUOTE:
+				return Toolkit.getProperty("AWT.backQuote", "Back Quote");
+
+			case VC_1:
+				return "1";
+			case VC_2:
+				return "2";
+			case VC_3:
+				return "3";
+			case VC_4:
+				return "4";
+			case VC_5:
+				return "5";
+			case VC_6:
+				return "6";
+			case VC_7:
+				return "7";
+			case VC_8:
+				return "8";
+			case VC_9:
+				return "9";
+			case VC_0:
+				return "0";
+
+			case VC_MINUS:
+				return Toolkit.getProperty("AWT.minus", "Minus");
+			case VC_KP_EQUALS:
+			case VC_EQUALS:
+				return Toolkit.getProperty("AWT.equals", "Equals");
+			case VC_BACKSPACE:
+				return Toolkit.getProperty("AWT.backSpace", "Backspace");
+
+			case VC_TAB:
+				return Toolkit.getProperty("AWT.tab", "Tab");
+			case VC_CAPS_LOCK:
+				return Toolkit.getProperty("AWT.capsLock", "Caps Lock");
+
 			case VC_A:
 				return "A";
 			case VC_B:
@@ -505,58 +609,109 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_Z:
 				return "Z";
 
+			case VC_OPEN_BRACKET:
+				return Toolkit.getProperty("AWT.openBracket", "Open Bracket");
+			case VC_CLOSE_BRACKET:
+				return Toolkit.getProperty("AWT.closeBracket", "Close Bracket");
+			case VC_BACK_SLASH:
+				return Toolkit.getProperty("AWT.backSlash", "Back Slash");
+
+			case VC_SEMICOLON:
+				return Toolkit.getProperty("AWT.semicolon", "Semicolon");
+			case VC_QUOTE:
+				return Toolkit.getProperty("AWT.quote", "Quote");
+			case VC_KP_ENTER:
+			case VC_ENTER:
+				return Toolkit.getProperty("AWT.enter", "Enter");
+
+			case VC_KP_COMMA:
+			case VC_COMMA:
+				return Toolkit.getProperty("AWT.comma", "Comma");
+			case VC_PERIOD:
+				return Toolkit.getProperty("AWT.period", "Period");
+			case VC_SLASH:
+				return Toolkit.getProperty("AWT.slash", "Slash");
+
+			case VC_SPACE:
+				return Toolkit.getProperty("AWT.space", "Space");
+			// End Alphanumeric Zone
+
+			case VC_PRINTSCREEN:
+				return Toolkit.getProperty("AWT.printScreen", "Print Screen");
+			case VC_SCROLL_LOCK:
+				return Toolkit.getProperty("AWT.scrollLock", "Scroll Lock");
+			case VC_PAUSE:
+				return Toolkit.getProperty("AWT.pause", "Pause");
+
+			// Begin Edit Key Zone
+			case VC_INSERT:
+				return Toolkit.getProperty("AWT.insert", "Insert");
+			case VC_DELETE:
+				return Toolkit.getProperty("AWT.delete", "NumPad Delete");
+			case VC_HOME:
+				return Toolkit.getProperty("AWT.home", "Home");
+			case VC_END:
+				return Toolkit.getProperty("AWT.end", "End");
+			case VC_PAGE_UP:
+				return Toolkit.getProperty("AWT.pgup", "Page Up");
+			case VC_PAGE_DOWN:
+				return Toolkit.getProperty("AWT.pgdn", "Page Down");
+			// End Edit Key Zone
+
+
+			// Begin Cursor Key Zone
+			case VC_UP:
+				return Toolkit.getProperty("AWT.up", "Up");
+			case VC_DOWN:
+				return Toolkit.getProperty("AWT.down", "Down");
+			case VC_LEFT:
+				return Toolkit.getProperty("AWT.left", "Left");
+			case VC_RIGHT:
+				return Toolkit.getProperty("AWT.right", "Right");
+			// End Cursor Key Zone
+
+
+			// Begin Numeric Zone
+			case VC_NUM_LOCK:
+				return Toolkit.getProperty("AWT.numLock", "Num Lock");
+			case VC_KP_DIVIDE:
+				return Toolkit.getProperty("AWT.divide", "NumPad Divide");
+			case VC_KP_MULTIPLY:
+				return Toolkit.getProperty("AWT.multiply", "NumPad Multiply");
+			case VC_KP_SUBTRACT:
+				return Toolkit.getProperty("AWT.subtract", "NumPad Subtract");
+			//case VC_KP_EQUALS:
+			//	Defined with VC_EQUALS.
+			case VC_KP_ADD:
+				return Toolkit.getProperty("AWT.add", "NumPad Add");
+			//case VC_KP_ENTER:
+			//	Defined with VC_ENTER.
+			case VC_KP_SEPARATOR:
+				return Toolkit.getProperty("AWT.separator", "NumPad Separator");
+
 			case VC_KP_0:
 				return Toolkit.getProperty("AWT.numpad0", "NumPad 0");
 			case VC_KP_1:
 				return Toolkit.getProperty("AWT.numpad1", "NumPad 1");
 			case VC_KP_2:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 2");
+				return Toolkit.getProperty("AWT.numpad2", "NumPad 2");
 			case VC_KP_3:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 3");
+				return Toolkit.getProperty("AWT.numpad3", "NumPad 3");
 			case VC_KP_4:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 4");
+				return Toolkit.getProperty("AWT.numpad4", "NumPad 4");
 			case VC_KP_5:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 5");
+				return Toolkit.getProperty("AWT.numpad5", "NumPad 5");
 			case VC_KP_6:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 6");
+				return Toolkit.getProperty("AWT.numpad6", "NumPad 6");
 			case VC_KP_7:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 7");
+				return Toolkit.getProperty("AWT.numpad7", "NumPad 7");
 			case VC_KP_8:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 8");
+				return Toolkit.getProperty("AWT.numpad8", "NumPad 8");
 			case VC_KP_9:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 9");
+				return Toolkit.getProperty("AWT.numpad9", "NumPad 9");
+			// End Numeric Zone
 
-
-			case VC_0:
-				return "0";
-			case VC_1:
-				return "1";
-			case VC_2:
-				return "2";
-			case VC_3:
-				return "3";
-			case VC_4:
-				return "4";
-			case VC_5:
-				return "5";
-			case VC_6:
-				return "6";
-			case VC_7:
-				return "7";
-			case VC_8:
-				return "8";
-			case VC_9:
-				return "9";
-
-
-			case VC_KP_ENTER:
-			case VC_ENTER:
-				return Toolkit.getProperty("AWT.enter", "Enter");
-			case VC_BACKSPACE:
-				return Toolkit.getProperty("AWT.backSpace", "Backspace");
-			case VC_TAB:
-				return Toolkit.getProperty("AWT.tab", "Tab");
-
+			// Begin Modifier and Control Keys
 			case VC_SHIFT_L:
 			case VC_SHIFT_R:
 				return	Toolkit.getProperty("AWT.shift", "Shift");
@@ -571,311 +726,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.meta", "Meta");
 			case VC_CONTEXT_MENU:
 				return Toolkit.getProperty("AWT.context", "Context Menu");
-
-			case VC_PAUSE:
-				return Toolkit.getProperty("AWT.pause", "Pause");
-			case VC_CAPS_LOCK:
-				return Toolkit.getProperty("AWT.capsLock", "Caps Lock");
-			case VC_ESCAPE:
-				return Toolkit.getProperty("AWT.escape", "Escape");
-			case VC_SPACE:
-				return Toolkit.getProperty("AWT.space", "Space");
-
-			case VC_UP:
-				return Toolkit.getProperty("AWT.up", "Up");
-			case VC_DOWN:
-				return Toolkit.getProperty("AWT.down", "Down");
-			case VC_LEFT:
-				return Toolkit.getProperty("AWT.left", "Left");
-			case VC_RIGHT:
-				return Toolkit.getProperty("AWT.right", "Right");
+			// End Modifier and Control Keys
 
 
-			case VC_COMMA:
-				return Toolkit.getProperty("AWT.comma", "Comma");
-			case VC_MINUS:
-				return Toolkit.getProperty("AWT.minus", "Minus");
-			case VC_PERIOD:
-				return Toolkit.getProperty("AWT.period", "Period");
-			case VC_SLASH:
-				return Toolkit.getProperty("AWT.slash", "Slash");
-
-			case VC_KP_EQUALS:
-				// TODO Not sure if Apple defines an AWT property for this key.
-			case VC_EQUALS:
-				return Toolkit.getProperty("AWT.equals", "Equals");
-			case VC_SEMICOLON:
-				return Toolkit.getProperty("AWT.semicolon", "Semicolon");
-
-
-			case VC_OPEN_BRACKET:
-				return Toolkit.getProperty("AWT.openBracket", "Open Bracket");
-			case VC_BACK_SLASH:
-				return Toolkit.getProperty("AWT.backSlash", "Back Slash");
-			case VC_CLOSE_BRACKET:
-				return Toolkit.getProperty("AWT.closeBracket", "Close Bracket");
-
-
-			case VC_KP_MULTIPLY:
-				return Toolkit.getProperty("AWT.multiply", "NumPad Multiply");
-			case VC_KP_ADD:
-				return Toolkit.getProperty("AWT.add", "NumPad Add");
-			case VC_KP_SUBTRACT:
-				return Toolkit.getProperty("AWT.subtract", "NumPad Subtract");
-			case VC_KP_SEPARATOR:
-				return Toolkit.getProperty("AWT.separator", "NumPad Separator");
-			case VC_KP_DIVIDE:
-				return Toolkit.getProperty("AWT.divide", "NumPad Divide");
-			case VC_DELETE:
-				return Toolkit.getProperty("AWT.delete", "NumPad Delete");
-			case VC_NUM_LOCK:
-				return Toolkit.getProperty("AWT.numLock", "Num Lock");
-			case VC_SCROLL_LOCK:
-				return Toolkit.getProperty("AWT.scrollLock", "Scroll Lock");
-
-
-			/* F1 through F24 function keys. */
-			case VC_F1:
-				return Toolkit.getProperty("AWT.f1", "F1");
-			case VC_F2:
-				return Toolkit.getProperty("AWT.f2", "F2");
-			case VC_F3:
-				return Toolkit.getProperty("AWT.f3", "F3");
-			case VC_F4:
-				return Toolkit.getProperty("AWT.f4", "F4");
-			case VC_F5:
-				return Toolkit.getProperty("AWT.f5", "F5");
-			case VC_F6:
-				return Toolkit.getProperty("AWT.f6", "F6");
-			case VC_F7:
-				return Toolkit.getProperty("AWT.f7", "F7");
-			case VC_F8:
-				return Toolkit.getProperty("AWT.f8", "F8");
-			case VC_F9:
-				return Toolkit.getProperty("AWT.f9", "F9");
-			case VC_F10:
-				return Toolkit.getProperty("AWT.f10", "F10");
-			case VC_F11:
-				return Toolkit.getProperty("AWT.f11", "F11");
-			case VC_F12:
-				return Toolkit.getProperty("AWT.f12", "F12");
-
-			case VC_F13:
-				return Toolkit.getProperty("AWT.f13", "F13");
-			case VC_F14:
-				return Toolkit.getProperty("AWT.f14", "F14");
-			case VC_F15:
-				return Toolkit.getProperty("AWT.f15", "F15");
-			case VC_F16:
-				return Toolkit.getProperty("AWT.f16", "F16");
-			case VC_F17:
-				return Toolkit.getProperty("AWT.f17", "F17");
-			case VC_F18:
-				return Toolkit.getProperty("AWT.f18", "F18");
-			case VC_F19:
-				return Toolkit.getProperty("AWT.f19", "F19");
-			case VC_F20:
-				return Toolkit.getProperty("AWT.f20", "F20");
-			case VC_F21:
-				return Toolkit.getProperty("AWT.f21", "F21");
-			case VC_F22:
-				return Toolkit.getProperty("AWT.f22", "F22");
-			case VC_F23:
-				return Toolkit.getProperty("AWT.f23", "F23");
-			case VC_F24:
-				return Toolkit.getProperty("AWT.f24", "F24");
-
-
-			case VC_PRINTSCREEN:
-				return Toolkit.getProperty("AWT.printScreen", "Print Screen");
-			case VC_INSERT:
-				return Toolkit.getProperty("AWT.insert", "Insert");
-
-
-			case VC_PAGE_UP:
-				return Toolkit.getProperty("AWT.pgup", "Page Up");
-			case VC_PAGE_DOWN:
-				return Toolkit.getProperty("AWT.pgdn", "Page Down");
-			case VC_HOME:
-				return Toolkit.getProperty("AWT.home", "Home");
-			case VC_END:
-				return Toolkit.getProperty("AWT.end", "End");
-
-
-			case VC_QUOTE:
-				return Toolkit.getProperty("AWT.quote", "Quote");
-			case VC_BACKQUOTE:
-				return Toolkit.getProperty("AWT.backQuote", "Back Quote");
-
-
-
-			/* For European keyboards */
-/*
-			case VC_DEAD_GRAVE:
-				return Toolkit.getProperty("AWT.deadGrave", "Dead Grave");
-			case VC_DEAD_ACUTE:
-				return Toolkit.getProperty("AWT.deadAcute", "Dead Acute");
-			case VC_DEAD_CIRCUMFLEX:
-				return Toolkit.getProperty("AWT.deadCircumflex", "Dead Circumflex");
-			case VC_DEAD_TILDE:
-				return Toolkit.getProperty("AWT.deadTilde", "Dead Tilde");
-			case VC_DEAD_MACRON:
-				return Toolkit.getProperty("AWT.deadMacron", "Dead Macron");
-			case VC_DEAD_BREVE:
-				return Toolkit.getProperty("AWT.deadBreve", "Dead Breve");
-			case VC_DEAD_ABOVEDOT:
-				return Toolkit.getProperty("AWT.deadAboveDot", "Dead Above Dot");
-			case VC_DEAD_DIAERESIS:
-				return Toolkit.getProperty("AWT.deadDiaeresis", "Dead Diaeresis");
-			case VC_DEAD_ABOVERING:
-				return Toolkit.getProperty("AWT.deadAboveRing", "Dead Above Ring");
-			case VC_DEAD_DOUBLEACUTE:
-				return Toolkit.getProperty("AWT.deadDoubleAcute", "Dead Double Acute");
-			case VC_DEAD_CARON:
-				return Toolkit.getProperty("AWT.deadCaron", "Dead Caron");
-			case VC_DEAD_CEDILLA:
-				return Toolkit.getProperty("AWT.deadCedilla", "Dead Cedilla");
-			case VC_DEAD_OGONEK:
-				return Toolkit.getProperty("AWT.deadOgonek", "Dead Ogonek");
-			case VC_DEAD_IOTA:
-				return Toolkit.getProperty("AWT.deadIota", "Dead Iota");
-			case VC_DEAD_VOICED_SOUND:
-				return Toolkit.getProperty("AWT.deadVoicedSound", "Dead Voiced Sound");
-			case VC_DEAD_SEMIVOICED_SOUND:
-				return Toolkit.getProperty("AWT.deadSemivoicedSound", "Dead Semivoiced Sound");
-*/
-			/* Unknown Keyboard Codes */
-/*
-			case VC_AMPERSAND:
-				return Toolkit.getProperty("AWT.ampersand", "Ampersand");
-			case VC_ASTERISK:
-				return Toolkit.getProperty("AWT.asterisk", "Asterisk");
-			case VC_QUOTEDBL:
-				return Toolkit.getProperty("AWT.quoteDbl", "Double Quote");
-			case VC_LESS:
-				return Toolkit.getProperty("AWT.less", "Less");
-			case VC_GREATER:
-				return Toolkit.getProperty("AWT.greater", "Greater");
-			case VC_BRACELEFT:
-				return Toolkit.getProperty("AWT.braceLeft", "Left Brace");
-			case VC_BRACERIGHT:
-				return Toolkit.getProperty("AWT.braceRight", "Right Brace");
-*/
-
-			/* Unknown Extended Keyboard Codes */
-/*
-			case VC_AT:
-				return Toolkit.getProperty("AWT.at", "At");
-			case VC_COLON:
-				return Toolkit.getProperty("AWT.colon", "Colon");
-			case VC_CIRCUMFLEX:
-				return Toolkit.getProperty("AWT.circumflex", "Circumflex");
-			case VC_DOLLAR:
-				return Toolkit.getProperty("AWT.dollar", "Dollar");
-			case VC_EURO_SIGN:
-				return Toolkit.getProperty("AWT.euro", "Euro");
-			case VC_EXCLAMATION_MARK:
-				return Toolkit.getProperty("AWT.exclamationMark", "Exclamation Mark");
-			case VC_INVERTED_EXCLAMATION_MARK:
-				return Toolkit.getProperty("AWT.invertedExclamationMark", "Inverted Exclamation Mark");
-			case VC_LEFT_PARENTHESIS:
-				return Toolkit.getProperty("AWT.leftParenthesis", "Left Parenthesis");
-			case VC_NUMBER_SIGN:
-				return Toolkit.getProperty("AWT.numberSign", "Number Sign");
-			case VC_PLUS:
-				return Toolkit.getProperty("AWT.plus", "Plus");
-			case VC_RIGHT_PARENTHESIS:
-				return Toolkit.getProperty("AWT.rightParenthesis", "Right Parenthesis");
-			case VC_UNDERSCORE:
-				return Toolkit.getProperty("AWT.underscore", "Underscore");
-*/
-
-			/* For input method support on Asian Keyboards */
-/*
-			case VC_FINAL:
-				return Toolkit.getProperty("AWT.quote", "Quote");
-			case VC_CONVERT:
-				return Toolkit.getProperty("AWT.convert", "Convert");
-			case VC_NONCONVERT:
-				return Toolkit.getProperty("AWT.noconvert", "No Convert");
-			case VC_ACCEPT:
-				return Toolkit.getProperty("AWT.accept", "Accept");
-			case VC_MODECHANGE:
-				return Toolkit.getProperty("AWT.modechange", "Mode Change");
-			case VC_KANA:
-				return Toolkit.getProperty("AWT.kana", "Kana");
-			case VC_KANJI:
-				return Toolkit.getProperty("AWT.kanji", "Kanji");
-			case VC_ALPHANUMERIC:
-				return Toolkit.getProperty("AWT.alphanumeric", "Alphanumeric");
-			case VC_KATAKANA:
-				return Toolkit.getProperty("AWT.katakana", "Katakana");
-			case VC_HIRAGANA:
-				return Toolkit.getProperty("AWT.hiragana", "Hiragana");
-			case VC_FULL_WIDTH:
-				return Toolkit.getProperty("AWT.fullWidth", "Full-Width");
-			case VC_HALF_WIDTH:
-				return Toolkit.getProperty("AWT.halfWidth", "Half-Width");
-			case VC_ROMAN_CHARACTERS:
-				return Toolkit.getProperty("AWT.romanCharacters", "Roman Characters");
-			case VC_ALL_CANDIDATES:
-				return Toolkit.getProperty("AWT.allCandidates", "All Candidates");
-			case VC_PREVIOUS_CANDIDATE:
-				return Toolkit.getProperty("AWT.previousCandidate", "Previous Candidate");
-			case VC_CODE_INPUT:
-				return Toolkit.getProperty("AWT.codeInput", "Code Input");
-			case VC_JAPANESE_KATAKANA:
-				return Toolkit.getProperty("AWT.japaneseKatakana", "Japanese Katakana");
-			case VC_JAPANESE_HIRAGANA:
-				return Toolkit.getProperty("AWT.japaneseHiragana", "Japanese Hiragana");
-			case VC_JAPANESE_ROMAN:
-				return Toolkit.getProperty("AWT.japaneseRoman", "Japanese Roman");
-			case VC_KANA_LOCK:
-				return Toolkit.getProperty("AWT.kanaLock", "Kana Lock");
-			case VC_INPUT_METHOD_ON_OFF:
-				return Toolkit.getProperty("AWT.inputMethodOnOff", "Input Method On/Off");
-*/
-
-			/* Sun Keyboard keys */
-/*
-			case VC_AGAIN:
-				return Toolkit.getProperty("AWT.again", "Again");
-
-			case VC_FIND:
-				return Toolkit.getProperty("AWT.find", "Find");
-			case VC_PROPS:
-				return Toolkit.getProperty("AWT.props", "Props");
-			case VC_STOP:
-				return Toolkit.getProperty("AWT.stop", "Stop");
-
-
-			case VC_BEGIN:
-				return Toolkit.getProperty("AWT.begin", "Begin");
-*/
-
-			/* Media Control Keys */
+			// Begin Media Control Keys
 			case VC_POWER:
 				return Toolkit.getProperty("AWT.power", "Power");
 			case VC_SLEEP:
 				return Toolkit.getProperty("AWT.sleep", "Sleep");
 			case VC_WAKE:
 				return Toolkit.getProperty("AWT.wake", "Wake");
-			case VC_VOLUME_MUTE:
-				return Toolkit.getProperty("AWT.mute", "Mute");
-			case VC_VOLUME_UP:
-				return Toolkit.getProperty("AWT.volup", "Volume Up");
-			case VC_VOLUME_DOWN:
-				return Toolkit.getProperty("AWT.voldn", "Volume Down");
-			case VC_CUT:
-				return Toolkit.getProperty("AWT.cut", "Cut");
-			case VC_COPY:
-				return Toolkit.getProperty("AWT.copy", "Copy");
-			case VC_PASTE:
-				return Toolkit.getProperty("AWT.paste", "Paste");
-			case VC_UNDO:
-				return Toolkit.getProperty("AWT.undo", "Undo");
-			case VC_REDO:
-				return Toolkit.getProperty("AWT.redo", "Redo");
+
 			case VC_MEDIA_PLAY:
 				return Toolkit.getProperty("AWT.play", "Play");
 			case VC_MEDIA_STOP:
@@ -884,6 +745,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.previous", "Previous");
 			case VC_MEDIA_NEXT:
 				return Toolkit.getProperty("AWT.next", "Next");
+			case VC_MEDIA_SELECT:
+				return Toolkit.getProperty("AWT.select", "Select");
+
+			case VC_VOLUME_MUTE:
+				return Toolkit.getProperty("AWT.mute", "Mute");
+			case VC_VOLUME_UP:
+				return Toolkit.getProperty("AWT.volup", "Volume Up");
+			case VC_VOLUME_DOWN:
+				return Toolkit.getProperty("AWT.voldn", "Volume Down");
+
+			// Need to verify these codes.
 			/*
 			case VC_EJECT:
 				return Toolkit.getProperty("AWT.eject", "Eject");
@@ -899,30 +771,75 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			case VC_APP_MAIL:
 				return Toolkit.getProperty("AWT.mail", "Mail");
-
 			case VC_APP_CALCULATOR:
 				return Toolkit.getProperty("AWT.calculator", "Calculator");
 
 			case VC_BROWSER_SEARCH:
 				return Toolkit.getProperty("AWT.search", "Search");
-
 			case VC_BROWSER_HOME:
-				return Toolkit.getProperty("AWT.home", "Home");
-
+				return Toolkit.getProperty("AWT.homepage", "Browser Home");
 			case VC_BROWSER_BACK:
-				return Toolkit.getProperty("AWT.back", "Back");
-
+				return Toolkit.getProperty("AWT.back", "Browser Back");
 			case VC_BROWSER_FORWARD:
-				return Toolkit.getProperty("AWT.forward", "Forward");
-
+				return Toolkit.getProperty("AWT.forward", "Browser Forward");
 			case VC_BROWSER_STOP:
+				return Toolkit.getProperty("AWT.stop", "Browser Stop");
+			case VC_BROWSER_REFRESH:
+				return Toolkit.getProperty("AWT.refresh", "Browser Refresh");
+			case VC_BROWSER_FAVORITES:
+				return Toolkit.getProperty("AWT.favorites", "Browser Favorites");
+			// End Media Control Keys
+
+			// Begin Japanese Language Keys
+			case VC_KATAKANA:
+				return Toolkit.getProperty("AWT.katakana", "Katakana");
+			case VC_UNDERSCORE:
+				return Toolkit.getProperty("AWT.underscore", "Underscore");
+			case VC_FURIGANA:
+				return Toolkit.getProperty("AWT.furigana", "Furigana");
+			case VC_KANJI:
+				return Toolkit.getProperty("AWT.kanji", "Kanji");
+			case VC_HIRAGANA:
+				return Toolkit.getProperty("AWT.hiragana", "Hiragana");
+			case VC_YEN:
+				return Toolkit.getProperty("AWT.yen", Character.toString((char) 0x00A5));
+			//case VC_KP_COMMA:
+			//	Defined with VC_COMMA.
+			// End Japanese Language Keys
+
+
+			// Begin Sun keyboards
+			case VC_CUT:
+				return Toolkit.getProperty("AWT.cut", "Cut");
+			case VC_COPY:
+				return Toolkit.getProperty("AWT.copy", "Copy");
+			case VC_PASTE:
+				return Toolkit.getProperty("AWT.paste", "Paste");
+			case VC_HELP:
+				return Toolkit.getProperty("AWT.help", "Help");
+			case VC_UNDO:
+				return Toolkit.getProperty("AWT.undo", "Undo");
+			case VC_REDO:
+				return Toolkit.getProperty("AWT.redo", "Redo");
+    		// End Sun keyboards
+
+			// TODO Verify the following scancodes.
+			case VC_FIND:
+				return Toolkit.getProperty("AWT.find", "Find");
+			case VC_PROPS:
+				return Toolkit.getProperty("AWT.props", "Props");
+			case VC_COMPOSE:
+				return Toolkit.getProperty("AWT.compose", "Props");
+			case VC_ALT_GRAPH:
+				return Toolkit.getProperty("AWT.altgr", "Alt Graph");
+/*
+			case VC_STOP:
 				return Toolkit.getProperty("AWT.stop", "Stop");
 
-			case VC_BROWSER_REFRESH:
-				return Toolkit.getProperty("AWT.refresh", "Refresh");
+			case VC_BEGIN:
+				return Toolkit.getProperty("AWT.begin", "Begin");
+*/
 
-			case VC_BROWSER_FAVORITES:
-				return Toolkit.getProperty("AWT.favorites", "Favorites");
 
 			case VC_UNDEFINED:
 				return Toolkit.getProperty("AWT.undefined", "Undefined");
