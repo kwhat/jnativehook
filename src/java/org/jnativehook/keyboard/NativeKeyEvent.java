@@ -267,20 +267,16 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_MEDIA_PREVIOUS				= 0xE010;
 	public static final int VC_MEDIA_NEXT					= 0xE019;
 	public static final int VC_MEDIA_SELECT					= 0xE06D;
+	public static final int VC_MEDIA_EJECT					= 0xE02C;
 
 	public static final int VC_VOLUME_MUTE					= 0xE020;
 	public static final int VC_VOLUME_UP					= 0xE030;
 	public static final int VC_VOLUME_DOWN					= 0xE02E;
 
-	// Need to verify these codes.
-	//public static final int VC_EJECT						= 0xE02C;
-	//public static final int VC_WEB						= 0xE032;
-	//public static final int VC_MUSIC						= 0xE03C;
-	//public static final int VC_PICTURES					= 0xE064;
-	//public static final int VC_VIDEO						= 0x????;
-
 	public static final int VC_APP_MAIL						= 0xE06C;
 	public static final int VC_APP_CALCULATOR				= 0xE021;
+	public static final int VC_APP_MUSIC					= 0xE03C;
+	public static final int VC_APP_PICTURES					= 0xE064;
 
 	public static final int VC_BROWSER_SEARCH				= 0xE065;
 	public static final int VC_BROWSER_HOME					= 0xE032;
@@ -311,7 +307,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_FIND							= 0xE012;
 	public static final int VC_PROPS						= 0xFFCA;
 	public static final int VC_COMPOSE						= 0xFF20;
-	public static final int VC_ALT_GRAPH					= 0xFF7E;
 
 	/** This value is used to indicate that the keyCode is unknown. */
 	public static final int VC_UNDEFINED					= 0x0000;
@@ -830,8 +825,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.props", "Props");
 			case VC_COMPOSE:
 				return Toolkit.getProperty("AWT.compose", "Props");
-			case VC_ALT_GRAPH:
-				return Toolkit.getProperty("AWT.altgr", "Alt Graph");
 /*
 			case VC_STOP:
 				return Toolkit.getProperty("AWT.stop", "Stop");
