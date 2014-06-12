@@ -302,18 +302,7 @@ public class GlobalScreen {
 	 * @see #addNativeKeyListener(NativeKeyListener)
 	 */
 	private void processKeyEvent(NativeKeyEvent e) {
-		/*
-		try {
-			Field f = NativeInputEvent.class.getDeclaredField("propagate");
-			f.setAccessible(true);
-			f.setBoolean(e, false);
-		}
-		catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		*/
-
-		// The event cannot be modified beyond this point!  This is both a 
+		// The event cannot be modified beyond this point!  This is both a
 		// Java restriction and a native code restriction.
 		final NativeKeyEvent event = e;
 		eventExecutor.execute(new Runnable() {
