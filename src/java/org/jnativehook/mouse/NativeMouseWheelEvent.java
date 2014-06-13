@@ -57,13 +57,13 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * Constant representing scrolling by "units" (like scrolling with the
 	 * arrow keys).
 	 */
-	public static final int	WHEEL_UNIT_SCROLL	= 0;
+	public static final int	WHEEL_UNIT_SCROLL	= 1;
 
 	/**
 	 * Constant representing scrolling by a "block" (like scrolling with
 	 * page-up, page-down keys).
 	 */
-	public static final int	WHEEL_BLOCK_SCROLL	= 1;
+	public static final int	WHEEL_BLOCK_SCROLL	= 2;
 
 
     /**
