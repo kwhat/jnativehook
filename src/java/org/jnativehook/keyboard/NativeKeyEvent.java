@@ -296,17 +296,18 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_KP_COMMA						= 0x007E;
 
 	/** Sun keyboards */
-	public static final int VC_CUT							= 0xE017;
-	public static final int VC_COPY							= 0xE018;
-	public static final int VC_PASTE						= 0xE00A;
-	public static final int VC_HELP							= 0xE03B;
-	public static final int VC_UNDO							= 0xE008;
-	public static final int VC_REDO							= 0xE007;
+	public static final int VC_SUN_HELP						= 0xF075;
 
-	// TODO Verify the following scancodes.
-	public static final int VC_FIND							= 0xE012;
-	public static final int VC_PROPS						= 0xFFCA;
-	public static final int VC_COMPOSE						= 0xFF20;
+	public static final int VC_SUN_STOP						= 0xF078;
+	public static final int VC_SUN_PROPS					= 0xF076;
+	public static final int VC_SUN_FRONT					= 0xF077;
+	public static final int VC_SUN_OPEN						= 0xF074;
+	public static final int VC_SUN_FIND						= 0xF07E;
+	public static final int VC_SUN_AGAIN					= 0xF079;
+	public static final int VC_SUN_UNDO						= 0xF07A;
+	public static final int VC_SUN_COPY						= 0xF07C;
+	public static final int VC_SUN_INSERT					= 0xF07D;
+	public static final int VC_SUN_CUT						= 0xF07B;
 
 	/** This value is used to indicate that the keyCode is unknown. */
 	public static final int VC_UNDEFINED					= 0x0000;
@@ -540,7 +541,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			case VC_MINUS:
 				return Toolkit.getProperty("AWT.minus", "Minus");
-			case VC_KP_EQUALS:
 			case VC_EQUALS:
 				return Toolkit.getProperty("AWT.equals", "Equals");
 			case VC_BACKSPACE:
@@ -615,11 +615,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.semicolon", "Semicolon");
 			case VC_QUOTE:
 				return Toolkit.getProperty("AWT.quote", "Quote");
-			case VC_KP_ENTER:
 			case VC_ENTER:
 				return Toolkit.getProperty("AWT.enter", "Enter");
 
-			case VC_KP_COMMA:
 			case VC_COMMA:
 				return Toolkit.getProperty("AWT.comma", "Comma");
 			case VC_PERIOD:
@@ -668,57 +666,61 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			// Begin Numeric Zone
 			case VC_NUM_LOCK:
-				return Toolkit.getProperty("AWT.numLock", "Num Lock");
+				return Toolkit.getProperty("AWT.numpad_numLock", "Num Lock");
 			case VC_KP_DIVIDE:
-				return Toolkit.getProperty("AWT.divide", "NumPad Divide");
+				return Toolkit.getProperty("AWT.numpad_divide", "NumPad Divide");
 			case VC_KP_MULTIPLY:
-				return Toolkit.getProperty("AWT.multiply", "NumPad Multiply");
+				return Toolkit.getProperty("AWT.numpad_multiply", "NumPad Multiply");
 			case VC_KP_SUBTRACT:
-				return Toolkit.getProperty("AWT.subtract", "NumPad Subtract");
-			//case VC_KP_EQUALS:
-			//	Defined with VC_EQUALS.
+				return Toolkit.getProperty("AWT.numpad_subtract", "NumPad Subtract");
+			case VC_KP_EQUALS:
+				return Toolkit.getProperty("AWT.numpad_equals", "NumPad Equals");
 			case VC_KP_ADD:
-				return Toolkit.getProperty("AWT.add", "NumPad Add");
-			//case VC_KP_ENTER:
-			//	Defined with VC_ENTER.
+				return Toolkit.getProperty("AWT.numpad_add", "NumPad Add");
+			case VC_KP_ENTER:
+				return Toolkit.getProperty("AWT.numpad_enter", "NumPad Enter");
 			case VC_KP_SEPARATOR:
-				return Toolkit.getProperty("AWT.separator", "NumPad Separator");
+				return Toolkit.getProperty("AWT.numpad_separator", "NumPad Separator");
 
 			case VC_KP_0:
-				return Toolkit.getProperty("AWT.numpad0", "NumPad 0");
+				return Toolkit.getProperty("AWT.numpad_0", "NumPad 0");
 			case VC_KP_1:
-				return Toolkit.getProperty("AWT.numpad1", "NumPad 1");
+				return Toolkit.getProperty("AWT.numpad_1", "NumPad 1");
 			case VC_KP_2:
-				return Toolkit.getProperty("AWT.numpad2", "NumPad 2");
+				return Toolkit.getProperty("AWT.numpad_2", "NumPad 2");
 			case VC_KP_3:
-				return Toolkit.getProperty("AWT.numpad3", "NumPad 3");
+				return Toolkit.getProperty("AWT.numpad_3", "NumPad 3");
 			case VC_KP_4:
-				return Toolkit.getProperty("AWT.numpad4", "NumPad 4");
+				return Toolkit.getProperty("AWT.numpad_4", "NumPad 4");
 			case VC_KP_5:
-				return Toolkit.getProperty("AWT.numpad5", "NumPad 5");
+				return Toolkit.getProperty("AWT.numpad_5", "NumPad 5");
 			case VC_KP_6:
-				return Toolkit.getProperty("AWT.numpad6", "NumPad 6");
+				return Toolkit.getProperty("AWT.numpad_6", "NumPad 6");
 			case VC_KP_7:
-				return Toolkit.getProperty("AWT.numpad7", "NumPad 7");
+				return Toolkit.getProperty("AWT.numpad_7", "NumPad 7");
 			case VC_KP_8:
-				return Toolkit.getProperty("AWT.numpad8", "NumPad 8");
+				return Toolkit.getProperty("AWT.numpad_8", "NumPad 8");
 			case VC_KP_9:
-				return Toolkit.getProperty("AWT.numpad9", "NumPad 9");
+				return Toolkit.getProperty("AWT.numpad_9", "NumPad 9");
 			// End Numeric Zone
 
 			// Begin Modifier and Control Keys
 			case VC_SHIFT_L:
+				return	Toolkit.getProperty("AWT.shift_l", "Left Shift");
 			case VC_SHIFT_R:
-				return	Toolkit.getProperty("AWT.shift", "Shift");
+				return	Toolkit.getProperty("AWT.shift_r", "Right Shift");
 			case VC_CONTROL_L:
+				return Toolkit.getProperty("AWT.control_l", "Left Control");
 			case VC_CONTROL_R:
-				return Toolkit.getProperty("AWT.control", "Control");
+				return Toolkit.getProperty("AWT.control_r", "Right Control");
 			case VC_ALT_L:
+				return Toolkit.getProperty("AWT.alt_l", "Left Alt");
 			case VC_ALT_R:
-				return Toolkit.getProperty("AWT.alt", "Alt");
+				return Toolkit.getProperty("AWT.alt_r", "Right Alt");
 			case VC_META_L:
+				return Toolkit.getProperty("AWT.meta_l", "Left Meta");
 			case VC_META_R:
-				return Toolkit.getProperty("AWT.meta", "Meta");
+				return Toolkit.getProperty("AWT.meta_r", "Right Meta");
 			case VC_CONTEXT_MENU:
 				return Toolkit.getProperty("AWT.context", "Context Menu");
 			// End Modifier and Control Keys
@@ -742,6 +744,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.next", "Next");
 			case VC_MEDIA_SELECT:
 				return Toolkit.getProperty("AWT.select", "Select");
+			case VC_MEDIA_EJECT:
+				return Toolkit.getProperty("AWT.eject", "Eject");
 
 			case VC_VOLUME_MUTE:
 				return Toolkit.getProperty("AWT.mute", "Mute");
@@ -750,27 +754,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_VOLUME_DOWN:
 				return Toolkit.getProperty("AWT.voldn", "Volume Down");
 
-			// Need to verify these codes.
-			/*
-			case VC_EJECT:
-				return Toolkit.getProperty("AWT.eject", "Eject");
-			case VC_WEB:
-				return Toolkit.getProperty("AWT.web", "Web");
-			case VC_MUSIC:
-				return Toolkit.getProperty("AWT.music", "Music");
-			case VC_PICTURES:
-				return Toolkit.getProperty("AWT.pictures", "Pictures");
-			case VC_VIDEO:
-				return Toolkit.getProperty("AWT.video", "Video");
-			*/
-
 			case VC_APP_MAIL:
-				return Toolkit.getProperty("AWT.mail", "Mail");
+				return Toolkit.getProperty("AWT.app_mail", "App Mail");
 			case VC_APP_CALCULATOR:
-				return Toolkit.getProperty("AWT.calculator", "Calculator");
+				return Toolkit.getProperty("AWT.app_calculator", "App Calculator");
+			case VC_APP_MUSIC:
+				return Toolkit.getProperty("AWT.app_music", "App Music");
+			case VC_APP_PICTURES:
+				return Toolkit.getProperty("AWT.app_pictures", "App Pictures");
 
 			case VC_BROWSER_SEARCH:
-				return Toolkit.getProperty("AWT.search", "Search");
+				return Toolkit.getProperty("AWT.search", "Browser Search");
 			case VC_BROWSER_HOME:
 				return Toolkit.getProperty("AWT.homepage", "Browser Home");
 			case VC_BROWSER_BACK:
@@ -798,41 +792,34 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.hiragana", "Hiragana");
 			case VC_YEN:
 				return Toolkit.getProperty("AWT.yen", Character.toString((char) 0x00A5));
-			//case VC_KP_COMMA:
-			//	Defined with VC_COMMA.
+			case VC_KP_COMMA:
+				return Toolkit.getProperty("AWT.numpad_comma", "NumPad Comma");
 			// End Japanese Language Keys
 
 
 			// Begin Sun keyboards
-			case VC_CUT:
-				return Toolkit.getProperty("AWT.cut", "Cut");
-			case VC_COPY:
-				return Toolkit.getProperty("AWT.copy", "Copy");
-			case VC_PASTE:
-				return Toolkit.getProperty("AWT.paste", "Paste");
-			case VC_HELP:
-				return Toolkit.getProperty("AWT.help", "Help");
-			case VC_UNDO:
-				return Toolkit.getProperty("AWT.undo", "Undo");
-			case VC_REDO:
-				return Toolkit.getProperty("AWT.redo", "Redo");
+			case VC_SUN_HELP:
+				return Toolkit.getProperty("AWT.sun_help", "Sun Help");
+
+			case VC_SUN_STOP:
+				return Toolkit.getProperty("AWT.sun_stop", "Sun Stop");
+			case VC_SUN_PROPS:
+				return Toolkit.getProperty("AWT.sun_props", "Sun Props");
+			case VC_SUN_FRONT:
+				return Toolkit.getProperty("AWT.sun_front", "Sun Front");
+			case VC_SUN_OPEN:
+				return Toolkit.getProperty("AWT.sun_open", "Sun Open");
+			case VC_SUN_FIND:
+				return Toolkit.getProperty("AWT.sun_find", "Sun Find");
+			case VC_SUN_AGAIN:
+				return Toolkit.getProperty("AWT.sun_again", "Sun Again");
+			case VC_SUN_COPY:
+				return Toolkit.getProperty("AWT.sun_copy", "Sun Copy");
+			case VC_SUN_INSERT:
+				return Toolkit.getProperty("AWT.sun_insert", "Sun Insert");
+			case VC_SUN_CUT:
+				return Toolkit.getProperty("AWT.sun_cut", "Sun Cut");
     		// End Sun keyboards
-
-			// TODO Verify the following scancodes.
-			case VC_FIND:
-				return Toolkit.getProperty("AWT.find", "Find");
-			case VC_PROPS:
-				return Toolkit.getProperty("AWT.props", "Props");
-			case VC_COMPOSE:
-				return Toolkit.getProperty("AWT.compose", "Props");
-/*
-			case VC_STOP:
-				return Toolkit.getProperty("AWT.stop", "Stop");
-
-			case VC_BEGIN:
-				return Toolkit.getProperty("AWT.begin", "Begin");
-*/
-
 
 			case VC_UNDEFINED:
 				return Toolkit.getProperty("AWT.undefined", "Undefined");
@@ -854,21 +841,7 @@ public class NativeKeyEvent extends NativeInputEvent {
      */
     public boolean isActionKey() {
         switch (keyCode) {
-			case VC_SHIFT_L:
-			case VC_SHIFT_R:
-			case VC_CONTROL_L:
-			case VC_CONTROL_R:
-			case VC_ALT_L:
-			case VC_ALT_R:
-			case VC_META_L:
-			case VC_META_R:
-			case VC_CONTEXT_MENU:
-
-			case VC_UP:
-			case VC_DOWN:
-			case VC_LEFT:
-			case VC_RIGHT:
-
+			// Function Keys
 			case VC_F1:
 			case VC_F2:
 			case VC_F3:
@@ -895,60 +868,60 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_F23:
 			case VC_F24:
 
-			case VC_PRINTSCREEN:
-			case VC_INSERT:
+			// Alphanumeric Zone
+			case VC_CAPS_LOCK:
 
-			case VC_PAGE_UP:
-			case VC_PAGE_DOWN:
+			case VC_PRINTSCREEN:
+            case VC_SCROLL_LOCK:
+
+			// Edit Key Zone
+			case VC_INSERT:
 			case VC_HOME:
 			case VC_END:
+			case VC_PAGE_UP:
+			case VC_PAGE_DOWN:
 
+			// Cursor Key Zone
+			case VC_UP:
+			case VC_DOWN:
+			case VC_LEFT:
+			case VC_RIGHT:
 
-			case VC_SCROLL_LOCK:
-			case VC_CAPS_LOCK:
+			// Numeric Zone
 			case VC_NUM_LOCK:
 
+			// Modifier and Control Keys
+			case VC_SHIFT_L:
+			case VC_SHIFT_R:
+			case VC_CONTROL_L:
+			case VC_CONTROL_R:
+			case VC_ALT_L:
+			case VC_ALT_R:
+			case VC_META_L:
+			case VC_META_R:
+			case VC_CONTEXT_MENU:
 
-			/* For input method support on Asian Keyboards */
-			case VC_KANJI:
-			case VC_KATAKANA:
-			case VC_HIRAGANA:
-
-
+			// Media Control Keys
 			case VC_POWER:
 			case VC_SLEEP:
 			case VC_WAKE:
-
-			case VC_VOLUME_MUTE:
-			case VC_VOLUME_UP:
-			case VC_VOLUME_DOWN:
-
-			case VC_CUT:
-			case VC_COPY:
-			case VC_PASTE:
-			case VC_UNDO:
-			case VC_REDO:
 
 			case VC_MEDIA_PLAY:
 			case VC_MEDIA_STOP:
 			case VC_MEDIA_PREVIOUS:
 			case VC_MEDIA_NEXT:
+			case VC_MEDIA_SELECT:
+			case VC_MEDIA_EJECT:
 
-			/*
-			case VC_EJECT:
-				return Toolkit.getProperty("AWT.eject", "Eject");
-			case VC_WEB:
-				return Toolkit.getProperty("AWT.web", "Web");
-			case VC_MUSIC:
-				return Toolkit.getProperty("AWT.music", "Music");
-			case VC_PICTURES:
-				return Toolkit.getProperty("AWT.pictures", "Pictures");
-			case VC_VIDEO:
-				return Toolkit.getProperty("AWT.video", "Video");
-			*/
+			case VC_VOLUME_MUTE:
+			case VC_VOLUME_UP:
+			case VC_VOLUME_DOWN:
 
 			case VC_APP_MAIL:
 			case VC_APP_CALCULATOR:
+			case VC_APP_MUSIC:
+			case VC_APP_PICTURES:
+
 			case VC_BROWSER_SEARCH:
 			case VC_BROWSER_HOME:
 			case VC_BROWSER_BACK:
@@ -956,6 +929,26 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_BROWSER_STOP:
 			case VC_BROWSER_REFRESH:
 			case VC_BROWSER_FAVORITES:
+
+			// Japanese Language Keys
+			case VC_KATAKANA:
+			case VC_FURIGANA:
+			case VC_KANJI:
+			case VC_HIRAGANA:
+
+			// Sun keyboards
+			case VC_SUN_HELP:
+
+			case VC_SUN_STOP:
+			case VC_SUN_PROPS:
+			case VC_SUN_FRONT:
+			case VC_SUN_OPEN:
+			case VC_SUN_FIND:
+			case VC_SUN_AGAIN:
+			case VC_SUN_UNDO:
+			case VC_SUN_COPY:
+			case VC_SUN_INSERT:
+			case VC_SUN_CUT:
 
 				return true;
         }
