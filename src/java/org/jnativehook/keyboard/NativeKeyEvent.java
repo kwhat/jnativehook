@@ -296,18 +296,18 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_KP_COMMA						= 0x007E;
 
 	/** Sun keyboards */
-	public static final int VC_SUN_HELP						= 0xFF6A;
+	public static final int VC_SUN_HELP						= 0xFF75;
 
-	public static final int VC_SUN_STOP						= 0xFF69;
-	public static final int VC_SUN_PROPS					= 0xFF70;
-	public static final int VC_SUN_FRONT					= 0xFF71;
-	public static final int VC_SUN_OPEN						= 0xFF73;
-	public static final int VC_SUN_FIND						= 0xFF68;
-	public static final int VC_SUN_AGAIN					= 0xFF66;
-	public static final int VC_SUN_UNDO						= 0xFF65;
-	public static final int VC_SUN_COPY						= 0xFF72;
-	public static final int VC_SUN_INSERT					= 0xFF74;
-	public static final int VC_SUN_CUT						= 0xFF75;
+	public static final int VC_SUN_STOP						= 0xFF78;
+	public static final int VC_SUN_PROPS					= 0xFF76;
+	public static final int VC_SUN_FRONT					= 0xFF77;
+	public static final int VC_SUN_OPEN						= 0xFF74;
+	public static final int VC_SUN_FIND						= 0xFF7E;
+	public static final int VC_SUN_AGAIN					= 0xFF79;
+	public static final int VC_SUN_UNDO						= 0xFF7A;
+	public static final int VC_SUN_COPY						= 0xFF7C;
+	public static final int VC_SUN_INSERT					= 0xFF7D;
+	public static final int VC_SUN_CUT						= 0xFF7B;
 
 	/** This value is used to indicate that the keyCode is unknown. */
 	public static final int VC_UNDEFINED					= 0x0000;
