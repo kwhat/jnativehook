@@ -262,7 +262,18 @@ public class GlobalScreen {
 	public static native boolean isNativeHookRegistered();
 
 	/**
-	 * Send a native input event to the system.
+	 * Add a <code>NativeInputEvent</code> to the operating systems event queue.
+	 * <p/>
+	 * Each type of <code>NativeInputEvent</code> is processed based on its
+	 * event id.  For both <code>NATIVE_KEY_PRESSED</code> and
+	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
+	 * mask are used in the creation of the native event.  Please note that some
+	 * platforms may generate <code>NATIVE_KEY_PRESSED</code> and
+	 * <code>NATIVE_KEY_RELEASED</code> events for each required modifier.  The
+	 * <code>NATIVE_KEY_TYPED</code> events will translate the associated keyChar
+	 * to its respective virtual code.  A <code>NATIVE_KEY_PRESSED</code> and
+	 * <code>NATIVE_KEY_RELEASED</code> will be generated if the virtual code was
+	 * found on the native system.
 	 *
 	 * @since 1.2
 	 */
@@ -509,6 +520,9 @@ public class GlobalScreen {
 				libOutputStream.close();
 				libInputStream.close();
 
+				// Remove the extracted file when the JVM exists.
+				// FIXME This causes an issue on Windows due to file locking.
+				// FIXME See issue #88 for more information.
 				libFile.deleteOnExit();
 
 				System.load(libFile.getPath());
