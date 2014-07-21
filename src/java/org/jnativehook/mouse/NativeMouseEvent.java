@@ -210,7 +210,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @param x the x coordinate of the native pointer.
 	 * @param y the y coordinate of the native pointer.
 	 * @param clickCount the number of button clicks associated with this event.
-	 * @param button The mouse buttons that has changed state. NOBUTTON,
+	 * @param button The mouse buttons that have changed state. NOBUTTON,
 	 * BUTTON1, BUTTON2, BUTTON3, BUTTON5 or BUTTON5.
 	 *
 	 * @since 1.1

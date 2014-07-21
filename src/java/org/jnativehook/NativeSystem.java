@@ -21,7 +21,7 @@ package org.jnativehook;
  * A small class to determine the native system's operating system family and
  * architecture. The class is only used to determine which native library to
  * unpack and load at runtime. This class is never used if the native library
- * is load using the <code>java.library.path</code> property.
+ * is loaded using the <code>java.library.path</code> property.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1

@@ -42,12 +42,12 @@ import java.awt.Toolkit;
  * <code>NATIVE_KEY_RELEASED</code> are generated for every key code received by
  * the native system. The key being pressed or released is indicated by the
  * getKeyCode method, which returns a virtual key code. Native virtual
- * keyCode constants maybe equivalent to their {@link java.awt.event.KeyEvent}
- * counterparts, however this this not guaranteed.
+ * keyCode constants might equivalent to their {@link java.awt.event.KeyEvent}
+ * counterparts, however this is not guaranteed.
  * <p>
  *
  * <code>NATIVE_KEY_TYPED</code> events are produced for
- * <code>NATIVE_KEY_PRESSED</code> events that produce valid Unicode character
+ * <code>NATIVE_KEY_PRESSED</code> events that produce valid Unicode characters
  * for the native keyboard layout. The getKeyChar method always returns a valid
  * Unicode character or <code>CHAR_UNDEFINED</code>. For
  * <code>NATIVE_KEY_PRESSED</code> and <code>NATIVE_KEY_RELEASED</code> events,
@@ -56,8 +56,8 @@ import java.awt.Toolkit;
  * <code>VC_UNDEFINED</code>.
  * <p>
  *
- * Virtual key codes only represent the physical key has been pressed and should
- * not be mistaken with the character mapped to that key by the operating
+ * Virtual key codes only represent the physical key that has been pressed and
+ * should not be mistaken with the character mapped to that key by the operating
  * system.  To determine the Unicode representation of the
  * <code>NativeKeyEvent</code>, please use the {@link #getKeyChar()} method
  * for the <code>NATIVE_KEY_TYPED</code> event associated with that virtual key
@@ -389,9 +389,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 	/**
 	 * Set the rawCode value in this event. For more information on what this
-	 * value represents please see {@link #getRawCode()}.
-	 *
-	 *
+	 * value represents, please see {@link #getRawCode()}.
 	 *
 	 * @param rawCode the native key code for this event.
 	 */
@@ -831,8 +829,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 
     /**
-     * Returns whether the key in this event is an "action" key.  Typically an
-	 * action key does not fire a unicode character and is not a modifier key.
+     * Returns whether the key in this event is an "action" key.  Typically, an
+	 * action key does not fire a Unicode character and is not a modifier key.
      *
      * @return <code>true</code> if the key is an "action" key,
 	 * <code>false</code> otherwise.

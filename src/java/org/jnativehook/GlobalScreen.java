@@ -228,7 +228,7 @@ public class GlobalScreen {
 	}
 
 	/**
-	 * Enable the native hook if it is not currently running. If it is running
+	 * Enable the native hook if it is not currently running. If it is running,
 	 * the function has no effect.
 	 * <p>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
@@ -261,10 +261,11 @@ public class GlobalScreen {
 	public static native boolean isNativeHookRegistered();
 
 	/**
-	 * Add a <code>NativeInputEvent</code> to the operating systems event queue.
+	 * Add a <code>NativeInputEvent</code> to the operating system's event queue.
 	 * Each type of <code>NativeInputEvent</code> is processed according to its
 	 * event id.
 	 * <p>
+	 *
 	 * For both <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
 	 * mask are used in the creation of the native event.  Please note that some
@@ -276,25 +277,29 @@ public class GlobalScreen {
 	 * event using that virtual code.  If the JNativeHook is unable to translate
 	 * the keyChar to its respective virtual code, the event is ignored.
 	 * <p>
-	 * <code>NativeMouseEvent</code>'s are processed in much the same way as the
+	 *
+	 * <code>NativeMouseEvents</code> are processed in much the same way as the
 	 * <code>NativeKeyEvents</code>.  Both <code>NATIVE_MOUSE_PRESSED</code> and
 	 * <code>NATIVE_MOUSE_RELEASED</code> produce events corresponding to the
-	 * event's button code.  Keyboard modifiers maybe used in conjunction with
-	 * button press and release events, however, they may produce events for each
+	 * event's button code.  Keyboard modifiers may be used in conjunction with
+	 * button press and release events, however, they might produce events for each
 	 * modifier.  <code>NATIVE_MOUSE_CLICKED</code> events produce a
 	 * <code>NATIVE_MOUSE_PRESSED</code> event followed by a
 	 * <code>NATIVE_MOUSE_RELEASED</code> for the assigned event button.
 	 * <p>
+	 *
 	 * <code>NATIVE_MOUSE_DRAGGED</code> and <code>NATIVE_MOUSE_MOVED</code> events
-	 * are differentiated by the button modifiers assigned to the event.
-	 * <code>NATIVE_MOUSE_DRAGGED</code> events are only produced if a button
-	 * modifier mask containing at least one button modifier mask is set.  If the
-	 * mask does not contain a button modifier, a <code>NATIVE_MOUSE_MOVED</code>
-	 * event will be generated regardless of the event id.
+	 * are handled identically.  In order to produce a <code>NATIVE_MOUSE_DRAGGED</code>
+	 * event, you must specify a button modifier mask that contains at least one
+	 * button modifier and assign it to the event.  Failure to do so will produce a
+	 * <code>NATIVE_MOUSE_MOVED</code> event even if the event id was set to
+	 * <code>NATIVE_MOUSE_DRAGGED</code>.
 	 * <p>
+	 *
 	 * <code>NATIVE_MOUSE_WHEEL</code> events are identical to
 	 * <code>NATIVE_MOUSE_PRESSED</code> events.  Wheel events will only produce
-	 * pressed events and will never produce release, or motion events.
+	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
+	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the native system.
 	 * @since 1.2
@@ -303,14 +308,15 @@ public class GlobalScreen {
 
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
-	 * generally called by the native library but maybe used to synthesize
+	 * generally called by the native library but may be used to synthesize
 	 * native events from Java without replaying them on the native system.  If
 	 * you would like to send events to other applications, please use
 	 * {@link #postNativeEvent},
 	 * <p>
-	 * <b>Note:</b> This method executes on the native systems event queue.
+	 *
+	 * <b>Note:</b> This method executes on the native system's event queue.
 	 * It is imperative that all processing be off-loaded to other threads.
-	 * Failure to do so may result in the delay of user input and the automatic
+	 * Failure to do so might result in the delay of user input and the automatic
 	 * removal of the native hook.
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
@@ -451,7 +457,7 @@ public class GlobalScreen {
 	 * for event delivery by implementing an <code>ExecutorService</code>.
 	 * <p>
 	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
-	 * delivered events to be discard until a valid <code>ExecutorService</code>
+	 * delivered events to be discarded until a valid <code>ExecutorService</code>
 	 * is set.
 	 *
 	 * @param dispatcher The <code>ExecutorService</code> used to dispatch native events.

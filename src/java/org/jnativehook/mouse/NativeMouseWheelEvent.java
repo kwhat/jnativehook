@@ -99,7 +99,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * Instantiates a new <code>NativeMouseWheelEvent</code> object.
 	 *
 	 * @param id an integer that identifies the native event type.
-	 * @param when a long integer that gives the time the event occurred
+	 * @param when a long integer that gives the time the event occurred.
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
@@ -167,7 +167,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      *
      * @return negative values if the mouse wheel was rotated up/away from
      * the user, and positive values if the mouse wheel was rotated down/
-     * towards the user.
+     * toward(s) the user.
      */
 	public int getWheelRotation() {
 		return wheelRotation;

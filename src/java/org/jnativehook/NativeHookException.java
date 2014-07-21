@@ -51,7 +51,7 @@ public class NativeHookException extends Exception {
 	 *
 	 * @param message The detail message.
 	 * @param cause The cause of the exception. A null value is permitted, and
-	 * indicates that the cause is nonexistent or unknown.
+	 * indicates that the cause is unknown.
 	 */
 	public NativeHookException(String message, Throwable cause) {
 		super(message, cause);
@@ -62,7 +62,7 @@ public class NativeHookException extends Exception {
 	 * cause.
 	 *
 	 * @param cause The cause of the exception. A null value is permitted, and
-	 * indicates that the cause is nonexistent or unknown.
+	 * indicates that the cause is unknown.
 	 */
 	public NativeHookException(Throwable cause) {
 		super(cause);
