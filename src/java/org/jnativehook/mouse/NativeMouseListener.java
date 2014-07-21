@@ -25,6 +25,7 @@ import java.util.EventListener;
  * The listener interface for receiving systemwide <code>NativeMouseEvents</code>.
  * (To track native mouse moves, use the <code>NativeMouseMotionListener</code>.)
  * <p>
+ *
  * The class that is interested in processing a <code>NativeMouseEvent</code>
  * implements this interface, and the object created with that class is
  * registered with the <code>GlobalScreen</code> using the

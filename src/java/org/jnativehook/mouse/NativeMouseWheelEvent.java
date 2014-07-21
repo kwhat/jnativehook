@@ -23,7 +23,7 @@ import org.jnativehook.GlobalScreen;
 /**
  * An event which indicates that the mouse wheel was rotated on the system.
  * This event is not limited to a particular component's scope or visibility.
- * <p/>
+ * <p>
  *
  * A <code>NativeMouseWheelEvent</code> object is passed to every
  * <code>NativeMouseWheelListener</code> object which is registered to receive
@@ -31,7 +31,7 @@ import org.jnativehook.GlobalScreen;
  * {@link GlobalScreen#addNativeMouseWheelListener(NativeMouseWheelListener)}
  * method. The <code>GlobalScreen</code> object then dispatches a
  * <code>NativeMouseWheelEvent</code> to each listener.
- * <p/>
+ * <p>
  *
  * Platforms offer customization of the amount of scrolling that should take
  * place when the mouse wheel is moved. The two most common settings are to
@@ -80,8 +80,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * Indicates what sort of scrolling should take place in response to this
      * event, based on platform settings.  Legal values are:
      * <ul>
-     * <li> WHEEL_UNIT_SCROLL
-     * <li> WHEEL_BLOCK_SCROLL
+     * 	<li> WHEEL_UNIT_SCROLL
+     * 	<li> WHEEL_BLOCK_SCROLL
      * </ul>
      *
      * @see #getScrollType
@@ -107,6 +107,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * <code>InputEvent</code> modifiers.
 	 * @param x the x coordinate of the native pointer.
 	 * @param y the y coordinate of the native pointer.
+	 * @param clickCount the number of button clicks associated with this event.
      * @param scrollType the type of scrolling which should take place in
      * response to this event;  valid values are <code>WHEEL_UNIT_SCROLL</code>
      * and <code>WHEEL_BLOCK_SCROLL</code>.
@@ -144,8 +145,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * Returns the type of scrolling that should take place in response to this
      * event.  This is determined by the native platform.  Legal values are:
      * <ul>
-     * <li> MouseWheelEvent.WHEEL_UNIT_SCROLL
-     * <li> MouseWheelEvent.WHEEL_BLOCK_SCROLL
+     * 	<li> MouseWheelEvent.WHEEL_UNIT_SCROLL
+     * 	<li> MouseWheelEvent.WHEEL_BLOCK_SCROLL
      * </ul>
      *
      * @return either NativeMouseWheelEvent.WHEEL_UNIT_SCROLL or

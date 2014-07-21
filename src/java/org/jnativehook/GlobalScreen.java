@@ -40,7 +40,7 @@ import java.util.concurrent.ThreadFactory;
  * GlobalScreen is used to represent the native screen area that Java does not
  * usually have access to. This class can be thought of as the source component
  * for native input events.
- * <p/>
+ * <p>
  * This class also handles the loading, unpacking and communication with the
  * native library. That includes registering and un-registering the native hook
  * with the underlying operating system and adding global keyboard and mouse
@@ -230,7 +230,7 @@ public class GlobalScreen {
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
 	 * the function has no effect.
-	 * <p/>
+	 * <p>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
 	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
@@ -256,25 +256,47 @@ public class GlobalScreen {
 	 * Returns <code>true</code> if the native hook is currently registered.
 	 *
 	 * @return true if the native hook is currently registered.
-	 * @throws NativeHookException the native hook exception
 	 * @since 1.1
 	 */
 	public static native boolean isNativeHookRegistered();
 
 	/**
 	 * Add a <code>NativeInputEvent</code> to the operating systems event queue.
-	 * <p/>
-	 * Each type of <code>NativeInputEvent</code> is processed based on its
-	 * event id.  For both <code>NATIVE_KEY_PRESSED</code> and
+	 * Each type of <code>NativeInputEvent</code> is processed according to its
+	 * event id.
+	 * <p>
+	 * For both <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
 	 * mask are used in the creation of the native event.  Please note that some
 	 * platforms may generate <code>NATIVE_KEY_PRESSED</code> and
-	 * <code>NATIVE_KEY_RELEASED</code> events for each required modifier.  The
-	 * <code>NATIVE_KEY_TYPED</code> events will translate the associated keyChar
-	 * to its respective virtual code.  A <code>NATIVE_KEY_PRESSED</code> and
-	 * <code>NATIVE_KEY_RELEASED</code> will be generated if the virtual code was
-	 * found on the native system.
+	 * <code>NATIVE_KEY_RELEASED</code> events for each required modifier.
+	 * <code>NATIVE_KEY_TYPED</code> events will first translate the associated
+	 * keyChar to its respective virtual code and then produce a
+	 * <code>NATIVE_KEY_PRESSED</code> followed by a <code>NATIVE_KEY_RELEASED</code>
+	 * event using that virtual code.  If the JNativeHook is unable to translate
+	 * the keyChar to its respective virtual code, the event is ignored.
+	 * <p>
+	 * <code>NativeMouseEvent</code>'s are processed in much the same way as the
+	 * <code>NativeKeyEvents</code>.  Both <code>NATIVE_MOUSE_PRESSED</code> and
+	 * <code>NATIVE_MOUSE_RELEASED</code> produce events corresponding to the
+	 * event's button code.  Keyboard modifiers maybe used in conjunction with
+	 * button press and release events, however, they may produce events for each
+	 * modifier.  <code>NATIVE_MOUSE_CLICKED</code> events produce a
+	 * <code>NATIVE_MOUSE_PRESSED</code> event followed by a
+	 * <code>NATIVE_MOUSE_RELEASED</code> for the assigned event button.
+	 * <p>
+	 * <code>NATIVE_MOUSE_DRAGGED</code> and <code>NATIVE_MOUSE_MOVED</code> events
+	 * are differentiated by the button modifiers assigned to the event.
+	 * <code>NATIVE_MOUSE_DRAGGED</code> events are only produced if a button
+	 * modifier mask containing at least one button modifier mask is set.  If the
+	 * mask does not contain a button modifier, a <code>NATIVE_MOUSE_MOVED</code>
+	 * event will be generated regardless of the event id.
+	 * <p>
+	 * <code>NATIVE_MOUSE_WHEEL</code> events are identical to
+	 * <code>NATIVE_MOUSE_PRESSED</code> events.  Wheel events will only produce
+	 * pressed events and will never produce release, or motion events.
 	 *
+	 * @param e the <code>NativeInputEvent</code> sent to the native system.
 	 * @since 1.2
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
@@ -282,12 +304,16 @@ public class GlobalScreen {
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but maybe used to synthesize
-	 * native events from Java.
-	 * <p/>
+	 * native events from Java without replaying them on the native system.  If
+	 * you would like to send events to other applications, please use
+	 * {@link #postNativeEvent},
+	 * <p>
 	 * <b>Note:</b> This method executes on the native systems event queue.
 	 * It is imperative that all processing be off-loaded to other threads.
 	 * Failure to do so may result in the delay of user input and the automatic
 	 * removal of the native hook.
+	 *
+	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
 		if (eventExecutor != null) {
@@ -315,6 +341,7 @@ public class GlobalScreen {
 	private void processKeyEvent(NativeKeyEvent e) {
 		// The event cannot be modified beyond this point!  This is both a
 		// Java restriction and a native code restriction.
+		// FIXME The event should not be final for event consumption.  It still works but probably shouldn't.
 		final NativeKeyEvent event = e;
 		eventExecutor.execute(new Runnable() {
 			public void run() {
@@ -422,7 +449,7 @@ public class GlobalScreen {
 	 * JNativeHook utilizes a single thread executor to dispatch events from
 	 * the native event queue.  You may choose to use an alternative approach
 	 * for event delivery by implementing an <code>ExecutorService</code>.
-	 * <p/>
+	 * <p>
 	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
 	 * delivered events to be discard until a valid <code>ExecutorService</code>
 	 * is set.

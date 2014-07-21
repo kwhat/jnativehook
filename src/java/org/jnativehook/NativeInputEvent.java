@@ -27,7 +27,7 @@ import java.util.EventObject;
  * no method for listeners or subclasses to prevent delivery of the event to
  * the native system. There is no guarantee that the events will be received by
  * Java before they are delivered natively.
- * <p/>
+ * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1
@@ -184,13 +184,15 @@ public class NativeInputEvent extends EventObject {
 	/**
 	 * Sets the reserved flags for this event.
 	 * <p>
+	 *
 	 * Note the use of this method may not be supported by all native platforms.
+	 * <p>
 	 *
 	 * Event propagation support for X11 cannot be provided due to an oversight
 	 * in the way that XRecord currently operates.  No public method will be
 	 * available until a working cross-platform solution can be provided.
 	 * 
-	 * @param reserved Non-portable flags for undocumented functionality.
+	 * @param reserved Non-portable flags for unsupported functionality.
 	 * 
 	 * @since 1.1
 	 */
