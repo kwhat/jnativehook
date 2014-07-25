@@ -45,6 +45,10 @@
 	<property name="ant.build.native.toolchain" value="gcc" />
 	<property name="ant.build.native.jobs" value="auto" />
 
+	<tstamp>
+		<format property="ant.build.revision" pattern="yyyyMMdd" />
+	</tstamp>
+
 	<property environment="env" />
 
 	<!-- Path Settings -->
