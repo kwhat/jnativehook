@@ -23,6 +23,10 @@
 	<!-- Project Settings -->
 	<property file="build.num" />
 
+	<tstamp>
+		<format property="ant.build.revision" pattern="yyyyMMdd" />
+	</tstamp>
+
 	<property name="ant.project.vendor" value="Alexander Barker (alex@1stleg.com)" />
 	<property name="ant.project.version" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
 
@@ -44,10 +48,6 @@
 
 	<property name="ant.build.native.toolchain" value="gcc" />
 	<property name="ant.build.native.jobs" value="auto" />
-
-	<tstamp>
-		<format property="ant.build.revision" pattern="yyyyMMdd" />
-	</tstamp>
 
 	<property environment="env" />
 
