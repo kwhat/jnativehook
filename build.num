@@ -1,5 +1,4 @@
-#Build Number for ANT.
+# Build number properties for Ant.
 
 ant.build.major=1
 ant.build.minor=2
-#ant.build.revision=
