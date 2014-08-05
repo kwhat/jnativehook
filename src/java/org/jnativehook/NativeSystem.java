@@ -62,20 +62,8 @@ public class NativeSystem {
 	 * @see NativeSystem
 	 */
 	public enum Arch {
-		/** The alpha architecture. */
-		ALPHA,
-
 		/** The arm architecture. */
 		ARM,
-
-		/** The itanium64 32-bit architecture. */
-		IA64_32,
-
-		/** The itanium64 architecture. */
-		IA64,
-
-		/** The mips architecture. */
-		MIPS,
 
 		/** The sparc architecture. */
 		SPARC,
@@ -143,20 +131,8 @@ public class NativeSystem {
 		String osArch = System.getProperty("os.arch");
 		Arch arch;
 
-		if (osArch.equalsIgnoreCase("alpha")) {
-			arch = Arch.ALPHA;
-		}
-		else if (osArch.toLowerCase().startsWith("arm")) {
+		if (osArch.equalsIgnoreCase("arm")) {
 			arch = Arch.ARM;
-		}
-		else if (osArch.equalsIgnoreCase("ia64_32")) {
-			arch = Arch.IA64_32;
-		}
-		else if (osArch.equalsIgnoreCase("ia64")) {
-			arch = Arch.IA64;
-		}
-		else if (osArch.equalsIgnoreCase("mips")) {
-			arch = Arch.MIPS;
 		}
 		else if (osArch.equalsIgnoreCase("sparc")) {
 			arch = Arch.SPARC;
