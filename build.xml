@@ -164,40 +164,6 @@
 		<echo level="info">Found Java include location: ${ant.build.javac.include}</echo>
 
 
-		<!-- Try to locate the rt.jar location for ant.build.javac.bootclasspath -->
-		<condition property="ant.build.javac.bootclasspath" value="${env.JDK_HOME}/lib/rt.jar">
-			<available file="${env.JDK_HOME}/lib/rt.jar" type="dir" />
-		</condition>
-		<condition property="ant.build.javac.bootclasspath" value="${env.JAVA_HOME}/lib/rt.jar">
-			<available file="${env.JAVA_HOME}/lib/rt.jar" type="dir" />
-		</condition>
-		<condition property="ant.build.javac.bootclasspath" value="${java.home}/lib/rt.jar">
-			<available file="${java.home}/lib/rt.jar" type="file" />
-		</condition>
-
-		<condition property="ant.build.javac.bootclasspath" value="${env.JDK_HOME}/bundle/Classes/classes.jar">
-			<available file="${env.JDK_HOME}/bundle/Classes/classes.jar" type="dir" />
-		</condition>
-		<condition property="ant.build.javac.bootclasspath" value="${env.JAVA_HOME}/bundle/Classes/classes.jar">
-			<available file="${env.JAVA_HOME}/bundle/Classes/classes.jar" type="dir" />
-		</condition>
-		<condition property="ant.build.javac.bootclasspath" value="${java.home}/bundle/Classes/classes.jar">
-			<available file="${java.home}/bundle/Classes/classes.jar" type="file" />
-		</condition>
-
-		<fail message="Could not determine ant.build.javac.bootclasspath location.  Please set your JDK_HOME / JAVA_HOME environment variable or manually set the ant.build.javac.bootclasspath property to the location of your rt.jar file.">
-			<condition>
-				<not>
-					<or>
-						<isset property="ant.build.javac.bootclasspath" />
-						<available file="${ant.build.javac.bootclasspath}" type="file" />
-					</or>
-				</not>
-			</condition>
-		</fail>
-		<echo level="info">Found Java lib location: ${ant.build.javac.bootclasspath}</echo>
-
-
 		<!-- Preform jnitasks target checks. -->
 		<available file="${dir.src}/jnitasks" property="project.check.jnitasks.download" />
 
@@ -206,54 +172,6 @@
 		<available file="${dir.src}/libuiohook/configure" property="project.check.libuiohook.bootstrap" />
 		<available file="${dir.bin}/libuiohook/Makefile" property="project.check.libuiohook.configure" />
 		<available file="${dir.doc}/" property="project.check.javadoc" />
-
-
-		<!-- Try to locate the env path variable -->
-		<condition property="native.path" value="">
-			<isset property="env.PATH" />
-		</condition>
-		<condition property="native.path" value="${env.Path}">
-			<isset property="env.Path" />
-		</condition>
-		<condition property="native.path" value="${env.path}">
-			<isset property="env.path" />
-		</condition>
-
-		<!-- Check for clang before assuming gcc toolchain. -->
-		<condition property="ant.build.native.toolchain" value="clang" else="gcc">
-			<and>
-				<available filepath="${env.PATH};${env.Path};${env.path}" file="clang" type="file" />
-				<not>
-					<available filepath="${env.PATH};${env.Path};${env.path}" file="gcc" type="file" />
-				</not>
-			</and>
-		</condition>
-
-		<!-- Set the number of files to build in parallel. -->
-		<property name="ant.build.native.jobs" value="auto" />
-
-		<!-- Set the default compiler flags. -->
-		<condition property="ant.build.native.cflags" value="${env.CFLAGS}">
-			<isset property="env.CFLAGS" />
-		</condition>
-		<condition property="ant.build.native.cflags" value="-O2 -g -pipe" else="-O1 -g -pipe">
-			<not>
-				<istrue value="${ant.build.debug}" />
-			</not>
-		</condition>
-		<echo level="info">Using CFLAGS: ${ant.build.native.cflags}</echo>
-
-		<!-- Set the default linker flags. -->
-		<condition property="ant.build.native.ldflags" value="${env.LDFLAGS}">
-			<isset property="env.LDFLAGS" />
-		</condition>
-		<condition property="ant.build.native.ldflags" value="" else="">
-			<not>
-				<istrue value="${ant.build.debug}" />
-			</not>
-		</condition>
-		<echo level="info">Using LDFLAGS: ${ant.build.native.ldflags}</echo>
-
 
 
 		<!-- Set the operating system name used for organizing native libraries -->
@@ -341,7 +259,7 @@
 		</condition>
 
 
-		<!-- Set system specific library name -->
+		<!-- Set system specific library name. -->
 		<condition property="ant.build.native.executable" value="lib${ant.project.name}.dylib">
 			<equals arg1="${ant.build.native.os}" arg2="darwin" />
 		</condition>
@@ -349,6 +267,11 @@
 			<equals arg1="${ant.build.native.os}" arg2="windows" />
 		</condition>
 		<property name="ant.build.native.executable" value="lib${ant.project.name}.so" />
+
+		<!-- Print the relevant Ant properties for logging. -->
+		<!-- FIXME Add more properties! -->
+		<echo level="info">Using compile-jni: ${ant.build.native.cflags}</echo>
+		<echo level="info">Using LDFLAGS: ${ant.build.native.ldflags}</echo>
 	</target>
 
 
