@@ -1,10 +1,10 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2013 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
  * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * JNativeHook is distributed in the hope that it will be useful,
@@ -12,20 +12,20 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.jnativehook.keyboard;
+
+import org.junit.Test;
 
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+
+import static org.junit.Assert.*;
 
 public class NativeKeyEventTest {
 	/**
