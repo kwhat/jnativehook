@@ -92,7 +92,10 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
 	jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: JNI Unloaded.\n",
 			__FUNCTION__, __LINE__);
-
+	
+	// Unset Java logger for native code messages.
+	hook_set_logger_proc(NULL);
+	
 	// FIXME Change to take jvm, not env!
 	if (env != NULL) {
 		jni_DestroyGlobals(env);
