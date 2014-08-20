@@ -358,8 +358,8 @@
 		<!-- Call pkg-config to determine what libraries to link against. -->
 		<pkgconfig libs="true" packages="uiohook" outputproperty="ant.build.native.ld.libs">
 			<dirset dir="${dir.bin}">
-				<include name="lib/pkgconfig"/>
-				<include name="bin/pkgconfig"/>
+				<include name="lib/pc"/>
+				<include name="bin/pc"/>
 			</dirset>
 		</pkgconfig>
 
