@@ -358,8 +358,8 @@
 		<!-- Call pkg-config to determine what libraries to link against. -->
 		<pkgconfig libs="true" packages="uiohook" outputproperty="ant.build.native.ld.libs">
 			<dirset dir="${dir.bin}">
-				<include name="lib/pc"/>
-				<include name="bin/pc"/>
+				<include name="lib/pkgconfig"/>
+				<include name="bin/pkgconfig"/>
 			</dirset>
 		</pkgconfig>
 
@@ -522,12 +522,13 @@
 			</zipfileset>
 
 			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
-				<include name="*.jar" />
+				<include name="${ant.project.name}.jar" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
-				<include name="**/*" />
-				<exclude name="JNativeHook.iml" />
+				<include name="java/*" />
+				<include name="jni/*" />
+				<include name="test/*" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen.h" />
 				<exclude name="jnitasks/" />
 				<exclude name="libuiohook/" />
