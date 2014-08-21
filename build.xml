@@ -312,6 +312,7 @@
 			<enable>quiet</enable>
 			<enable>static</enable>
 			<disable>shared</disable>
+
 			<with>pic</with>
 		</configure>
 	</target>
@@ -356,7 +357,7 @@
 
 
 		<!-- Call pkg-config to determine what libraries to link against. -->
-		<pkgconfig libs="true" packages="uiohook" outputproperty="ant.build.native.ld.libs">
+		<pkgconfig libs="true" libraries="uiohook" outputproperty="ant.build.native.ld.libs">
 			<dirset dir="${dir.bin}">
 				<include name="lib/pkgconfig"/>
 				<include name="bin/pkgconfig"/>
