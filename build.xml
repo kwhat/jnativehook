@@ -70,7 +70,7 @@
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
 			<fileset dir="${dir.dist}" />
 			<fileset dir="${dir.doc}" />
-			<fileset dir="${dir.jar}" />
+			<fileset file="${dir.jar}/${ant.project.name}" />
 
 			<fileset dir="${dir.src}/libuiohook" casesensitive="yes">
 				<include name="autom4te.cache" />
@@ -498,6 +498,8 @@
 		<mkdir dir="${dir.doc}" />
 
 		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
+			<arg line="${ant.build.javac.args}" />
+
 			<packageset dir="${dir.src}/java" defaultexcludes="yes">
 				<include name="org/jnativehook/**" />
 				<exclude name="org/jnativehook/example/**" />
