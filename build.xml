@@ -308,6 +308,9 @@
 		<mkdir dir="${dir.bin}/libuiohook" />
 
 		<configure dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}">
+			<env key="CFLAGS" value="${ant.build.native.cflags}" />
+			<env key="LDFLAGS" value="${ant.build.native.ldflags}" />
+
 			<enable if="ant.build.debug">debug</enable>
 			<enable>quiet</enable>
 			<enable>static</enable>
