@@ -307,7 +307,7 @@
 		<echo>Configuring libUIOHook source...</echo>
 		<mkdir dir="${dir.bin}/libuiohook" />
 
-		<configure dir="${dir.bin}/libuiohook" path="${dir.src}/libuiohook" prefix="${dir.bin}">
+		<configure dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}">
 			<enable if="ant.build.debug">debug</enable>
 			<enable>quiet</enable>
 			<enable>static</enable>
