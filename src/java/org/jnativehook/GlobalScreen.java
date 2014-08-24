@@ -503,7 +503,7 @@ public class GlobalScreen {
 
 			// Slice up the library name.
 			int i = libNativeName.lastIndexOf('.');
-			String libNativePrefix = libNativeName.substring(0, i) + '_';
+			String libNativePrefix = libNativeName.substring(0, i) + '-';
 			String libNativeSuffix = libNativeName.substring(i);
 			String libNativeVersion = String.valueOf(GlobalScreen.class.hashCode());
 
