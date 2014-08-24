@@ -531,7 +531,7 @@
 	</target>
 
 
-	<target name="package" depends="compile,jar,javadoc" description="Creates zip files for distribution.">
+	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
