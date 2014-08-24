@@ -50,23 +50,35 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		}
 
 		#ifndef USE_QUIET
-		fprintf(stdout, "\n%s%s%s\n%s%s%s%s\n%s%s%s%s\n%s\n",
-				"JNativeHook: Global keyboard and mouse hooking for Java.\n",
-				"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n",
-				"https://github.com/kwhat/jnativehook/\n",
+		jclass PrintStream_class = (*env)->FindClass(env, "java/io/PrintStream");
+		jfieldID out_id = (*env)->GetStaticFieldID(env, java_lang_System->cls, "out", "Ljava/io/PrintStream;");
 
-				"JNativeHook is free software: you can redistribute it and/or modify\n",
-				"it under the terms of the GNU Lesser General Public License as published\n",
-				"by the Free Software Foundation, either version 3 of the License, or\n",
-				"(at your option) any later version.\n"
+		if (PrintStream_class != NULL && out_id != NULL) {
+			jmethodID println_id = (*env)->GetMethodID(env, PrintStream_class, "println", "(Ljava/lang/String;)V");
+			jobject out = (*env)->GetStaticObjectField(env, PrintStream_class, out_id);
 
-				"JNativeHook is distributed in the hope that it will be useful,\n",
-				"but WITHOUT ANY WARRANTY; without even the implied warranty of\n",
-				"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n",
-				"GNU General Public License for more details.\n",
+			if (println_id != NULL && out_id != NULL) {
+				jstring copyright = (*env)->NewStringUTF(env, "\n"
+						"JNativeHook: Global keyboard and mouse hooking for Java.\n"
+						"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n"
+						"https://github.com/kwhat/jnativehook/\n"
+						"\n"
+						"JNativeHook is free software: you can redistribute it and/or modify\n"
+						"it under the terms of the GNU Lesser General Public License as published\n"
+						"by the Free Software Foundation, either version 3 of the License, or\n"
+						"(at your option) any later version.\n"
+						"\n"
+						"JNativeHook is distributed in the hope that it will be useful,\n"
+						"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+						"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+						"GNU General Public License for more details.\n"
+						"\n"
+						"You should have received a copy of the GNU Lesser General Public License\n"
+						"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
 
-				"You should have received a copy of the GNU Lesser General Public License\n",
-				"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
+				(*env)->CallVoidMethod(env, out, println_id, copyright);
+			}
+		}
 		#endif
 
 		// Set Java logger for native code messages.
