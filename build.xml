@@ -379,7 +379,6 @@
 			<arg value="${ant.build.native.cflags}" />
 
 			<define name="DEBUG" if="ant.build.debug"/>
-			<define name="VERSION" value="${ant.project.version}" />
 
 			<include path="${dir.bin}/include" />
 			<include path="${dir.src}/jni/include" />
@@ -477,8 +476,12 @@
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
 				<section name="org/jnativehook">
-					<attribute name="Implementation-Title" value="${ant.project.name} Library" />
-					<attribute name="Implementation-Version" value="${ant.project.version}" />
+					<attribute name="Specification-Title" value="${ant.project.name} Library" />
+					<attribute name="Specification-Version" value="${ant.build.major}.${ant.build.minor}" />
+					<attribute name="Specification-Vendor" value="${ant.project.vendor}" />
+
+					<attribute name="Implementation-Title" value="org.jnativehook" />
+					<attribute name="Implementation-Version" value="${ant.build.revision}" />
 					<attribute name="Implementation-Vendor" value="${ant.project.vendor}" />
 				</section>
 			</manifest>

@@ -207,34 +207,6 @@ void jni_SetProperties(JNIEnv *env) {
 		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
 				__FUNCTION__, __LINE__);
 	}
-
-
-	#ifdef VERSION
-	#define STR_EXPAND(tok) #tok
-	#define STR(tok) STR_EXPAND(tok)
-
-	jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: Native library version set: %s.\n",
-			__FUNCTION__, __LINE__, STR(VERSION));
-
-	if (snprintf(buffer, sizeof(buffer), "%s", STR(VERSION)) >= 0) {
-		jstring name = (*env)->NewStringUTF(env, "jnativehook.version");
-		jstring value = (*env)->NewStringUTF(env, buffer);
-
-		(*env)->CallStaticObjectMethod(
-				env,
-				java_lang_System->cls,
-				java_lang_System->setProperty,
-				name,
-				value);
-
-		(*env)->DeleteLocalRef(env, name);
-		(*env)->DeleteLocalRef(env, value);
-	}
-	else {
-		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert version to string!\n",
-				__FUNCTION__, __LINE__);
-	}
-	#endif
 }
 
 
@@ -293,15 +265,4 @@ void jni_ClearProperties(JNIEnv *env) {
 			java_lang_System->clearProperty, 
 			name);
 	(*env)->DeleteLocalRef(env, name);
-
-
-	#ifdef VERSION
-	name = (*env)->NewStringUTF(env, "jnativehook.version");
-	(*env)->CallStaticObjectMethod(
-			env,
-			java_lang_System->cls,
-			java_lang_System->clearProperty,
-			name);
-	(*env)->DeleteLocalRef(env, name);
-	#endif
 }

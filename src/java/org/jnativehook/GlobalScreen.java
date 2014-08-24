@@ -18,13 +18,11 @@
 package org.jnativehook;
 
 // Imports.
+
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-import org.jnativehook.mouse.NativeMouseEvent;
-import org.jnativehook.mouse.NativeMouseListener;
-import org.jnativehook.mouse.NativeMouseMotionListener;
-import org.jnativehook.mouse.NativeMouseWheelEvent;
-import org.jnativehook.mouse.NativeMouseWheelListener;
+import org.jnativehook.mouse.*;
+
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +32,9 @@ import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 /**
  * GlobalScreen is used to represent the native screen area that Java does not
@@ -477,9 +478,7 @@ public class GlobalScreen {
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
 	private static void loadNativeLibrary() {
-		String libNativeVersion = System.getProperty("jnativehook.version", "1.2");
-
-		String libName = "JNativeHook";
+		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
 
 		try {
 			// Try to load the native library assuming the java.library.path was
@@ -487,15 +486,18 @@ public class GlobalScreen {
 			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
+			// Get the package name for the GlobalScreen.
+			String basePackage = GlobalScreen.class.getPackage().getName().replace('.', '/');
 
-			StringBuilder libResourcePath = new StringBuilder("/org/jnativehook/lib/");
-
+			// Compile the resource path for the
+			StringBuilder libResourcePath = new StringBuilder("/");
+			libResourcePath.append(basePackage).append("/lib/");
 			libResourcePath.append(NativeSystem.getFamily()).append('/');
 			libResourcePath.append(NativeSystem.getArchitecture()).append('/');
 
 
 			// Get what the system "thinks" the library name should be.
-			String libNativeName = System.mapLibraryName("JNativeHook");
+			String libNativeName = System.mapLibraryName(libName);
 			// Hack for OS X JRE 1.6 and earlier.
 			libNativeName = libNativeName.replaceAll("\\.jnilib$", "\\.dylib");
 
@@ -503,6 +505,22 @@ public class GlobalScreen {
 			int i = libNativeName.lastIndexOf('.');
 			String libNativePrefix = libNativeName.substring(0, i) + '_';
 			String libNativeSuffix = libNativeName.substring(i);
+			String libNativeVersion = String.valueOf(GlobalScreen.class.hashCode());
+
+			try {
+				// Try and extract a version string from the Manifest.
+				Manifest manifest = new Manifest(GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
+				Attributes attributes = manifest.getAttributes(basePackage);
+
+				String version = attributes.getValue("Specification-Version");
+				String revision = attributes.getValue("Implementation-Version");
+
+				libNativeVersion = version + '.' + revision;
+			}
+			catch (IOException E) {
+				Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!");
+			}
+
 
 			// Create the temp file for this instance of the library.
 			File libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
@@ -512,7 +530,10 @@ public class GlobalScreen {
 				InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString().toLowerCase() + libNativeName);
 
 				if (libInputStream == null) {
-					throw new RuntimeException("Unable to locate the native library.");
+					Logger.getLogger(GlobalScreen.class.getPackage().getName())
+							.severe("Unable to extract the native library " + libResourcePath.toString().toLowerCase() + libNativeName + "!");
+
+					throw new UnsatisfiedLinkError();
 				}
 
 				try {
@@ -526,11 +547,6 @@ public class GlobalScreen {
 					}
 					libOutputStream.close();
 					libInputStream.close();
-
-					// Remove the extracted file when the JVM exists.
-					// FIXME This causes an issue on Windows due to file locking.
-					// FIXME See issue #88 for more information.
-					//libFile.deleteOnExit();
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e.getMessage(), e);
