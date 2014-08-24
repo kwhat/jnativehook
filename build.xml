@@ -127,7 +127,6 @@
 				</not>
 			</condition>
 		</fail>
-		<echo level="info">${ant.project.name} version ${ant.project.version}</echo>
 
 
 		<!-- Try to locate the include folder for java headers -->
@@ -163,7 +162,6 @@
 				</not>
 			</condition>
 		</fail>
-		<echo level="info">Found Java include location: ${ant.build.javac.include}</echo>
 
 
 		<!-- Preform jnitasks target checks. -->
@@ -276,9 +274,21 @@
 
 
 		<!-- Print the relevant Ant properties for logging. -->
-		<!-- FIXME Add more properties! -->
-		<echo level="info">Using compile-jni: ${ant.build.native.cflags}</echo>
-		<echo level="info">Using LDFLAGS: ${ant.build.native.ldflags}</echo>
+		<echo level="info">Project:            ${ant.project.name} ${ant.project.version}</echo>
+		<echo level="info">Debug:              ${ant.build.debug}</echo>
+
+		<echo level="info">Java Compiler:      ${ant.build.javac.compiler}</echo>
+		<echo level="info">Java Source:        ${ant.build.javac.source}</echo>
+		<echo level="info">Java Target:        ${ant.build.javac.target}</echo>
+		<echo level="info">Java Include:       ${ant.build.javac.include}</echo>
+		<echo level="info">Java Args:          ${ant.build.javac.args}</echo>
+
+		<echo level="info">Native Lib:         ${ant.build.native.executable}</echo>
+		<echo level="info">Native OS:          ${ant.build.native.os}</echo>
+		<echo level="info">Native Arch:        ${ant.build.native.arch}</echo>
+		<echo level="info">Native Toolchain:   ${ant.build.native.toolchain}</echo>
+		<echo level="info">Native CFLAGS:      ${ant.build.native.cflags}</echo>
+		<echo level="info">Native LDFLAGS:     ${ant.build.native.ldflags}</echo>
 	</target>
 
 
