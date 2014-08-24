@@ -79,7 +79,7 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
 						message);
 					break;
 			}
-			
+
 			(*env)->DeleteLocalRef(env, name);
 			(*env)->DeleteLocalRef(env, message);
 			(*env)->DeleteLocalRef(env, Logger_object);

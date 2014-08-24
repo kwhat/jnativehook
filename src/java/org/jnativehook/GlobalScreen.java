@@ -25,7 +25,6 @@ import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
-
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -478,23 +477,7 @@ public class GlobalScreen {
 	 * include unpacking and loading the library into the Java Virtual Machine.
 	 */
 	private static void loadNativeLibrary() {
-		System.out.println("\n" +
-			"JNativeHook: Global keyboard and mouse hooking for Java.\n" +
-			"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n" +
-			"https://github.com/kwhat/jnativehook/\n" +
-			"\n" +
-			"JNativeHook is free software: you can redistribute it and/or modify\n" +
-			"it under the terms of the GNU Lesser General Public License as published\n" +
-			"by the Free Software Foundation, either version 3 of the License, or\n" +
-			"(at your option) any later version.\n" +
-			"\n" +
-			"JNativeHook is distributed in the hope that it will be useful,\n" +
-			"but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
-			"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
-			"GNU General Public License for more details.\n" +
-			"\n" +
-			"You should have received a copy of the GNU Lesser General Public License\n" +
-			"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
+		String libNativeVersion = System.getProperty("jnativehook.version", "1.2");
 
 		String libName = "JNativeHook";
 
@@ -504,66 +487,57 @@ public class GlobalScreen {
 			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
-			// The library is not in the java.library.path so try to extract it.
-			try {
-				String libResourcePath = "/org/jnativehook/lib/" +
-						NativeSystem.getFamily() + "/" +
-						NativeSystem.getArchitecture() + "/";
 
-				// Get what the system "thinks" the library name should be.
-				String libNativeName = System.mapLibraryName(libName);
-				// Hack for OS X JRE 1.6 and earlier.
-				libNativeName = libNativeName.replaceAll("\\.jnilib$", "\\.dylib");
+			StringBuilder libResourcePath = new StringBuilder("/org/jnativehook/lib/");
 
-				// Slice up the library name.
-				int i = libNativeName.lastIndexOf('.');
-				String libNativePrefix = libNativeName.substring(0, i) + '_';
-				String libNativeSuffix = libNativeName.substring(i);
+			libResourcePath.append(NativeSystem.getFamily()).append('/');
+			libResourcePath.append(NativeSystem.getArchitecture()).append('/');
 
-				// Determine if the user specified temp directory should be used.
-				String tmpDir = System.getProperty("jnativehook.tmpdir", null);
 
-				File libDir = null;
-				if (tmpDir != null) {
-					libDir = new File(tmpDir);
-				}
+			// Get what the system "thinks" the library name should be.
+			String libNativeName = System.mapLibraryName("JNativeHook");
+			// Hack for OS X JRE 1.6 and earlier.
+			libNativeName = libNativeName.replaceAll("\\.jnilib$", "\\.dylib");
 
-				// Create the temp file for this instance of the library.
-				File libFile = File.createTempFile(libNativePrefix, libNativeSuffix, libDir);
+			// Slice up the library name.
+			int i = libNativeName.lastIndexOf('.');
+			String libNativePrefix = libNativeName.substring(0, i) + '_';
+			String libNativeSuffix = libNativeName.substring(i);
 
+			// Create the temp file for this instance of the library.
+			File libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
+
+			if (!libFile.exists()) {
 				// This may return null in some circumstances.
-				InputStream libInputStream =
-						GlobalScreen.class.getResourceAsStream(
-								libResourcePath.toLowerCase()
-										+ libNativeName
-						);
+				InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString().toLowerCase() + libNativeName);
 
 				if (libInputStream == null) {
-					throw new IOException("Unable to locate the native library.");
+					throw new RuntimeException("Unable to locate the native library.");
 				}
 
-				// Check and see if a copy of the native lib already exists.
-				FileOutputStream libOutputStream = new FileOutputStream(libFile);
-				byte[] buffer = new byte[4 * 1024];
+				try {
+					// Check and see if a copy of the native lib already exists.
+					FileOutputStream libOutputStream = new FileOutputStream(libFile);
+					byte[] buffer = new byte[4 * 1024];
 
-				int size;
-				while ((size = libInputStream.read(buffer)) != -1) {
-					libOutputStream.write(buffer, 0, size);
+					int size;
+					while ((size = libInputStream.read(buffer)) != -1) {
+						libOutputStream.write(buffer, 0, size);
+					}
+					libOutputStream.close();
+					libInputStream.close();
+
+					// Remove the extracted file when the JVM exists.
+					// FIXME This causes an issue on Windows due to file locking.
+					// FIXME See issue #88 for more information.
+					//libFile.deleteOnExit();
 				}
-				libOutputStream.close();
-				libInputStream.close();
-
-				// Remove the extracted file when the JVM exists.
-				// FIXME This causes an issue on Windows due to file locking.
-				// FIXME See issue #88 for more information.
-				libFile.deleteOnExit();
-
-				System.load(libFile.getPath());
+				catch (IOException e) {
+					throw new RuntimeException(e.getMessage(), e);
+				}
 			}
-			catch (IOException e) {
-				// Tried and Failed to manually setup the java.library.path.
-				throw new RuntimeException(e.getMessage(), e);
-			}
+
+			System.load(libFile.getPath());
 		}
 	}
 

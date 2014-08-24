@@ -53,7 +53,12 @@ public class NativeSystem {
 		WINDOWS,
 
 		/** Any unsupported operating system family. */
-		UNSUPPORTED
+		UNSUPPORTED;
+
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
 	}
 
 	/**
@@ -84,7 +89,12 @@ public class NativeSystem {
 		x86_64,
 
 		/** Any unsupported system architecture. */
-		UNSUPPORTED
+		UNSUPPORTED;
+
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
 	}
 
 	/**

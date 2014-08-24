@@ -33,7 +33,7 @@ void jni_SetProperties(JNIEnv *env) {
     				__FUNCTION__, __LINE__, rate);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", rate) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.rate");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -63,7 +63,7 @@ void jni_SetProperties(JNIEnv *env) {
     				__FUNCTION__, __LINE__, delay);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.delay");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -94,7 +94,7 @@ void jni_SetProperties(JNIEnv *env) {
 				__FUNCTION__, __LINE__, multiplier);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", multiplier) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointer.acceleration.multiplier");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -125,7 +125,7 @@ void jni_SetProperties(JNIEnv *env) {
 				__FUNCTION__, __LINE__, threshold);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", threshold) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointer.acceleration.threshold");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -155,7 +155,7 @@ void jni_SetProperties(JNIEnv *env) {
 				__FUNCTION__, __LINE__, sensitivity);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", sensitivity) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.pointer.sensitivity");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -185,7 +185,7 @@ void jni_SetProperties(JNIEnv *env) {
         		__FUNCTION__, __LINE__, clicktime);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.multiClickInterval");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.multiclick.iterval");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
@@ -207,13 +207,41 @@ void jni_SetProperties(JNIEnv *env) {
 		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
 				__FUNCTION__, __LINE__);
 	}
+
+
+	#ifdef VERSION
+	#define STR_EXPAND(tok) #tok
+	#define STR(tok) STR_EXPAND(tok)
+
+	jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: Native library version set: %s.\n",
+			__FUNCTION__, __LINE__, STR(VERSION));
+
+	if (snprintf(buffer, sizeof(buffer), "%s", STR(VERSION)) >= 0) {
+		jstring name = (*env)->NewStringUTF(env, "jnativehook.version");
+		jstring value = (*env)->NewStringUTF(env, buffer);
+
+		(*env)->CallStaticObjectMethod(
+				env,
+				java_lang_System->cls,
+				java_lang_System->setProperty,
+				name,
+				value);
+
+		(*env)->DeleteLocalRef(env, name);
+		(*env)->DeleteLocalRef(env, value);
+	}
+	else {
+		jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Failed to convert version to string!\n",
+				__FUNCTION__, __LINE__);
+	}
+	#endif
 }
 
 
 void jni_ClearProperties(JNIEnv *env) {
 	jstring name = NULL;
 	
-	name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatRate");
+	name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.rate");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
@@ -222,7 +250,7 @@ void jni_ClearProperties(JNIEnv *env) {
 	(*env)->DeleteLocalRef(env, name);
 
 
-	name = (*env)->NewStringUTF(env, "jnativehook.autoRepeatDelay");
+	name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.delay");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
@@ -231,7 +259,7 @@ void jni_ClearProperties(JNIEnv *env) {
 	(*env)->DeleteLocalRef(env, name);
 
 
-	name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationMultiplier");
+	name = (*env)->NewStringUTF(env, "jnativehook.pointer.acceleration.multiplier");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
@@ -240,7 +268,7 @@ void jni_ClearProperties(JNIEnv *env) {
 	(*env)->DeleteLocalRef(env, name);
 
 
-	name = (*env)->NewStringUTF(env, "jnativehook.pointerAccelerationThreshold");
+	name = (*env)->NewStringUTF(env, "jnativehook.pointer.acceleration.threshold");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
@@ -249,7 +277,7 @@ void jni_ClearProperties(JNIEnv *env) {
 	(*env)->DeleteLocalRef(env, name);
 
 
-	name = (*env)->NewStringUTF(env, "jnativehook.pointerSensitivity");
+	name = (*env)->NewStringUTF(env, "jnativehook.pointer.sensitivity");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
@@ -258,11 +286,22 @@ void jni_ClearProperties(JNIEnv *env) {
 	(*env)->DeleteLocalRef(env, name);
 
 
-	name = (*env)->NewStringUTF(env, "jnativehook.multiClickInterval");
+	name = (*env)->NewStringUTF(env, "jnativehook.button.multiclick.iterval");
 	(*env)->CallStaticObjectMethod(
 			env, 
 			java_lang_System->cls, 
 			java_lang_System->clearProperty, 
 			name);
 	(*env)->DeleteLocalRef(env, name);
+
+
+	#ifdef VERSION
+	name = (*env)->NewStringUTF(env, "jnativehook.version");
+	(*env)->CallStaticObjectMethod(
+			env,
+			java_lang_System->cls,
+			java_lang_System->clearProperty,
+			name);
+	(*env)->DeleteLocalRef(env, name);
+	#endif
 }

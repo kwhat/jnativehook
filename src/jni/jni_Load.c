@@ -49,6 +49,26 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 			ThrowFatalError("Failed to locate one or more required classes.");
 		}
 
+		#ifndef USE_QUIET
+		fprintf(stdout, "\n%s%s%s\n%s%s%s%s\n%s%s%s%s\n%s\n",
+				"JNativeHook: Global keyboard and mouse hooking for Java.\n",
+				"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n",
+				"https://github.com/kwhat/jnativehook/\n",
+
+				"JNativeHook is free software: you can redistribute it and/or modify\n",
+				"it under the terms of the GNU Lesser General Public License as published\n",
+				"by the Free Software Foundation, either version 3 of the License, or\n",
+				"(at your option) any later version.\n"
+
+				"JNativeHook is distributed in the hope that it will be useful,\n",
+				"but WITHOUT ANY WARRANTY; without even the implied warranty of\n",
+				"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n",
+				"GNU General Public License for more details.\n",
+
+				"You should have received a copy of the GNU Lesser General Public License\n",
+				"along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
+		#endif
+
 		// Set Java logger for native code messages.
 		hook_set_logger_proc(&jni_Logger);
 
