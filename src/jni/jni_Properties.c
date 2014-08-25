@@ -185,7 +185,7 @@ void jni_SetProperties(JNIEnv *env) {
         		__FUNCTION__, __LINE__, clicktime);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
-			jstring name = (*env)->NewStringUTF(env, "jnativehook.multiclick.iterval");
+			jstring name = (*env)->NewStringUTF(env, "jnativehook.button.multiclick.iterval");
 			jstring value = (*env)->NewStringUTF(env, buffer);
 
 			(*env)->CallStaticObjectMethod(
