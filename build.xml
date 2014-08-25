@@ -70,7 +70,7 @@
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
 			<fileset dir="${dir.dist}" />
 			<fileset dir="${dir.doc}" />
-			<fileset file="${dir.jar}/${ant.project.name}" />
+			<fileset file="${dir.jar}/${ant.project.name}.jar" />
 
 			<fileset dir="${dir.src}/libuiohook" casesensitive="yes">
 				<include name="autom4te.cache" />
