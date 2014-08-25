@@ -508,19 +508,32 @@ public class GlobalScreen {
 			String libNativeVersion = String.valueOf(GlobalScreen.class.hashCode());
 
 			try {
-				// Try and extract a version string from the Manifest.
-				Manifest manifest = new Manifest(GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
-				Attributes attributes = manifest.getAttributes(basePackage);
+				InputStream manInputStream = GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF");
+				if (manInputStream != null) {
+					// Try and extract a version string from the Manifest.
+					Manifest manifest = new Manifest(manInputStream);
+					Attributes attributes = manifest.getAttributes(basePackage);
 
-				String version = attributes.getValue("Specification-Version");
-				String revision = attributes.getValue("Implementation-Version");
+					if (attributes != null) {
+						String version = attributes.getValue("Specification-Version");
+						String revision = attributes.getValue("Implementation-Version");
 
-				libNativeVersion = version + '.' + revision;
+						libNativeVersion = version + '.' + revision;
+					}
+					else {
+						Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Invalid library manifest!");
+					}
+				}
+				else {
+					Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!");
+				}
 			}
-			catch (IOException E) {
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!");
+			catch (IOException e) {
+				Logger.getLogger(GlobalScreen.class.getPackage().getName()).severe(e.getMessage());
 			}
 
+			// Set the library version property.
+			System.setProperty("jnativehook.version", libNativeVersion);
 
 			// Create the temp file for this instance of the library.
 			File libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
