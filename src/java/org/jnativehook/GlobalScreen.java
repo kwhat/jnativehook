@@ -565,15 +565,17 @@ public class GlobalScreen {
 
 					// Setup a digest...
 					MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-					DigestInputStream digest = new DigestInputStream(libInputStream, sha1);
+					DigestInputStream digestInputStrem = new DigestInputStream(libInputStream, sha1);
 
-					//while ((size = libInputStream.read(buffer)) != -1) {
-					while ((size = digest.read(buffer)) != -1) {
+					// Read from the digest stream and write to the file steam.
+					while ((size = digestInputStrem.read(buffer)) != -1) {
 						libOutputStream.write(buffer, 0, size);
 					}
 
-					libOutputStream.close();
+					// Close all the streams.
+					digestInputStrem.close();
 					libInputStream.close();
+					libOutputStream.close();
 
 					// Convert the digest from byte[] to hex string.
 					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16);
@@ -583,7 +585,6 @@ public class GlobalScreen {
 
 						// Better late than never.
 						File newFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
-
 						if (libFile.renameTo(newFile)) {
 							libFile = newFile;
 						}
@@ -596,7 +597,7 @@ public class GlobalScreen {
 					System.load(libFile.getPath());
 
 					Logger.getLogger(GlobalScreen.class.getPackage().getName())
-							.info("Library extracted successfully: " + libResourcePath.toString().toLowerCase() + libNativeName + " (0x" + sha1Sum + ").\n");
+							.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e.getMessage(), e);
