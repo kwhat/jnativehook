@@ -21,13 +21,21 @@ package org.jnativehook;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-import org.jnativehook.mouse.*;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseListener;
+import org.jnativehook.mouse.NativeMouseMotionListener;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+import org.jnativehook.mouse.NativeMouseWheelListener;
 
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.EventListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -505,70 +513,104 @@ public class GlobalScreen {
 			int i = libNativeName.lastIndexOf('.');
 			String libNativePrefix = libNativeName.substring(0, i) + '-';
 			String libNativeSuffix = libNativeName.substring(i);
+			String libNativeVersion = null;
 
-			// FIXME WE CANT USE THE HASH CODE!  GENERATE MD5 FOR THE BINARY!
-			String libNativeVersion = String.valueOf(GlobalScreen.class.hashCode());
+			// This may return null in some circumstances.
+			InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString().toLowerCase() + libNativeName);
+			if (libInputStream != null) {
+				try {
+					// Try and load the Jar manifest as a resource stream.
+					InputStream manInputStream = GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF");
+					if (manInputStream != null) {
+						// Try and extract a version string from the Manifest.
+						Manifest manifest = new Manifest(manInputStream);
+						Attributes attributes = manifest.getAttributes(basePackage);
 
-			try {
-				InputStream manInputStream = GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF");
-				if (manInputStream != null) {
-					// Try and extract a version string from the Manifest.
-					Manifest manifest = new Manifest(manInputStream);
-					Attributes attributes = manifest.getAttributes(basePackage);
+						if (attributes != null) {
+							String version = attributes.getValue("Specification-Version");
+							String revision = attributes.getValue("Implementation-Version");
 
-					if (attributes != null) {
-						String version = attributes.getValue("Specification-Version");
-						String revision = attributes.getValue("Implementation-Version");
-
-						libNativeVersion = version + '.' + revision;
+							libNativeVersion = version + '.' + revision;
+						}
+						else {
+							Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Invalid library manifest!\n");
+						}
 					}
 					else {
-						Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Invalid library manifest!");
+						Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!\n");
 					}
 				}
-				else {
-					Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!");
+				catch (IOException e) {
+					Logger.getLogger(GlobalScreen.class.getPackage().getName()).severe(e.getMessage());
 				}
-			}
-			catch (IOException e) {
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).severe(e.getMessage());
-			}
 
-			// Set the library version property.
-			System.setProperty("jnativehook.version", libNativeVersion);
-
-			// Create the temp file for this instance of the library.
-			File libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
-
-			if (!libFile.exists()) {
-				// This may return null in some circumstances.
-				InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString().toLowerCase() + libNativeName);
-
-				if (libInputStream == null) {
-					Logger.getLogger(GlobalScreen.class.getPackage().getName())
-							.severe("Unable to extract the native library " + libResourcePath.toString().toLowerCase() + libNativeName + "!");
-
-					throw new UnsatisfiedLinkError();
-				}
 
 				try {
+					// The temp file for this instance of the library.
+					File libFile;
+
+					// If we were unable to extract a library version from the manifest.
+					if (libNativeVersion != null) {
+						libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
+					}
+					else {
+						libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
+					}
+
+					byte[] buffer = new byte[4 * 1024];
+					int size;
+
 					// Check and see if a copy of the native lib already exists.
 					FileOutputStream libOutputStream = new FileOutputStream(libFile);
-					byte[] buffer = new byte[4 * 1024];
 
-					int size;
-					while ((size = libInputStream.read(buffer)) != -1) {
+					// Setup a digest...
+					MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+					DigestInputStream digest = new DigestInputStream(libInputStream, sha1);
+
+					//while ((size = libInputStream.read(buffer)) != -1) {
+					while ((size = digest.read(buffer)) != -1) {
 						libOutputStream.write(buffer, 0, size);
 					}
+
 					libOutputStream.close();
 					libInputStream.close();
+
+					// Convert the digest from byte[] to hex string.
+					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16);
+					if (libNativeVersion == null) {
+						// Use the sha1 sum as a version finger print.
+						libNativeVersion = sha1Sum;
+
+						// Better late than never.
+						File newFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
+
+						if (libFile.renameTo(newFile)) {
+							libFile = newFile;
+						}
+					}
+
+					// Set the library version property.
+					System.setProperty("jnativehook.version", libNativeVersion);
+
+					// Load the native library.
+					System.load(libFile.getPath());
+
+					Logger.getLogger(GlobalScreen.class.getPackage().getName())
+							.info("Library extracted successfully: " + libResourcePath.toString().toLowerCase() + libNativeName + " (0x" + sha1Sum + ").\n");
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e.getMessage(), e);
 				}
+				catch (NoSuchAlgorithmException e) {
+					throw new RuntimeException(e.getMessage(), e);
+				}
 			}
+			else {
+				Logger.getLogger(GlobalScreen.class.getPackage().getName())
+						.severe("Unable to extract the native library " + libResourcePath.toString().toLowerCase() + libNativeName + "!\n");
 
-			System.load(libFile.getPath());
+				throw new UnsatisfiedLinkError();
+			}
 		}
 	}
 
