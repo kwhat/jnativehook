@@ -505,6 +505,8 @@ public class GlobalScreen {
 			int i = libNativeName.lastIndexOf('.');
 			String libNativePrefix = libNativeName.substring(0, i) + '-';
 			String libNativeSuffix = libNativeName.substring(i);
+
+			// FIXME WE CANT USE THE HASH CODE!  GENERATE MD5 FOR THE BINARY!
 			String libNativeVersion = String.valueOf(GlobalScreen.class.hashCode());
 
 			try {
