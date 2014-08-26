@@ -457,6 +457,12 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		}
 	}
 
+
+	/**
+	 * This is a special ExecutorService to transfer NativeInputEvents to Swing's Event Dispatch Thread.
+	 *
+	 * @see GlobalScreen
+	 */
 	private class SwingExecutorService extends AbstractExecutorService {
 		private EventQueue queue;
 
