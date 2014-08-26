@@ -155,7 +155,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		// Create custom logger and level.
 		logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 		LogManager.getLogManager().reset();
-		logger.setLevel(Level.ALL);
+		logger.setLevel(Level.INFO);
 
 		// Add formatter and console logger.
 		ConsoleHandler handler = new ConsoleHandler();
