@@ -564,7 +564,7 @@ public class GlobalScreen {
 					FileOutputStream libOutputStream = new FileOutputStream(libFile);
 
 					// Setup a digest...
-					MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+					MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 					DigestInputStream digestInputStrem = new DigestInputStream(libInputStream, sha1);
 
 					// Read from the digest stream and write to the file steam.
@@ -578,7 +578,7 @@ public class GlobalScreen {
 					libOutputStream.close();
 
 					// Convert the digest from byte[] to hex string.
-					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16);
+					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16).toUpperCase();
 					if (libNativeVersion == null) {
 						// Use the sha1 sum as a version finger print.
 						libNativeVersion = sha1Sum;
