@@ -680,8 +680,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_KP_SEPARATOR:
 				return Toolkit.getProperty("AWT.numpad_separator", "NumPad Separator");
 
-			case VC_KP_0:
-				return Toolkit.getProperty("AWT.numpad_0", "NumPad 0");
 			case VC_KP_1:
 				return Toolkit.getProperty("AWT.numpad_1", "NumPad 1");
 			case VC_KP_2:
@@ -700,6 +698,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.numpad_8", "NumPad 8");
 			case VC_KP_9:
 				return Toolkit.getProperty("AWT.numpad_9", "NumPad 9");
+			case VC_KP_0:
+				return Toolkit.getProperty("AWT.numpad_0", "NumPad 0");
 			// End Numeric Zone
 
 			// Begin Modifier and Control Keys
