@@ -165,7 +165,25 @@
 
 
 		<!-- Preform jnitasks target checks. -->
-		<available file="${dir.src}/jnitasks" property="project.check.jnitasks.download" />
+		<available file="${dir.jar}/JNITasks-0.1.jar" property="project.check.jnitasks.download" />
+
+		<!-- Define the JNI Tasks provided by classpathref. -->
+		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" onerror="ignore"/>
+
+		<!-- Check and make sure the required tasks were defined -->
+		<condition property="project.check.jnitasks.download" value="true">
+			<and>
+				<typefound name="autoreconf" />
+				<typefound name="configure" />
+				<typefound name="make" />
+
+				<typefound name="pkgconfig" />
+
+				<typefound name="cc" />
+				<typefound name="ld" />
+			</and>
+		</condition>
+
 
 		<!-- Preform libuiohook target checks. -->
 		<available file="${dir.src}/libuiohook" property="project.check.libuiohook.download" />
@@ -269,10 +287,6 @@
 		<property name="ant.build.native.executable" value="lib${ant.project.name}.so" />
 
 
-		<!-- Define the JNI Tasks provided by classpathref. -->
-		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" />
-
-
 		<!-- Print the relevant Ant properties for logging. -->
 		<echo level="info">Project:            ${ant.project.name} ${ant.project.version}</echo>
 		<echo level="info">Debug:              ${ant.build.debug}</echo>
@@ -292,6 +306,23 @@
 	</target>
 
 
+	<target name="download-jnitasks" depends="init" unless="project.check.jnitasks.download" description="Download the JNITasks library.">
+		<echo>Downloading JNITasks library...</echo>
+		<mkdir dir="${dir.jar}" />
+
+		<get src="https://github.com/kwhat/jnitasks/releases/download/0.1/JNITasks-0.1.zip" dest="${dir.bin}/jnitasks-0.1.zip" verbose="true" />
+
+		<unzip src="${dir.bin}/jnitasks-0.1.zip" dest="${dir.jar}">
+			<patternset>
+				<include name="JNITasks/jar/JNITasks.jar" />
+			</patternset>
+
+			<mapper type="glob" from="JNITasks/jar/JNITasks.jar" to="${dir.jar}/JNITasks.jar" />
+		</unzip>
+
+		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" onerror="failall" />
+	</target>
+
 	<target name="download-libuiohook" depends="init" unless="project.check.libuiohook.download" description="Download the native library source code.">
 		<echo>Downloading libUIOHook source...</echo>
 		<mkdir dir="${dir.src}/libuiohook" />
@@ -299,12 +330,12 @@
 		<get src="https://github.com/kwhat/libuiohook/archive/master.zip" dest="${dir.bin}/libuiohook-master.zip" verbose="true" />
 
 		<unzip src="${dir.bin}/libuiohook-master.zip" dest="${dir.src}/libuiohook">
-			<mapper type="glob" from="libuiohook-master/*" to="*"/>
+			<mapper type="glob" from="libuiohook-master/*" to="*" />
 		</unzip>
 	</target>
 
 
-	<target name="bootstrap-libuiohook" depends="download-libuiohook" unless="project.check.libuiohook.bootstrap" description="Initialize the native library build system.">
+	<target name="bootstrap-libuiohook" depends="download-jnitasks,download-libuiohook" unless="project.check.libuiohook.bootstrap" description="Initialize the native library build system.">
 		<echo>Bootstrapping libUIOHook...</echo>
 
 		<autoreconf dir="${dir.src}/libuiohook" force="true" install="true">
