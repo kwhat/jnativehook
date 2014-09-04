@@ -35,6 +35,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 			org_jnativehook_GlobalScreen->cls,
 			org_jnativehook_GlobalScreen->getInstance);
 
+	// FIXME I dont think this check is required anymore...
 	if (GlobalScreen_object != NULL) {
 		hook_enable();
 	}
@@ -47,6 +48,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JN
 			org_jnativehook_GlobalScreen->cls,
 			org_jnativehook_GlobalScreen->getInstance);
 
+	// FIXME I dont think this check is required anymore...
 	if (GlobalScreen_object != NULL) {
 		hook_disable();
 	}

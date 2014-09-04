@@ -41,7 +41,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		// issues with JNLP and some IDE's.
 		// FIXME Change to take jvm, not env!
 		if (jni_CreateGlobals(env) != JNI_OK) {
-			#ifndef QUIET
+			#ifndef USE_QUIET
 			fprintf(stderr, "%s [%u]: CreateJNIGlobals() failed!\n", 
 					__FUNCTION__, __LINE__);
 			#endif

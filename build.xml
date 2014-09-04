@@ -385,7 +385,7 @@
 			<arg value="-fPIC" unless="native.os.isWindows" />
 			<arg value="${ant.build.native.cflags}" />
 
-			<define name="DEBUG" if="ant.build.debug"/>
+			<define name="USE_DEBUG" if="ant.build.debug"/>
 
 			<include path="${dir.bin}/include" />
 			<include path="${dir.src}/jni/include" />

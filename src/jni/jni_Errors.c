@@ -23,7 +23,7 @@
 #include "jni_Globals.h"
 
 void ThrowFatalError(const char *message) {
-	#ifdef DEBUG
+	#ifdef USE_DEBUG
 	fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
@@ -44,7 +44,7 @@ void ThrowException(const char *classname, const char *message) {
 
 		if (Exception_class != NULL) {
 			(*env)->ThrowNew(env, Exception_class, message);
-			#ifdef DEBUG
+			#ifdef USE_DEBUG
 			fprintf(stderr, "ThrowException(): %s: %s\n", classname, message);
 			#endif
 			(*env)->DeleteLocalRef(env, Exception_class);
@@ -53,7 +53,7 @@ void ThrowException(const char *classname, const char *message) {
 			Exception_class = (*env)->FindClass(env, java_lang_NoClassDefFoundError);
 
 			if (Exception_class != NULL) {
-				#ifdef DEBUG
+				#ifdef USE_DEBUG
 				fprintf(stderr, "ThrowException(): %s: %s\n", java_lang_NoClassDefFoundError, classname);
 				#endif
 
