@@ -201,6 +201,12 @@ void jni_EventDispatcher(virtual_event * const event) {
 			jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
 					__FUNCTION__, __LINE__);
 		}
+
+		// Detach the running thread.
+		// NOTE  I am not sure what the overhead detaching and reattaching
+		// for each event is going to be.  If this is to expensive, this uiohook needs to provide
+		// a state change event for startup and shutdown signals.
+		(*jvm)->DetachCurrentThread(jvm);
 	}
 	else {
 		// FIXME an exception should be thrown!
