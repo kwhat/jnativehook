@@ -86,6 +86,7 @@ public class GlobalScreen {
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
 				t.setName("JNativeHook Native Dispatch");
+				t.setDaemon(true);
 
 				return t;
 			}
