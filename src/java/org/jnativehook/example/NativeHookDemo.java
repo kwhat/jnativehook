@@ -453,6 +453,11 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		});
 	}
 
+	/**
+	 * A simple log formatter.
+	 *
+	 * @see java.util.Formatter
+	 */
 	private final class LogFormatter extends Formatter {
 		@Override
 		public String format(LogRecord record) {
