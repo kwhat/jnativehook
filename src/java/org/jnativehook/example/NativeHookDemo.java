@@ -404,9 +404,9 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		//Enable the hook, this will cause the GlobalScreen to be initilized.
 		menuItemEnable.setSelected(true);
 
-		//Please note that these properties are not avaiable until after the
+		//Please note that these properties are not available until after the
 		//GlobalScreen class is initialized.
-		txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.version"));
+		txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
 		txtEventInfo.append("\nAuto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
 		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
 		txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.button.multiclick.iterval"));

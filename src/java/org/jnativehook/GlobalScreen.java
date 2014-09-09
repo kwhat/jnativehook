@@ -566,15 +566,15 @@ public class GlobalScreen {
 
 					// Setup a digest...
 					MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-					DigestInputStream digestInputStrem = new DigestInputStream(libInputStream, sha1);
+					DigestInputStream digestInputStream = new DigestInputStream(libInputStream, sha1);
 
 					// Read from the digest stream and write to the file steam.
-					while ((size = digestInputStrem.read(buffer)) != -1) {
+					while ((size = digestInputStream.read(buffer)) != -1) {
 						libOutputStream.write(buffer, 0, size);
 					}
 
 					// Close all the streams.
-					digestInputStrem.close();
+					digestInputStream.close();
 					libInputStream.close();
 					libOutputStream.close();
 
@@ -592,7 +592,7 @@ public class GlobalScreen {
 					}
 
 					// Set the library version property.
-					System.setProperty("jnativehook.version", libNativeVersion);
+					System.setProperty("jnativehook.lib.version", libNativeVersion);
 
 					// Load the native library.
 					System.load(libFile.getPath());
