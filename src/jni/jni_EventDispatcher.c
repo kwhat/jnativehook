@@ -28,190 +28,201 @@
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
-void jni_EventDispatcher(virtual_event * const event) {
-	JNIEnv *env = NULL;
+static JNIEnv *env = NULL;
 
-	// NOTE: This function executes on the hook thread!  If you need to block
-	// please do so on another thread via your own event dispatcher.
-	if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		// Create the global screen references up front to save time in the callback.
-		jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-				env,
-				org_jnativehook_GlobalScreen->cls,
-				org_jnativehook_GlobalScreen->getInstance);
+// NOTE: This function executes on the hook thread!  If you need to block
+// please do so on another thread via your own event dispatcher.
+void jni_EventDispatcher(uiohook_event * const event) {
+		switch (event->type) {
+			case EVENT_HOOK_START:
+				if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) != JNI_OK) {
+					if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
+						jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
+								__FUNCTION__, __LINE__);
 
-		if (GlobalScreen_object != NULL) {
-			jobject NativeInputEvent_object = NULL;
-			jint location;
+						// FIXME Throw exception!
+					}
+					else {
+						jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: AttachCurrentThread OK.\n",
+								__FUNCTION__, __LINE__);
+					}
+				}
+				break;
 
-			switch (event->type) {
-				case EVENT_KEY_PRESSED:
-					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
+			case EVENT_HOOK_STOP:
+				if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+					if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
+						jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: DetachCurrentThread failed.\n",
+								__FUNCTION__, __LINE__);
 
-					NativeInputEvent_object = (*env)->NewObject(
+						// FIXME Throw exception!
+					}
+					else {
+					jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: DetachCurrentThread OK.\n",
+							__FUNCTION__, __LINE__);
+					}
+				}
+				break;
+
+			case EVENT_KEY_PRESSED:
+				jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
+
+				NativeInputEvent_object = (*env)->NewObject(
+										env,
+										org_jnativehook_keyboard_NativeKeyEvent->cls,
+										org_jnativehook_keyboard_NativeKeyEvent->init,
+										org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
+										(jlong) event->time,
+										(jint) event->mask,
+										(jint) event->data.keyboard.rawcode,
+										(jint) event->data.keyboard.keycode,
+										(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+										location);
+				break;
+
+			case EVENT_KEY_RELEASED:
+				jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
+
+				NativeInputEvent_object = (*env)->NewObject(
+										env,
+										org_jnativehook_keyboard_NativeKeyEvent->cls,
+										org_jnativehook_keyboard_NativeKeyEvent->init,
+										org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
+										(jlong) event->time,
+										(jint) event->mask,
+										(jint) event->data.keyboard.rawcode,
+										(jint) event->data.keyboard.keycode,
+										(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+										location);
+				break;
+
+			case EVENT_KEY_TYPED:
+				jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
+
+				NativeInputEvent_object = (*env)->NewObject(
+										env,
+										org_jnativehook_keyboard_NativeKeyEvent->cls,
+										org_jnativehook_keyboard_NativeKeyEvent->init,
+										org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
+										(jlong) event->time,
+										(jint) event->mask,
+										(jint) event->data.keyboard.rawcode,
+										(jint) org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
+										(jchar) event->data.keyboard.keychar,
+										location);
+				break;
+
+			case EVENT_MOUSE_PRESSED:
+				NativeInputEvent_object = (*env)->NewObject(
 											env,
-											org_jnativehook_keyboard_NativeKeyEvent->cls,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
+											org_jnativehook_mouse_NativeMouseEvent->cls,
+											org_jnativehook_mouse_NativeMouseEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
-											(jint) event->data.keyboard.keycode,
-											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											location);
-					break;
+											(jint) event->data.mouse.x,
+											(jint) event->data.mouse.y,
+											(jint) event->data.mouse.clicks,
+											(jint) event->data.mouse.button);
+				break;
 
-				case EVENT_KEY_RELEASED:
-					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
-
-					NativeInputEvent_object = (*env)->NewObject(
+			case EVENT_MOUSE_RELEASED:
+				NativeInputEvent_object = (*env)->NewObject(
 											env,
-											org_jnativehook_keyboard_NativeKeyEvent->cls,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
+											org_jnativehook_mouse_NativeMouseEvent->cls,
+											org_jnativehook_mouse_NativeMouseEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
-											(jint) event->data.keyboard.keycode,
-											(jchar) org_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-											location);
-					break;
+											(jint) event->data.mouse.x,
+											(jint) event->data.mouse.y,
+											(jint) event->data.mouse.clicks,
+											(jint) event->data.mouse.button);
+				break;
 
-				case EVENT_KEY_TYPED:
-					jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location);
-
-					NativeInputEvent_object = (*env)->NewObject(
+			case EVENT_MOUSE_CLICKED:
+				NativeInputEvent_object = (*env)->NewObject(
 											env,
-											org_jnativehook_keyboard_NativeKeyEvent->cls,
-											org_jnativehook_keyboard_NativeKeyEvent->init,
-											org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
+											org_jnativehook_mouse_NativeMouseEvent->cls,
+											org_jnativehook_mouse_NativeMouseEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
 											(jlong) event->time,
 											(jint) event->mask,
-											(jint) event->data.keyboard.rawcode,
-											(jint) org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
-											(jchar) event->data.keyboard.keychar,
-											location);
-					break;
+											(jint) event->data.mouse.x,
+											(jint) event->data.mouse.y,
+											(jint) event->data.mouse.clicks,
+											(jint) event->data.mouse.button);
+				break;
 
-				case EVENT_MOUSE_PRESSED:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->cls,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.mouse.x,
-												(jint) event->data.mouse.y,
-												(jint) event->data.mouse.clicks,
-												(jint) event->data.mouse.button);
-					break;
+			case EVENT_MOUSE_MOVED:
+				NativeInputEvent_object = (*env)->NewObject(
+											env,
+											org_jnativehook_mouse_NativeMouseEvent->cls,
+											org_jnativehook_mouse_NativeMouseEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
+											(jlong) event->time,
+											(jint) event->mask,
+											(jint) event->data.mouse.x,
+											(jint) event->data.mouse.y,
+											(jint) event->data.mouse.clicks,
+											(jint) event->data.mouse.button);
+				break;
 
-				case EVENT_MOUSE_RELEASED:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->cls,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.mouse.x,
-												(jint) event->data.mouse.y,
-												(jint) event->data.mouse.clicks,
-												(jint) event->data.mouse.button);
-					break;
+			case EVENT_MOUSE_DRAGGED:
+				NativeInputEvent_object = (*env)->NewObject(
+											env,
+											org_jnativehook_mouse_NativeMouseEvent->cls,
+											org_jnativehook_mouse_NativeMouseEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
+											(jlong) event->time,
+											(jint) event->mask,
+											(jint) event->data.mouse.x,
+											(jint) event->data.mouse.y,
+											(jint) event->data.mouse.clicks,
+											(jint) event->data.mouse.button);
+				break;
 
-				case EVENT_MOUSE_CLICKED:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->cls,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.mouse.x,
-												(jint) event->data.mouse.y,
-												(jint) event->data.mouse.clicks,
-												(jint) event->data.mouse.button);
-					break;
-
-				case EVENT_MOUSE_MOVED:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->cls,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.mouse.x,
-												(jint) event->data.mouse.y,
-												(jint) event->data.mouse.clicks,
-												(jint) event->data.mouse.button);
-					break;
-
-				case EVENT_MOUSE_DRAGGED:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseEvent->cls,
-												org_jnativehook_mouse_NativeMouseEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.mouse.x,
-												(jint) event->data.mouse.y,
-												(jint) event->data.mouse.clicks,
-												(jint) event->data.mouse.button);
-					break;
-
-				case EVENT_MOUSE_WHEEL:
-					NativeInputEvent_object = (*env)->NewObject(
-												env,
-												org_jnativehook_mouse_NativeMouseWheelEvent->cls,
-												org_jnativehook_mouse_NativeMouseWheelEvent->init,
-												org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
-												(jlong) event->time,
-												(jint) event->mask,
-												(jint) event->data.wheel.x,
-												(jint) event->data.wheel.y,
-												(jint) event->data.wheel.clicks,
-												(jint) event->data.wheel.type,
-												(jint) event->data.wheel.amount,
-												(jint) event->data.wheel.rotation);
-					break;
-			}
-
-			if (NativeInputEvent_object != NULL) {
-				(*env)->CallVoidMethod(
-						env,
-						GlobalScreen_object,
-						org_jnativehook_GlobalScreen->dispatchEvent,
-						NativeInputEvent_object);
-
-				// Set the propagate flag from java.
-				event->reserved = (unsigned short) (*env)->GetShortField(
-						env, 
-						NativeInputEvent_object, 
-						org_jnativehook_NativeInputEvent->reserved);
-				(*env)->DeleteLocalRef(env, NativeInputEvent_object);
-			}
-		}
-		else {
-			// FIXME an exception should be thrown!
-
-			jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
-					__FUNCTION__, __LINE__);
+			case EVENT_MOUSE_WHEEL:
+				NativeInputEvent_object = (*env)->NewObject(
+											env,
+											org_jnativehook_mouse_NativeMouseWheelEvent->cls,
+											org_jnativehook_mouse_NativeMouseWheelEvent->init,
+											org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
+											(jlong) event->time,
+											(jint) event->mask,
+											(jint) event->data.wheel.x,
+											(jint) event->data.wheel.y,
+											(jint) event->data.wheel.clicks,
+											(jint) event->data.wheel.type,
+											(jint) event->data.wheel.amount,
+											(jint) event->data.wheel.rotation);
+				break;
 		}
 
-		// Detach the running thread.
-		// NOTE  I am not sure what the overhead detaching and reattaching
-		// for each event is going to be.  If this is to expensive, this uiohook needs to provide
-		// a state change event for startup and shutdown signals.
-		(*jvm)->DetachCurrentThread(jvm);
+		if (NativeInputEvent_object != NULL) {
+			(*env)->CallVoidMethod(
+					env,
+					GlobalScreen_object,
+					org_jnativehook_GlobalScreen->dispatchEvent,
+					NativeInputEvent_object);
+
+			// Set the propagate flag from java.
+			event->reserved = (unsigned short) (*env)->GetShortField(
+					env,
+					NativeInputEvent_object,
+					org_jnativehook_NativeInputEvent->reserved);
+			(*env)->DeleteLocalRef(env, NativeInputEvent_object);
+		}
+
+		(*env)->DeleteLocalRef(env, GlobalScreen_object);
+
+/*
 	}
 	else {
 		// FIXME an exception should be thrown!
 
-		jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: AttachCurrentThread() failed!\n",
+		jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
 				__FUNCTION__, __LINE__);
 	}
+*/
 }

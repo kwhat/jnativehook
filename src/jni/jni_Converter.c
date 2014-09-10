@@ -33,7 +33,7 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
 	    case EVENT_KEY_TYPED:
 	    case EVENT_KEY_PRESSED:
 	    case EVENT_KEY_RELEASED:
-			*javaType = (nativeType + org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) - 1;
+			*javaType = (nativeType + org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
 			break;
 
         case EVENT_MOUSE_CLICKED:
@@ -43,7 +43,7 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
         case EVENT_MOUSE_DRAGGED:
         case EVENT_MOUSE_WHEEL:
         	*javaType = (nativeType + org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST) -
-        			(org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) - 1;
+        			(org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
        		break;
 
 		default:
