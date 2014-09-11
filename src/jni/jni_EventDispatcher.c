@@ -52,6 +52,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			break;
 
 		case EVENT_HOOK_STOP:
+			// NOTE This callback may note be called from Windows under some circumstances.
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 				if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 					jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: DetachCurrentThread failed.\n",
