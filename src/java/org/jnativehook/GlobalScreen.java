@@ -525,6 +525,8 @@ public class GlobalScreen {
 					if (manInputStream != null) {
 						// Try and extract a version string from the Manifest.
 						Manifest manifest = new Manifest(manInputStream);
+
+						// FIXME More OS X JRE Bugs!  This returns NULL but only for Apple!
 						Attributes attributes = manifest.getAttributes(basePackage);
 
 						if (attributes != null) {
