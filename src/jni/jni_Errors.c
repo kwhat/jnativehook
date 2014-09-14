@@ -22,48 +22,42 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 
-void ThrowFatalError(const char *message) {
+void jni_ThrowFatalError(JNIEnv *env, const char *message) {
 	#ifdef USE_DEBUG
 	fprintf(stderr, "Fatal Error: %s\n", message);
 	#endif
 
-	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		(*env)->FatalError(env, message);
-	}
+	(*env)->FatalError(env, message);
 
 	exit(EXIT_FAILURE);
 }
 
-void ThrowException(const char *classname, const char *message) {
-	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
-		// Locate our exception class.
-		// FIXME This needs to be relocated to a jni_Global.
-		jclass Exception_class = (*env)->FindClass(env, classname);
+void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
+	// Locate our exception class.
+	// FIXME This needs to be relocated to a jni_Global.
+	jclass Exception_class = (*env)->FindClass(env, classname);
+
+	if (Exception_class != NULL) {
+		(*env)->ThrowNew(env, Exception_class, message);
+		#ifdef USE_DEBUG
+		fprintf(stderr, "%s: %s\n", classname, message);
+		#endif
+		(*env)->DeleteLocalRef(env, Exception_class);
+	}
+	else {
+		Exception_class = (*env)->FindClass(env, java_lang_NoClassDefFoundError);
 
 		if (Exception_class != NULL) {
-			(*env)->ThrowNew(env, Exception_class, message);
 			#ifdef USE_DEBUG
-			fprintf(stderr, "ThrowException(): %s: %s\n", classname, message);
+			fprintf(stderr, "%s: %s\n", java_lang_NoClassDefFoundError, classname);
 			#endif
+
+			(*env)->ThrowNew(env, Exception_class, classname);
 			(*env)->DeleteLocalRef(env, Exception_class);
 		}
 		else {
-			Exception_class = (*env)->FindClass(env, java_lang_NoClassDefFoundError);
-
-			if (Exception_class != NULL) {
-				#ifdef USE_DEBUG
-				fprintf(stderr, "ThrowException(): %s: %s\n", java_lang_NoClassDefFoundError, classname);
-				#endif
-
-				(*env)->ThrowNew(env, Exception_class, classname);
-				(*env)->DeleteLocalRef(env, Exception_class);
-			}
-			else {
-				// Unable to find exception class, Terminate with error.
-				ThrowFatalError("Unable to locate exception class.");
-			}
+			// Unable to find exception class, Terminate with error.
+			jni_ThrowFatalError(env, "Unable to locate exception class.");
 		}
 	}
 }

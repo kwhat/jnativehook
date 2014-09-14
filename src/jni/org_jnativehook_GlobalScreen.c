@@ -64,7 +64,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
-	virtual_event *virtualEvent = (virtual_event *) malloc(sizeof(virtual_event));
+	uiohook_event *virtualEvent = (uiohook_event *) malloc(sizeof(uiohook_event));
 	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
 
 	// Convert Java event to virtual event.

@@ -39,14 +39,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Create all the global class references onload to prevent class loader
 		// issues with JNLP and some IDE's.
-		// FIXME Change to take jvm, not env!
 		if (jni_CreateGlobals(env) != JNI_OK) {
 			#ifndef USE_QUIET
 			fprintf(stderr, "%s [%u]: CreateJNIGlobals() failed!\n", 
 					__FUNCTION__, __LINE__);
 			#endif
 
-			ThrowFatalError("Failed to locate one or more required classes.");
+			jni_ThrowFatalError(env, "Failed to locate one or more required classes.");
 		}
 
 		#ifndef USE_QUIET
@@ -96,7 +95,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 				__FUNCTION__, __LINE__);
 		#endif
 
-		ThrowFatalError("Failed to acquire JNI interface pointer");
+		jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
 	}
 
 	jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: JNI Loaded.\n",
@@ -112,7 +111,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Clear java properties from native sources.
-		// FIXME Change to take jvm, not env!
 		jni_ClearProperties(env);
 	}
 	else {
@@ -124,11 +122,13 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
 	jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: JNI Unloaded.\n",
 			__FUNCTION__, __LINE__);
-	
+
+	// Unset the hook callback function to dispatch events.
+	hook_set_dispatch_proc(NULL);
+
 	// Unset Java logger for native code messages.
 	hook_set_logger_proc(NULL);
 	
-	// FIXME Change to take jvm, not env!
 	if (env != NULL) {
 		jni_DestroyGlobals(env);
 	}
