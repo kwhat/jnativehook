@@ -1,6 +1,6 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
- * http://code.google.com/p/jnativehook/
+ * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
