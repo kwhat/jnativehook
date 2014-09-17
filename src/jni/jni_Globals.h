@@ -22,7 +22,6 @@
 #include <jni.h>
 
 // Globals for the jvm and jni version, this is set in JNILoad.c
-// TODO The jvm poitner can probably be replaced with jint GetJavaVM(JNIEnv *env, JavaVM **vm);
 extern JavaVM *jvm;
 extern jint jni_version;
 

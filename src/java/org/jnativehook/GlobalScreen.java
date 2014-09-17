@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +42,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
@@ -521,10 +523,12 @@ public class GlobalScreen {
 			if (libInputStream != null) {
 				try {
 					// Try and load the Jar manifest as a resource stream.
-					InputStream manInputStream = GlobalScreen.class.getResourceAsStream("/META-INF/MANIFEST.MF");
-					if (manInputStream != null) {
-						// Try and extract a version string from the Manifest.
-						Manifest manifest = new Manifest(manInputStream);
+					URL jarFile = GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation();
+					JarInputStream jarInputStream = new JarInputStream(jarFile.openStream());
+
+					// Try and extract a version string from the Manifest.
+					Manifest manifest = jarInputStream.getManifest();
+					if (manifest != null) {
 						Attributes attributes = manifest.getAttributes(basePackage);
 
 						if (attributes != null) {
