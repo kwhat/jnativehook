@@ -30,7 +30,8 @@ import java.util.EventObject;
  * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @since	1.0
+ * @version	1.2
  *
  * @see org.jnativehook.keyboard.NativeKeyListener
  * @see org.jnativehook.mouse.NativeMouseListener
@@ -50,7 +51,8 @@ public class NativeInputEvent extends EventObject {
 	/** The modifier keys down during event. */
 	private int modifiers;
 	
-	/** Flag to prevent native event propagation.
+	/** Mask for undocumented behavior.
+	 * @see https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported
 	 * @since 1.2
 	 */
 	@SuppressWarnings("unused")

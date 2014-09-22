@@ -65,7 +65,8 @@ import java.awt.Toolkit;
  * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @version	1.2
+ * @since	1.0
  *
  * @see GlobalScreen
  * @see NativeKeyListener

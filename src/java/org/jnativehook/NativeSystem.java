@@ -24,7 +24,8 @@ package org.jnativehook;
  * is loaded using the <code>java.library.path</code> property.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @since	1.0
+ * @version	1.2
  */
 public class NativeSystem {
 

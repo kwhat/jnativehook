@@ -57,7 +57,8 @@ import java.util.logging.Logger;
  * listeners.
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version 1.1
+ * @since	1.0
+ * @version 1.2
  */
 public class GlobalScreen {
 	/**

@@ -69,7 +69,8 @@ import java.util.logging.Logger;
  * A demonstration of how to use the JNativeHook library.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @version	1.2
+ * @since	1.0
  *
  * @see GlobalScreen
  * @see NativeKeyListener

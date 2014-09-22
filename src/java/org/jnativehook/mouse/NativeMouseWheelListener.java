@@ -34,7 +34,7 @@ import java.util.EventListener;
  * method is invoked.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.1
+ * @version	1.2
  * @since	1.1
  *
  * @see NativeMouseWheelEvent
