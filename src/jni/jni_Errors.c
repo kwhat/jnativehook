@@ -34,7 +34,6 @@ void jni_ThrowFatalError(JNIEnv *env, const char *message) {
 
 void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
 	// Locate our exception class.
-	// FIXME This needs to be relocated to a jni_Global.
 	jclass Exception_class = (*env)->FindClass(env, classname);
 
 	if (Exception_class != NULL) {
@@ -57,7 +56,7 @@ void jni_ThrowException(JNIEnv *env, const char *classname, const char *message)
 		}
 		else {
 			// Unable to find exception class, Terminate with error.
-			jni_ThrowFatalError(env, "Unable to locate exception class.");
+			jni_ThrowFatalError(env, "Unable to locate java classes.");
 		}
 	}
 }

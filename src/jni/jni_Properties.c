@@ -87,7 +87,6 @@ void jni_SetProperties(JNIEnv *env) {
 	}
 
 
-	// 0-Threshold X, 1-Threshold Y and 2-Speed.
 	long multiplier = hook_get_pointer_acceleration_multiplier();
 	if (multiplier >= 0) {
 		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_acceleration_multiplier(): successful. (%li)\n",
@@ -118,7 +117,6 @@ void jni_SetProperties(JNIEnv *env) {
 	}
 
 
-	// 0-Threshold X, 1-Threshold Y and 2-Speed.
 	long threshold = hook_get_pointer_acceleration_threshold();
 	if (threshold >= 0) {
 		jni_Logger(LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_acceleration_threshold(): successful. (%li)\n",
