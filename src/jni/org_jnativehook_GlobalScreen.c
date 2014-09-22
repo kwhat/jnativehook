@@ -22,6 +22,7 @@
 #include "jni_Converter.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
+#include "jni_Errors.h"
 #include "org_jnativehook_NativeInputEvent.h"
 #include "org_jnativehook_keyboard_NativeKeyEvent.h"
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
@@ -29,29 +30,112 @@
 #include "org_jnativehook_GlobalScreen.h"
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
-	// Request an instance of the GlobalScreen.
-	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-			env,
-			org_jnativehook_GlobalScreen->cls,
-			org_jnativehook_GlobalScreen->getInstance);
+	int status = hook_enable();
 
-	// FIXME I dont think this check is required anymore...
-	if (GlobalScreen_object != NULL) {
-		hook_enable();
+	jclass Exception_class = NULL;
+	char *message = NULL;
+
+	switch (status) {
+		case UIOHOOK_SUCCESS:
+			// Everything is ok.
+			break;
+
+		// System level errors.
+		case UIOHOOK_ERROR_OUT_OF_MEMORY:
+			Exception_class = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+			if (Exception_class != NULL) {
+				(*env)->ThrowNew(env, Exception_class, "Failed to allocate native memory.");
+			}
+			break;
+
+		// Native thread errors.
+		case UIOHOOK_ERROR_THREAD_CREATE:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to create native thread.";
+			/*
+			jmethodID init = (*env)->GetMethodID(
+            					env,
+            					Exception_class,
+            					"<init>",
+            					"(SLjava/lang/String;)V");
+            */
+			break;
+
+		case UIOHOOK_ERROR_THREAD_INIT:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to initialize native thread.";
+			break;
+
+		case UIOHOOK_ERROR_THREAD_START:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to start native thread.";
+			break;
+
+		// Unix specific errors.
+		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to open X11 display.";
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_NOT_FOUND:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Unable to locate XRecord extension.";
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ALLOC_RANGE:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to allocate xrecord range.";
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_CREATE_CONTEXT:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to allocate xrecord context.";
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ENABLE_CONTEXT:
+			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+			message = "Failed to allocate xrecord context.";
+
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to enable xrecord context.");
+			break;
+
+		// Windows specific errors.
+		case UIOHOOK_ERROR_SET_WINDOWS_HOOK_EX:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to register low level windows hook.");
+			break;
+
+		// Darwin specific errors.
+		case UIOHOOK_ERROR_AXAPI_DISABLED:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to enable access for assistive devices.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_EVENT_PORT:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to create apple event port.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_RUN_LOOP_SOURCE:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to create apple run loop source.");
+			break;
+
+		case UIOHOOK_ERROR_GET_RUNLOOP:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to acquire apple run loop.");
+			break;
+
+		case UIOHOOK_ERROR_OBSERVER_CREATE:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to create apple run loop observer.");
+			break;
+
+		case UIOHOOK_FAILURE:
+		case defaut:
+			jni_ThrowException(env, "org/jnativehook/NativeHookException", "An unknown uiohook error occurred.");
+			break;
 	}
+
+
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
-	// Request an instance of the GlobalScreen.
-	jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-			env,
-			org_jnativehook_GlobalScreen->cls,
-			org_jnativehook_GlobalScreen->getInstance);
-
-	// FIXME I dont think this check is required anymore...
-	if (GlobalScreen_object != NULL) {
-		hook_disable();
-	}
+	hook_disable();
 }
 
 JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *env, jclass cls) {
