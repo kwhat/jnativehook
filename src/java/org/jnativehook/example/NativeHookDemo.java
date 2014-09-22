@@ -1,6 +1,6 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
  * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
- * http://code.google.com/p/jnativehook/
+ * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -405,9 +405,9 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		//Enable the hook, this will cause the GlobalScreen to be initilized.
 		menuItemEnable.setSelected(true);
 
-		//Please note that these properties are not avaiable until after the
+		//Please note that these properties are not available until after the
 		//GlobalScreen class is initialized.
-		txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.version"));
+		txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
 		txtEventInfo.append("\nAuto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
 		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
 		txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.button.multiclick.iterval"));
