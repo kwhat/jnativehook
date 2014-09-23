@@ -226,4 +226,15 @@ public class NativeHookException extends Exception {
 
 		this.code = code;
 	}
+
+	/**
+	 * Get the native error code associated with this exception.
+	 *
+	 * @since 1.2
+	 *
+	 * @return The native error code
+	 */
+	public short getCode() {
+		return this.code;
+	}
 }

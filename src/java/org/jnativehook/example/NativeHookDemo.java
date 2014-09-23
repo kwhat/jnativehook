@@ -225,7 +225,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 					GlobalScreen.registerNativeHook();
 				}
 				catch (NativeHookException ex) {
-					txtEventInfo.append("\n" + "Error: " + ex.getMessage());
+					txtEventInfo.append("Error: " + ex.getMessage() + "\n");
 				}
 			}
 			else {

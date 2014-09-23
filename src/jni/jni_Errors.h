@@ -36,4 +36,5 @@ extern void jni_ThrowFatalError(JNIEnv *env, const char *message);
  */
 extern void jni_ThrowException(JNIEnv *env, const char *classname, const char *message);
 
+extern void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message);
 #endif
