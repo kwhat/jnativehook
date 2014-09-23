@@ -41,8 +41,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
 					jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
 							__FUNCTION__, __LINE__);
-
-					// FIXME Throw exception!
 				}
 				else {
 					jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: AttachCurrentThread OK.\n",
@@ -57,8 +55,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
 					jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: DetachCurrentThread failed.\n",
 							__FUNCTION__, __LINE__);
-
-					// FIXME Throw exception!
 				}
 				else {
 				jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: DetachCurrentThread OK.\n",
@@ -223,6 +219,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			break;
 	}
 
+	// NOTE It is assumed that we do not need to check env* for null because NativeInputEvent_object
+	// cannot be assigned if env* is NULL.
 	if (NativeInputEvent_object != NULL) {
 		// Create the global screen references up front to save time in the callback.
 		jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
@@ -249,7 +247,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
 					__FUNCTION__, __LINE__);
 
-			// FIXME null pointer exception should be thrown!
+			jni_ThrowException(env, "java/lang/NullPointerException", "GlobalScreen singleton is null.");
 		}
 
 		(*env)->DeleteLocalRef(env, NativeInputEvent_object);

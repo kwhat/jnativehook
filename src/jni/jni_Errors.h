@@ -19,22 +19,19 @@
 #ifndef _Included_jni_Errors_h
 #define _Included_jni_Errors_h
 
-// Exception class definitions.
-#define java_lang_InternalError				"java/lang/InternalError"
-#define java_lang_OutOfMemoryError			"java/lang/OutOfMemoryError"
-#define java_lang_NoClassDefFoundError		"java/lang/NoClassDefFoundError"
-
-#define org_jnativehook_NativeHookException	"org/jnativehook/NativeHookException"
-
-/* Produces a hard error in the virtual machine.  This error is unrecoverable
- * and Program execution will terminate immediately.
+/* Produces a fatal error in the virtual machine.  This error is unrecoverable
+ * and program execution will terminate immediately.
  */
 extern void jni_ThrowFatalError(JNIEnv *env, const char *message);
 
-/* Produces a recoverable error in the virtual machine.  This error should be
- * recoverable outside of the native library.
+/* Produces and throw a general exception to the virtual machine.  This error may or may
+ * not be recoverable outside of the native library.
  */
 extern void jni_ThrowException(JNIEnv *env, const char *classname, const char *message);
 
+/* Produces a specific NativeHookException containing an error code indicating what might
+ * have gone wrong.
+ */
 extern void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message);
+
 #endif

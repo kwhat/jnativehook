@@ -24,10 +24,7 @@
 #include "jni_Logger.h"
 
 void jni_ThrowFatalError(JNIEnv *env, const char *message) {
-	#ifdef USE_DEBUG
-	fprintf(stderr, "Fatal Error: %s\n", message);
-	#endif
-
+	// Throw a fatal error to the JVM.
 	(*env)->FatalError(env, message);
 
 	exit(EXIT_FAILURE);
@@ -36,28 +33,19 @@ void jni_ThrowFatalError(JNIEnv *env, const char *message) {
 void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
 	// Locate our exception class.
 	jclass Exception_class = (*env)->FindClass(env, classname);
-
 	if (Exception_class != NULL) {
 		(*env)->ThrowNew(env, Exception_class, message);
-		#ifdef USE_DEBUG
-		fprintf(stderr, "%s: %s\n", classname, message);
-		#endif
 		(*env)->DeleteLocalRef(env, Exception_class);
 	}
 	else {
-		Exception_class = (*env)->FindClass(env, java_lang_NoClassDefFoundError);
-
+		// Throw a ClassNotFoundException if we could not locate the exception class above.
+		Exception_class = (*env)->FindClass(env, "java/lang/ClassNotFoundException");
 		if (Exception_class != NULL) {
-			#ifdef USE_DEBUG
-			fprintf(stderr, "%s: %s\n", java_lang_NoClassDefFoundError, classname);
-			#endif
-
 			(*env)->ThrowNew(env, Exception_class, classname);
 			(*env)->DeleteLocalRef(env, Exception_class);
 		}
 		else {
-			// Unable to find exception class, Terminate with error.
-			jni_ThrowFatalError(env, "Unable to locate java classes.");
+			jni_ThrowFatalError(env, "Failed to locate core class: java.lang.ClassNotFoundException");
 		}
 	}
 }
@@ -65,7 +53,6 @@ void jni_ThrowException(JNIEnv *env, const char *classname, const char *message)
 void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) {
 	// Locate our exception class.
 	jclass Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
-
 	if (Exception_class != NULL) {
 		jmethodID init = (*env)->GetMethodID(
 				env,
@@ -87,10 +74,14 @@ void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) 
 		else {
 			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeHookException.<init>(SLjava/lang/String;)V!\n",
 					__FUNCTION__, __LINE__);
+
+			jni_ThrowException(env, "java/lang/NoClassDefFoundError", "org/jnativehook/NativeHookException.<init>(SLjava/lang/String;)V");
 		}
 	}
 	else {
 		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeHookException class!\n",
     			__FUNCTION__, __LINE__);
+
+		jni_ThrowException(env, "java/lang/ClassNotFoundException", "org.jnativehook.NativeHookException");
 	}
 }
