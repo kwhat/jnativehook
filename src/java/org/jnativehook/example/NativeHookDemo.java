@@ -225,7 +225,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 					GlobalScreen.registerNativeHook();
 				}
 				catch (NativeHookException ex) {
-					txtEventInfo.append("\n" + "Error: " + ex.toString());
+					txtEventInfo.append("\n" + "Error: " + ex.getMessage());
 				}
 			}
 			else {
@@ -407,7 +407,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
 		//Please note that these properties are not available until after the
 		//GlobalScreen class is initialized.
-		txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
+		txtEventInfo.append("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
 		txtEventInfo.append("\nAuto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
 		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
 		txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.button.multiclick.iterval"));
