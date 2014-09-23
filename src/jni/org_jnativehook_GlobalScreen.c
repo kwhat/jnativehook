@@ -33,8 +33,89 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 	int status = hook_enable();
 
 	jclass Exception_class = NULL;
-	char *message = NULL;
+	const char *message = NULL;
 
+	// Cant seem to figure out why org.jnativehook.NativeHookException is found but wont throw!
+	Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+	message = "Test of throw new!";
+
+
+	if (Exception_class == NULL) {
+		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: NativeException_object was null!\n",
+				__FUNCTION__, __LINE__);
+		return;
+	}
+
+	//(*env)->ThrowNew(env, Exception_class, message);
+	//return;
+
+	jmethodID init = (*env)->GetMethodID(
+						env,
+						Exception_class,
+						"<init>",
+						"(SLjava/lang/String;)V");
+
+	if (init == NULL) {
+		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: init was null!\n",
+				__FUNCTION__, __LINE__);
+		return;
+	}
+
+	jobject NativeException_object = (*env)->NewObject(
+				env,
+				Exception_class,
+				init,
+				(jshort) status,
+				(*env)->NewStringUTF(env, message));
+
+	if (NativeException_object == NULL) {
+		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: NativeException_object was null!\n",
+				__FUNCTION__, __LINE__);
+		return;
+	}
+
+	(*env)->Throw(env, (jthrowable) NativeException_object);
+	(*env)->DeleteLocalRef(env, NativeException_object);
+    return;
+	/*
+	Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+	message = "TESTING!!!!";
+
+
+	jmethodID init = (*env)->GetMethodID(
+						env,
+						Exception_class,
+						"<init>",
+						"(SLjava/lang/String;)V");
+	jstring jmsg = (*env)->NewStringUTF(env, message);
+	if (jmsg != NULL) {
+		jobject NativeException_object = (*env)->NewObject(
+				env,
+				Exception_class,
+				init,
+				(jshort)status,
+				(jstring) jmsg);
+
+		if (NativeException_object == NULL) {
+							jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: NativeException_object was null!\n",
+														__FUNCTION__, __LINE__);
+		}
+		else {
+		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: NativeException_object was NOT null!\n",
+																		__FUNCTION__, __LINE__);
+
+
+		}
+
+		(*env)->Throw(env, (jthrowable) NativeException_object);
+		return;
+	}
+	else {
+			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: jmsg was null!\n",
+					__FUNCTION__, __LINE__);
+	}
+	*/
+    /*
 	switch (status) {
 		case UIOHOOK_SUCCESS:
 			// Everything is ok.
@@ -52,13 +133,23 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 		case UIOHOOK_ERROR_THREAD_CREATE:
 			Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
 			message = "Failed to create native thread.";
-			/*
 			jmethodID init = (*env)->GetMethodID(
             					env,
             					Exception_class,
             					"<init>",
             					"(SLjava/lang/String;)V");
-            */
+			jstring jmsg = (*env)->NewStringUTF(env, message);
+			if (jmsg != NULL) {
+				jobject NativeInputEvent_object = (*env)->NewObject(
+						env,
+						Exception_class,
+						init,
+						(jshort)status,
+						(jstring) jmsg);
+
+				(*env)->Throw(env, (jthrowable) NativeInputEvent_object);
+			}
+
 			break;
 
 		case UIOHOOK_ERROR_THREAD_INIT:
@@ -121,17 +212,16 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to acquire apple run loop.");
 			break;
 
-		case UIOHOOK_ERROR_OBSERVER_CREATE:
+		case UIOHOOK_ERROR_CREATE_OBSERVER:
 			jni_ThrowException(env, "org/jnativehook/NativeHookException", "Failed to create apple run loop observer.");
 			break;
 
 		case UIOHOOK_FAILURE:
-		case defaut:
+		default:
 			jni_ThrowException(env, "org/jnativehook/NativeHookException", "An unknown uiohook error occurred.");
 			break;
 	}
-
-
+    */
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
