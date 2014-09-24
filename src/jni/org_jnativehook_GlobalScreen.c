@@ -42,10 +42,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIE
 
 		// System level errors.
 		case UIOHOOK_ERROR_OUT_OF_MEMORY:
-			Exception_class = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
-			if (Exception_class != NULL) {
-				(*env)->ThrowNew(env, Exception_class, "Failed to allocate native memory.");
-			}
+			jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
 			break;
 
 
