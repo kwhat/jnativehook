@@ -21,6 +21,7 @@
 #include <uiohook.h>
 
 #include "jni_Converter.h"
+#include "jni_Errors.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 #include "org_jnativehook_NativeInputEvent.h"
