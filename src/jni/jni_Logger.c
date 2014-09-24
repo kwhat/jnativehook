@@ -100,18 +100,13 @@ bool uiohook_LoggerCallback(unsigned int level, const char *format, ...) {
 	bool status = false;
 
 	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK
+			|| (*jvm)->AttachCurrentThread(jvm, (void **)(&env), &jvm_attach_args) == JNI_OK) {
+
 		va_list args;
 		va_start(args, format);
 		status = logger(env, level, format, args);
 	}
-	else if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-        va_list args;
-		va_start(args, format);
-		status = jni_Logger(env, level, format, args);
-
-		(*jvm)->DetachCurrentThread(jvm);
-    }
 	else {
 		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
     			__FUNCTION__, __LINE__);

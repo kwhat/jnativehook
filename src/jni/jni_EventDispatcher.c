@@ -38,14 +38,14 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 	switch (event->type) {
 		case EVENT_HOOK_START:
-			if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) != JNI_OK) {
-				(*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL);
+			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) != JNI_OK) {
+				(*jvm)->AttachCurrentThread(jvm, (void **)(&env), &jvm_attach_args);
 			}
 			break;
 
 		case EVENT_HOOK_STOP:
 			// NOTE This callback may note be called from Windows under some circumstances.
-			if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 				(*jvm)->DetachCurrentThread(jvm);
 			}
 			break;

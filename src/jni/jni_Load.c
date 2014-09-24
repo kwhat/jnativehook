@@ -26,8 +26,13 @@
 #include "jni_Properties.h"
 
 // JNI Related global references.
+//jint jni_version = JNI_VERSION_1_4;
 JavaVM *jvm;
-jint jni_version = JNI_VERSION_1_4;
+JavaVMAttachArgs jvm_attach_args = {
+	.version = JNI_VERSION_1_4,
+	.name = "JNativeHook Native Dispatch",
+	.group = NULL
+};
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -36,12 +41,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	 */
 	jvm = vm;
 	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 		// Create all the global class references onload to prevent class loader
 		// issues with JNLP and some IDE's.
 		if (jni_CreateGlobals(env) != JNI_OK) {
 			#ifndef USE_QUIET
-			fprintf(stderr, "%s [%u]: CreateJNIGlobals() failed!\n", 
+			fprintf(stderr, "%s [%u]: jni_CreateGlobals() failed!\n",
 					__FUNCTION__, __LINE__);
 			#endif
 
@@ -101,7 +106,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 	jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: JNI Loaded.\n",
 			__FUNCTION__, __LINE__);
 
-    return jni_version;
+    return jvm_attach_args.version;
 }
 
 // JNI exit point, This is executed when the Java virtual machine detaches from the native library.
@@ -109,7 +114,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	// Grab the currently JNI interface pointer so we can cleanup the
 	// system properties set on load.
 	JNIEnv *env = NULL;
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 		// Clear java properties from native sources.
 		jni_ClearProperties(env);
 
@@ -123,14 +128,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 				__FUNCTION__, __LINE__);
 	}
 
-
-
 	// Unset the hook callback function to dispatch events.
 	hook_set_dispatch_proc(NULL);
 
 	// Unset Java logger for native code messages.
 	hook_set_logger_proc(NULL);
-	
+
 	if (env != NULL) {
 		jni_DestroyGlobals(env);
 	}

@@ -23,7 +23,7 @@
 
 // Globals for the jvm and jni version, this is set in JNILoad.c
 extern JavaVM *jvm;
-extern jint jni_version;
+extern JavaVMAttachArgs jvm_attach_args;
 
 /* JNI requires that all calls to FindClass be made during JNI_OnLoad to
  * prevent NoClassDefError from popping up when various Java security models
