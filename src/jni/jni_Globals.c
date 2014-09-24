@@ -31,6 +31,7 @@ NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
 System *java_lang_System = NULL;
 Logger *java_util_logging_Logger = NULL;
 
+// FIXME This function is unreadable, refactor into separate static functions.
 int jni_CreateGlobals(JNIEnv *env) {
 	int status = JNI_ERR;
 
@@ -467,7 +468,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to allocate memory for JNI structures!\n",
 				__FUNCTION__, __LINE__);
 
-		// FIXME Throw java.lang.OutOfMemoryError
+		jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
 	}
 
 	// Check and make sure everything is correct.
