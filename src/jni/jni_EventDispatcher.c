@@ -21,6 +21,7 @@
 #include <uiohook.h>
 
 #include "jni_Converter.h"
+#include "jni_Errors.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 #include "org_jnativehook_NativeInputEvent.h"
@@ -39,11 +40,11 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		case EVENT_HOOK_START:
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) != JNI_OK) {
 				if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) != JNI_OK) {
-					jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
+					jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
 							__FUNCTION__, __LINE__);
 				}
 				else {
-					jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: AttachCurrentThread OK.\n",
+					jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: AttachCurrentThread OK.\n",
 							__FUNCTION__, __LINE__);
 				}
 			}
@@ -53,11 +54,11 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			// NOTE This callback may note be called from Windows under some circumstances.
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 				if ((*jvm)->DetachCurrentThread(jvm) != JNI_OK) {
-					jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: DetachCurrentThread failed.\n",
+					jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: DetachCurrentThread failed.\n",
 							__FUNCTION__, __LINE__);
 				}
 				else {
-				jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: DetachCurrentThread OK.\n",
+				jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: DetachCurrentThread OK.\n",
 						__FUNCTION__, __LINE__);
 				}
 			}
@@ -244,7 +245,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			(*env)->DeleteLocalRef(env, GlobalScreen_object);
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR,	"%s [%u]: Failed to acquire GlobalScreen singleton!\n",
 					__FUNCTION__, __LINE__);
 
 			jni_ThrowException(env, "java/lang/NullPointerException", "GlobalScreen singleton is null.");

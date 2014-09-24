@@ -65,7 +65,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()Lorg/jnativehook/GlobalScreen;");
 
 			if (org_jnativehook_GlobalScreen->getInstance == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for GlobalScreen.getInstance()Lorg/jnativehook/GlobalScreen;!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for GlobalScreen.getInstance()Lorg/jnativehook/GlobalScreen;!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -78,12 +78,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Lorg/jnativehook/NativeInputEvent;)V");
 
 			if (org_jnativehook_GlobalScreen->dispatchEvent == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for GlobalScreen.dispatchEvent(Lorg/jnativehook/NativeInputEvent;)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for GlobalScreen.dispatchEvent(Lorg/jnativehook/NativeInputEvent;)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the GlobalScreen class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the GlobalScreen class!\n",
 						__FUNCTION__, __LINE__);
 		}
 
@@ -101,7 +101,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"S");
 
 			if (org_jnativehook_NativeInputEvent->reserved == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the field ID for NativeInputEvent.reserved S!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the field ID for NativeInputEvent.reserved S!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -114,7 +114,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Lorg/jnativehook/GlobalScreen;IJI)V");
 
 			if (org_jnativehook_NativeInputEvent->init == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.<init>(Lorg.jnativehook.GlobalScreen;IJI)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -127,7 +127,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_NativeInputEvent->getID == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getID()I!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getID()I!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -140,12 +140,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_NativeInputEvent->getModifiers == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getModifiers()I!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeInputEvent.getModifiers()I!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeInputEvent class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeInputEvent class!\n",
 					__FUNCTION__, __LINE__);
 		}
 
@@ -166,7 +166,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(IJIIICI)V");
 			
 			if (org_jnativehook_keyboard_NativeKeyEvent->init == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.<init>(IJIIICI)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.<init>(IJIIICI)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -179,7 +179,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_keyboard_NativeKeyEvent->getKeyCode == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyCode()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyCode()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -192,7 +192,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyLocation()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyLocation()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -205,12 +205,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()C");
 
 			if (org_jnativehook_keyboard_NativeKeyEvent->getKeyChar == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyChar()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeKeyEvent.getKeyChar()!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeKeyEvent class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeKeyEvent class!\n",
 					__FUNCTION__, __LINE__);
 		}
 
@@ -231,7 +231,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(IJIIIII)V");
 			
 			if (org_jnativehook_mouse_NativeMouseEvent->init == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.<init>(IJIIIII)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.<init>(IJIIIII)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -244,7 +244,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseEvent->getButton == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getButton()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getButton()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -257,7 +257,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseEvent->getClickCount == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getClickCount()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getClickCount()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -270,7 +270,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseEvent->getX == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getX()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getX()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -283,12 +283,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseEvent->getY == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getY()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.getY()!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeMouseEvent class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeMouseEvent class!\n",
 					__FUNCTION__, __LINE__);
 		}
 
@@ -309,7 +309,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(IJIIIIIII)V");
 			
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->init == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.<init>(IJIIIIIII)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseEvent.<init>(IJIIIIIII)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -322,7 +322,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollAmount()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollAmount()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -335,7 +335,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollType()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getScrollType()!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -348,12 +348,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"()I");
 
 			if (org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getWheelRotation()!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeMouseWheelEvent.getWheelRotation()!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeMouseWheelEvent class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the NativeMouseWheelEvent class!\n",
 					__FUNCTION__, __LINE__);
 		}
 
@@ -371,7 +371,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 			if (java_lang_System->setProperty == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for System.setProperty(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for System.setProperty(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -384,12 +384,12 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)Ljava/lang/String;");
 
 			if (java_lang_System->clearProperty == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for System.clearProperty(Ljava/lang/String;)Ljava/lang/String;!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for System.clearProperty(Ljava/lang/String;)Ljava/lang/String;!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the System class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the System class!\n",
 					__FUNCTION__, __LINE__);
 		}
 
@@ -407,7 +407,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)Ljava/util/logging/Logger;");
 
 			if (java_util_logging_Logger->getLogger == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.getLogger(Ljava/lang/String;)Ljava/util/logging/Logger;!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.getLogger(Ljava/lang/String;)Ljava/util/logging/Logger;!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -419,7 +419,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)V");
 
 			if (java_util_logging_Logger->fine == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.fine(Ljava/lang/String;)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.fine(Ljava/lang/String;)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -430,7 +430,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)V");
 
 			if (java_util_logging_Logger->info == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.info(Ljava/lang/String;)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.info(Ljava/lang/String;)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -441,7 +441,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)V");
 
 			if (java_util_logging_Logger->warning == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.warning(Ljava/lang/String;)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.warning(Ljava/lang/String;)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 
@@ -452,19 +452,19 @@ int jni_CreateGlobals(JNIEnv *env) {
 					"(Ljava/lang/String;)V");
 
 			if (java_util_logging_Logger->severe == NULL) {
-				jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.severe(Ljava/lang/String;)V!\n",
+				jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for Logger.severe(Ljava/lang/String;)V!\n",
 						__FUNCTION__, __LINE__);
 			}
 		}
 		else {
-			jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the Logger class!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to locate the Logger class!\n",
 					__FUNCTION__, __LINE__);
 		}
 	}
 	else {
 		status = JNI_ENOMEM;
 
-		jni_Logger(LOG_LEVEL_ERROR, "%s [%u]: Failed to allocate memory for JNI structures!\n",
+		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to allocate memory for JNI structures!\n",
 				__FUNCTION__, __LINE__);
 
 		// FIXME Throw java.lang.OutOfMemoryError
