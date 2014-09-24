@@ -30,6 +30,7 @@ static char log_buffer[1024];
 
 static bool logger(JNIEnv *env, unsigned int level, const char *format, va_list args) {
 	bool status = false;
+
 	int log_size = vsnprintf(log_buffer, sizeof(log_buffer), format, args);
 
 	if (log_size >= 0) {
@@ -105,14 +106,11 @@ bool uiohook_LoggerCallback(unsigned int level, const char *format, ...) {
 		status = logger(env, level, format, args);
 	}
 	else if ((*jvm)->AttachCurrentThread(jvm, (void **)(&env), NULL) == JNI_OK) {
-		/*
         va_list args;
 		va_start(args, format);
 		status = jni_Logger(env, level, format, args);
-		va_end(args);
 
 		(*jvm)->DetachCurrentThread(jvm);
-		*/
     }
 	else {
 		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed.\n",
