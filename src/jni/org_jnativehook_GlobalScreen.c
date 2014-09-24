@@ -183,7 +183,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		default:
 			// TODO Should this thrown an exception?
 
-			jni_Logger(LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type!\n",
+			jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type!\n",
 					__FUNCTION__, __LINE__);
 			break;
 	}

@@ -81,7 +81,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		#endif
 
 		// Set Java logger for native code messages.
-		hook_set_logger_proc(&jni_Logger);
+		hook_set_logger_proc(&uiohook_LoggerCallback);
 
 		// Set java properties from native sources.
 		jni_SetProperties(env);
@@ -98,7 +98,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
 	}
 
-	jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: JNI Loaded.\n",
+	jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: JNI Loaded.\n",
 			__FUNCTION__, __LINE__);
 
     return jni_version;
@@ -112,16 +112,18 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jni_version) == JNI_OK) {
 		// Clear java properties from native sources.
 		jni_ClearProperties(env);
+
+		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: JNI Unloaded.\n",
+				__FUNCTION__, __LINE__);
 	}
 	else {
 		// It is not critical that these values are cleared so no exception
 		// will be thrown.
-		jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Failed to call jni_ClearProperties()!\n",
+		jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Failed to call jni_ClearProperties()!\n",
 				__FUNCTION__, __LINE__);
 	}
 
-	jni_Logger(LOG_LEVEL_DEBUG, "%s [%u]: JNI Unloaded.\n",
-			__FUNCTION__, __LINE__);
+
 
 	// Unset the hook callback function to dispatch events.
 	hook_set_dispatch_proc(NULL);
