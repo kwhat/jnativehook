@@ -32,8 +32,6 @@
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
 	int status = hook_enable();
 
-	jclass Exception_class = NULL;
-
 	switch (status) {
 		case UIOHOOK_SUCCESS:
 			// Everything is ok.
