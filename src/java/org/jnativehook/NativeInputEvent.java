@@ -52,7 +52,8 @@ public class NativeInputEvent extends EventObject {
 	private int modifiers;
 	
 	/** Mask for undocumented behavior.
-	 * @see https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported
+	 * More information available at:
+	 * <a href="https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported">wiki/Usage#consuming-events-unsupported</a>
 	 * @since 1.2
 	 */
 	@SuppressWarnings("unused")
