@@ -56,7 +56,7 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -110,7 +110,7 @@ static inline int create_NativeInputEvent(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -165,7 +165,7 @@ static inline int create_NativeKeyEvent(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -224,7 +224,7 @@ static inline int create_NativeMouseEvent(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -279,7 +279,7 @@ static inline int create_NativeMouseWheelEvent(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -325,7 +325,7 @@ static inline int create_System(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
@@ -383,7 +383,7 @@ static inline int create_Logger(JNIEnv *env) {
 			}
 			else {
 				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
-            	status = JNI_ENOMEM;
+				status = JNI_ENOMEM;
 			}
 		}
 	}
