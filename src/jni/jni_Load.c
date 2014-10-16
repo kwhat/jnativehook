@@ -26,7 +26,6 @@
 #include "jni_Properties.h"
 
 // JNI Related global references.
-//jint jni_version = JNI_VERSION_1_4;
 JavaVM *jvm;
 JavaVMAttachArgs jvm_attach_args = {
 	.version = JNI_VERSION_1_4,
@@ -52,7 +51,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 				jmethodID println_id = (*env)->GetMethodID(env, PrintStream_class, "println", "(Ljava/lang/String;)V");
 				jobject out = (*env)->GetStaticObjectField(env, PrintStream_class, out_id);
 
-				if (println_id != NULL && out_id != NULL) {
+				if (println_id != NULL && out != NULL) {
 					jstring copyright = (*env)->NewStringUTF(env, "\n"
 							"JNativeHook: Global keyboard and mouse hooking for Java.\n"
 							"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n"
