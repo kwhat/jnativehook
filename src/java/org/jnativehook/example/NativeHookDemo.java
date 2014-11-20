@@ -18,6 +18,7 @@
 package org.jnativehook.example;
 
 //Imports
+
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -27,6 +28,7 @@ import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
+
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -61,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -88,7 +89,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	private JTextArea txtEventInfo;
 
 	/** Logging */
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
 	 * Instantiates a new native hook demo.
@@ -176,17 +177,15 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		add(scrollPane, BorderLayout.CENTER);
 
 
-		// Create custom logger and level.
-		logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-		LogManager.getLogManager().reset();
-		logger.setLevel(Level.INFO);
+		// Disable parent logger and set the desired level.
+		logger.setUseParentHandlers(false);
+		logger.setLevel(Level.ALL);
 
-		// Add formatter and console logger.
+		// Add our custom formatter to a console handler.
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setFormatter(new LogFormatter());
-		handler.setLevel(Level.ALL);
+		handler.setLevel(Level.WARNING);
 		logger.addHandler(handler);
-
 
 		/* Note: JNativeHook does *NOT* operate on the event dispatching thread.
 		 * Because Swing components must be accessed on the event dispatching
