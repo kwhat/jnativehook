@@ -38,7 +38,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 	switch (event->type) {
 		case EVENT_HOOK_START:
-			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) != JNI_OK) {
+			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_EDETACHED) {
 				(*jvm)->AttachCurrentThread(jvm, (void **)(&env), &jvm_attach_args);
 			}
 			break;
@@ -47,6 +47,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			// NOTE This callback may note be called from Windows under some circumstances.
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 				(*jvm)->DetachCurrentThread(jvm);
+				env = NULL;
 			}
 			break;
 
