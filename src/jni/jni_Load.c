@@ -29,7 +29,7 @@
 JavaVM *jvm;
 JavaVMAttachArgs jvm_attach_args = {
 	.version = JNI_VERSION_1_4,
-	.name = "JNativeHook Native Dispatch",
+	.name = "JNativeHook Native Hook",
 	.group = NULL
 };
 
