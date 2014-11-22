@@ -37,6 +37,9 @@ void jni_EventDispatcher(uiohook_event * const event) {
 	jobject NativeInputEvent_object = NULL;
 
 	switch (event->type) {
+		/* The following start and stop functions are less than ideal for attaching JNI.
+		 * TODO Consider moving threads out of the lib and into Java.
+		 */
 		case EVENT_HOOK_START:
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_EDETACHED) {
 				(*jvm)->AttachCurrentThread(jvm, (void **)(&env), &jvm_attach_args);
@@ -46,8 +49,9 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		case EVENT_HOOK_STOP:
 			// NOTE This callback may note be called from Windows under some circumstances.
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-				(*jvm)->DetachCurrentThread(jvm);
-				env = NULL;
+				if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+					env = NULL;
+				}
 			}
 			break;
 
@@ -240,4 +244,10 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 		(*env)->DeleteLocalRef(env, NativeInputEvent_object);
 	}
+
+	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
+    				if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
+    					env = NULL;
+    				}
+    			}
 }
