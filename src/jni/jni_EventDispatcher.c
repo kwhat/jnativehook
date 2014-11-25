@@ -244,10 +244,4 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 		(*env)->DeleteLocalRef(env, NativeInputEvent_object);
 	}
-
-	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-    				if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
-    					env = NULL;
-    				}
-    			}
 }
