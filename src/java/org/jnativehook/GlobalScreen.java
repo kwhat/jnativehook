@@ -38,8 +38,10 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.EventListener;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
@@ -71,6 +73,8 @@ public class GlobalScreen {
 	 */
 	private static final EventListenerList eventListeners = new EventListenerList();
 
+	private static ExecutorService hookExecutor;
+
 	/**
 	 * The service to dispatch events.
 	 */
@@ -85,10 +89,21 @@ public class GlobalScreen {
 		// Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
 
+		GlobalScreen.hookExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setName("JNativeHook Hook Thread");
+				t.setDaemon(false);
+				t.setPriority(Thread.MAX_PRIORITY);
+
+				return t;
+			}
+		});
+
 		GlobalScreen.eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
-				t.setName("JNativeHook Native Dispatch");
+				t.setName("JNativeHook Dispatch Thread");
 				t.setDaemon(true);
 
 				return t;
@@ -101,14 +116,12 @@ public class GlobalScreen {
 	 * {@link #unregisterNativeHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 *
-	 * @throws Throwable a <code>NativeHookException</code> raised by calling
-	 *                   {@link #unloadNativeLibrary()}
 	 * @see Object#finalize
 	 */
 	@Override
 	protected void finalize() throws Throwable {
 		if (GlobalScreen.isNativeHookRegistered()) {
-			GlobalScreen.unloadNativeLibrary();
+			GlobalScreen.unregisterNativeHook();
 		}
 
 		// Shutdown the current Event executor.
@@ -126,6 +139,22 @@ public class GlobalScreen {
 	public static synchronized GlobalScreen getInstance() {
 		return GlobalScreen.instance;
 	}
+
+	private Future<Integer> hookStatus;
+	public void enableHook() {
+		hookStatus = GlobalScreen.hookExecutor.submit(new NativeHookTask());
+		Integer result = null;
+		try {
+			result = hookStatus.get();
+		}
+		catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		catch (InterruptedException e) {
+			result = 0;
+		}
+	}
+
 
 	/**
 	 * Adds the specified native key listener to receive key events from the
@@ -318,6 +347,86 @@ public class GlobalScreen {
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
 
+	private class EventDispatchTask implements Runnable {
+		private NativeInputEvent event;
+
+		public EventDispatchTask(NativeInputEvent event) {
+			this.event = event;
+		}
+
+		public void run() {
+			EventListener[] listeners;
+
+			switch (event.getID()) {
+				case NativeHookEvent.NATIVE_HOOK_ENABLED:
+				case NativeHookEvent.NATIVE_HOOK_DISABLED:
+
+					break;
+
+				case NativeKeyEvent.NATIVE_KEY_PRESSED:
+					for (NativeKeyListener t : (NativeKeyListener[]) eventListeners.getListeners(NativeKeyListener.class)) {
+						t.nativeKeyPressed((NativeKeyEvent) event);
+					}
+					break;
+
+				case NativeKeyEvent.NATIVE_KEY_TYPED:
+					listeners = eventListeners.getListeners(NativeKeyListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeKeyListener) listeners[i]).nativeKeyTyped((NativeKeyEvent) event);
+					}
+					break;
+
+				case NativeKeyEvent.NATIVE_KEY_RELEASED:
+					listeners = eventListeners.getListeners(NativeKeyListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeKeyListener) listeners[i]).nativeKeyReleased((NativeKeyEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+					listeners = eventListeners.getListeners(NativeMouseListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseListener) listeners[i]).nativeMouseClicked((NativeMouseEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+					listeners = eventListeners.getListeners(NativeMouseListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseListener) listeners[i]).nativeMousePressed((NativeMouseEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+					listeners = eventListeners.getListeners(NativeMouseListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseListener) listeners[i]).nativeMouseReleased((NativeMouseEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseMotionListener) listeners[i]).nativeMouseMoved((NativeMouseEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseMotionListener) listeners[i]).nativeMouseDragged((NativeMouseEvent) event);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_WHEEL:
+					listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
+					for (int i = 0; i < listeners.length; i++) {
+						((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved((NativeMouseWheelEvent) event);
+					}
+					break;
+			}
+		}
+	}
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but may be used to synthesize
@@ -334,132 +443,14 @@ public class GlobalScreen {
 	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
-		if (eventExecutor != null) {
-			if (e instanceof NativeKeyEvent) {
-				processKeyEvent((NativeKeyEvent) e);
-			}
-			else if (e instanceof NativeMouseWheelEvent) {
-				processMouseWheelEvent((NativeMouseWheelEvent) e);
-			}
-			else if (e instanceof NativeMouseEvent) {
-				processMouseEvent((NativeMouseEvent) e);
+		if (e.getID() == NativeHookEvent.NATIVE_HOOK_ENABLED || e.getID() == NativeHookEvent.NATIVE_HOOK_DISABLED) {
+			this.hookStatus.cancel(false);
+		}
+		else {
+			if (eventExecutor != null) {
+				eventExecutor.execute(new EventDispatchTask(e));
 			}
 		}
-	}
-
-	/**
-	 * Processes native key events by dispatching them to all registered
-	 * <code>NativeKeyListener</code> objects.
-	 *
-	 * @param e the <code>NativeKeyEvent</code> to dispatch.
-	 * @see NativeKeyEvent
-	 * @see NativeKeyListener
-	 * @see #addNativeKeyListener(NativeKeyListener)
-	 */
-	private void processKeyEvent(NativeKeyEvent e) {
-		// The event cannot be modified beyond this point!  This is both a
-		// Java restriction and a native code restriction.
-		// FIXME The event should not be final for event consumption.  It still works but probably shouldn't.
-		final NativeKeyEvent event = e;
-		eventExecutor.execute(new Runnable() {
-			public void run() {
-				int id = event.getID();
-				EventListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-
-				for (int i = 0; i < listeners.length; i++) {
-					switch (id) {
-						case NativeKeyEvent.NATIVE_KEY_PRESSED:
-							((NativeKeyListener) listeners[i]).nativeKeyPressed(event);
-							break;
-
-						case NativeKeyEvent.NATIVE_KEY_TYPED:
-							((NativeKeyListener) listeners[i]).nativeKeyTyped(event);
-							break;
-
-						case NativeKeyEvent.NATIVE_KEY_RELEASED:
-							((NativeKeyListener) listeners[i]).nativeKeyReleased(event);
-							break;
-					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Processes native mouse events by dispatching them to all registered
-	 * <code>NativeMouseListener</code> objects.
-	 *
-	 * @param e the <code>NativeMouseEvent</code> to dispatch.
-	 * @see NativeMouseEvent
-	 * @see NativeMouseListener
-	 * @see #addNativeMouseListener(NativeMouseListener)
-	 */
-	private void processMouseEvent(NativeMouseEvent e) {
-		// The event cannot be modified beyond this point!  This is both a 
-		// Java restriction and a native code restriction.
-		final NativeMouseEvent event = e;
-		eventExecutor.execute(new Runnable() {
-			public void run() {
-				int id = event.getID();
-
-				EventListener[] listeners;
-				if (id == NativeMouseEvent.NATIVE_MOUSE_MOVED || id == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
-					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-				}
-				else {
-					listeners = eventListeners.getListeners(NativeMouseListener.class);
-				}
-
-				for (int i = 0; i < listeners.length; i++) {
-					switch (id) {
-						case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-							((NativeMouseListener) listeners[i]).nativeMouseClicked(event);
-							break;
-
-						case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-							((NativeMouseListener) listeners[i]).nativeMousePressed(event);
-							break;
-
-						case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-							((NativeMouseListener) listeners[i]).nativeMouseReleased(event);
-							break;
-
-						case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-							((NativeMouseMotionListener) listeners[i]).nativeMouseMoved(event);
-							break;
-
-						case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-							((NativeMouseMotionListener) listeners[i]).nativeMouseDragged(event);
-							break;
-					}
-				}
-			}
-		});
-	}
-
-	/**
-	 * Processes native mouse wheel events by dispatching them to all registered
-	 * <code>NativeMouseWheelListener</code> objects.
-	 *
-	 * @param e The <code>NativeMouseWheelEvent</code> to dispatch.
-	 * @see NativeMouseWheelEvent
-	 * @see NativeMouseWheelListener
-	 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
-	 * @since 1.1
-	 */
-	private void processMouseWheelEvent(NativeMouseWheelEvent e) {
-		// The event cannot be modified beyond this point!  This is both a 
-		// Java restriction and a native code restriction.
-		final NativeMouseWheelEvent event = e;
-		eventExecutor.execute(new Runnable() {
-			public void run() {
-				EventListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
-
-				for (int i = 0; i < listeners.length; i++) {
-					((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved(event);
-				}
-			}
-		});
 	}
 
 	/**
@@ -619,14 +610,5 @@ public class GlobalScreen {
 				throw new UnsatisfiedLinkError();
 			}
 		}
-	}
-
-	/**
-	 * Perform procedures to cleanup the native library. This method is called
-	 * on garbage collection to ensure proper native cleanup.
-	 */
-	private static void unloadNativeLibrary() throws NativeHookException {
-		// Make sure the native thread has stopped.
-		GlobalScreen.unregisterNativeHook();
 	}
 }
