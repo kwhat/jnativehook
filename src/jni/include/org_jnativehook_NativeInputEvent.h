@@ -24,11 +24,6 @@
 #ifndef _Included_org_jnativehook_NativeInputEvent
 #define _Included_org_jnativehook_NativeInputEvent
 
-#define org_jnativehook_NativeInputEvent_NATIVE_INPUT_FIRST		2300
-#define org_jnativehook_NativeInputEvent_NATIVE_INPUT_LAST		2301
-#define org_jnativehook_NativeInputEvent_NATIVE_HOOK_ENABLED		org_jnativehook_NativeInputEvent_NATIVE_INPUT_FIRST
-#define org_jnativehook_NativeInputEvent_NATIVE_HOOK_DISABLED	1 + org_jnativehook_NativeInputEvent_NATIVE_INPUT_FIRST
-
 #define org_jnativehook_NativeInputEvent_SHIFT_L_MASK			1 << 0
 #define org_jnativehook_NativeInputEvent_CTRL_L_MASK			1 << 1
 #define org_jnativehook_NativeInputEvent_META_L_MASK			1 << 2
