@@ -26,7 +26,7 @@
 
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST				2400
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST					2402
-#define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED				org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST
+#define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED					org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED				1 + org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST
 #define org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED				2 + org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST
 
