@@ -241,7 +241,7 @@ public class GlobalScreen {
 		}
 	}
 
-	private static class NativeHookThread extends Thread implements NativeInputListener {
+	private static class NativeHookThread extends Thread {
 		private short status;
 
 		public void start() {
@@ -268,20 +268,6 @@ public class GlobalScreen {
 		private native short enable();
 
 		public native short signal();
-
-		public void nativeHookEnabled(NativeInputEvent e) {
-			/*
-			synchronized (this) {
-				this.notifyAll();
-			}
-			*/
-		}
-
-		public void nativeHookDisabled(NativeInputEvent e) {
-			synchronized (this) {
-				this.notifyAll();
-			}
-		}
 	}
 
 	/**
