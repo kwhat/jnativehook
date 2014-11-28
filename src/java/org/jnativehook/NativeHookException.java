@@ -22,11 +22,11 @@ package org.jnativehook;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	1.2
+ * @version	1.3
  */
 public class NativeHookException extends Exception {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 6199753732102764333L;
+	private static final long serialVersionUID = -7944506738553380757L;
 
 	/** The error code associated with this exception. */
 	private short code = NativeHookException.UNKNOWN_FAILURE;
@@ -44,28 +44,6 @@ public class NativeHookException extends Exception {
 	 * @since	1.2
 	 */
 	public static final short HOOK_FAILURE					= 0x01;
-
-
-	/**
-	 * Native thread create failure error code.
-	 *
-	 * @since	1.2
-	 */
-	public static final short THREAD_CREATE					= 0x10;
-
-	/**
-	 * Native thread initialization failure error code.
-	 *
-	 * @since	1.2
-	 */
-	public static final short THREAD_INIT					= 0x11;
-
-	/**
-	 * Native thread start failure error code.
-	 *
-	 * @since	1.2
-	 */
-	public static final short THREAD_START					= 0x12;
 
 	/**
 	 * X11 open display error code.

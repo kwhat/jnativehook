@@ -94,6 +94,8 @@
 			</fileset>
 
 			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen.h" />
+			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />
+			<fileset file="${dir.src}/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h" />
 		</delete>
 	</target>
 

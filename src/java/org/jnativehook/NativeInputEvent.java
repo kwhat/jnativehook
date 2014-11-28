@@ -59,7 +59,7 @@ public class NativeInputEvent extends EventObject {
 	@SuppressWarnings("unused")
 	private short reserved;
 
-	/** The left shift key modifier constant. 
+	/** The left shift key modifier constant.
 	 * @since 1.2
 	 */
 	public static final int SHIFT_L_MASK	= 1 << 0;

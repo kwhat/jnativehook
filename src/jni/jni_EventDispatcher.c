@@ -25,7 +25,6 @@
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 #include "org_jnativehook_NativeInputEvent.h"
-#include "org_jnativehook_NativeHookEvent.h"
 #include "org_jnativehook_keyboard_NativeKeyEvent.h"
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
@@ -46,27 +45,24 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			// FIXME NULL Pointer exception.
 		}
 
+		jobject hookThread_object;
 		jint location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
 		switch (event->type) {
-			case EVENT_HOOK_START:
-				NativeInputEvent_object = (*env)->NewObject(
+			case EVENT_HOOK_DISABLED:
+			case EVENT_HOOK_ENABLED:
+				hookThread_object = (*env)->GetStaticObjectField(
 						env,
-						org_jnativehook_NativeHookEvent->cls,
-						org_jnativehook_NativeHookEvent->init,
-						org_jnativehook_NativeHookEvent_EVENT_HOOK_ENABLED,
-						(jlong)	event->time,
-						(jint)	event->mask);
+						java_lang_Object->cls,
+						org_jnativehook_GlobalScreen->hookThread);
+
+				(*env)->MonitorEnter(env, hookThread_object);
+				(*env)->CallVoidMethod(
+						env,
+						hookThread_object,
+						java_lang_Object->notify);
+				(*env)->MonitorExit(env, hookThread_object);
 				break;
 
-			case EVENT_HOOK_STOP:
-				NativeInputEvent_object = (*env)->NewObject(
-						env,
-						org_jnativehook_NativeHookEvent->cls,
-						org_jnativehook_NativeHookEvent->init,
-						org_jnativehook_NativeHookEvent_EVENT_HOOK_DISABLED,
-						(jlong)	event->time,
-						(jint)	event->mask);
-				break;
 
 			case EVENT_KEY_PRESSED:
 				if (jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location) == JNI_OK) {
@@ -100,7 +96,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 					}
 				break;
 
-
 			case EVENT_KEY_TYPED:
 					NativeInputEvent_object = (*env)->NewObject(
 							env,
@@ -114,6 +109,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 							(jchar)	event->data.keyboard.keychar,
 							location);
 				break;
+
 
 			case EVENT_MOUSE_PRESSED:
 				NativeInputEvent_object = (*env)->NewObject(
@@ -202,7 +198,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			default:
-			// FIXME Exception
+				// FIXME Exception
+				break;
 		}
 
 		// FIXME if ! check exception.

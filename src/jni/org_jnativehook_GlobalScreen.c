@@ -29,99 +29,25 @@
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_registerNativeHook(JNIEnv *env, jclass cls) {
+JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject obj) {
+	return hook_enable();
+}
+
+JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_signal(JNIEnv *env, jobject obj) {
+	return hook_disable();
+}
+
+JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookTask_enable(JNIEnv *env, jobject obj) {
 	int status = hook_enable();
 
 	switch (status) {
-		case UIOHOOK_SUCCESS:
-			// Everything is ok.
-			break;
-
-
 		// System level errors.
 		case UIOHOOK_ERROR_OUT_OF_MEMORY:
 			jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
 			break;
-
-
-		// Native thread errors.
-		case UIOHOOK_ERROR_THREAD_CREATE:
-			jni_ThrowNativeHookException(env, status, "Failed to create native thread.");
-			break;
-
-		case UIOHOOK_ERROR_THREAD_INIT:
-			jni_ThrowNativeHookException(env, status, "Failed to initialize native thread.");
-			break;
-
-		case UIOHOOK_ERROR_THREAD_START:
-			jni_ThrowNativeHookException(env, status, "Failed to start native thread.");
-			break;
-
-
-		// Unix specific errors.
-		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
-			jni_ThrowNativeHookException(env, status, "Failed to open X11 display.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_NOT_FOUND:
-			jni_ThrowNativeHookException(env, status, "Unable to locate XRecord extension.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_ALLOC_RANGE:
-			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord range.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_CREATE_CONTEXT:
-			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord context.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_ENABLE_CONTEXT:
-			jni_ThrowNativeHookException(env, status, "Failed to enable XRecord context.");
-			break;
-
-
-		// Windows specific errors.
-		case UIOHOOK_ERROR_SET_WINDOWS_HOOK_EX:
-			jni_ThrowNativeHookException(env, status, "Failed to register low level windows hook.");
-			break;
-
-
-		// Darwin specific errors.
-		case UIOHOOK_ERROR_AXAPI_DISABLED:
-			jni_ThrowNativeHookException(env, status, "Failed to enable access for assistive devices.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_EVENT_PORT:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple event port.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_RUN_LOOP_SOURCE:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop source.");
-			break;
-
-		case UIOHOOK_ERROR_GET_RUNLOOP:
-			jni_ThrowNativeHookException(env, status, "Failed to acquire apple run loop.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_OBSERVER:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop observer.");
-			break;
-
-		// Default error.
-		case UIOHOOK_FAILURE:
-		default:
-			jni_ThrowNativeHookException(env, status, "An unknown hook error occurred.");
-			break;
 	}
-}
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_unregisterNativeHook(JNIEnv *env, jclass cls) {
-	hook_disable();
-}
-
-JNIEXPORT jboolean JNICALL Java_org_jnativehook_GlobalScreen_isNativeHookRegistered(JNIEnv *env, jclass cls) {
-	// Simple wrapper to return the hook status.
-	return (jboolean) hook_is_enabled();
+	return (jint) status;
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {

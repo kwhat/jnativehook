@@ -18,7 +18,6 @@
 package org.jnativehook.example;
 
 //Imports
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -28,7 +27,6 @@ import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -70,7 +68,7 @@ import java.util.logging.Logger;
  * A demonstration of how to use the JNativeHook library.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	1.3
  * @since	1.0
  *
  * @see GlobalScreen
@@ -78,7 +76,7 @@ import java.util.logging.Logger;
  */
 public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -2650769602844831098L;
+	private static final long serialVersionUID = 1541183202160543102L;
 
 	/** Menu Items */
 	private JMenu menuSubListeners;
@@ -231,7 +229,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 				GlobalScreen.unregisterNativeHook();
 			}
 
-			menuSubListeners.setEnabled(GlobalScreen.isNativeHookRegistered());
+			menuSubListeners.setEnabled(menuItemEnable.getState());
 		}
 		else if (item == menuItemKeyboardEvents) {
 			//Keyboard checkbox was changed, adjust listeners accordingly

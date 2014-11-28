@@ -37,11 +37,8 @@ import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.EventListener;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
@@ -60,7 +57,7 @@ import java.util.logging.Logger;
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version 1.2
+ * @version 1.3
  */
 public class GlobalScreen {
 	/**
@@ -73,7 +70,10 @@ public class GlobalScreen {
 	 */
 	private static final EventListenerList eventListeners = new EventListenerList();
 
-	private static ExecutorService hookExecutor;
+	/**
+	 * The event hook run thread.
+	 */
+	private static final NativeHookThread hookThread = new NativeHookThread();
 
 	/**
 	 * The service to dispatch events.
@@ -89,18 +89,7 @@ public class GlobalScreen {
 		// Unpack and Load the native library.
 		GlobalScreen.loadNativeLibrary();
 
-		GlobalScreen.hookExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				t.setName("JNativeHook Hook Thread");
-				t.setDaemon(false);
-				t.setPriority(Thread.MAX_PRIORITY);
-
-				return t;
-			}
-		});
-
-		GlobalScreen.eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+		eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
 				t.setName("JNativeHook Dispatch Thread");
@@ -126,7 +115,6 @@ public class GlobalScreen {
 
 		// Shutdown the current Event executor.
 		eventExecutor.shutdownNow();
-		eventExecutor = null;
 
 		super.finalize();
 	}
@@ -138,21 +126,6 @@ public class GlobalScreen {
 	 */
 	public static synchronized GlobalScreen getInstance() {
 		return GlobalScreen.instance;
-	}
-
-	private Future<Integer> hookStatus;
-	public void enableHook() {
-		hookStatus = GlobalScreen.hookExecutor.submit(new NativeHookTask());
-		Integer result = null;
-		try {
-			result = hookStatus.get();
-		}
-		catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
-			result = 0;
-		}
 	}
 
 
@@ -268,6 +241,49 @@ public class GlobalScreen {
 		}
 	}
 
+	private static class NativeHookThread extends Thread implements NativeInputListener {
+		private short status;
+
+		public void start() {
+			this.setName("JNativeHook Hook Thread");
+			this.setDaemon(false);
+			this.setPriority(Thread.MAX_PRIORITY);
+			this.status = 0;
+
+			super.start();
+		}
+
+		public void run() {
+			status = enable();
+
+			synchronized (this) {
+				this.notifyAll();
+			}
+		}
+
+		public short getStatus() {
+			return status;
+		}
+
+		private native short enable();
+
+		public native short signal();
+
+		public void nativeHookEnabled(NativeInputEvent e) {
+			/*
+			synchronized (this) {
+				this.notifyAll();
+			}
+			*/
+		}
+
+		public void nativeHookDisabled(NativeInputEvent e) {
+			synchronized (this) {
+				this.notifyAll();
+			}
+		}
+	}
+
 	/**
 	 * Enable the native hook if it is not currently running. If it is running,
 	 * the function has no effect.
@@ -283,7 +299,62 @@ public class GlobalScreen {
 	 *                             the underlying operating system.
 	 * @since 1.1
 	 */
-	public static native void registerNativeHook() throws NativeHookException;
+	public static void registerNativeHook() throws NativeHookException {
+		synchronized (hookThread) {
+			hookThread.start();
+			try {
+				hookThread.wait();
+			}
+			catch (InterruptedException e) {
+				throw new NativeHookException(e);
+			}
+
+			short status = hookThread.getStatus();
+			switch (status) {
+				// Unix specific errors.
+				case NativeHookException.X11_OPEN_DISPLAY:
+					throw new NativeHookException(status, "Failed to open X11 display.");
+
+				case NativeHookException.X11_RECORD_NOT_FOUND:
+					throw new NativeHookException(status, "Unable to locate XRecord extension.");
+
+				case NativeHookException.X11_RECORD_ALLOC_RANGE:
+					throw new NativeHookException(status, "Unable to allocate XRecord range.");
+
+				case NativeHookException.X11_RECORD_CREATE_CONTEXT:
+					throw new NativeHookException(status, "Unable to allocate XRecord context.");
+
+				case NativeHookException.X11_RECORD_ENABLE_CONTEXT:
+					throw new NativeHookException(status, "Failed to enable XRecord context.");
+
+
+				// Windows specific errors.
+				case NativeHookException.WIN_SET_HOOK:
+					throw new NativeHookException(status, "Failed to register low level windows hook.");
+
+
+				// Darwin specific errors.
+				case NativeHookException.DARWIN_AXAPI_DISABLED:
+					throw new NativeHookException(status, "Failed to enable access for assistive devices.");
+
+				case NativeHookException.DARWIN_CREATE_EVENT_PORT:
+					throw new NativeHookException(status, "Failed to create apple event port.");
+
+				case NativeHookException.DARWIN_CREATE_RUN_LOOP_SOURCE:
+					throw new NativeHookException(status, "Failed to create apple run loop source.");
+
+				case NativeHookException.DARWIN_GET_RUNLOOP:
+					throw new NativeHookException(status, "Failed to acquire apple run loop.");
+
+				case NativeHookException.DARWIN_CREATE_OBSERVER:
+					throw new NativeHookException(status, "Failed to create apple run loop observer.");
+
+				// Default error.
+				case NativeHookException.HOOK_FAILURE:
+					throw new NativeHookException(status, "An unknown hook error occurred.");
+			}
+		}
+	}
 
 	/**
 	 * Disable the native hook if it is currently registered. If the native
@@ -291,7 +362,9 @@ public class GlobalScreen {
 	 *
 	 * @since 1.1
 	 */
-	public static native void unregisterNativeHook();
+	public static void unregisterNativeHook() {
+		GlobalScreen.hookThread.signal();
+	}
 
 	/**
 	 * Returns <code>true</code> if the native hook is currently registered.
@@ -299,7 +372,10 @@ public class GlobalScreen {
 	 * @return true if the native hook is currently registered.
 	 * @since 1.1
 	 */
-	public static native boolean isNativeHookRegistered();
+	public static boolean isNativeHookRegistered() {
+		return GlobalScreen.hookThread.isAlive();
+	}
+
 
 	/**
 	 * Add a <code>NativeInputEvent</code> to the operating system's event queue.
@@ -355,78 +431,66 @@ public class GlobalScreen {
 		}
 
 		public void run() {
-			EventListener[] listeners;
+			if (event.getID() == NativeKeyEvent.NATIVE_KEY_PRESSED) {
+				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeKeyPressed((NativeKeyEvent) event);
+				}
+			}
+			else if (event.getID() == NativeKeyEvent.NATIVE_KEY_TYPED) {
+				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeKeyTyped((NativeKeyEvent) event);
+				}
+			}
+			else if (event.getID() == NativeKeyEvent.NATIVE_KEY_RELEASED) {
+				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeKeyReleased((NativeKeyEvent) event);
+				}
+			}
 
-			switch (event.getID()) {
-				case NativeHookEvent.NATIVE_HOOK_ENABLED:
-				case NativeHookEvent.NATIVE_HOOK_DISABLED:
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_PRESSED) {
+				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMousePressed((NativeMouseEvent) event);
+				}
+			}
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_CLICKED) {
+				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMouseClicked((NativeMouseEvent) event);
+				}
+			}
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_RELEASED) {
+				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMouseReleased((NativeMouseEvent) event);
+				}
+			}
 
-					break;
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_MOVED) {
+				NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMouseMoved((NativeMouseEvent) event);
+				}
+			}
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
+				NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMouseDragged((NativeMouseEvent) event);
+				}
+			}
 
-				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					for (NativeKeyListener t : (NativeKeyListener[]) eventListeners.getListeners(NativeKeyListener.class)) {
-						t.nativeKeyPressed((NativeKeyEvent) event);
-					}
-					break;
-
-				case NativeKeyEvent.NATIVE_KEY_TYPED:
-					listeners = eventListeners.getListeners(NativeKeyListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeKeyListener) listeners[i]).nativeKeyTyped((NativeKeyEvent) event);
-					}
-					break;
-
-				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					listeners = eventListeners.getListeners(NativeKeyListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeKeyListener) listeners[i]).nativeKeyReleased((NativeKeyEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-					listeners = eventListeners.getListeners(NativeMouseListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseListener) listeners[i]).nativeMouseClicked((NativeMouseEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					listeners = eventListeners.getListeners(NativeMouseListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseListener) listeners[i]).nativeMousePressed((NativeMouseEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					listeners = eventListeners.getListeners(NativeMouseListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseListener) listeners[i]).nativeMouseReleased((NativeMouseEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseMotionListener) listeners[i]).nativeMouseMoved((NativeMouseEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-					listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseMotionListener) listeners[i]).nativeMouseDragged((NativeMouseEvent) event);
-					}
-					break;
-
-				case NativeMouseEvent.NATIVE_MOUSE_WHEEL:
-					listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
-					for (int i = 0; i < listeners.length; i++) {
-						((NativeMouseWheelListener) listeners[i]).nativeMouseWheelMoved((NativeMouseWheelEvent) event);
-					}
-					break;
+			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_WHEEL) {
+				NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
+				for (int i = 0; i < listeners.length; i++) {
+					listeners[i].nativeMouseWheelMoved((NativeMouseWheelEvent) event);
+				}
 			}
 		}
 	}
+
 	/**
 	 * Dispatches an event to the appropriate processor.  This method is
 	 * generally called by the native library but may be used to synthesize
@@ -443,13 +507,8 @@ public class GlobalScreen {
 	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
 	public final void dispatchEvent(NativeInputEvent e) {
-		if (e.getID() == NativeHookEvent.NATIVE_HOOK_ENABLED || e.getID() == NativeHookEvent.NATIVE_HOOK_DISABLED) {
-			this.hookStatus.cancel(false);
-		}
-		else {
-			if (eventExecutor != null) {
-				eventExecutor.execute(new EventDispatchTask(e));
-			}
+		if (eventExecutor != null) {
+			eventExecutor.execute(new EventDispatchTask(e));
 		}
 	}
 
