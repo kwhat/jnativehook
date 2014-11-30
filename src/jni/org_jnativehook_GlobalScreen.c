@@ -29,15 +29,8 @@
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 #include "org_jnativehook_GlobalScreen.h"
 
-JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject obj) {
-	return hook_enable();
-}
 
-JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_signal(JNIEnv *env, jobject obj) {
-	return hook_disable();
-}
-
-JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookTask_enable(JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject Thread_obj) {
 	int status = hook_enable();
 
 	switch (status) {
@@ -45,25 +38,144 @@ JNIEXPORT jint JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookTask_ena
 		case UIOHOOK_ERROR_OUT_OF_MEMORY:
 			jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
 			break;
-	}
 
-	return (jint) status;
+		// Unix specific errors.
+		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
+			jni_ThrowNativeHookException(env, status, "Failed to open X11 display.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_NOT_FOUND:
+			jni_ThrowNativeHookException(env, status, "Unable to locate XRecord extension.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ALLOC_RANGE:
+			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord range.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_CREATE_CONTEXT:
+			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord context.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ENABLE_CONTEXT:
+			jni_ThrowNativeHookException(env, status, "Failed to enable XRecord context.");
+			break;
+
+
+		// Windows specific errors.
+		case UIOHOOK_ERROR_SET_WINDOWS_HOOK_EX:
+			jni_ThrowNativeHookException(env, status, "Failed to register low level windows hook.");
+			break;
+
+
+		// Darwin specific errors.
+		case UIOHOOK_ERROR_AXAPI_DISABLED:
+			jni_ThrowNativeHookException(env, status, "Failed to enable access for assistive devices.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_EVENT_PORT:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple event port.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_RUN_LOOP_SOURCE:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop source.");
+			break;
+
+		case UIOHOOK_ERROR_GET_RUNLOOP:
+			jni_ThrowNativeHookException(env, status, "Failed to acquire apple run loop.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_OBSERVER:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop observer.");
+			break;
+
+
+		// Default error.
+		case UIOHOOK_FAILURE:
+			jni_ThrowNativeHookException(env, status, "An unknown hook error occurred.");
+			break;
+	}
 }
 
-JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass cls, jobject event) {
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_disable(JNIEnv *env, jobject Thread_obj) {
+	int status = hook_disable();
+
+	switch (status) {
+		// System level errors.
+		case UIOHOOK_ERROR_OUT_OF_MEMORY:
+			jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+			break;
+
+		// Unix specific errors.
+		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
+			jni_ThrowNativeHookException(env, status, "Failed to open X11 display.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_NOT_FOUND:
+			jni_ThrowNativeHookException(env, status, "Unable to locate XRecord extension.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ALLOC_RANGE:
+			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord range.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_CREATE_CONTEXT:
+			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord context.");
+			break;
+
+		case UIOHOOK_ERROR_X_RECORD_ENABLE_CONTEXT:
+			jni_ThrowNativeHookException(env, status, "Failed to enable XRecord context.");
+			break;
+
+
+		// Windows specific errors.
+		case UIOHOOK_ERROR_SET_WINDOWS_HOOK_EX:
+			jni_ThrowNativeHookException(env, status, "Failed to register low level windows hook.");
+			break;
+
+
+		// Darwin specific errors.
+		case UIOHOOK_ERROR_AXAPI_DISABLED:
+			jni_ThrowNativeHookException(env, status, "Failed to enable access for assistive devices.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_EVENT_PORT:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple event port.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_RUN_LOOP_SOURCE:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop source.");
+			break;
+
+		case UIOHOOK_ERROR_GET_RUNLOOP:
+			jni_ThrowNativeHookException(env, status, "Failed to acquire apple run loop.");
+			break;
+
+		case UIOHOOK_ERROR_CREATE_OBSERVER:
+			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop observer.");
+			break;
+
+
+		// Default error.
+		case UIOHOOK_FAILURE:
+			jni_ThrowNativeHookException(env, status, "An unknown hook error occurred.");
+			break;
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass GlobalScreen_cls, jobject NativeInputEvent_obj) {
 	// Convert the event type.
-	jint javaType = (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getID);
+	jint javaType = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
 	uiohook_event *virtualEvent = (uiohook_event *) malloc(sizeof(uiohook_event));
 	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
 
 	// Convert Java event to virtual event.
-	virtualEvent->mask = (unsigned int) (*env)->CallIntMethod(env, event, org_jnativehook_NativeInputEvent->getModifiers);
+	virtualEvent->mask = (unsigned int) (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getModifiers);
 
 	switch (javaType) {
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-			virtualEvent->data.keyboard.keychar = (*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
+			virtualEvent->data.keyboard.keychar = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
 			virtualEvent->data.keyboard.keycode = VC_UNDEFINED;
 			virtualEvent->data.keyboard.rawcode = 0x00;
 			break;
@@ -71,7 +183,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
 			virtualEvent->data.keyboard.keychar = CHAR_UNDEFINED;
-			virtualEvent->data.keyboard.keycode = (*env)->CallIntMethod(env, event, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
+			virtualEvent->data.keyboard.keycode = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
 			virtualEvent->data.keyboard.rawcode = 0x00;
 			break;
 
@@ -79,26 +191,26 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-        	virtualEvent->data.mouse.button = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getButton);
-			virtualEvent->data.mouse.clicks = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
-			virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getY);
+        	virtualEvent->data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
+			virtualEvent->data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
+			virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
             break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
 			virtualEvent->data.mouse.button = MOUSE_NOBUTTON;
 			virtualEvent->data.mouse.clicks = 0;
-		    virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseEvent->getY);
+		    virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
             break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-            virtualEvent->data.wheel.clicks = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
-			virtualEvent->data.wheel.x = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
-			virtualEvent->data.wheel.y = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
-			virtualEvent->data.wheel.type = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
-			virtualEvent->data.wheel.amount = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
-			virtualEvent->data.wheel.rotation = (*env)->CallIntMethod(env, event, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
+            virtualEvent->data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
+			virtualEvent->data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
+			virtualEvent->data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
+			virtualEvent->data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
+			virtualEvent->data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
+			virtualEvent->data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
             break;
 
 		default:

@@ -18,7 +18,6 @@
 package org.jnativehook;
 
 // Imports.
-
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -26,7 +25,6 @@ import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
-
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,9 +69,9 @@ public class GlobalScreen {
 	private static final EventListenerList eventListeners = new EventListenerList();
 
 	/**
-	 * The event hook run thread.
+	 * The service to control the hook.
 	 */
-	private static final NativeHookThread hookThread = new NativeHookThread();
+	private static NativeHookThread hookThread;
 
 	/**
 	 * The service to dispatch events.
@@ -242,33 +240,38 @@ public class GlobalScreen {
 	}
 
 	private static class NativeHookThread extends Thread {
-		private short status;
+		private NativeHookException exception;
 
-		public void start() {
+		public NativeHookThread() {
 			this.setName("JNativeHook Hook Thread");
 			this.setDaemon(false);
 			this.setPriority(Thread.MAX_PRIORITY);
-			this.status = 0;
-
-			super.start();
 		}
 
 		public void run() {
-			status = enable();
+			exception = null;
+
+			try {
+				this.enable();
+			}
+			catch (NativeHookException e) {
+				exception = e;
+			}
 
 			synchronized (this) {
 				this.notifyAll();
 			}
 		}
 
-		public short getStatus() {
-			return status;
+		public NativeHookException getException() {
+			return exception;
 		}
 
-		private native short enable();
+		private native void enable() throws NativeHookException;
 
-		public native short signal();
+		public native void disable() throws NativeHookException;
 	}
+
 
 	/**
 	 * Enable the native hook if it is not currently running. If it is running,
@@ -286,58 +289,22 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static void registerNativeHook() throws NativeHookException {
-		synchronized (hookThread) {
-			hookThread.start();
-			try {
-				hookThread.wait();
-			}
-			catch (InterruptedException e) {
-				throw new NativeHookException(e);
-			}
+		if (hookThread == null || !hookThread.isAlive()) {
+			hookThread = new NativeHookThread();
 
-			short status = hookThread.getStatus();
-			switch (status) {
-				// Unix specific errors.
-				case NativeHookException.X11_OPEN_DISPLAY:
-					throw new NativeHookException(status, "Failed to open X11 display.");
+			synchronized (hookThread) {
+				hookThread.start();
+				try {
+					hookThread.wait();
+				}
+				catch (InterruptedException e) {
+					throw new NativeHookException(e);
+				}
 
-				case NativeHookException.X11_RECORD_NOT_FOUND:
-					throw new NativeHookException(status, "Unable to locate XRecord extension.");
-
-				case NativeHookException.X11_RECORD_ALLOC_RANGE:
-					throw new NativeHookException(status, "Unable to allocate XRecord range.");
-
-				case NativeHookException.X11_RECORD_CREATE_CONTEXT:
-					throw new NativeHookException(status, "Unable to allocate XRecord context.");
-
-				case NativeHookException.X11_RECORD_ENABLE_CONTEXT:
-					throw new NativeHookException(status, "Failed to enable XRecord context.");
-
-
-				// Windows specific errors.
-				case NativeHookException.WIN_SET_HOOK:
-					throw new NativeHookException(status, "Failed to register low level windows hook.");
-
-
-				// Darwin specific errors.
-				case NativeHookException.DARWIN_AXAPI_DISABLED:
-					throw new NativeHookException(status, "Failed to enable access for assistive devices.");
-
-				case NativeHookException.DARWIN_CREATE_EVENT_PORT:
-					throw new NativeHookException(status, "Failed to create apple event port.");
-
-				case NativeHookException.DARWIN_CREATE_RUN_LOOP_SOURCE:
-					throw new NativeHookException(status, "Failed to create apple run loop source.");
-
-				case NativeHookException.DARWIN_GET_RUNLOOP:
-					throw new NativeHookException(status, "Failed to acquire apple run loop.");
-
-				case NativeHookException.DARWIN_CREATE_OBSERVER:
-					throw new NativeHookException(status, "Failed to create apple run loop observer.");
-
-				// Default error.
-				case NativeHookException.HOOK_FAILURE:
-					throw new NativeHookException(status, "An unknown hook error occurred.");
+				NativeHookException exception = hookThread.getException();
+				if (exception != null) {
+					throw exception;
+				}
 			}
 		}
 	}
@@ -348,8 +315,19 @@ public class GlobalScreen {
 	 *
 	 * @since 1.1
 	 */
-	public static void unregisterNativeHook() {
-		GlobalScreen.hookThread.signal();
+	public static void unregisterNativeHook() throws NativeHookException {
+		if (isNativeHookRegistered()) {
+			synchronized (hookThread) {
+				hookThread.disable();
+
+				try {
+					hookThread.join();
+				}
+				catch (InterruptedException e) {
+					throw new NativeHookException(e.getCause());
+				}
+			}
+		}
 	}
 
 	/**
@@ -359,7 +337,7 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static boolean isNativeHookRegistered() {
-		return GlobalScreen.hookThread.isAlive();
+		return hookThread != null && hookThread.isAlive();
 	}
 
 

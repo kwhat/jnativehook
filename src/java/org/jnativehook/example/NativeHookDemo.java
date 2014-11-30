@@ -226,9 +226,15 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 				}
 			}
 			else {
-				GlobalScreen.unregisterNativeHook();
+				try {
+					GlobalScreen.unregisterNativeHook();
+				}
+				catch (NativeHookException ex) {
+					txtEventInfo.append("Error: " + ex.getMessage() + "\n");
+				}
 			}
 
+			menuItemEnable.setState(GlobalScreen.isNativeHookRegistered());
 			menuSubListeners.setEnabled(menuItemEnable.getState());
 		}
 		else if (item == menuItemKeyboardEvents) {
@@ -433,7 +439,12 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 */
 	public void windowClosed(WindowEvent e) {
 		//Clean up the native hook.
-		GlobalScreen.unregisterNativeHook();
+		try {
+			GlobalScreen.unregisterNativeHook();
+		}
+		catch (NativeHookException ex) {
+			ex.printStackTrace();
+		}
 		System.runFinalization();
 		System.exit(0);
 	}
