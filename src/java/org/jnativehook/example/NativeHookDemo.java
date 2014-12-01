@@ -78,7 +78,7 @@ import java.util.logging.Logger;
  */
 public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -2650769602844831098L;
+	private static final long serialVersionUID = 1541183202160543102L;
 
 	/** Menu Items */
 	private JMenu menuSubListeners;

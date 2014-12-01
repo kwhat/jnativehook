@@ -40,19 +40,23 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		/* The following start and stop functions are less than ideal for attaching JNI.
 		 * TODO Consider moving threads out of the lib and into Java.
 		 */
-		case EVENT_HOOK_START:
+		case EVENT_THREAD_START:
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_EDETACHED) {
 				(*jvm)->AttachCurrentThread(jvm, (void **)(&env), &jvm_attach_args);
 			}
 			break;
 
-		case EVENT_HOOK_STOP:
+		case EVENT_THREAD_STOP:
 			// NOTE This callback may note be called from Windows under some circumstances.
 			if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 				if ((*jvm)->DetachCurrentThread(jvm) == JNI_OK) {
 					env = NULL;
 				}
 			}
+			break;
+
+		case EVENT_HOOK_START:
+		case EVENT_HOOK_STOP:
 			break;
 
 		case EVENT_KEY_PRESSED:
