@@ -25,7 +25,6 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 
-// TODO This maybe a little large for static memory.
 static char log_buffer[1024];
 
 static bool logger(JNIEnv *env, unsigned int level, const char *format, va_list args) {
