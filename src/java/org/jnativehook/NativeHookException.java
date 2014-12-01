@@ -29,21 +29,21 @@ public class NativeHookException extends Exception {
 	private static final long serialVersionUID = 6199753732102764333L;
 
 	/** The error code associated with this exception. */
-	private short code = NativeHookException.UNKNOWN_FAILURE;
+	private int code = NativeHookException.UNKNOWN_FAILURE;
 
 	/**
 	 * Unknown failure error code.
 	 *
 	 * @since	1.2
 	 */
-	public static final short UNKNOWN_FAILURE				= 0x00;
+	public static final int UNKNOWN_FAILURE					= 0x00;
 
 	/**
 	 * General failure error code.
 	 *
 	 * @since	1.2
 	 */
-	public static final short HOOK_FAILURE					= 0x01;
+	public static final int HOOK_FAILURE					= 0x01;
 
 
 	/**
@@ -51,89 +51,93 @@ public class NativeHookException extends Exception {
 	 *
 	 * @since	1.2
 	 */
-	public static final short THREAD_CREATE					= 0x10;
+	public static final int THREAD_CREATE					= 0x10;
 
 	/**
 	 * Native thread initialization failure error code.
 	 *
 	 * @since	1.2
 	 */
-	public static final short THREAD_INIT					= 0x11;
+	public static final int THREAD_INIT						= 0x11;
 
 	/**
 	 * Native thread start failure error code.
 	 *
 	 * @since	1.2
 	 */
-	public static final short THREAD_START					= 0x12;
+	public static final int THREAD_START					= 0x12;
 
 	/**
 	 * X11 open display error code.
 	 *
 	 * @since	1.2
 	 */
-	public static final short X11_OPEN_DISPLAY				= 0x20;
+	public static final int X11_OPEN_DISPLAY				= 0x20;
 
 	/**
 	 * X11 extension XRecord was not found.
 	 *
 	 * @since	1.2
 	 */
-	public static final short X11_RECORD_NOT_FOUND			= 0x21;
+	public static final int X11_RECORD_NOT_FOUND			= 0x21;
 
 	/**
 	 * X11 extension XRecord could not allocate range.
 	 *
 	 * @since	1.2
 	 */
-	public static final short X11_RECORD_ALLOC_RANGE		= 0x22;
+	public static final int X11_RECORD_ALLOC_RANGE			= 0x22;
 
 	/**
 	 * X11 extension XRecord could not create a context.
 	 *
 	 * @since	1.2
 	 */
-	public static final short X11_RECORD_CREATE_CONTEXT		= 0x23;
+	public static final int X11_RECORD_CREATE_CONTEXT		= 0x23;
 
 
 	/**
 	 * X11 extension XRecord could not enable the context.
 	 */
-	public static final short X11_RECORD_ENABLE_CONTEXT		= 0x24;
+	public static final int X11_RECORD_ENABLE_CONTEXT		= 0x24;
 
+	/**
+	 * X11 extension XRecord could not enable the context.
+	 */
+	public static final int X11_RECORD_GET_CONTEXT			= 0x25;
 
 	/**
 	 * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for detailed
 	 *
 	 * @since	1.2
 	 */
-	public static final short WIN_SET_HOOK					= 0x30;
+	public static final int WIN_SET_HOOK					= 0x30;
 
 
 	/**
 	 * Apple access for assistive devices is disabled.
 	 */
-	public static final short DARWIN_AXAPI_DISABLED			= 0x40;
+	public static final int DARWIN_AXAPI_DISABLED			= 0x40;
 
 	/**
 	 * Apple could not create an event port.
 	 */
-	public static final short DARWIN_CREATE_EVENT_PORT		= 0x41;
+	public static final int DARWIN_CREATE_EVENT_PORT		= 0x41;
 
 	/**
 	 * Apple could not create a run loop source.
 	 */
-	public static final short DARWIN_CREATE_RUN_LOOP_SOURCE	= 0x42;
+	public static final int DARWIN_CREATE_RUN_LOOP_SOURCE	= 0x42;
 
 	/**
 	 * Apple could not acquire the current run loop.
 	 */
-	public static final short DARWIN_GET_RUNLOOP			= 0x43;
+	public static final int DARWIN_GET_RUNLOOP				= 0x43;
 
 	/**
 	 * Apple could not create an observer.
 	 */
-	public static final short DARWIN_CREATE_OBSERVER		= 0x44;
+	public static final int DARWIN_CREATE_OBSERVER			= 0x44;
 
 
 	/**
@@ -152,7 +156,7 @@ public class NativeHookException extends Exception {
 	 *
 	 * @param code The native error code.
 	 */
-	public NativeHookException(short code) {
+	public NativeHookException(int code) {
 		super();
 
 		this.code = code;
@@ -176,7 +180,7 @@ public class NativeHookException extends Exception {
 	 * @param code The native error code.
 	 * @param message The detail message.
 	 */
-	public NativeHookException(short code, String message) {
+	public NativeHookException(int code, String message) {
 		super(message);
 
 		this.code = code;
@@ -201,7 +205,7 @@ public class NativeHookException extends Exception {
 	 * @param message The detail message.
 	 * @param cause The cause of the exception. A null value is permitted, and indicates that the cause is unknown.
 	 */
-	public NativeHookException(short code, String message, Throwable cause) {
+	public NativeHookException(int code, String message, Throwable cause) {
 		super(message, cause);
 
 		this.code = code;
@@ -221,7 +225,7 @@ public class NativeHookException extends Exception {
 	 *
 	 * @param cause The cause of the exception. A null value is permitted, and indicates that the cause is unknown.
 	 */
-	public NativeHookException(short code, Throwable cause) {
+	public NativeHookException(int code, Throwable cause) {
 		super(cause);
 
 		this.code = code;
@@ -234,7 +238,7 @@ public class NativeHookException extends Exception {
 	 *
 	 * @return The native error code
 	 */
-	public short getCode() {
+	public int getCode() {
 		return this.code;
 	}
 }
