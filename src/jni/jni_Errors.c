@@ -58,7 +58,7 @@ void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) 
 				env,
 				Exception_class,
 				"<init>",
-				"(SLjava/lang/String;)V");
+				"(ILjava/lang/String;)V");
 
 		if (init != NULL) {
 			jobject Exception_object = (*env)->NewObject(
@@ -72,10 +72,10 @@ void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) 
 			(*env)->DeleteLocalRef(env, Exception_object);
 		}
 		else {
-			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeHookException.<init>(SLjava/lang/String;)V!\n",
+			jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: Failed to acquire the method ID for NativeHookException.<init>(ILjava/lang/String;)V!\n",
 					__FUNCTION__, __LINE__);
 
-			jni_ThrowException(env, "java/lang/NoClassDefFoundError", "org/jnativehook/NativeHookException.<init>(SLjava/lang/String;)V");
+			jni_ThrowException(env, "java/lang/NoClassDefFoundError", "org/jnativehook/NativeHookException.<init>(ILjava/lang/String;)V");
 		}
 	}
 	else {
