@@ -31,7 +31,7 @@
 
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject Thread_obj) {
-	int status = hook_enable();
+	int status = hook_run();
 
 	switch (status) {
 		// System level errors.
@@ -39,7 +39,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_e
 			jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
 			break;
 
-		// Unix specific errors.
+		// X11 specific errors.
 		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
 			jni_ThrowNativeHookException(env, status, "Failed to open X11 display.");
 			break;
@@ -97,8 +97,9 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_e
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_disable(JNIEnv *env, jobject Thread_obj) {
-	int status = hook_disable();
+	int status = hook_stop();
 
+	// Only a handful of the total errors are possible on stop.
 	switch (status) {
 		// System level errors.
 		case UIOHOOK_ERROR_OUT_OF_MEMORY:
@@ -106,54 +107,17 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_d
 			break;
 
 		// Unix specific errors.
-		case UIOHOOK_ERROR_X_OPEN_DISPLAY:
-			jni_ThrowNativeHookException(env, status, "Failed to open X11 display.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_NOT_FOUND:
-			jni_ThrowNativeHookException(env, status, "Unable to locate XRecord extension.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_ALLOC_RANGE:
-			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord range.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_CREATE_CONTEXT:
-			jni_ThrowNativeHookException(env, status, "Unable to allocate XRecord context.");
-			break;
-
-		case UIOHOOK_ERROR_X_RECORD_ENABLE_CONTEXT:
-			jni_ThrowNativeHookException(env, status, "Failed to enable XRecord context.");
+		case UIOHOOK_ERROR_X_RECORD_GET_CONTEXT:
+			jni_ThrowNativeHookException(env, status, "Failed to get XRecord context.");
 			break;
 
 
 		// Windows specific errors.
-		case UIOHOOK_ERROR_SET_WINDOWS_HOOK_EX:
-			jni_ThrowNativeHookException(env, status, "Failed to register low level windows hook.");
-			break;
+		// There are no Windows specific errors at this time.
 
 
 		// Darwin specific errors.
-		case UIOHOOK_ERROR_AXAPI_DISABLED:
-			jni_ThrowNativeHookException(env, status, "Failed to enable access for assistive devices.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_EVENT_PORT:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple event port.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_RUN_LOOP_SOURCE:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop source.");
-			break;
-
-		case UIOHOOK_ERROR_GET_RUNLOOP:
-			jni_ThrowNativeHookException(env, status, "Failed to acquire apple run loop.");
-			break;
-
-		case UIOHOOK_ERROR_CREATE_OBSERVER:
-			jni_ThrowNativeHookException(env, status, "Failed to create apple run loop observer.");
-			break;
-
+		// There are no Darwin specific errors at this time.
 
 		// Default error.
 		case UIOHOOK_FAILURE:
