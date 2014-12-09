@@ -231,7 +231,11 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 				GlobalScreen.unregisterNativeHook();
 			}
 
-			menuSubListeners.setEnabled(GlobalScreen.isNativeHookRegistered());
+			// Set the enable menu item to the state of the hook.
+			menuItemEnable.setState(GlobalScreen.isNativeHookRegistered());
+
+			// Set enable/disable the sub-menus based on the enable menu item's state.
+			menuSubListeners.setEnabled(menuItemEnable.getState());
 		}
 		else if (item == menuItemKeyboardEvents) {
 			//Keyboard checkbox was changed, adjust listeners accordingly

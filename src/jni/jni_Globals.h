@@ -38,6 +38,11 @@ typedef struct _org_jnativehook_GlobalScreen {
 	jmethodID dispatchEvent;
 } GlobalScreen;
 
+typedef struct _org_jnativehook_NativeHookException {
+	jclass cls;
+	jmethodID init;
+} NativeHookException;
+
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
 	jfieldID reserved;
@@ -91,6 +96,7 @@ typedef struct _java_util_logging_Logger {
 
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
+extern NativeHookException *org_jnativehook_NativeHookException;
 extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;

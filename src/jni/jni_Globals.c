@@ -24,13 +24,13 @@
 #include "jni_Logger.h"
 
 GlobalScreen *org_jnativehook_GlobalScreen = NULL;
+NativeHookException *org_jnativehook_NativeHookException = NULL;
 NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
 NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = NULL;
 NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = NULL;
 NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
 System *java_lang_System = NULL;
 Logger *java_util_logging_Logger = NULL;
-
 
 static inline int create_GlobalScreen(JNIEnv *env) {
 	int status = JNI_ERR;
@@ -74,6 +74,48 @@ static inline void destroy_GlobalScreen(JNIEnv *env) {
 		// Free struct memory.
 		free(org_jnativehook_GlobalScreen);
 		org_jnativehook_GlobalScreen = NULL;
+	}
+}
+
+
+static inline int create_NativeHookException(JNIEnv *env) {
+	int status = JNI_ERR;
+
+	// Class and Constructor for the NativeHookException Object.
+	jclass NativeHookException_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+	if (NativeHookException_class != NULL) {
+		// Get the method ID for NativeInputEvent constructor.
+		jmethodID init = (*env)->GetMethodID(env, NativeHookException_class, "<init>", "(ILjava/lang/String;)V");
+
+		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
+			org_jnativehook_NativeHookException = malloc(sizeof(NativeInputEvent));
+			if (org_jnativehook_NativeHookException != NULL) {
+				// Populate our structure for later use.
+				org_jnativehook_NativeHookException->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookException_class);
+				org_jnativehook_NativeHookException->init = init;
+
+				status = JNI_OK;
+			}
+			else {
+				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+				status = JNI_ENOMEM;
+			}
+		}
+	}
+
+	return status;
+}
+
+static inline void destroy_NativeHookException(JNIEnv *env) {
+	if (org_jnativehook_NativeHookException != NULL) {
+		// The class *should* never be null if the struct was allocated, but we will check anyway.
+		if (org_jnativehook_NativeHookException->cls != NULL) {
+			(*env)->DeleteGlobalRef(env, org_jnativehook_NativeHookException->cls);
+		}
+
+		// Free struct memory.
+		free(org_jnativehook_NativeHookException);
+		org_jnativehook_NativeHookException = NULL;
 	}
 }
 
@@ -347,6 +389,7 @@ static inline void destroy_System(JNIEnv *env) {
 }
 
 
+
 static inline int create_Logger(JNIEnv *env) {
 	int status = JNI_ERR;
 
@@ -409,6 +452,10 @@ int jni_CreateGlobals(JNIEnv *env) {
 	int status = create_GlobalScreen(env);
 
 	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
+		status = create_NativeHookException(env);
+	}
+
+	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
 		status = create_NativeInputEvent(env);
 	}
 
@@ -442,6 +489,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 int jni_DestroyGlobals(JNIEnv *env) {
 	destroy_GlobalScreen(env);
+	destroy_NativeHookException(env);
 	destroy_NativeInputEvent(env);
 	destroy_NativeKeyEvent(env);
 	destroy_NativeMouseEvent(env);

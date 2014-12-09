@@ -51,6 +51,12 @@ void jni_ThrowException(JNIEnv *env, const char *classname, const char *message)
 }
 
 void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) {
+	jobject Exception_object = (*env)->NewObject(env, org_jnativehook_NativeHookException->cls,
+			org_jnativehook_NativeHookException->init, (jint) code, (*env)->NewStringUTF(env, message));
+	(*env)->Throw(env, (jthrowable) Exception_object);
+	(*env)->DeleteLocalRef(env, Exception_object);
+
+	/*
 	// Locate our exception class.
 	jclass Exception_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
 	if (Exception_class != NULL) {
@@ -65,7 +71,7 @@ void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) 
 					env,
 					Exception_class,
 					init,
-					(jshort) code,
+					(jint) code,
 					(*env)->NewStringUTF(env, message));
 
 			(*env)->Throw(env, (jthrowable) Exception_object);
@@ -84,4 +90,5 @@ void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) 
 
 		jni_ThrowException(env, "java/lang/ClassNotFoundException", "org.jnativehook.NativeHookException");
 	}
+	*/
 }
