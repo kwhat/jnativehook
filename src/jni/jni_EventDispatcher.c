@@ -29,6 +29,20 @@
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
+// Simple function to notify() the hook thread.
+static inline void notifyHookThread(JNIEnv *env) {
+	jobject hookThread_object = (*env)->GetStaticObjectField(
+			env,
+			java_lang_Object->cls,
+			org_jnativehook_GlobalScreen->hookThread);
+
+	(*env)->MonitorEnter(env, hookThread_object);
+	(*env)->CallVoidMethod(
+			env,
+			hookThread_object,
+			java_lang_Object->notify);
+	(*env)->MonitorExit(env, hookThread_object);
+}
 
 // NOTE: This function executes on the hook thread!  If you need to block
 // please do so on another thread via your own event dispatcher.
@@ -42,26 +56,15 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				org_jnativehook_GlobalScreen->getInstance);
 
 		if (GlobalScreen_object == NULL) {
-			// FIXME NULL Pointer exception.
-			return;
+			jni_ThrowException(env, "java/lang/NullPointerException", "No GlobalScreen instance available.");
+			notifyHookThread(env);
 		}
 
-		jobject hookThread_object;
 		jint location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
 		switch (event->type) {
 			case EVENT_HOOK_DISABLED:
 			case EVENT_HOOK_ENABLED:
-				hookThread_object = (*env)->GetStaticObjectField(
-						env,
-						java_lang_Object->cls,
-						org_jnativehook_GlobalScreen->hookThread);
-
-				(*env)->MonitorEnter(env, hookThread_object);
-				(*env)->CallVoidMethod(
-						env,
-						hookThread_object,
-						java_lang_Object->notify);
-				(*env)->MonitorExit(env, hookThread_object);
+				notifyHookThread(env);
 				return;
 
 
@@ -217,6 +220,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				NativeInputEvent_object,
 				org_jnativehook_NativeInputEvent->reserved);
 
+		// Make sure our object is garbage collected.
 		(*env)->DeleteLocalRef(env, GlobalScreen_object);
 	}
 }
