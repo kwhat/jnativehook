@@ -399,10 +399,10 @@ public class GlobalScreen {
 
 		public void run() {
 			if (event instanceof NativeKeyEvent) {
-				processKeyEvent((NativeKeyEvent) e);
+				processKeyEvent((NativeKeyEvent) event);
 			}
 			else if (event instanceof NativeMouseWheelEvent) {
-				processMouseWheelEvent((NativeMouseWheelEvent) e);
+				processMouseWheelEvent((NativeMouseWheelEvent) event);
 			}
 			else if (event instanceof NativeMouseEvent) {
 				switch (event.getID()) {
