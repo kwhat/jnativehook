@@ -62,7 +62,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						hookThread_object,
 						java_lang_Object->notify);
 				(*env)->MonitorExit(env, hookThread_object);
-				break;
+				return;
 
 
 			case EVENT_KEY_PRESSED:
@@ -203,7 +203,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				// TODO Warning.
 				return;
 		}
-
 
 		// Dispatch the event.
 		(*env)->CallVoidMethod(
