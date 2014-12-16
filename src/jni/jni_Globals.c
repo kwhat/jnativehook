@@ -29,6 +29,7 @@ NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
 NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = NULL;
 NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = NULL;
 NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
+Object *java_lang_Object=NULL;
 System *java_lang_System = NULL;
 Logger *java_util_logging_Logger = NULL;
 
@@ -38,7 +39,10 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 	// Class and Constructor for the GlobalScreen Object.
 	jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 	if (GlobalScreen_class != NULL) {
-		// // Get the method ID for GlobalScreen.getInstance().
+		// Get the field ID for hookThread.
+    	jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
+
+		// Get the method ID for GlobalScreen.getInstance().
 		jmethodID getInstance = (*env)->GetStaticMethodID(env, GlobalScreen_class, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
 
 		// Get the method ID for GlobalScreen.dispatchEvent().
@@ -49,6 +53,7 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 			if (org_jnativehook_GlobalScreen != NULL) {
 				// Populate our structure for later use.
 				org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
+				org_jnativehook_GlobalScreen->hookThread = hookThread;
 				org_jnativehook_GlobalScreen->getInstance = getInstance;
 				org_jnativehook_GlobalScreen->dispatchEvent = dispatchEvent;
 
@@ -343,6 +348,48 @@ static inline void destroy_NativeMouseWheelEvent(JNIEnv *env) {
 }
 
 
+static inline int create_Object(JNIEnv *env) {
+	int status = JNI_ERR;
+
+	// Class and Constructor for the Object object.
+	jclass Object_class = (*env)->FindClass(env, "java/lang/Object");
+	if (Object_class != NULL) {
+		// Get the method ID for Object.notify().
+		jmethodID notify = (*env)->GetMethodID(env, Object_class, "notify", "()V");
+
+		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
+			java_lang_Object = malloc(sizeof(Object));
+			if (java_lang_Object != NULL) {
+				// Populate our structure for later use.
+				java_lang_Object->cls = (jclass) (*env)->NewGlobalRef(env, Object_class);
+				java_lang_Object->notify = notify;
+
+				status = JNI_OK;
+			}
+			else {
+				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+				status = JNI_ENOMEM;
+			}
+		}
+	}
+
+	return status;
+}
+
+static inline void destroy_Object(JNIEnv *env) {
+	if (java_lang_Object != NULL) {
+		// The class *should* never be null if the struct was allocated, but we will check anyway.
+		if (java_lang_Object->cls != NULL) {
+			(*env)->DeleteGlobalRef(env, java_lang_Object->cls);
+		}
+
+		// Free struct memory.
+		free(java_lang_Object);
+		java_lang_Object = NULL;
+	}
+}
+
+
 static inline int create_System(JNIEnv *env) {
 	int status = JNI_ERR;
 
@@ -472,6 +519,10 @@ int jni_CreateGlobals(JNIEnv *env) {
 	}
 
 	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
+		status = create_Object(env);
+	}
+
+	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
 		status = create_System(env);
 	}
 
@@ -494,6 +545,7 @@ int jni_DestroyGlobals(JNIEnv *env) {
 	destroy_NativeKeyEvent(env);
 	destroy_NativeMouseEvent(env);
 	destroy_NativeMouseWheelEvent(env);
+	destroy_Object(env);
 	destroy_System(env);
 	destroy_Logger(env);
 

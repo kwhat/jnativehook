@@ -34,6 +34,7 @@ extern JavaVMAttachArgs jvm_attach_args;
  */
 typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
+	jfieldID hookThread;
 	jmethodID getInstance;
 	jmethodID dispatchEvent;
 } GlobalScreen;
@@ -79,6 +80,11 @@ typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
 	jmethodID getWheelRotation;
 } NativeMouseWheelEvent;
 
+typedef struct _java_lang_Object {
+	jclass cls;
+	jmethodID notify;
+} Object;
+
 typedef struct _java_lang_System {
 	jclass cls;
 	jmethodID setProperty;
@@ -101,6 +107,7 @@ extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;
+extern Object *java_lang_Object;
 extern System *java_lang_System;
 extern Logger *java_util_logging_Logger;
 

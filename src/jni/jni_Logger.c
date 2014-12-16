@@ -26,7 +26,6 @@
 #include "jni_Globals.h"
 
 static char log_buffer[1024];
-
 static bool logger(JNIEnv *env, unsigned int level, const char *format, va_list args) {
 	bool status = false;
 
@@ -100,9 +99,13 @@ bool uiohook_LoggerCallback(unsigned int level, const char *format, ...) {
 
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-    	va_list args;
+		va_list args;
 		va_start(args, format);
 		status = logger(env, level, format, args);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed!\n",
+    			__FUNCTION__, __LINE__);
 	}
 
 	return status;

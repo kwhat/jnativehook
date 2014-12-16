@@ -18,7 +18,6 @@
 package org.jnativehook.example;
 
 //Imports
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -28,7 +27,6 @@ import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -78,7 +76,7 @@ import java.util.logging.Logger;
  */
 public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 1541183202160543102L;
+	private static final long serialVersionUID = -2650769602844831098L;
 
 	/** Menu Items */
 	private JMenu menuSubListeners;
@@ -228,7 +226,12 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 				}
 			}
 			else {
-				GlobalScreen.unregisterNativeHook();
+				try {
+					GlobalScreen.unregisterNativeHook();
+				}
+				catch (NativeHookException ex) {
+					txtEventInfo.append("Error: " + ex.getMessage() + "\n");
+				}
 			}
 
 			// Set the enable menu item to the state of the hook.
@@ -439,7 +442,12 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 */
 	public void windowClosed(WindowEvent e) {
 		//Clean up the native hook.
-		GlobalScreen.unregisterNativeHook();
+		try {
+			GlobalScreen.unregisterNativeHook();
+		}
+		catch (NativeHookException ex) {
+			ex.printStackTrace();
+		}
 		System.runFinalization();
 		System.exit(0);
 	}

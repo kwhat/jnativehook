@@ -310,7 +310,7 @@ public class GlobalScreenTest {
 	 * Test of unregisterNativeHook method, of class GlobalScreen.
 	 */
 	@Test
-	public void testUnregisterNativeHook() {
+	public void testUnregisterNativeHook() throws NativeHookException {
 		System.out.println("unregisterNativeHook");
 
 		GlobalScreen.unregisterNativeHook();
