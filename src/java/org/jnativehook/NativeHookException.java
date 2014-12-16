@@ -22,7 +22,7 @@ package org.jnativehook;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	1.3
+ * @version	1.2
  */
 public class NativeHookException extends Exception {
 	/** The Constant serialVersionUID. */
@@ -79,6 +79,10 @@ public class NativeHookException extends Exception {
 	 */
 	public static final int X11_RECORD_ENABLE_CONTEXT		= 0x24;
 
+	/**
+	 * X11 extension XRecord could not enable the context.
+	 */
+	public static final int X11_RECORD_GET_CONTEXT			= 0x25;
 
 	/**
 	 * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for detailed

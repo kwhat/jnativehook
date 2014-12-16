@@ -68,7 +68,7 @@ import java.util.logging.Logger;
  * A demonstration of how to use the JNativeHook library.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.3
+ * @version	1.2
  * @since	1.0
  *
  * @see GlobalScreen
@@ -76,7 +76,7 @@ import java.util.logging.Logger;
  */
 public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 1541183202160543102L;
+	private static final long serialVersionUID = -2650769602844831098L;
 
 	/** Menu Items */
 	private JMenu menuSubListeners;
@@ -234,7 +234,10 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 				}
 			}
 
+			// Set the enable menu item to the state of the hook.
 			menuItemEnable.setState(GlobalScreen.isNativeHookRegistered());
+
+			// Set enable/disable the sub-menus based on the enable menu item's state.
 			menuSubListeners.setEnabled(menuItemEnable.getState());
 		}
 		else if (item == menuItemKeyboardEvents) {

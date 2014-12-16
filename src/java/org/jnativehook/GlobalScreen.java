@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version 1.3
+ * @version 1.2
  */
 public class GlobalScreen {
 	/**
@@ -103,10 +103,13 @@ public class GlobalScreen {
 	 * {@link #unregisterNativeHook} method.  This method will not run until the
 	 * class is garbage collected.
 	 *
+	 * @throws Throwable a <code>NativeHookException</code> raised by calling
+	 *                   {@link #unregisterNativeHook()}
 	 * @see Object#finalize
 	 */
 	@Override
 	protected void finalize() throws Throwable {
+		// Make sure the native thread has stopped.
 		if (GlobalScreen.isNativeHookRegistered()) {
 			GlobalScreen.unregisterNativeHook();
 		}
@@ -395,62 +398,140 @@ public class GlobalScreen {
 		}
 
 		public void run() {
-			if (event.getID() == NativeKeyEvent.NATIVE_KEY_PRESSED) {
-				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeKeyPressed((NativeKeyEvent) event);
+			if (event instanceof NativeKeyEvent) {
+				processKeyEvent((NativeKeyEvent) e);
+			}
+			else if (event instanceof NativeMouseWheelEvent) {
+				processMouseWheelEvent((NativeMouseWheelEvent) e);
+			}
+			else if (event instanceof NativeMouseEvent) {
+				switch (event.getID()) {
+					case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+					case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+						processButtonEvent((NativeMouseEvent) event);
+						break;
+					
+					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+					case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+						processMouseEvent((NativeMouseEvent) event);
+						break;
 				}
 			}
-			else if (event.getID() == NativeKeyEvent.NATIVE_KEY_TYPED) {
-				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeKeyTyped((NativeKeyEvent) event);
-				}
+			else if (event instanceof NativeMouseWheelEvent) {
+				processMouseWheelEvent((NativeMouseWheelEvent) event);
 			}
-			else if (event.getID() == NativeKeyEvent.NATIVE_KEY_RELEASED) {
-				NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeKeyReleased((NativeKeyEvent) event);
-				}
-			}
+		}
 
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_PRESSED) {
-				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMousePressed((NativeMouseEvent) event);
-				}
-			}
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_CLICKED) {
-				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMouseClicked((NativeMouseEvent) event);
-				}
-			}
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_RELEASED) {
-				NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMouseReleased((NativeMouseEvent) event);
-				}
-			}
 
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_MOVED) {
-				NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMouseMoved((NativeMouseEvent) event);
-				}
-			}
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_DRAGGED) {
-				NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMouseDragged((NativeMouseEvent) event);
-				}
-			}
+		/**
+		 * Processes native key events by dispatching them to all registered
+		 * <code>NativeKeyListener</code> objects.
+		 *
+		 * @param e the <code>NativeKeyEvent</code> to dispatch.
+		 * @see NativeKeyEvent
+		 * @see NativeKeyListener
+		 * @see #addNativeKeyListener(NativeKeyListener)
+		 */
+		private void processKeyEvent(final NativeKeyEvent e) {
+			NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
-			else if (event.getID() == NativeMouseEvent.NATIVE_MOUSE_WHEEL) {
-				NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
-				for (int i = 0; i < listeners.length; i++) {
-					listeners[i].nativeMouseWheelMoved((NativeMouseWheelEvent) event);
-				}
+			switch (e.getID()) {
+				case NativeKeyEvent.NATIVE_KEY_PRESSED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeKeyPressed(e);
+					}
+					break;
+
+				case NativeKeyEvent.NATIVE_KEY_TYPED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeKeyTyped(e);
+					}
+					break;
+
+				case NativeKeyEvent.NATIVE_KEY_RELEASED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeKeyReleased(e);
+					}
+					break;
+			}
+		}
+
+		/**
+		 * Processes native mouse button events by dispatching them to all registered
+		 * <code>NativeMouseListener</code> objects.
+		 *
+		 * @param e the <code>NativeMouseEvent</code> to dispatch.
+		 * @see NativeMouseEvent
+		 * @see NativeMouseListener
+		 * @see #addNativeMouseListener(NativeMouseListener)
+		 */
+		private void processButtonEvent(final NativeMouseEvent e) {
+			NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
+
+			switch (e.getID()) {
+				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeMouseClicked(e);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeMousePressed(e);
+					}
+					break;
+
+				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeMouseReleased(e);
+					}
+					break;
+			}
+		}
+		
+		/**
+		 * Processes native mouse events by dispatching them to all registered
+		 * <code>NativeMouseListener</code> objects.
+		 *
+		 * @param e the <code>NativeMouseEvent</code> to dispatch.
+		 * @see NativeMouseEvent
+		 * @see NativeMouseMotionListener
+		 * @see #addNativeMouseMotionListener(NativeMouseMotionListener)
+		 */
+		private void processMouseEvent(final NativeMouseEvent e) {
+			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
+			
+			switch (e.getID()) {
+				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeMouseMoved(e);
+					}
+					break;
+				
+				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+					for (int i = 0; i < listeners.length; i++) {
+						listeners[i].nativeMouseDragged(e);
+					}
+					break;
+			}
+		}
+
+		/**
+		 * Processes native mouse wheel events by dispatching them to all registered
+		 * <code>NativeMouseWheelListener</code> objects.
+		 *
+		 * @param e The <code>NativeMouseWheelEvent</code> to dispatch.
+		 * @see NativeMouseWheelEvent
+		 * @see NativeMouseWheelListener
+		 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
+		 * @since 1.1
+		 */
+		private void processMouseWheelEvent(final NativeMouseWheelEvent e) {
+			NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
+			
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].nativeMouseWheelMoved(e);
 			}
 		}
 	}
