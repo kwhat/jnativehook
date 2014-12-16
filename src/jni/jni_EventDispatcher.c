@@ -43,6 +43,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 		if (GlobalScreen_object == NULL) {
 			// FIXME NULL Pointer exception.
+			return;
 		}
 
 		jobject hookThread_object;
@@ -198,25 +199,25 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			default:
-				// FIXME Exception
-				break;
+				// We didn't receive an event we know what to do with.
+				// TODO Warning.
+				return;
 		}
 
-		// FIXME if ! check exception.
-		if (NativeInputEvent_object != NULL) {
-			(*env)->CallVoidMethod(
-					env,
-					GlobalScreen_object,
-					org_jnativehook_GlobalScreen->dispatchEvent,
-					NativeInputEvent_object);
 
-			// Set the propagate flag from java.
-			event->reserved = (unsigned short) (*env)->GetShortField(
-					env,
-					NativeInputEvent_object,
-					org_jnativehook_NativeInputEvent->reserved);
+		// Dispatch the event.
+		(*env)->CallVoidMethod(
+				env,
+				GlobalScreen_object,
+				org_jnativehook_GlobalScreen->dispatchEvent,
+				NativeInputEvent_object);
 
-			(*env)->DeleteLocalRef(env, GlobalScreen_object);
-		}
+		// Set the propagate flag from java.
+		event->reserved = (unsigned short) (*env)->GetShortField(
+				env,
+				NativeInputEvent_object,
+				org_jnativehook_NativeInputEvent->reserved);
+
+		(*env)->DeleteLocalRef(env, GlobalScreen_object);
 	}
 }
