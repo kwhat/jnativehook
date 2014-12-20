@@ -262,12 +262,19 @@
 		</condition>
 
 
+		<!-- Set system specific toolchain. -->
+		<condition property="ant.build.native.toolchain" value="clang">
+			<isset property="native.os.isDarwin" />
+		</condition>
+		<property name="ant.build.native.toolchain" value="gcc" />
+
+
 		<!-- Set system specific library name. -->
 		<condition property="ant.build.native.executable" value="lib${ant.project.name}.dylib">
-			<equals arg1="${ant.build.native.os}" arg2="darwin" />
+			<isset property="native.os.isDarwin" />
 		</condition>
 		<condition property="ant.build.native.executable" value="${ant.project.name}.dll">
-			<equals arg1="${ant.build.native.os}" arg2="windows" />
+			<isset property="native.os.isWindows" />
 		</condition>
 		<property name="ant.build.native.executable" value="lib${ant.project.name}.so" />
 
@@ -316,7 +323,7 @@
 		<echo>Configuring libUIOHook source...</echo>
 		<mkdir dir="${dir.bin}/libuiohook" />
 
-		<configure dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}">
+		<configure toolchain="${ant.build.native.toolchain}" dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}">
 			<env key="CFLAGS" value="${ant.build.native.cflags}" />
 			<env key="LDFLAGS" value="${ant.build.native.ldflags}" />
 
