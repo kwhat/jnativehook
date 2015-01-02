@@ -1,4 +1,4 @@
 # Build number properties for Ant.
 
-ant.build.major=1
-ant.build.minor=2
+ant.build.major=2
+ant.build.minor=0
