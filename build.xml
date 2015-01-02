@@ -47,6 +47,7 @@
 		<pathelement location="${dir.bin}/class/test" />
 		<fileset dir="${dir.jar}">
 			<include name="**/*.jar" />
+			<exclude name="**/${ant.project.name}.jar" />
 		</fileset>
 		<pathelement location="${dir.lib}" />
 
@@ -344,7 +345,6 @@
 
 
 	<target name="compile-java" depends="init" description="Compiles Java source files.">
-
 		<echo>Compiling Java source...</echo>
 		<mkdir dir="${dir.bin}/class/java" />
 
@@ -391,6 +391,7 @@
 		<!-- Execute the native compiler on the source files. -->
 		<cc toolchain="${ant.build.native.toolchain}" jobs="${ant.build.native.jobs}" objdir="${dir.bin}/obj/jni">
 			<arg value="-Wall -Wextra -Wno-unused-parameter" />
+			<arg value="-std=c99" />
 			<arg value="-fPIC" unless="native.os.isWindows" />
 			<arg value="${ant.build.native.cflags}" />
 
