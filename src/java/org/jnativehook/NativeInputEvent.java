@@ -138,7 +138,7 @@ public class NativeInputEvent extends EventObject {
 	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
 	 */
-	public NativeInputEvent(GlobalScreen source, int id, long when, int modifiers) {
+	public NativeInputEvent(Class<GlobalScreen> source, int id, long when, int modifiers) {
 		super(source);
 
 		this.id = id;

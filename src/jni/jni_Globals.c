@@ -42,11 +42,8 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 		// Get the field ID for hookThread.
     	jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
 
-		// Get the method ID for GlobalScreen.getInstance().
-		jmethodID getInstance = (*env)->GetStaticMethodID(env, GlobalScreen_class, "getInstance", "()Lorg/jnativehook/GlobalScreen;");
-
 		// Get the method ID for GlobalScreen.dispatchEvent().
-		jmethodID dispatchEvent = (*env)->GetMethodID(env, GlobalScreen_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+		jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, GlobalScreen_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
 
 		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
 			org_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
@@ -54,7 +51,6 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 				// Populate our structure for later use.
 				org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
 				org_jnativehook_GlobalScreen->hookThread = hookThread;
-				org_jnativehook_GlobalScreen->getInstance = getInstance;
 				org_jnativehook_GlobalScreen->dispatchEvent = dispatchEvent;
 
 				status = JNI_OK;
@@ -135,7 +131,7 @@ static inline int create_NativeInputEvent(JNIEnv *env) {
 		jfieldID reserved = (*env)->GetFieldID(env, NativeInputEvent_class, "reserved", "S");
 
 		// Get the method ID for NativeInputEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeInputEvent_class, "<init>", "(Lorg/jnativehook/GlobalScreen;IJI)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeInputEvent_class, "<init>", "(Ljava/lang/Class;IJI)V");
 
 		// Get the method ID for NativeInputEvent.getID().
 		jmethodID getID = (*env)->GetMethodID(env, NativeInputEvent_class, "getID", "()I");

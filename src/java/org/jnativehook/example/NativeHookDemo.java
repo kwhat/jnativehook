@@ -93,7 +93,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 * Instantiates a new native hook demo.
 	 */
 	public NativeHookDemo() {
-		//Setup the main window.
+		// Setup the main window.
 		setTitle("JNativeHook Demo");
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -102,7 +102,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
 		JMenuBar menuBar = new JMenuBar();
 
-		//Create the file menu.
+		// Create the file menu.
 		JMenu menuFile = new JMenu("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuFile);
@@ -113,7 +113,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		menuItemQuit.getAccessibleContext().setAccessibleDescription("Exit the program");
 		menuFile.add(menuItemQuit);
 
-		//Create the view.
+		// Create the view.
 		JMenu menuView = new JMenu("View");
 		menuView.setMnemonic(KeyEvent.VK_V);
 		menuBar.add(menuView);
@@ -132,7 +132,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		menuItemEnable.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
 		menuView.add(menuItemEnable);
 
-		//Create the listeners sub menu.
+		// Create the listeners sub menu.
 		menuSubListeners = new JMenu("Listeners");
 		menuSubListeners.setMnemonic(KeyEvent.VK_L);
 		menuView.add(menuSubListeners);
@@ -190,7 +190,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		 * thread, you *MUST* wrap access to Swing components using the
 		 * SwingUtilities.invokeLater() or EventQueue.invokeLater() methods.
 		 */
-		GlobalScreen.getInstance().setEventDispatcher(new SwingExecutorService());
+		GlobalScreen.setEventDispatcher(new SwingExecutorService());
 		
 		setVisible(true);
 	}
@@ -214,11 +214,11 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		ItemSelectable item = e.getItemSelectable();
 
 		if (item == menuItemEnable) {
-			//Keyboard checkbox was changed, adjust listeners accordingly
+			// Keyboard checkbox was changed, adjust listeners accordingly.
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				try {
-					//Initialze native hook.  This is done on window open because the
-					//listener requires the txtEventInfo object to be constructed.
+					// Initialize native hook.  This is done on window open because the
+					// listener requires the txtEventInfo object to be constructed.
 					GlobalScreen.registerNativeHook();
 				}
 				catch (NativeHookException ex) {
@@ -241,39 +241,39 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 			menuSubListeners.setEnabled(menuItemEnable.getState());
 		}
 		else if (item == menuItemKeyboardEvents) {
-			//Keyboard checkbox was changed, adjust listeners accordingly
+			// Keyboard checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
-				GlobalScreen.getInstance().addNativeKeyListener(this);
+				GlobalScreen.addNativeKeyListener(this);
 			}
 			else {
-				GlobalScreen.getInstance().removeNativeKeyListener(this);
+				GlobalScreen.removeNativeKeyListener(this);
 			}
 		}
 		else if (item == menuItemButtonEvents) {
-			//Button checkbox was changed, adjust listeners accordingly
+			// Button checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
-				GlobalScreen.getInstance().addNativeMouseListener(this);
+				GlobalScreen.addNativeMouseListener(this);
 			}
 			else {
-				GlobalScreen.getInstance().removeNativeMouseListener(this);
+				GlobalScreen.removeNativeMouseListener(this);
 			}
 		}
 		else if (item == menuItemMotionEvents) {
-			//Motion checkbox was changed, adjust listeners accordingly
+			// Motion checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
-				GlobalScreen.getInstance().addNativeMouseMotionListener(this);
+				GlobalScreen.addNativeMouseMotionListener(this);
 			}
 			else {
-				GlobalScreen.getInstance().removeNativeMouseMotionListener(this);
+				GlobalScreen.removeNativeMouseMotionListener(this);
 			}
 		}
 		else if (item == menuItemWheelEvents) {
-			//Motion checkbox was changed, adjust listeners accordingly
+			// Motion checkbox was changed, adjust listeners accordingly
 			if (e.getStateChange() == ItemEvent.SELECTED) {
-				GlobalScreen.getInstance().addNativeMouseWheelListener(this);
+				GlobalScreen.addNativeMouseWheelListener(this);
 			}
 			else {
-				GlobalScreen.getInstance().removeNativeMouseWheelListener(this);
+				GlobalScreen.removeNativeMouseWheelListener(this);
 			}
 		}
 	}
@@ -405,14 +405,13 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
-		//Return the focus to the window.
+		// Return the focus to the window.
 		this.requestFocusInWindow();
 
-		//Enable the hook, this will cause the GlobalScreen to be initilized.
+		// Enable the hook, this will cause the GlobalScreen to be initilized.
 		menuItemEnable.setSelected(true);
 
-		//Please note that these properties are not available until after the
-		//GlobalScreen class is initialized.
+		// Please note that these properties are not available until after the GlobalScreen class is initialized.
 		txtEventInfo.append("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
 		txtEventInfo.append("\nAuto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
 		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
@@ -428,7 +427,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 			txtEventInfo.setCaretPosition(txtEventInfo.getDocument().getLength());
 		}
 
-		//Enable all of the listeners.
+		// Enable all of the listeners.
 		menuItemKeyboardEvents.setSelected(true);
 		menuItemButtonEvents.setSelected(true);
 		menuItemMotionEvents.setSelected(true);
@@ -441,7 +440,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
 	 */
 	public void windowClosed(WindowEvent e) {
-		//Clean up the native hook.
+		// Clean up the native hook.
 		try {
 			GlobalScreen.unregisterNativeHook();
 		}

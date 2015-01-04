@@ -217,7 +217,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @since 1.1
 	 */
 	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount, int button) {
-		super(GlobalScreen.getInstance(), id, when, modifiers);
+		super(GlobalScreen.class, id, when, modifiers);
 
 		this.x = x;
 		this.y = y;

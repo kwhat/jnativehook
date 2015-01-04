@@ -338,7 +338,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * @since 1.1
 	 */
 	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation) {
-		super(GlobalScreen.getInstance(), id, when, modifiers);
+		super(GlobalScreen.class, id, when, modifiers);
 
 		this.rawCode = rawCode;
 		this.keyCode = keyCode;

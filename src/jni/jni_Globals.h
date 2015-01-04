@@ -35,7 +35,6 @@ extern JavaVMAttachArgs jvm_attach_args;
 typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
 	jfieldID hookThread;
-	jmethodID getInstance;
 	jmethodID dispatchEvent;
 } GlobalScreen;
 
