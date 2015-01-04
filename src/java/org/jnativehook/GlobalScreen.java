@@ -108,7 +108,7 @@ public class GlobalScreen {
 	}
 
 
-	private GlobalScreen() { }
+	protected GlobalScreen() { }
 
 
 	/**
@@ -223,6 +223,7 @@ public class GlobalScreen {
 		}
 	}
 
+	// FIXME comment.
 	private static class NativeHookThread extends Thread {
 		private NativeHookException exception;
 
@@ -371,6 +372,7 @@ public class GlobalScreen {
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
 
+	// FIXME this needs to be extendable....
 	private static class EventDispatchTask implements Runnable {
 		private NativeInputEvent event;
 
