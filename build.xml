@@ -556,9 +556,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<include name="java/**/*" />
 				<include name="jni/**/*" />
 				<include name="test/**/*" />
+				<include name="libuiohook/**/*" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen.h" />
+				<exclude name="jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />
+				<exclude name="jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h" />
 				<exclude name="jnitasks/" />
-				<exclude name="libuiohook/" />
 			</zipfileset>
 
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
