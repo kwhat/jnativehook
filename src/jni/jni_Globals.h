@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -35,7 +35,6 @@ extern JavaVMAttachArgs jvm_attach_args;
 typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
 	jfieldID hookThread;
-	jmethodID getInstance;
 	jmethodID dispatchEvent;
 } GlobalScreen;
 

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -180,8 +180,8 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		default:
 			// TODO Should this thrown an exception?
 
-			jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type!\n",
-					__FUNCTION__, __LINE__);
+			jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
+					__FUNCTION__, __LINE__, javaType);
 			break;
 	}
 

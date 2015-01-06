@@ -15,18 +15,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jnativehook.mouse;
+package org.jnativehook;
+
+// Imports.
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * A listener implementing all the methods in both the NativeMouseListener and
- * NativeMouseMotionListener interfaces.
+ * Default implementation of the <code>ExecutorService</code> used to dispatch native events.  This is effectively
+ * the same as calling {@link java.util.concurrent.Executors#newSingleThreadExecutor}.
+ * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	2.0
- * @since	1.0
+ * @since	2.0
  *
- * @see NativeMouseEvent
+ * @see  java.util.concurrent.ExecutorService
+ * @see  org.jnativehook.GlobalScreen#setEventDispatcher
  */
-public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {
+public class DefaultDispatchService extends ThreadPoolExecutor {
+	public DefaultDispatchService() {
+		super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setName("JNativeHook Dispatch Thread");
+				t.setDaemon(true);
 
+				return t;
+			}
+		});
+	}
 }

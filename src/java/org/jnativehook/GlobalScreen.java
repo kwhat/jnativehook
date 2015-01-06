@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -27,20 +27,8 @@ import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
 import javax.swing.event.EventListenerList;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.net.URL;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.jar.Attributes;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
 /**
@@ -54,19 +42,11 @@ import java.util.logging.Logger;
  * listeners.
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @since	1.0
- * @version 1.2
+ * @version 2.0
+ * @since 1.0
  */
-public class GlobalScreen {
-	/**
-	 * The GlobalScreen singleton.
-	 */
-	private static final GlobalScreen instance = new GlobalScreen();
-
-	/**
-	 * The list of event listeners to notify.
-	 */
-	private static final EventListenerList eventListeners = new EventListenerList();
+public final class GlobalScreen {
+	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
 	 * The service to control the hook.
@@ -76,58 +56,47 @@ public class GlobalScreen {
 	/**
 	 * The service to dispatch events.
 	 */
-	private static ExecutorService eventExecutor;
+	private static ExecutorService eventExecutor = new DefaultDispatchService();
 
 	/**
-	 * Private constructor to prevent multiple instances of the global screen.
-	 * The {@link #registerNativeHook} method will be called on construction to
-	 * unpack and load the native library.
+	 * The list of event listeners to notify.
 	 */
-	private GlobalScreen() {
-		// Unpack and Load the native library.
-		GlobalScreen.loadNativeLibrary();
+	private static EventListenerList eventListeners = new EventListenerList();
 
-		eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				t.setName("JNativeHook Dispatch Thread");
-				t.setDaemon(true);
 
-				return t;
-			}
-		});
-	}
+	static {
+		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
 
-	/**
-	 * A destructor that will perform native cleanup by calling the
-	 * {@link #unregisterNativeHook} method.  This method will not run until the
-	 * class is garbage collected.
-	 *
-	 * @throws Throwable a <code>NativeHookException</code> raised by calling
-	 *                   {@link #unregisterNativeHook()}
-	 * @see Object#finalize
-	 */
-	@Override
-	protected void finalize() throws Throwable {
-		// Make sure the native thread has stopped.
-		if (GlobalScreen.isNativeHookRegistered()) {
-			GlobalScreen.unregisterNativeHook();
+		try {
+			// Try to load the native library assuming the java.library.path was set correctly at launch.
+			System.loadLibrary(libName);
 		}
+		catch (UnsatisfiedLinkError linkError) {
+			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultLibraryLoader");
 
-		// Shutdown the current Event executor.
-		eventExecutor.shutdownNow();
+			try {
+				// Use the specified class to load the native library.
+				NativeLibraryLoader loader = Class.forName(libLoader).asSubclass(NativeLibraryLoader.class).newInstance();
 
-		super.finalize();
+				Iterator<File> libs = loader.getLibraries();
+				while (libs.hasNext()) {
+					File lib = libs.next();
+					if (lib.exists() && lib.isFile() && lib.canRead()) {
+						System.load(lib.getPath());
+					}
+				}
+			}
+			catch (Exception e) {
+				// There was a problem instantiating the library loader.
+				log.severe(e.getMessage());
+
+				throw new UnsatisfiedLinkError(e.getMessage());
+			}
+		}
 	}
 
-	/**
-	 * Returns the singleton instance of <code>GlobalScreen</code>.
-	 *
-	 * @return singleton instance of <code>GlobalScreen</code>
-	 */
-	public static synchronized GlobalScreen getInstance() {
-		return GlobalScreen.instance;
-	}
+
+	private GlobalScreen() { }
 
 
 	/**
@@ -137,7 +106,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native key listener object
 	 */
-	public void addNativeKeyListener(NativeKeyListener listener) {
+	public static void addNativeKeyListener(NativeKeyListener listener) {
 		if (listener != null) {
 			eventListeners.add(NativeKeyListener.class, listener);
 		}
@@ -151,7 +120,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native key listener object
 	 */
-	public void removeNativeKeyListener(NativeKeyListener listener) {
+	public static void removeNativeKeyListener(NativeKeyListener listener) {
 		if (listener != null) {
 			eventListeners.remove(NativeKeyListener.class, listener);
 		}
@@ -164,7 +133,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native mouse listener object
 	 */
-	public void addNativeMouseListener(NativeMouseListener listener) {
+	public static void addNativeMouseListener(NativeMouseListener listener) {
 		if (listener != null) {
 			eventListeners.add(NativeMouseListener.class, listener);
 		}
@@ -178,7 +147,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native mouse listener object
 	 */
-	public void removeNativeMouseListener(NativeMouseListener listener) {
+	public static void removeNativeMouseListener(NativeMouseListener listener) {
 		if (listener != null) {
 			eventListeners.remove(NativeMouseListener.class, listener);
 		}
@@ -191,7 +160,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native mouse motion listener object
 	 */
-	public void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
+	public static void addNativeMouseMotionListener(NativeMouseMotionListener listener) {
 		if (listener != null) {
 			eventListeners.add(NativeMouseMotionListener.class, listener);
 		}
@@ -206,7 +175,7 @@ public class GlobalScreen {
 	 *
 	 * @param listener a native mouse motion listener object
 	 */
-	public void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
+	public static void removeNativeMouseMotionListener(NativeMouseMotionListener listener) {
 		if (listener != null) {
 			eventListeners.remove(NativeMouseMotionListener.class, listener);
 		}
@@ -220,7 +189,7 @@ public class GlobalScreen {
 	 * @param listener a native mouse wheel listener object
 	 * @since 1.1
 	 */
-	public void addNativeMouseWheelListener(NativeMouseWheelListener listener) {
+	public static void addNativeMouseWheelListener(NativeMouseWheelListener listener) {
 		if (listener != null) {
 			eventListeners.add(NativeMouseWheelListener.class, listener);
 		}
@@ -236,12 +205,13 @@ public class GlobalScreen {
 	 * @param listener a native mouse wheel listener object
 	 * @since 1.1
 	 */
-	public void removeNativeMouseWheelListener(NativeMouseWheelListener listener) {
+	public static void removeNativeMouseWheelListener(NativeMouseWheelListener listener) {
 		if (listener != null) {
 			eventListeners.remove(NativeMouseWheelListener.class, listener);
 		}
 	}
 
+	// FIXME comment.
 	private static class NativeHookThread extends Thread {
 		private NativeHookException exception;
 
@@ -386,11 +356,12 @@ public class GlobalScreen {
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the native system.
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
 
-	private class EventDispatchTask implements Runnable {
+	// FIXME Comment.
+	private static class EventDispatchTask implements Runnable {
 		private NativeInputEvent event;
 
 		public EventDispatchTask(NativeInputEvent event) {
@@ -411,7 +382,7 @@ public class GlobalScreen {
 					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
 						processButtonEvent((NativeMouseEvent) event);
 						break;
-					
+
 					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
 					case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
 						processMouseEvent((NativeMouseEvent) event);
@@ -489,7 +460,7 @@ public class GlobalScreen {
 					break;
 			}
 		}
-		
+
 		/**
 		 * Processes native mouse events by dispatching them to all registered
 		 * <code>NativeMouseListener</code> objects.
@@ -501,14 +472,14 @@ public class GlobalScreen {
 		 */
 		private void processMouseEvent(final NativeMouseEvent e) {
 			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
-			
+
 			switch (e.getID()) {
 				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
 					for (int i = 0; i < listeners.length; i++) {
 						listeners[i].nativeMouseMoved(e);
 					}
 					break;
-				
+
 				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
 					for (int i = 0; i < listeners.length; i++) {
 						listeners[i].nativeMouseDragged(e);
@@ -529,7 +500,7 @@ public class GlobalScreen {
 		 */
 		private void processMouseWheelEvent(final NativeMouseWheelEvent e) {
 			NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
-			
+
 			for (int i = 0; i < listeners.length; i++) {
 				listeners[i].nativeMouseWheelMoved(e);
 			}
@@ -551,7 +522,7 @@ public class GlobalScreen {
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
-	public final void dispatchEvent(NativeInputEvent e) {
+	public static void dispatchEvent(NativeInputEvent e) {
 		if (eventExecutor != null) {
 			eventExecutor.execute(new EventDispatchTask(e));
 		}
@@ -570,149 +541,13 @@ public class GlobalScreen {
 	 * @param dispatcher The <code>ExecutorService</code> used to dispatch native events.
 	 * @see java.util.concurrent.ExecutorService
 	 * @see java.util.concurrent.Executors#newSingleThreadExecutor()
-	 * @since 1.2
+	 * @since 2.0
 	 */
-	public final void setEventDispatcher(ExecutorService dispatcher) {
+	public static void setEventDispatcher(ExecutorService dispatcher) {
 		if (GlobalScreen.eventExecutor != null) {
 			GlobalScreen.eventExecutor.shutdown();
 		}
 
 		GlobalScreen.eventExecutor = dispatcher;
-	}
-
-	/**
-	 * Perform procedures to interface with the native library. These procedures
-	 * include unpacking and loading the library into the Java Virtual Machine.
-	 */
-	private static void loadNativeLibrary() {
-		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
-
-		try {
-			// Try to load the native library assuming the java.library.path was
-			// set correctly at launch.
-			System.loadLibrary(libName);
-		}
-		catch (UnsatisfiedLinkError linkError) {
-			// Get the package name for the GlobalScreen.
-			String basePackage = GlobalScreen.class.getPackage().getName().replace('.', '/');
-
-			// Compile the resource path for the
-			StringBuilder libResourcePath = new StringBuilder("/");
-			libResourcePath.append(basePackage).append("/lib/");
-			libResourcePath.append(NativeSystem.getFamily()).append('/');
-			libResourcePath.append(NativeSystem.getArchitecture()).append('/');
-
-
-			// Get what the system "thinks" the library name should be.
-			String libNativeName = System.mapLibraryName(libName);
-			// Hack for OS X JRE 1.6 and earlier.
-			libNativeName = libNativeName.replaceAll("\\.jnilib$", "\\.dylib");
-
-			// Slice up the library name.
-			int i = libNativeName.lastIndexOf('.');
-			String libNativePrefix = libNativeName.substring(0, i) + '-';
-			String libNativeSuffix = libNativeName.substring(i);
-			String libNativeVersion = null;
-
-			// This may return null in some circumstances.
-			InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString().toLowerCase() + libNativeName);
-			if (libInputStream != null) {
-				try {
-					// Try and load the Jar manifest as a resource stream.
-					URL jarFile = GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation();
-					JarInputStream jarInputStream = new JarInputStream(jarFile.openStream());
-
-					// Try and extract a version string from the Manifest.
-					Manifest manifest = jarInputStream.getManifest();
-					if (manifest != null) {
-						Attributes attributes = manifest.getAttributes(basePackage);
-
-						if (attributes != null) {
-							String version = attributes.getValue("Specification-Version");
-							String revision = attributes.getValue("Implementation-Version");
-
-							libNativeVersion = version + '.' + revision;
-						}
-						else {
-							Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Invalid library manifest!\n");
-						}
-					}
-					else {
-						Logger.getLogger(GlobalScreen.class.getPackage().getName()).warning("Cannot find library manifest!\n");
-					}
-				}
-				catch (IOException e) {
-					Logger.getLogger(GlobalScreen.class.getPackage().getName()).severe(e.getMessage());
-				}
-
-
-				try {
-					// The temp file for this instance of the library.
-					File libFile;
-
-					// If we were unable to extract a library version from the manifest.
-					if (libNativeVersion != null) {
-						libFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
-					}
-					else {
-						libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
-					}
-
-					byte[] buffer = new byte[4 * 1024];
-					int size;
-
-					// Check and see if a copy of the native lib already exists.
-					FileOutputStream libOutputStream = new FileOutputStream(libFile);
-
-					// Setup a digest...
-					MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-					DigestInputStream digestInputStream = new DigestInputStream(libInputStream, sha1);
-
-					// Read from the digest stream and write to the file steam.
-					while ((size = digestInputStream.read(buffer)) != -1) {
-						libOutputStream.write(buffer, 0, size);
-					}
-
-					// Close all the streams.
-					digestInputStream.close();
-					libInputStream.close();
-					libOutputStream.close();
-
-					// Convert the digest from byte[] to hex string.
-					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16).toUpperCase();
-					if (libNativeVersion == null) {
-						// Use the sha1 sum as a version finger print.
-						libNativeVersion = sha1Sum;
-
-						// Better late than never.
-						File newFile = new File(System.getProperty("java.io.tmpdir"), libNativePrefix + libNativeVersion + libNativeSuffix);
-						if (libFile.renameTo(newFile)) {
-							libFile = newFile;
-						}
-					}
-
-					// Set the library version property.
-					System.setProperty("jnativehook.lib.version", libNativeVersion);
-
-					// Load the native library.
-					System.load(libFile.getPath());
-
-					Logger.getLogger(GlobalScreen.class.getPackage().getName())
-							.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
-				}
-				catch (IOException e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
-				catch (NoSuchAlgorithmException e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
-			}
-			else {
-				Logger.getLogger(GlobalScreen.class.getPackage().getName())
-						.severe("Unable to extract the native library " + libResourcePath.toString().toLowerCase() + libNativeName + "!\n");
-
-				throw new UnsatisfiedLinkError();
-			}
-		}
 	}
 }

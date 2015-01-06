@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -54,7 +54,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 				if (println_id != NULL && out != NULL) {
 					jstring copyright = (*env)->NewStringUTF(env, "\n"
 							"JNativeHook: Global keyboard and mouse hooking for Java.\n"
-							"Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.\n"
+							"Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.\n"
 							"https://github.com/kwhat/jnativehook/\n"
 							"\n"
 							"JNativeHook is free software: you can redistribute it and/or modify\n"

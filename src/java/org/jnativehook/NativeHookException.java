@@ -1,6 +1,6 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnativehook/
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
+ * http://code.google.com/p/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,54 +22,54 @@ package org.jnativehook;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	1.2
+ * @version	2.0
  */
 public class NativeHookException extends Exception {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -7944506738553380757L;
+	private static final long serialVersionUID = 8952825837670265527L;
 
 	/** The error code associated with this exception. */
-	private int code = NativeHookException.UNKNOWN_FAILURE;
+	private int code = NativeHookException.UNSPECIFIED_FAILURE;
 
 	/**
-	 * Unknown failure error code.
+	 * Unspecified failure error code.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
-	public static final int UNKNOWN_FAILURE					= 0x00;
+	public static final int UNSPECIFIED_FAILURE				= 0x00;
 
 	/**
 	 * General failure error code.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int HOOK_FAILURE					= 0x01;
 
 	/**
 	 * X11 open display error code.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int X11_OPEN_DISPLAY				= 0x20;
 
 	/**
 	 * X11 extension XRecord was not found.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int X11_RECORD_NOT_FOUND			= 0x21;
 
 	/**
 	 * X11 extension XRecord could not allocate range.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int X11_RECORD_ALLOC_RANGE			= 0x22;
 
 	/**
 	 * X11 extension XRecord could not create a context.
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int X11_RECORD_CREATE_CONTEXT		= 0x23;
 
@@ -87,7 +87,7 @@ public class NativeHookException extends Exception {
 	/**
 	 * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for detailed
 	 *
-	 * @since	1.2
+	 * @since	2.0
 	 */
 	public static final int WIN_SET_HOOK					= 0x30;
 
@@ -127,10 +127,10 @@ public class NativeHookException extends Exception {
 	}
 
 
-	 /**
+	/**
 	 * Instantiates a new <code>NativeHookException</code> with a specified error code and null as its detail message.
 	 *
-	 * @since 1.2
+	 * @since 2.0
 	 *
 	 * @param code The native error code.
 	 */
@@ -153,7 +153,7 @@ public class NativeHookException extends Exception {
 	/**
 	 * Instantiates a new <code>NativeHookException</code> with a specified code and detail message.
 	 *
-	 * @since 1.2
+	 * @since 2.0
 	 *
 	 * @param code The native error code.
 	 * @param message The detail message.
@@ -177,7 +177,7 @@ public class NativeHookException extends Exception {
 	/**
 	 * Instantiates a new <code>NativeHookException</code> with a specified error code, detail message and cause.
 	 *
-	 * @since 1.2
+	 * @since 2.0
 	 *
 	 * @param code The native error code.
 	 * @param message The detail message.
@@ -212,7 +212,7 @@ public class NativeHookException extends Exception {
 	/**
 	 * Get the native error code associated with this exception.
 	 *
-	 * @since 1.2
+	 * @since 2.0
 	 *
 	 * @return The native error code
 	 */

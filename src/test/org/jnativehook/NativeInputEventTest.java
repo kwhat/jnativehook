@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  */
 package org.jnativehook;
 
+// Imports.
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +32,7 @@ public class NativeInputEventTest {
 		System.out.println("getID");
 
 		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.getInstance(),
+				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
 				0x00);
@@ -49,7 +50,7 @@ public class NativeInputEventTest {
 		long when = System.currentTimeMillis();
 
 		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.getInstance(),
+				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				when,
 				0x00);
@@ -70,7 +71,7 @@ public class NativeInputEventTest {
 					NativeInputEvent.SHIFT_MASK;
 
 		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.getInstance(),
+				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
 				mask);
@@ -92,7 +93,7 @@ public class NativeInputEventTest {
 					NativeInputEvent.BUTTON5_MASK;
 
 		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.getInstance(),
+				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
 				0x00);
@@ -122,7 +123,7 @@ public class NativeInputEventTest {
 		System.out.println("paramString");
 
 		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.getInstance(),
+				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
 				NativeInputEvent.SHIFT_MASK |

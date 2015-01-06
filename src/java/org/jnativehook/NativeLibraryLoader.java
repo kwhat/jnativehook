@@ -15,30 +15,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jnativehook.mouse.listeners;
+package org.jnativehook;
 
 // Imports.
-import org.jnativehook.mouse.NativeMouseWheelEvent;
-import org.jnativehook.mouse.NativeMouseWheelListener;
+import java.io.File;
+import java.util.Iterator;
 
-public class NativeMouseWheelListenerImpl implements NativeMouseWheelListener {
-	private NativeMouseWheelEvent lastEvent;
+/**
+ * Interface used for native library loading.  This interface should be implemented to alter the way the native library
+ * is loaded.  Set the <code>jnativehook.lib.loader</code> property prior to loading the <code>GlobalScreen</code>
+ * class, If no property is specified, <code>DefaultNativeLibraryLoader</code> will be used.
+ * <p>
+ *
+ * @author  Aidas Adomkus (vasiukai@gmail.com)
+ * @version	2.0
+ * @since	2.0
+ *
+ * @see org.jnativehook.NativeLibraryLoader
+ * @see org.jnativehook.DefaultLibraryLoader
+ */
+public interface NativeLibraryLoader {
 
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-		System.out.println("Received " + e.paramString());
-
-		if (e.getID() != NativeMouseWheelEvent.NATIVE_MOUSE_WHEEL) {
-			throw new IllegalArgumentException("Invalid event type received for nativeMouseWheelMoved!");
-		}
-
-		lastEvent = e;
-
-		synchronized(this) {
-			this.notifyAll();
-		}
-	}
-
-	public NativeMouseWheelEvent getLastEvent() {
-		return lastEvent;
-	}
+	/**
+	 * Perform procedures to interface with the native library. These procedures may include acquiring, unpacking and
+	 * loading the library into the Java Virtual Machine.
+	 */
+	public Iterator<File> getLibraries();
 }

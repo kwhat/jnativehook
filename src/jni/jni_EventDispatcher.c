@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -31,17 +31,19 @@
 
 // Simple function to notify() the hook thread.
 static inline void notifyHookThread(JNIEnv *env) {
-	jobject hookThread_object = (*env)->GetStaticObjectField(
+	jobject hookThread_obj = (*env)->GetStaticObjectField(
 			env,
 			java_lang_Object->cls,
 			org_jnativehook_GlobalScreen->hookThread);
 
-	(*env)->MonitorEnter(env, hookThread_object);
-	(*env)->CallVoidMethod(
-			env,
-			hookThread_object,
-			java_lang_Object->notify);
-	(*env)->MonitorExit(env, hookThread_object);
+	if (hookThread_obj != NULL) {
+		(*env)->MonitorEnter(env, hookThread_obj);
+		(*env)->CallVoidMethod(
+				env,
+				hookThread_obj,
+				java_lang_Object->notify);
+		(*env)->MonitorExit(env, hookThread_obj);
+	}
 }
 
 // NOTE: This function executes on the hook thread!  If you need to block
@@ -49,16 +51,7 @@ static inline void notifyHookThread(JNIEnv *env) {
 void jni_EventDispatcher(uiohook_event * const event) {
 	JNIEnv *env;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-		jobject NativeInputEvent_object = NULL;
-		jobject GlobalScreen_object = (*env)->CallStaticObjectMethod(
-				env,
-				org_jnativehook_GlobalScreen->cls,
-				org_jnativehook_GlobalScreen->getInstance);
-
-		if (GlobalScreen_object == NULL) {
-			jni_ThrowException(env, "java/lang/NullPointerException", "No GlobalScreen instance available.");
-			notifyHookThread(env);
-		}
+		jobject NativeInputEvent_obj = NULL;
 
 		jint location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
 		switch (event->type) {
@@ -70,7 +63,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 			case EVENT_KEY_PRESSED:
 				if (jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location) == JNI_OK) {
-					NativeInputEvent_object = (*env)->NewObject(
+					NativeInputEvent_obj = (*env)->NewObject(
 							env,
 							org_jnativehook_keyboard_NativeKeyEvent->cls,
 							org_jnativehook_keyboard_NativeKeyEvent->init,
@@ -86,7 +79,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 			case EVENT_KEY_RELEASED:
 					if (jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location) == JNI_OK) {
-						NativeInputEvent_object = (*env)->NewObject(
+						NativeInputEvent_obj = (*env)->NewObject(
 								env,
 								org_jnativehook_keyboard_NativeKeyEvent->cls,
 								org_jnativehook_keyboard_NativeKeyEvent->init,
@@ -101,7 +94,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_KEY_TYPED:
-					NativeInputEvent_object = (*env)->NewObject(
+					NativeInputEvent_obj = (*env)->NewObject(
 							env,
 							org_jnativehook_keyboard_NativeKeyEvent->cls,
 							org_jnativehook_keyboard_NativeKeyEvent->init,
@@ -109,14 +102,14 @@ void jni_EventDispatcher(uiohook_event * const event) {
 							(jlong)	event->time,
 							(jint)	event->mask,
 							(jint)	event->data.keyboard.rawcode,
-							(jint)	org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
+							(jint)	org_jnativehook_keyboard_NativeKeyEvent_VC_UNDEFINED,
 							(jchar)	event->data.keyboard.keychar,
 							location);
 				break;
 
 
 			case EVENT_MOUSE_PRESSED:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
@@ -130,7 +123,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_MOUSE_RELEASED:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
@@ -144,7 +137,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_MOUSE_CLICKED:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
@@ -158,7 +151,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_MOUSE_MOVED:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
@@ -172,7 +165,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_MOUSE_DRAGGED:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
@@ -186,7 +179,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_MOUSE_WHEEL:
-				NativeInputEvent_object = (*env)->NewObject(
+				NativeInputEvent_obj = (*env)->NewObject(
 						env,
 						org_jnativehook_mouse_NativeMouseWheelEvent->cls,
 						org_jnativehook_mouse_NativeMouseWheelEvent->init,
@@ -203,24 +196,27 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 			default:
 				// We didn't receive an event we know what to do with.
-				// TODO Warning.
-				return;
+				jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
+                		__FUNCTION__, __LINE__, event->type);
+				break;
 		}
 
-		// Dispatch the event.
-		(*env)->CallVoidMethod(
-				env,
-				GlobalScreen_object,
-				org_jnativehook_GlobalScreen->dispatchEvent,
-				NativeInputEvent_object);
+		if (NativeInputEvent_obj != NULL) {
+			// Dispatch the event.
+			(*env)->CallStaticVoidMethod(
+					env,
+					org_jnativehook_GlobalScreen->cls,
+					org_jnativehook_GlobalScreen->dispatchEvent,
+					NativeInputEvent_obj);
 
-		// Set the propagate flag from java.
-		event->reserved = (unsigned short) (*env)->GetShortField(
-				env,
-				NativeInputEvent_object,
-				org_jnativehook_NativeInputEvent->reserved);
+			// Set the propagate flag from java.
+			event->reserved = (unsigned short) (*env)->GetShortField(
+					env,
+					NativeInputEvent_obj,
+					org_jnativehook_NativeInputEvent->reserved);
 
-		// Make sure our object is garbage collected.
-		(*env)->DeleteLocalRef(env, GlobalScreen_object);
+			// Make sure our object is garbage collected.
+			(*env)->DeleteLocalRef(env, NativeInputEvent_obj);
+		}
 	}
 }

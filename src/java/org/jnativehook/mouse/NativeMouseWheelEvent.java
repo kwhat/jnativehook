@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 package org.jnativehook.mouse;
 
-//Imports
+// Imports.
 import org.jnativehook.GlobalScreen;
 
 /**
@@ -43,7 +43,7 @@ import org.jnativehook.GlobalScreen;
  * settings.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	2.0
  * @since	1.1
  *
  * @see GlobalScreen
@@ -65,8 +65,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 */
 	public static final int	WHEEL_BLOCK_SCROLL	= 2;
 
-
-    /**
+	/**
      * Only valid for scrollType WHEEL_UNIT_SCROLL. Indicates number of units
      * that should be scrolled per click of mouse wheel rotation, based on
      * platform settings.

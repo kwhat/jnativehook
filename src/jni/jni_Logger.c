@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -104,7 +104,7 @@ bool uiohook_LoggerCallback(unsigned int level, const char *format, ...) {
 		status = logger(env, level, format, args);
 	}
 	else {
-		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: AttachCurrentThread failed!\n",
+		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: GetEnv failed!\n",
     			__FUNCTION__, __LINE__);
 	}
 
