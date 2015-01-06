@@ -20,8 +20,7 @@ package org.jnativehook.mouse;
 // Imports.
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
-
-import java.awt.*;
+import java.awt.Point;
 
 /**
  * An event which indicates that a mouse action occurred on the system.

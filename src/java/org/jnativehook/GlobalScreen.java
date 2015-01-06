@@ -72,7 +72,7 @@ public final class GlobalScreen {
 			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
-			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultNativeLibraryLoader");
+			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultLibraryLoader");
 
 			try {
 				// Use the specified class to load the native library.
@@ -319,7 +319,7 @@ public final class GlobalScreen {
 	 * Each type of <code>NativeInputEvent</code> is processed according to its
 	 * event id.
 	 * <p/>
-	 * <p/>
+	 *
 	 * For both <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
 	 * mask are used in the creation of the native event.  Please note that some
@@ -331,7 +331,7 @@ public final class GlobalScreen {
 	 * event using that virtual code.  If the JNativeHook is unable to translate
 	 * the keyChar to its respective virtual code, the event is ignored.
 	 * <p/>
-	 * <p/>
+	 *
 	 * <code>NativeMouseEvents</code> are processed in much the same way as the
 	 * <code>NativeKeyEvents</code>.  Both <code>NATIVE_MOUSE_PRESSED</code> and
 	 * <code>NATIVE_MOUSE_RELEASED</code> produce events corresponding to the
@@ -341,7 +341,7 @@ public final class GlobalScreen {
 	 * <code>NATIVE_MOUSE_PRESSED</code> event followed by a
 	 * <code>NATIVE_MOUSE_RELEASED</code> for the assigned event button.
 	 * <p/>
-	 * <p/>
+	 *
 	 * <code>NATIVE_MOUSE_DRAGGED</code> and <code>NATIVE_MOUSE_MOVED</code> events
 	 * are handled identically.  In order to produce a <code>NATIVE_MOUSE_DRAGGED</code>
 	 * event, you must specify a button modifier mask that contains at least one
@@ -349,7 +349,7 @@ public final class GlobalScreen {
 	 * <code>NATIVE_MOUSE_MOVED</code> event even if the event id was set to
 	 * <code>NATIVE_MOUSE_DRAGGED</code>.
 	 * <p/>
-	 * <p/>
+	 *
 	 * <code>NATIVE_MOUSE_WHEEL</code> events are identical to
 	 * <code>NATIVE_MOUSE_PRESSED</code> events.  Wheel events will only produce
 	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -102,7 +102,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 							(jlong)	event->time,
 							(jint)	event->mask,
 							(jint)	event->data.keyboard.rawcode,
-							(jint)	org_jnativehook_keyboard_NativeKeyEvent_VK_UNDEFINED,
+							(jint)	org_jnativehook_keyboard_NativeKeyEvent_VC_UNDEFINED,
 							(jchar)	event->data.keyboard.keychar,
 							location);
 				break;
@@ -196,7 +196,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 			default:
 				// We didn't receive an event we know what to do with.
-				// TODO Warning.
+				jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
+                		__FUNCTION__, __LINE__, event->type);
 				break;
 		}
 

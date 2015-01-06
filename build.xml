@@ -45,12 +45,12 @@
 	<path id="ant.project.class.path">
 		<pathelement location="${dir.bin}/class/java" />
 		<pathelement location="${dir.bin}/class/test" />
-		<fileset dir="${dir.jar}">
-			<include name="**/*.jar" />
-			<exclude name="**/${ant.project.name}.jar" />
-		</fileset>
-		<pathelement location="${dir.lib}" />
 
+		<fileset dir="${basedir}">
+			<include name="*.jar" />
+		</fileset>
+
+		<pathelement location="${dir.lib}" />
 		<pathelement path="${java.class.path}" />
 	</path>
 
