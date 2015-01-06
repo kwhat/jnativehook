@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,54 +18,43 @@
 package org.jnativehook;
 
 // Imports
-
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.keyboard.listeners.NativeKeyListenerImpl;
-import org.jnativehook.mouse.*;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseListener;
+import org.jnativehook.mouse.NativeMouseMotionListener;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+import org.jnativehook.mouse.NativeMouseWheelListener;
 import org.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
 import org.jnativehook.mouse.listeners.NativeMouseWheelListenerImpl;
 import org.junit.Test;
-
 import javax.swing.event.EventListenerList;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class GlobalScreenTest {
     @Test
     public void testProperties() {
 		System.out.println("properties");
 
-		assertNotNull("Auto Repeat Rate",
-				System.getProperty("jnativehook.autoRepeatRate"));
+		assertNotNull("Auto Repeat Rate", System.getProperty("jnativehook.key.repeat.rate"));
 
-		assertNotNull("Auto Repeat Delay",
-				System.getProperty("jnativehook.autoRepeatDelay"));
+		assertNotNull("Auto Repeat Delay", System.getProperty("jnativehook.key.repeat.delay"));
 
-		assertNotNull("Double Click Time",
-				System.getProperty("jnativehook.multiClickInterval"));
+		assertNotNull("Double Click Time", System.getProperty("jnativehook.button.multiclick.iterval"));
 
-		assertNotNull("Pointer Sensitivity",
-				System.getProperty("jnativehook.pointerSensitivity"));
+		assertNotNull("Pointer Sensitivity", System.getProperty("jnativehook.pointer.sensitivity"));
 
-		assertNotNull("Pointer Acceleration Multiplier",
-				System.getProperty("jnativehook.pointerAccelerationMultiplier"));
+		assertNotNull("Pointer Acceleration Multiplier", System.getProperty("jnativehook.pointer.acceleration.multiplier"));
 
-		assertNotNull("Pointer Acceleration Threshold",
-				System.getProperty("jnativehook.pointerAccelerationThreshold"));
+		assertNotNull("Pointer Acceleration Threshold", System.getProperty("jnativehook.pointer.acceleration.threshold"));
     }
-
-	/**
-	 * Test of getInstance method, of class GlobalScreen.
-	 */
-	@Test
-	public void testGetInstance() {
-		System.out.println("getInstance");
-
-		assertNotNull("Checking getInstance() for null", GlobalScreen.getInstance());
-	}
 
 	/**
 	 * Test of addNativeKeyListener method, of class GlobalScreen.
@@ -75,11 +64,11 @@ public class GlobalScreenTest {
 		System.out.println("addNativeKeyListener");
 
 		NativeKeyListener listener = new NativeKeyListenerImpl();
-		GlobalScreen.getInstance().addNativeKeyListener(listener);
+		GlobalScreen.addNativeKeyListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeKeyListener[] nativeKeyListeners = listeners.getListeners(NativeKeyListener.class);
@@ -93,7 +82,7 @@ public class GlobalScreenTest {
 			fail("Could not find the listener after it was added!");
 		}
 
-		GlobalScreen.getInstance().removeNativeKeyListener(listener);
+		GlobalScreen.removeNativeKeyListener(listener);
 	}
 
 	/**
@@ -104,12 +93,12 @@ public class GlobalScreenTest {
 		System.out.println("removeNativeKeyListener");
 
 		NativeKeyListener listener = new NativeKeyListenerImpl();
-		GlobalScreen.getInstance().addNativeKeyListener(listener);
-		GlobalScreen.getInstance().removeNativeKeyListener(listener);
+		GlobalScreen.addNativeKeyListener(listener);
+		GlobalScreen.removeNativeKeyListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeKeyListener[] nativeKeyListeners = listeners.getListeners(NativeKeyListener.class);
@@ -132,11 +121,11 @@ public class GlobalScreenTest {
 		System.out.println("addNativeMouseListener");
 
 		NativeMouseListener listener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseListener(listener);
+		GlobalScreen.addNativeMouseListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseListener[] nativeKeyListeners = listeners.getListeners(NativeMouseListener.class);
@@ -150,7 +139,7 @@ public class GlobalScreenTest {
 			fail("Could not find the listener after it was added!");
 		}
 
-		GlobalScreen.getInstance().removeNativeMouseListener(listener);
+		GlobalScreen.removeNativeMouseListener(listener);
 	}
 
 	/**
@@ -161,12 +150,12 @@ public class GlobalScreenTest {
 		System.out.println("removeNativeMouseListener");
 
 		NativeMouseListener listener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseListener(listener);
-		GlobalScreen.getInstance().removeNativeMouseListener(listener);
+		GlobalScreen.addNativeMouseListener(listener);
+		GlobalScreen.removeNativeMouseListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseListener[] nativeKeyListeners = listeners.getListeners(NativeMouseListener.class);
@@ -189,11 +178,11 @@ public class GlobalScreenTest {
 		System.out.println("addNativeMouseMotionListener");
 
 		NativeMouseMotionListener listener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseMotionListener(listener);
+		GlobalScreen.addNativeMouseMotionListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseMotionListener[] nativeKeyListeners = listeners.getListeners(NativeMouseMotionListener.class);
@@ -207,7 +196,7 @@ public class GlobalScreenTest {
 			fail("Could not find the listener after it was added!");
 		}
 
-		GlobalScreen.getInstance().removeNativeMouseMotionListener(listener);
+		GlobalScreen.removeNativeMouseMotionListener(listener);
 	}
 
 	/**
@@ -218,12 +207,12 @@ public class GlobalScreenTest {
 		System.out.println("removeNativeMouseMotionListener");
 
 		NativeMouseMotionListener listener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseMotionListener(listener);
-		GlobalScreen.getInstance().removeNativeMouseMotionListener(listener);
+		GlobalScreen.addNativeMouseMotionListener(listener);
+		GlobalScreen.removeNativeMouseMotionListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseMotionListener[] nativeKeyListeners = listeners.getListeners(NativeMouseMotionListener.class);
@@ -247,11 +236,11 @@ public class GlobalScreenTest {
 
 
 		NativeMouseWheelListener listener = new NativeMouseWheelListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseWheelListener(listener);
+		GlobalScreen.addNativeMouseWheelListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseWheelListener[] nativeKeyListeners = listeners.getListeners(NativeMouseWheelListener.class);
@@ -265,7 +254,7 @@ public class GlobalScreenTest {
 			fail("Could not find the listener after it was added!");
 		}
 
-		GlobalScreen.getInstance().removeNativeMouseWheelListener(listener);
+		GlobalScreen.removeNativeMouseWheelListener(listener);
 	}
 
 	/**
@@ -276,12 +265,12 @@ public class GlobalScreenTest {
 		System.out.println("removeNativeMouseWheelListener");
 
 		NativeMouseWheelListener listener = new NativeMouseWheelListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseWheelListener(listener);
-		GlobalScreen.getInstance().removeNativeMouseWheelListener(listener);
+		GlobalScreen.addNativeMouseWheelListener(listener);
+		GlobalScreen.removeNativeMouseWheelListener(listener);
 
 		Field eventListeners = GlobalScreen.class.getDeclaredField("eventListeners");
 		eventListeners.setAccessible(true);
-		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.getInstance());
+		EventListenerList listeners = (EventListenerList) eventListeners.get(GlobalScreen.class);
 
 		boolean found = false;
 		NativeMouseWheelListener[] nativeKeyListeners = listeners.getListeners(NativeMouseWheelListener.class);
@@ -339,16 +328,16 @@ public class GlobalScreenTest {
 
 		// Setup and event listener.
 		NativeKeyListenerImpl keyListener = new NativeKeyListenerImpl();
-		GlobalScreen.getInstance().addNativeKeyListener(keyListener);
+		GlobalScreen.addNativeKeyListener(keyListener);
 
 		NativeMouseInputListenerImpl mouseListener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseListener(mouseListener);
+		GlobalScreen.addNativeMouseListener(mouseListener);
 
 		NativeMouseWheelListenerImpl wheelListener = new NativeMouseWheelListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseWheelListener(wheelListener);
+		GlobalScreen.addNativeMouseWheelListener(wheelListener);
 
 		// Make sure the native thread is running!
-		GlobalScreen.getInstance().registerNativeHook();
+		GlobalScreen.registerNativeHook();
 
 		// Dispatch a key event and check to see if it was sent.
 		NativeKeyEvent keyEvent = new NativeKeyEvent(
@@ -402,12 +391,12 @@ public class GlobalScreenTest {
 		}
 */
 		// Stop the native thread.
-		GlobalScreen.getInstance().unregisterNativeHook();
+		GlobalScreen.unregisterNativeHook();
 
 		// Remove all added listeners.
-		GlobalScreen.getInstance().removeNativeKeyListener(keyListener);
-		GlobalScreen.getInstance().removeNativeMouseListener(mouseListener);
-		GlobalScreen.getInstance().removeNativeMouseWheelListener(wheelListener);
+		GlobalScreen.removeNativeKeyListener(keyListener);
+		GlobalScreen.removeNativeMouseListener(mouseListener);
+		GlobalScreen.removeNativeMouseWheelListener(wheelListener);
 	}
 
 	/**
@@ -419,16 +408,16 @@ public class GlobalScreenTest {
 
 		// Setup and event listener.
 		NativeKeyListenerImpl keyListener = new NativeKeyListenerImpl();
-		GlobalScreen.getInstance().addNativeKeyListener(keyListener);
+		GlobalScreen.addNativeKeyListener(keyListener);
 
 		NativeMouseInputListenerImpl mouseListener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseListener(mouseListener);
+		GlobalScreen.addNativeMouseListener(mouseListener);
 
 		NativeMouseWheelListenerImpl wheelListener = new NativeMouseWheelListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseWheelListener(wheelListener);
+		GlobalScreen.addNativeMouseWheelListener(wheelListener);
 
 		// Make sure the native thread is running!
-		GlobalScreen.getInstance().registerNativeHook();
+		GlobalScreen.registerNativeHook();
 
 		// Dispatch a key event and check to see if it was sent.
 		NativeKeyEvent keyEvent = new NativeKeyEvent(
@@ -441,7 +430,7 @@ public class GlobalScreenTest {
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
 		synchronized (keyListener) {
-			GlobalScreen.getInstance().dispatchEvent(keyEvent);
+			GlobalScreen.dispatchEvent(keyEvent);
 			keyListener.wait(3000);
 			assertEquals(keyEvent, keyListener.getLastEvent());
 		}
@@ -458,7 +447,7 @@ public class GlobalScreenTest {
 				NativeMouseEvent.BUTTON1);
 
 		synchronized (mouseListener) {
-			GlobalScreen.getInstance().dispatchEvent(mouseEvent);
+			GlobalScreen.dispatchEvent(mouseEvent);
 			mouseListener.wait(3000);
 			assertEquals(mouseEvent, mouseListener.getLastEvent());
 		}
@@ -476,18 +465,18 @@ public class GlobalScreenTest {
 				-1);	// Wheel Rotation
 
 		synchronized (wheelListener) {
-			GlobalScreen.getInstance().dispatchEvent(wheelEvent);
+			GlobalScreen.dispatchEvent(wheelEvent);
 			wheelListener.wait(3000);
 			assertEquals(wheelEvent, wheelListener.getLastEvent());
 		}
 
 		// Stop the native thread.
-		GlobalScreen.getInstance().unregisterNativeHook();
+		GlobalScreen.unregisterNativeHook();
 
 		// Remove all added listeners.
-		GlobalScreen.getInstance().removeNativeKeyListener(keyListener);
-		GlobalScreen.getInstance().removeNativeMouseListener(mouseListener);
-		GlobalScreen.getInstance().removeNativeMouseWheelListener(wheelListener);
+		GlobalScreen.removeNativeKeyListener(keyListener);
+		GlobalScreen.removeNativeMouseListener(mouseListener);
+		GlobalScreen.removeNativeMouseWheelListener(wheelListener);
 	}
 
 	/**
@@ -499,7 +488,7 @@ public class GlobalScreenTest {
 
 		// Setup and event listener.
 		NativeKeyListenerImpl listener = new NativeKeyListenerImpl();
-		GlobalScreen.getInstance().addNativeKeyListener(listener);
+		GlobalScreen.addNativeKeyListener(listener);
 
 		// Dispatch a key event and check to see if it was sent.
 		NativeKeyEvent event = new NativeKeyEvent(
@@ -512,12 +501,12 @@ public class GlobalScreenTest {
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
 		synchronized (listener) {
-			GlobalScreen.getInstance().dispatchEvent(event);
+			GlobalScreen.dispatchEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
 
-		GlobalScreen.getInstance().removeNativeKeyListener(listener);
+		GlobalScreen.removeNativeKeyListener(listener);
 	}
 
 	/**
@@ -529,7 +518,7 @@ public class GlobalScreenTest {
 
 		// Setup and event listener.
 		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseListener(listener);
+		GlobalScreen.addNativeMouseListener(listener);
 
 		// Dispatch a mouse event and check to see if it was sent.
 		NativeMouseEvent event = new NativeMouseEvent(
@@ -542,12 +531,12 @@ public class GlobalScreenTest {
 				NativeMouseEvent.BUTTON1);
 
 		synchronized (listener) {
-			GlobalScreen.getInstance().dispatchEvent(event);
+			GlobalScreen.dispatchEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
 
-		GlobalScreen.getInstance().removeNativeMouseListener(listener);
+		GlobalScreen.removeNativeMouseListener(listener);
 	}
 
 	/**
@@ -559,7 +548,7 @@ public class GlobalScreenTest {
 
 		// Setup and event listener.
 		NativeMouseWheelListenerImpl listener = new NativeMouseWheelListenerImpl();
-		GlobalScreen.getInstance().addNativeMouseWheelListener(listener);
+		GlobalScreen.addNativeMouseWheelListener(listener);
 
 		// Dispatch a mouse event and check to see if it was sent.
 		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
@@ -574,12 +563,12 @@ public class GlobalScreenTest {
 				-1);	// Wheel Rotation
 
 		synchronized (listener) {
-			GlobalScreen.getInstance().dispatchEvent(event);
+			GlobalScreen.dispatchEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
 
-		GlobalScreen.getInstance().removeNativeMouseWheelListener(listener);
+		GlobalScreen.removeNativeMouseWheelListener(listener);
 	}
 
 	/**
@@ -589,12 +578,9 @@ public class GlobalScreenTest {
 	public void testStartEventDispatcher() throws IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		System.out.println("startEventDispatcher");
 
-		// Make sure the eventExecutor is created!
-		GlobalScreen.getInstance();
-
 		Field eventExecutor = GlobalScreen.class.getDeclaredField("eventExecutor");
 		eventExecutor.setAccessible(true);
-		assertNotNull(eventExecutor.get(GlobalScreen.getInstance()));
+		assertNotNull(eventExecutor.get(GlobalScreen.class));
 	}
 
 	/**
@@ -605,11 +591,11 @@ public class GlobalScreenTest {
 	public void testStopEventDispatcher() throws IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		System.out.println("stopEventDispatcher");
 
-		GlobalScreen.getInstance().stopEventDispatcher();
+		GlobalScreen.stopEventDispatcher();
 
 		Field eventExecutor = GlobalScreen.class.getDeclaredField("eventExecutor");
 		eventExecutor.setAccessible(true);
-		assertNull(eventExecutor.get(GlobalScreen.getInstance()));
+		assertNull(eventExecutor.get(GlobalScreen.class));
 	}
 	*/
 }

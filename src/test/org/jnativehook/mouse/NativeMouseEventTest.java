@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,8 +17,9 @@
  */
 package org.jnativehook.mouse;
 
-import java.awt.Point;
+// Imports.
 import org.junit.Test;
+import java.awt.Point;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

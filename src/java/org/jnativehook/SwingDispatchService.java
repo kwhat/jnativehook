@@ -19,7 +19,6 @@ package org.jnativehook;
 
 // Imports.
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -28,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Swing compatible implementation of the <code>ExecutorService</code> used to dispatch native events.  This wraps
  * event dispatching with {@link java.awt.EventQueue#invokeLater}.
- * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	2.0
@@ -38,27 +36,27 @@ import java.util.concurrent.TimeUnit;
  * @see  org.jnativehook.GlobalScreen#setEventDispatcher
  */
 public class SwingDispatchService extends AbstractExecutorService {
-	/** The default toolkit system event queue. */
-	private EventQueue queue;
+	private boolean running = false;
 
 	public SwingDispatchService() {
-		queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+		running = true;
 	}
 
 	public void shutdown() {
-		queue = null;
+		running = false;
 	}
 
 	public List<Runnable> shutdownNow() {
+		running = false;
 		return new ArrayList<Runnable>(0);
 	}
 
 	public boolean isShutdown() {
-		return queue == null;
+		return running;
 	}
 
 	public boolean isTerminated() {
-		return queue == null;
+		return running;
 	}
 
 	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
