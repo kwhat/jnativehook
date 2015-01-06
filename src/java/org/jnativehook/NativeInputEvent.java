@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 package org.jnativehook;
 
-//Imports
+// Imports.
 import java.awt.Toolkit;
 import java.util.EventObject;
 
@@ -31,7 +31,7 @@ import java.util.EventObject;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	1.2
+ * @version	2.0
  *
  * @see org.jnativehook.keyboard.NativeKeyListener
  * @see org.jnativehook.mouse.NativeMouseListener
@@ -40,7 +40,7 @@ import java.util.EventObject;
  */
 public class NativeInputEvent extends EventObject {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 4090734094523119531L;
+	private static final long serialVersionUID = -6960142969790223296L;
 
 	/** The type of event. */
 	private int id;
@@ -54,48 +54,48 @@ public class NativeInputEvent extends EventObject {
 	/** Mask for undocumented behavior.
 	 * More information available at:
 	 * <a href="https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported">wiki/Usage#consuming-events-unsupported</a>
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	@SuppressWarnings("unused")
 	private short reserved;
 
 	/** The left shift key modifier constant.
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int SHIFT_L_MASK	= 1 << 0;
 
 	/** The left ctrl key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int CTRL_L_MASK		= 1 << 1;
 
 	/** The left meta key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int META_L_MASK		= 1 << 2;
 
 	/** The left alt key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int ALT_L_MASK		= 1 << 3;
 
 	/** The right shift key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int SHIFT_R_MASK	= 1 << 4;
 
 	/** The right ctrl key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int CTRL_R_MASK		= 1 << 5;
 
 	/** The right meta key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int META_R_MASK		= 1 << 6;
 
 	/** The right alt key modifier constant. 
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static final int ALT_R_MASK		= 1 << 7;
 	
@@ -263,7 +263,7 @@ public class NativeInputEvent extends EventObject {
 		}
 
 		if (param.length() > 0) {
-			//Remove the trailing '+'
+			// Remove the trailing '+'.
 			param.deleteCharAt(param.length() - 1);
 		}
 

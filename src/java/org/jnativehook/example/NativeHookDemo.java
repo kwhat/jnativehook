@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 package org.jnativehook.example;
 
-//Imports
+// Imports.
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -68,7 +68,7 @@ import java.util.logging.Logger;
  * A demonstration of how to use the JNativeHook library.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	2.0
  * @since	1.0
  *
  * @see GlobalScreen
@@ -76,7 +76,7 @@ import java.util.logging.Logger;
  */
 public class NativeHookDemo extends JFrame implements ActionListener, ItemListener, NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener, WindowListener {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -2650769602844831098L;
+	private static final long serialVersionUID = 1541183202160543102L;
 
 	/** Menu Items */
 	private JMenu menuSubListeners;

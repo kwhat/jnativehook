@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,12 +17,14 @@
  */
 package org.jnativehook;
 
+// Imports.
 import java.io.File;
 import java.util.Iterator;
 
 /**
  * Interface used for native library loading.  This interface should be implemented to alter the way the native library
- * is loaded.
+ * is loaded.  Set the <code>jnativehook.lib.loader</code> property prior to loading the <code>GlobalScreen</code>
+ * class, If no property is specified, <code>DefaultNativeLibraryLoader</code> will be used.
  * <p>
  *
  * @author  Aidas Adomkus (vasiukai@gmail.com)
@@ -30,6 +32,7 @@ import java.util.Iterator;
  * @since	2.0
  *
  * @see org.jnativehook.NativeLibraryLoader
+ * @see org.jnativehook.DefaultLibraryLoader
  */
 public interface NativeLibraryLoader {
 

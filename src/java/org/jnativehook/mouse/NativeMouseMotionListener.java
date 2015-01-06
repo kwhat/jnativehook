@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 package org.jnativehook.mouse;
 
-//Imports
+// Imports.
 import org.jnativehook.GlobalScreen;
 import java.util.EventListener;
 
@@ -33,7 +33,7 @@ import java.util.EventListener;
  * NativeMouseMotion event occurs, that object's appropriate method is invoked.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	2.0
  * @since	1.0
  *
  * @see NativeMouseEvent

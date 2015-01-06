@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  *
  * @see org.jnativehook.NativeLibraryLoader
  */
-public class DefaultNativeLibraryLoader implements NativeLibraryLoader {
+public class DefaultLibraryLoader implements NativeLibraryLoader {
 	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**

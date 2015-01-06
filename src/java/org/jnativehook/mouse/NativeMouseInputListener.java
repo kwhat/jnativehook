@@ -22,7 +22,7 @@ package org.jnativehook.mouse;
  * NativeMouseMotionListener interfaces.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	2.0
  * @since	1.0
  *
  * @see NativeMouseEvent

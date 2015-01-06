@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @see  org.jnativehook.GlobalScreen#setEventDispatcher
  */
 public class SwingDispatchService extends AbstractExecutorService {
+	/** The default toolkit system event queue. */
 	private EventQueue queue;
 
 	public SwingDispatchService() {

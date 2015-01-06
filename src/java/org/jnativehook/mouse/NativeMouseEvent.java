@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  */
 package org.jnativehook.mouse;
 
-//Imports
+// Imports.
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
 
@@ -70,7 +70,7 @@ import java.awt.*;
  * modifiers and buttons.
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	1.2
+ * @version	2.0
  * @since	1.0
  *
  * @see GlobalScreen
@@ -79,7 +79,7 @@ import java.awt.*;
  */
 public class NativeMouseEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 6869201569046923469L;
+	private static final long serialVersionUID = 5891184453781453671L;
 
 	/**
 	 * The native mouse event's x pointer position.

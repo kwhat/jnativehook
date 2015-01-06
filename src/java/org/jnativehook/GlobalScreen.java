@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
 package org.jnativehook;
 
 // Imports.
-
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -26,13 +25,10 @@ import org.jnativehook.mouse.NativeMouseListener;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 import org.jnativehook.mouse.NativeMouseWheelEvent;
 import org.jnativehook.mouse.NativeMouseWheelListener;
-
 import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Logger;
 
 /**
@@ -49,7 +45,7 @@ import java.util.logging.Logger;
  * @version 2.0
  * @since 1.0
  */
-public class GlobalScreen {
+public final class GlobalScreen {
 	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
@@ -60,20 +56,12 @@ public class GlobalScreen {
 	/**
 	 * The service to dispatch events.
 	 */
-	private static ExecutorService eventExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-		public Thread newThread(Runnable r) {
-			Thread t = new Thread(r);
-			t.setName("JNativeHook Dispatch Thread");
-			t.setDaemon(true);
-
-			return t;
-		}
-	});
+	private static ExecutorService eventExecutor = new DefaultDispatchService();
 
 	/**
 	 * The list of event listeners to notify.
 	 */
-	protected static final EventListenerList eventListeners = new EventListenerList();
+	private static EventListenerList eventListeners = new EventListenerList();
 
 
 	static {
@@ -108,7 +96,7 @@ public class GlobalScreen {
 	}
 
 
-	protected GlobalScreen() { }
+	private GlobalScreen() { }
 
 
 	/**
@@ -368,11 +356,11 @@ public class GlobalScreen {
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the native system.
-	 * @since 1.2
+	 * @since 2.0
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
 
-	// FIXME this needs to be extendable....
+	// FIXME Comment.
 	private static class EventDispatchTask implements Runnable {
 		private NativeInputEvent event;
 
@@ -533,7 +521,7 @@ public class GlobalScreen {
 	 *
 	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
-	public static final void dispatchEvent(NativeInputEvent e) {
+	public static void dispatchEvent(NativeInputEvent e) {
 		if (eventExecutor != null) {
 			eventExecutor.execute(new EventDispatchTask(e));
 		}
@@ -554,7 +542,7 @@ public class GlobalScreen {
 	 * @see java.util.concurrent.Executors#newSingleThreadExecutor()
 	 * @since 2.0
 	 */
-	public static final void setEventDispatcher(ExecutorService dispatcher) {
+	public static void setEventDispatcher(ExecutorService dispatcher) {
 		if (GlobalScreen.eventExecutor != null) {
 			GlobalScreen.eventExecutor.shutdown();
 		}
