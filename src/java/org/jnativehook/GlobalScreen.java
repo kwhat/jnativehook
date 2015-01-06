@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * GlobalScreen is used to represent the native screen area that Java does not
  * usually have access to. This class can be thought of as the source component
  * for native input events.
- * <p/>
+ * <p>
  * This class also handles the loading, unpacking and communication with the
  * native library. That includes registering and un-registering the native hook
  * with the underlying operating system and adding global keyboard and mouse
@@ -249,7 +249,7 @@ public final class GlobalScreen {
 	/**
 	 * Enable the native hook if it is not currently running. If it is running,
 	 * the function has no effect.
-	 * <p/>
+	 * <p>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
 	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
@@ -318,7 +318,7 @@ public final class GlobalScreen {
 	 * Add a <code>NativeInputEvent</code> to the operating system's event queue.
 	 * Each type of <code>NativeInputEvent</code> is processed according to its
 	 * event id.
-	 * <p/>
+	 * <p>
 	 *
 	 * For both <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
@@ -330,7 +330,7 @@ public final class GlobalScreen {
 	 * <code>NATIVE_KEY_PRESSED</code> followed by a <code>NATIVE_KEY_RELEASED</code>
 	 * event using that virtual code.  If the JNativeHook is unable to translate
 	 * the keyChar to its respective virtual code, the event is ignored.
-	 * <p/>
+	 * <p>
 	 *
 	 * <code>NativeMouseEvents</code> are processed in much the same way as the
 	 * <code>NativeKeyEvents</code>.  Both <code>NATIVE_MOUSE_PRESSED</code> and
@@ -340,7 +340,7 @@ public final class GlobalScreen {
 	 * modifier.  <code>NATIVE_MOUSE_CLICKED</code> events produce a
 	 * <code>NATIVE_MOUSE_PRESSED</code> event followed by a
 	 * <code>NATIVE_MOUSE_RELEASED</code> for the assigned event button.
-	 * <p/>
+	 * <p>
 	 *
 	 * <code>NATIVE_MOUSE_DRAGGED</code> and <code>NATIVE_MOUSE_MOVED</code> events
 	 * are handled identically.  In order to produce a <code>NATIVE_MOUSE_DRAGGED</code>
@@ -348,7 +348,7 @@ public final class GlobalScreen {
 	 * button modifier and assign it to the event.  Failure to do so will produce a
 	 * <code>NATIVE_MOUSE_MOVED</code> event even if the event id was set to
 	 * <code>NATIVE_MOUSE_DRAGGED</code>.
-	 * <p/>
+	 * <p>
 	 *
 	 * <code>NATIVE_MOUSE_WHEEL</code> events are identical to
 	 * <code>NATIVE_MOUSE_PRESSED</code> events.  Wheel events will only produce
@@ -513,7 +513,8 @@ public final class GlobalScreen {
 	 * native events from Java without replaying them on the native system.  If
 	 * you would like to send events to other applications, please use
 	 * {@link #postNativeEvent},
-	 * <p/>
+	 * <p>
+	 *
 	 * <b>Note:</b> This method executes on the native system's event queue.
 	 * It is imperative that all processing be off-loaded to other threads.
 	 * Failure to do so might result in the delay of user input and the automatic
@@ -532,7 +533,7 @@ public final class GlobalScreen {
 	 * JNativeHook utilizes a single thread executor to dispatch events from
 	 * the native event queue.  You may choose to use an alternative approach
 	 * for event delivery by implementing an <code>ExecutorService</code>.
-	 * <p/>
+	 * <p>
 	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
 	 * delivered events to be discarded until a valid <code>ExecutorService</code>
 	 * is set.
