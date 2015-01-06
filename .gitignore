@@ -1,0 +1,8 @@
+/bin/
+/doc/
+/jar/
+/lib/
+/src/jni/include/org_jnativehook_GlobalScreen.h
+/src/jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h
+/src/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h
+/src/libuiohook
