@@ -94,9 +94,9 @@ The first release candidate for version 1.1 has been released. ([changelog](Chan
 
 **JNativeHook 1.1.0 Beta 2 Released (Mar 31, 2012)**
 
-The second beta for version 1.1 has been released. ([changelog](ChangeLog.md)) Fixed several cross compiler issues for OS X targets. These targets should now compile and run correctly. Added support for a key typed and mouse click events. Additional native code restructuring and build file cleanup. All targets should function correctly at this point. Some erroneous events maybe generated for key typed events at this time. These will be fixed in the near future.
+The second beta for version 1.1 has been released. ([changelog](ChangeLog.md)) Fixed several cross compiler issues for OS X targets. These targets should now compile and run correctly. Added support for key typed and mouse click events. Additional native code restructuring and build file cleanup. All targets should function correctly at this point. Some erroneous events may be generated for key typed events at this time. These will be fixed in the near future.
 
 
 **JNativeHook 1.1.0 Beta 1 Released (Mar 20, 2012)**
 
-The first beta for version 1.1 has been released. ([changelog](ChangeLog.md)) This version is almost a complete rewrite of the original 1.0 release with a focus on exception recovery and thread safety. There are still a few issues to work out with Apple OSX system properties and Exception cleanup but for the most part the core functionality is very stable.
+The first beta for version 1.1 has been released. ([changelog](ChangeLog.md)) This version is almost a complete rewrite of the original 1.0 release with a focus on exception recovery and thread safety. There are still a few issues to work out with Apple OSX system properties and Exception cleanup, but for the most part the core functionality is very stable.
