@@ -1,4 +1,4 @@
 Alexander Barker <alex@1stleg.com>
 
 Aidas Adomkus <vasiukai@gmail.com>
-    NativeLibraryLocator interface and loading override concept
+    NativeLibraryLocator interface and locator override concept
