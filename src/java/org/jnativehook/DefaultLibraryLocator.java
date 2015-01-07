@@ -36,7 +36,7 @@ import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
 /**
- * Default implementation of the <code>NativeLibraryLoader</code> interface.  This will first attempt to load the
+ * Default implementation of the <code>NativeLibraryLocator</code> interface.  This will first attempt to load the
  * native library from the java.library.path property.  If that fails, it will attempt to extract a library from the
  * jar based on the host operating system and architecture.
  * <p>
@@ -45,9 +45,9 @@ import java.util.logging.Logger;
  * @version	2.0
  * @since	2.0
  *
- * @see org.jnativehook.NativeLibraryLoader
+ * @see NativeLibraryLocator
  */
-public class DefaultLibraryLoader implements NativeLibraryLoader {
+public class DefaultLibraryLocator implements NativeLibraryLocator {
 	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**

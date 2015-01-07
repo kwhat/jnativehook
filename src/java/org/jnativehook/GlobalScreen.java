@@ -72,11 +72,11 @@ public final class GlobalScreen {
 			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
-			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultLibraryLoader");
+			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultLibraryLocator");
 
 			try {
 				// Use the specified class to load the native library.
-				NativeLibraryLoader loader = Class.forName(libLoader).asSubclass(NativeLibraryLoader.class).newInstance();
+				NativeLibraryLocator loader = Class.forName(libLoader).asSubclass(NativeLibraryLocator.class).newInstance();
 
 				Iterator<File> libs = loader.getLibraries();
 				while (libs.hasNext()) {
@@ -211,10 +211,18 @@ public final class GlobalScreen {
 		}
 	}
 
-	// FIXME comment.
+	/**
+	 * Specialized thread implementation for the native hook.
+	 */
 	private static class NativeHookThread extends Thread {
+		/**
+		 * Exception thrown by this thread.
+		 */
 		private NativeHookException exception;
 
+		/**
+		 * Default constructor.
+		 */
 		public NativeHookThread() {
 			this.setName("JNativeHook Hook Thread");
 			this.setDaemon(false);
@@ -225,6 +233,7 @@ public final class GlobalScreen {
 			exception = null;
 
 			try {
+				// NOTE enable() will call notifyAll() on this object after passing exception throwing code.
 				this.enable();
 			}
 			catch (NativeHookException e) {
@@ -232,16 +241,30 @@ public final class GlobalScreen {
 			}
 
 			synchronized (this) {
+				// Notify anyone that is still waiting for the hook that it has completed.
 				this.notifyAll();
 			}
 		}
 
+		/**
+		 * Get the exception associated with the current hook, or null of no exception was thrown.
+		 *
+		 * @return the <code>NativeHookException</code> or null.
+		 */
 		public NativeHookException getException() {
 			return exception;
 		}
 
+		/**
+		 * Native implementation to start the input hook.  This method blocks and should only be called by this
+		 * specialized thread implementation.  This method will notifyAll() after passing any exception exception
+		 * throwing code.
+		 */
 		private native void enable() throws NativeHookException;
 
+		/**
+		 * Native implementation to stop the input hook.  There is no other way to stop the hook.
+		 */
 		public native void disable() throws NativeHookException;
 	}
 
@@ -360,10 +383,20 @@ public final class GlobalScreen {
 	 */
 	public static native void postNativeEvent(NativeInputEvent e);
 
-	// FIXME Comment.
+	/**
+	 * Internal class to handle event dispatching via the executor service.
+	 */
 	private static class EventDispatchTask implements Runnable {
+		/**
+		 * The event to dispatch.
+		 */
 		private NativeInputEvent event;
 
+		/**
+		 * Single argument constructor for dispatch task.
+		 *
+		 * @param event	the <code>NativeInputEvent</code> to dispatch.
+		 */
 		public EventDispatchTask(NativeInputEvent event) {
 			this.event = event;
 		}

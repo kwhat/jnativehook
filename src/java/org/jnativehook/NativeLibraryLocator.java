@@ -22,23 +22,25 @@ import java.io.File;
 import java.util.Iterator;
 
 /**
- * Interface used for native library loading.  This interface should be implemented to alter the way the native library
- * is loaded.  Set the <code>jnativehook.lib.loader</code> property prior to loading the <code>GlobalScreen</code>
- * class, If no property is specified, <code>DefaultNativeLibraryLoader</code> will be used.
+ * Interface used for native library loading.  This interface should be implemented to alter what libraries are loaded,
+ * and where they are loaded from.  The <code>jnativehook.lib.loader</code> property should be set to the implementing
+ * class prior to loading the <code>GlobalScreen</code> class. If no property is specified,
+ * <code>DefaultNativeLibraryLoader</code> will be used.
  * <p>
  *
  * @author  Aidas Adomkus (vasiukai@gmail.com)
  * @version	2.0
  * @since	2.0
  *
- * @see org.jnativehook.NativeLibraryLoader
- * @see org.jnativehook.DefaultLibraryLoader
+ * @see DefaultLibraryLocator
  */
-public interface NativeLibraryLoader {
+public interface NativeLibraryLocator {
 
 	/**
 	 * Perform procedures to interface with the native library. These procedures may include acquiring, unpacking and
 	 * loading the library into the Java Virtual Machine.
+	 *
+	 * @return Iterator of type file, where each file points to a native library to load.
 	 */
 	public Iterator<File> getLibraries();
 }

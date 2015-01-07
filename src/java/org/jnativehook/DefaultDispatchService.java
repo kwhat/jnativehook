@@ -36,6 +36,9 @@ import java.util.concurrent.TimeUnit;
  * @see  org.jnativehook.GlobalScreen#setEventDispatcher
  */
 public class DefaultDispatchService extends ThreadPoolExecutor {
+	/**
+	 * Instantiates a new default dispatch service using a single thread.
+	 */
 	public DefaultDispatchService() {
 		super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 			public Thread newThread(Runnable r) {
