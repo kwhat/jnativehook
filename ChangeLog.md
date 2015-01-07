@@ -1,5 +1,14 @@
-**JNativeHook 2.0.0 ()**
- * Complete rewrite.
+**JNativeHook 2.0.0 (Tentative)**
+ * Total rewrite and fork of the native code to its own [standalone project](https://github.com/kwhat/libuiohook).
+ * Transitioned to virutal codes backed by scancode set 1.
+ * Added Java's ExecutorService support for event delivery.
+ * Added the ability to post NativeInputEvent's back to the Operating System.
+ * Countless bug fixes and perfomance improvments.
+ * Fixed a long standing RDP capture issue.
+ * More flexible library loading.
+ * More accurate event timestamps.
+ * Removed the vestigial singleton API.
+ * Vastly improved the build process.
  
 **JNativeHook 1.1.4 (Mar 17, 2013)**
  * Added no-strict-aliasing compiler option that is enabled by default for all platforms.
