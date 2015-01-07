@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 /**
  * Interface used for native library loading.  This interface should be implemented to alter what libraries are loaded,
- * and where they are loaded from.  The <code>jnativehook.lib.loader</code> property should be set to the implementing
+ * and where they are loaded from.  The <code>jnativehook.lib.locator</code> property should be set to the implementing
  * class prior to loading the <code>GlobalScreen</code> class. If no property is specified,
- * <code>DefaultNativeLibraryLoader</code> will be used.
+ * <code>DefaultLibraryLocator</code> will be used.
  * <p>
  *
  * @author  Aidas Adomkus (vasiukai@gmail.com)

@@ -72,13 +72,13 @@ public final class GlobalScreen {
 			System.loadLibrary(libName);
 		}
 		catch (UnsatisfiedLinkError linkError) {
-			String libLoader = System.getProperty("jnativehook.lib.loader", "org.jnativehook.DefaultLibraryLocator");
+			String libLoader = System.getProperty("jnativehook.lib.locator", "org.jnativehook.DefaultLibraryLocator");
 
 			try {
-				// Use the specified class to load the native library.
-				NativeLibraryLocator loader = Class.forName(libLoader).asSubclass(NativeLibraryLocator.class).newInstance();
+				// Use the specified class to locator the native library.
+				NativeLibraryLocator locator = Class.forName(libLoader).asSubclass(NativeLibraryLocator.class).newInstance();
 
-				Iterator<File> libs = loader.getLibraries();
+				Iterator<File> libs = locator.getLibraries();
 				while (libs.hasNext()) {
 					File lib = libs.next();
 					if (lib.exists() && lib.isFile() && lib.canRead()) {
