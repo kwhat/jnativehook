@@ -65,6 +65,9 @@ application simply execute the jar file provided.
 * [Demo Application](https://github.com/kwhat/jnativehook/wiki/Usage#demo-application)
 * [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported)
 
+## Donate
+If you have found this library useful, please consider making a [donation](https://github.com/kwhat/jnativehook/wiki/Donate).
+
 ## Compiling Instructions
 https://github.com/kwhat/jnativehook/wiki/Compiling
 
