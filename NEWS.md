@@ -80,3 +80,23 @@ After almost a year in development, version 1.1.0 is finally ready for an offici
 **JNativeHook 1.1.0 RC 3 Released (July 20, 2012)**
 
 Due to the number of problems with release candidate 2, I have decided to put another release candidate together.  The current version should address all known bugs with the exception of a possible crash on OS X.  If you experience a crash please file a bug report and attach the jnh-error.txt or equivalent error log.
+
+
+**JNativeHook 1.1.0 RC 2 Released (May 8, 2012)**
+
+The second and probably last release candidate for version 1.1 is ready for download. ([changelog](ChangeLog.md))  Most of the work has gone into polishing up the code base and documentation. Several minor bug fixes have been addressed including another web start issue. There have been a few small API changes, mainly method names and modifiers, throughout the project. Please consult the documentation for the updated method signatures.
+
+
+**JNativeHook 1.1.0 RC 1 Released (Apr 28, 2012)**
+
+The first release candidate for version 1.1 has been released. ([changelog](ChangeLog.md)) OS X binaries should finally work. Major work has gone into producing accurate key typed events. This includes only firing key typed evens when a printable character is pressed and producing the correct native Unicode character for that event.
+
+
+**JNativeHook 1.1.0 Beta 2 Released (Mar 31, 2012)**
+
+The second beta for version 1.1 has been released. ([changelog](ChangeLog.md)) Fixed several cross compiler issues for OS X targets. These targets should now compile and run correctly. Added support for a key typed and mouse click events. Additional native code restructuring and build file cleanup. All targets should function correctly at this point. Some erroneous events maybe generated for key typed events at this time. These will be fixed in the near future.
+
+
+**JNativeHook 1.1.0 Beta 1 Released (Mar 20, 2012)**
+
+The first beta for version 1.1 has been released. ([changelog](ChangeLog.md)) This version is almost a complete rewrite of the original 1.0 release with a focus on exception recovery and thread safety. There are still a few issues to work out with Apple OSX system properties and Exception cleanup but for the most part the core functionality is very stable.
