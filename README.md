@@ -28,33 +28,45 @@ guarantee that any of these properties will be available.
 * jnativehook.pointer.acceleration.threshold
 
 ## Software and Hardware Requirements
-####Linux
-  * i586 or amd64
-  * 64 MB of RAM
-  * Java 1.5 - 1.7
-  * x11-libs/libX11 1.0 - 1.5
-  * x11-libs/libXt 1.0 - 1.3
-  * x11-libs/libXtst 1.0 - 1.2
-  * x11-libs/libxcb 1.7 - 1.8
+* Java 1.5 - 1.8
+* 256 MB of RAM
+* Apple OS X 10.5 - 10.10
+  * i586, amd64
+  * Enable Access for Assistive Devices
+* Windows 2000 - 8.1
+  * i586, amd64
+* X11 Linux
+  * i586, amd64, arm6j
+  * libX11.so.6
+  * libXt.so.6
+  * libXtst.so.6
+  * libXext.so.6
+  * libXdmcp.so.6
+  * libXau.so.6
+  * libICE.so.6
+  * libSM.so.6
+  * libxcb.so.1
+  * libc.so.6
+  * libdl.so.2
+  * libuuid.so.1
+  * libXinerama.so.1
 
-####Mac OS X
-  * i586, amd64, powerpc or powerpc64
-  * 256 MB of RAM
-  * Java 1.5 - 1.7
-  * Apple Mac OS X 10.5 - 10.9
-  * Access for Assistive Devices Enabled
-
-####Windows
-  * i586 or amd64
-  * 32-bit 64 MB of RAM
-  * 64-bit 128 MB of RAM
-  * Java 1.5 - 1.7
-  * Microsoft Windows 2000 - 8.1
-
-## Sample Code
+## Demo Applicaiton
 The graphical example application was created to provided a real-time
 demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided.
+
+## Sample Code
+* [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-keyboard-listener)
+* [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-mouse-listener)
+* [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-mouse-wheel-listener)
+* [Working with Swing](https://github.com/kwhat/jnativehook/wiki/Usage#working-with-swing)
+* [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/Usage#logging-and-console-output)
+* [Demo Application](https://github.com/kwhat/jnativehook/wiki/Usage#demo-application)
+* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/Usage#consuming-events-unsupported)
+
+## Compiling Instructions
+https://github.com/kwhat/jnativehook/wiki/Compiling
 
 ## Additional Information
 Up to date source code and documentation available at:
