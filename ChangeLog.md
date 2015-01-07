@@ -5,7 +5,7 @@
  * Added the ability to post NativeInputEvent's back to the Operating System.
  * Added support for multi-head hosts.
  * Countless bug fixes and perfomance improvments.
- * Fixed a long standing RDP capture issue.
+ * Fixed a long-standing RDP capture issue.
  * More flexible library loading.
  * More accurate event timestamps.
  * Removed the vestigial singleton API.
