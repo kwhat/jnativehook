@@ -52,11 +52,11 @@ public class SwingDispatchService extends AbstractExecutorService {
 	}
 
 	public boolean isShutdown() {
-		return running;
+		return !running;
 	}
 
 	public boolean isTerminated() {
-		return running;
+		return !running;
 	}
 
 	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
