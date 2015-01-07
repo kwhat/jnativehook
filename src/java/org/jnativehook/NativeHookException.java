@@ -85,7 +85,7 @@ public class NativeHookException extends Exception {
 	public static final int X11_RECORD_GET_CONTEXT			= 0x25;
 
 	/**
-	 * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for detailed
+	 * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for details.
 	 *
 	 * @since	2.0
 	 */
