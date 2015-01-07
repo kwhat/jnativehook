@@ -3,6 +3,7 @@
  * Transitioned to virutal keycodes backed by scancode set 1.
  * Added Java's ExecutorService support for event delivery.
  * Added the ability to post NativeInputEvent's back to the Operating System.
+ * Added support for multi-head hosts.
  * Countless bug fixes and perfomance improvments.
  * Fixed a long standing RDP capture issue.
  * More flexible library loading.
