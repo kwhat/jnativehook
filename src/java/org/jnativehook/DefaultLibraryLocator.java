@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  * @see NativeLibraryLocator
  */
 public class DefaultLibraryLocator implements NativeLibraryLocator {
-	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+	private static Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
 	 * Perform default procedures to interface with the native library. These
@@ -102,17 +102,17 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 						libNativeVersion = version + '.' + revision;
 					}
 					else {
-						log.warning("Invalid library manifest!\n");
+						logger.warning("Invalid library manifest!\n");
 					}
 				}
 				else {
-					log.warning("Cannot find library manifest!\n");
+					logger.warning("Cannot find library manifest!\n");
 				}
 
 				jarInputStream.close();
 			}
 			catch (IOException e) {
-				log.severe(e.getMessage());
+				logger.severe(e.getMessage());
 			}
 
 
@@ -171,7 +171,7 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 				libraries.add(libFile);
 
 				// Log the file path and checksum.
-				log.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
+				logger.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
 			}
 			catch (IOException e) {
 				throw new IllegalStateException(e.getMessage(), e);
@@ -181,7 +181,7 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 			}
 		}
 		else {
-			log.severe("Unable to extract the native library " + libResourcePath.toString() + "!\n");
+			logger.severe("Unable to extract the native library " + libResourcePath.toString() + "!\n");
 		}
 
 		return libraries.iterator();
