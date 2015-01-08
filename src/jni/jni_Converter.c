@@ -33,7 +33,8 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
 	    case EVENT_KEY_TYPED:
 	    case EVENT_KEY_PRESSED:
 	    case EVENT_KEY_RELEASED:
-			*javaType = (nativeType + org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
+	    	// 3 = EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
+			*javaType = org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST + (nativeType - 3);
 			break;
 
         case EVENT_MOUSE_CLICKED:
@@ -42,8 +43,8 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
         case EVENT_MOUSE_MOVED:
         case EVENT_MOUSE_DRAGGED:
         case EVENT_MOUSE_WHEEL:
-        	*javaType = (nativeType + org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST) -
-        			(org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
+        	// 6 = (NATIVE_KEY_LAST - NATIVE_KEY_FIRST) + EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
+        	*javaType = org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST + (nativeType - 6);
        		break;
 
 		default:
@@ -63,7 +64,7 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
 	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-			*nativeType = (javaType - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
+			*nativeType = (javaType + 3) - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST;
 			break;
 
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
@@ -72,8 +73,7 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-        	*nativeType = (javaType - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST) +
-        			(org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_LAST - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST) + 1;
+        	*nativeType = (javaType + 6) - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
        		break;
 
 		default:
