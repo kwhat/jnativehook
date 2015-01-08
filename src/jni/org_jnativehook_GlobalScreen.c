@@ -131,50 +131,50 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	jint javaType = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
-	uiohook_event *virtualEvent = (uiohook_event *) malloc(sizeof(uiohook_event));
-	jni_ConvertToNativeType(javaType, &(virtualEvent->type));
+	uiohook_event virtualEvent;
+	jni_ConvertToNativeType(javaType, &virtualEvent.type);
 
 	// Convert Java event to virtual event.
-	virtualEvent->mask = (unsigned int) (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getModifiers);
+	virtualEvent.mask = (unsigned int) (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getModifiers);
 
 	switch (javaType) {
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-			virtualEvent->data.keyboard.keychar = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
-			virtualEvent->data.keyboard.keycode = VC_UNDEFINED;
-			virtualEvent->data.keyboard.rawcode = 0x00;
+			virtualEvent.data.keyboard.keychar = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
+			virtualEvent.data.keyboard.keycode = VC_UNDEFINED;
+			virtualEvent.data.keyboard.rawcode = 0x00;
 			break;
 
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
 		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-			virtualEvent->data.keyboard.keychar = CHAR_UNDEFINED;
-			virtualEvent->data.keyboard.keycode = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
-			virtualEvent->data.keyboard.rawcode = 0x00;
+			virtualEvent.data.keyboard.keychar = CHAR_UNDEFINED;
+			virtualEvent.data.keyboard.keycode = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
+			virtualEvent.data.keyboard.rawcode = 0x00;
 			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
         case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-        	virtualEvent->data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
-			virtualEvent->data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
-			virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+        	virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
+			virtualEvent.data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
+			virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
             break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-			virtualEvent->data.mouse.button = MOUSE_NOBUTTON;
-			virtualEvent->data.mouse.clicks = 0;
-		    virtualEvent->data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent->data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+			virtualEvent.data.mouse.button = MOUSE_NOBUTTON;
+			virtualEvent.data.mouse.clicks = 0;
+		    virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
             break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-            virtualEvent->data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
-			virtualEvent->data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
-			virtualEvent->data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
-			virtualEvent->data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
-			virtualEvent->data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
-			virtualEvent->data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
+            virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
+			virtualEvent.data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
+			virtualEvent.data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
+			virtualEvent.data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
+			virtualEvent.data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
+			virtualEvent.data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
             break;
 
 		default:
@@ -185,5 +185,5 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 			break;
 	}
 
-	hook_post_event(virtualEvent);
+	hook_post_event(&virtualEvent);
 }
