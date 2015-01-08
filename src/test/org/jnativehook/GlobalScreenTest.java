@@ -344,7 +344,7 @@ public class GlobalScreenTest {
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
 				System.currentTimeMillis(),
 				0x00,		// Modifiers
-				0x41,		// Raw Code
+				0x00,		// Raw Code
 				NativeKeyEvent.VC_A,
 				NativeKeyEvent.CHAR_UNDEFINED,
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
