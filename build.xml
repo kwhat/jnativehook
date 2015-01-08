@@ -565,6 +565,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
 				<include name="build.*" />
+				<include name="AUTHORS" />
 				<include name="*.md" />
 			</zipfileset>
 		</zip>
