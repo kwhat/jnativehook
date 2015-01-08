@@ -2,8 +2,8 @@
 JNativeHook is a library to provide global keyboard and mouse listeners for
 Java.  This will allow you to listen for global shortcuts or mouse motion that
 would otherwise be impossible using pure Java.  To accomplish this task,
-JNativeHook leverages platform dependent native code through Java's native
-interface to create low level system wide hooks and deliver those events to
+JNativeHook leverages platform-dependent native code through Java's native
+interface to create low-level system-wide hooks and deliver those events to
 your application.
 
 The following events are available via their respective listeners.
