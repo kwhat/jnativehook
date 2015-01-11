@@ -271,6 +271,21 @@ public class NativeInputEvent extends EventObject {
 			param.append('+');
 		}
 
+		if ((modifiers & NativeInputEvent.CAPS_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.capsLock", "Caps Lock"));
+			param.append('+');
+		}
+
+		if ((modifiers & NativeInputEvent.NUM_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.numpad_numLock", "Num Lock"));
+			param.append('+');
+		}
+
+		if ((modifiers & NativeInputEvent.SCROLL_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
+			param.append('+');
+		}
+
 		if (param.length() > 0) {
 			// Remove the trailing '+'.
 			param.deleteCharAt(param.length() - 1);
