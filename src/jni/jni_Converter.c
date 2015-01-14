@@ -30,27 +30,27 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
 	jint status = JNI_OK;
 
 	switch (nativeType) {
-	    case EVENT_KEY_TYPED:
-	    case EVENT_KEY_PRESSED:
-	    case EVENT_KEY_RELEASED:
-	    	// 3 = EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
+		case EVENT_KEY_TYPED:
+		case EVENT_KEY_PRESSED:
+		case EVENT_KEY_RELEASED:
+			// 3 = EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
 			*javaType = org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST + (nativeType - 3);
 			break;
 
-        case EVENT_MOUSE_CLICKED:
-        case EVENT_MOUSE_PRESSED:
-        case EVENT_MOUSE_RELEASED:
-        case EVENT_MOUSE_MOVED:
-        case EVENT_MOUSE_DRAGGED:
-        case EVENT_MOUSE_WHEEL:
-        	// 6 = (NATIVE_KEY_LAST - NATIVE_KEY_FIRST) + EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
-        	*javaType = org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST + (nativeType - 6);
-       		break;
+		case EVENT_MOUSE_CLICKED:
+		case EVENT_MOUSE_PRESSED:
+		case EVENT_MOUSE_RELEASED:
+		case EVENT_MOUSE_MOVED:
+		case EVENT_MOUSE_DRAGGED:
+		case EVENT_MOUSE_WHEEL:
+			// 6 = (NATIVE_KEY_LAST - NATIVE_KEY_FIRST) + EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
+			*javaType = org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST + (nativeType - 6);
+			break;
 
 		default:
-        	*javaType = 0;
-        	status = JNI_ERR;
-        	break;
+			*javaType = 0;
+			status = JNI_ERR;
+			break;
 	}
 
 	return status;
@@ -61,25 +61,25 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 	jint status = JNI_OK;
 
 	switch (javaType) {
-	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
-	    case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
+		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
+		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
+		case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
 			*nativeType = (javaType + 3) - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST;
 			break;
 
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-        	*nativeType = (javaType + 6) - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
-       		break;
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
+			*nativeType = (javaType + 6) - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
+	   		break;
 
 		default:
-        	*nativeType = 0;
-        	status = JNI_ERR;
-        	break;
+			*nativeType = 0;
+			status = JNI_ERR;
+			break;
 	}
 
 	return status;

@@ -154,32 +154,31 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
-        case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-        	virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
+		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
+			virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
 			virtualEvent.data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
 			virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
-            break;
+			virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
 			virtualEvent.data.mouse.button = MOUSE_NOBUTTON;
 			virtualEvent.data.mouse.clicks = 0;
-		    virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
-            break;
+			virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
+			virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-            virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
+			virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
 			virtualEvent.data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
 			virtualEvent.data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
 			virtualEvent.data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
 			virtualEvent.data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
 			virtualEvent.data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
-            break;
+			break;
 
 		default:
 			// TODO Should this thrown an exception?
-
 			jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
 					__FUNCTION__, __LINE__, javaType);
 			break;

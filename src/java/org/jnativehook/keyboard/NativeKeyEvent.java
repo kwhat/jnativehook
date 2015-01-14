@@ -811,7 +811,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.sun_insert", "Sun Insert");
 			case VC_SUN_CUT:
 				return Toolkit.getProperty("AWT.sun_cut", "Sun Cut");
-    		// End Sun keyboards
+			// End Sun keyboards
 
 			case VC_UNDEFINED:
 				return Toolkit.getProperty("AWT.undefined", "Undefined");
@@ -822,17 +822,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 	}
 
 
-    /**
-     * Returns whether the key in this event is an "action" key.  Typically, an
+	/**
+	 * Returns whether the key in this event is an "action" key.  Typically, an
 	 * action key does not fire a Unicode character and is not a modifier key.
-     *
-     * @return <code>true</code> if the key is an "action" key,
+	 *
+	 * @return <code>true</code> if the key is an "action" key,
 	 * <code>false</code> otherwise.
 	 *
 	 * @since 1.1
-     */
-    public boolean isActionKey() {
-        switch (keyCode) {
+	 */
+	public boolean isActionKey() {
+		switch (keyCode) {
 			// Function Keys
 			case VC_F1:
 			case VC_F2:
@@ -864,7 +864,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_CAPS_LOCK:
 
 			case VC_PRINTSCREEN:
-            case VC_SCROLL_LOCK:
+			case VC_SCROLL_LOCK:
 
 			// Edit Key Zone
 			case VC_INSERT:
@@ -943,10 +943,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_SUN_CUT:
 
 				return true;
-        }
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 
 	/**

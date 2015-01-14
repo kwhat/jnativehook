@@ -105,7 +105,7 @@ bool uiohook_LoggerCallback(unsigned int level, const char *format, ...) {
 	}
 	else {
 		jni_Logger(env, LOG_LEVEL_ERROR, "%s [%u]: GetEnv failed!\n",
-    			__FUNCTION__, __LINE__);
+				__FUNCTION__, __LINE__);
 	}
 
 	return status;

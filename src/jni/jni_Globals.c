@@ -40,7 +40,7 @@ static inline int create_GlobalScreen(JNIEnv *env) {
 	jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
 	if (GlobalScreen_class != NULL) {
 		// Get the field ID for hookThread.
-    	jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
+		jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
 
 		// Get the method ID for GlobalScreen.dispatchEvent().
 		jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, GlobalScreen_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");

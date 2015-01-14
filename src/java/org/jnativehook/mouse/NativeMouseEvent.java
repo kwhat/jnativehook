@@ -287,7 +287,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * @return a string identifying the native event and its attributes.
 	 */
 	@Override
-	public String  paramString() {
+	public String paramString() {
 		StringBuilder param = new StringBuilder(255);
 
 		switch(getID()) {
