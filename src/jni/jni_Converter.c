@@ -74,7 +74,7 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
 			*nativeType = (javaType + 6) - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
-	   		break;
+			break;
 
 		default:
 			*nativeType = 0;
