@@ -126,15 +126,6 @@ public class NativeInputEvent extends EventObject {
 	/** The Button5 modifier constant. */
 	public static final int BUTTON5_MASK		= 1 << 12;
 
-	/** The caps lock modifier constant. */
-	public static final int CAPS_LOCK_MASK		= 1 << 13;
-
-	/** The num lock modifier constant. */
-	public static final int NUM_LOCK_MASK		= 1 << 14;
-
-	/** The scroll lock modifier constant. */
-	public static final int SCROLL_LOCK_MASK	= 1 << 15;
-
 
 	/**
 	 * Instantiates a new native input event.
@@ -268,21 +259,6 @@ public class NativeInputEvent extends EventObject {
 
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button5", "Button5"));
-			param.append('+');
-		}
-
-		if ((modifiers & NativeInputEvent.CAPS_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.capsLock", "Caps Lock"));
-			param.append('+');
-		}
-
-		if ((modifiers & NativeInputEvent.NUM_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.numpad_numLock", "Num Lock"));
-			param.append('+');
-		}
-
-		if ((modifiers & NativeInputEvent.SCROLL_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
 			param.append('+');
 		}
 
