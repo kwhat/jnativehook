@@ -30,7 +30,7 @@ void jni_SetProperties(JNIEnv *env) {
 	long rate = hook_get_auto_repeat_rate();
 	if (rate >= 0) {
 		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: hook_get_auto_repeat_rate(): successful. (%li)\n",
-    			__FUNCTION__, __LINE__, rate);
+				__FUNCTION__, __LINE__, rate);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", rate) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.rate");
@@ -48,7 +48,7 @@ void jni_SetProperties(JNIEnv *env) {
 		}
 		else {
 			jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Failed to convert auto repeat rate to string!\n",
-        			__FUNCTION__, __LINE__);
+				__FUNCTION__, __LINE__);
 		}
 	}
 	else {
@@ -60,7 +60,7 @@ void jni_SetProperties(JNIEnv *env) {
 	long delay = hook_get_auto_repeat_delay();
 	if (delay >= 0) {
 		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_auto_repeat_delay(): successful. (%li)\n",
-    				__FUNCTION__, __LINE__, delay);
+				__FUNCTION__, __LINE__, delay);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.key.repeat.delay");
@@ -83,7 +83,7 @@ void jni_SetProperties(JNIEnv *env) {
 	}
 	else {
 		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n",
-        		__FUNCTION__, __LINE__);
+				__FUNCTION__, __LINE__);
 	}
 
 
@@ -180,7 +180,7 @@ void jni_SetProperties(JNIEnv *env) {
 	long clicktime = hook_get_multi_click_time();
 	if (clicktime >= 0) {
 		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_multi_click_time(): successful. (%li)\n",
-        		__FUNCTION__, __LINE__, clicktime);
+				__FUNCTION__, __LINE__, clicktime);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
 			jstring name = (*env)->NewStringUTF(env, "jnativehook.button.multiclick.iterval");

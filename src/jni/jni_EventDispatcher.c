@@ -197,7 +197,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			default:
 				// We didn't receive an event we know what to do with.
 				jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
-                		__FUNCTION__, __LINE__, event->type);
+						__FUNCTION__, __LINE__, event->type);
 				break;
 		}
 

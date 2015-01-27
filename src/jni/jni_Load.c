@@ -89,7 +89,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
 	}
 
-    return jvm_attach_args.version;
+	return jvm_attach_args.version;
 }
 
 // JNI exit point, This is executed when the Java virtual machine detaches from the native library.
@@ -107,7 +107,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 		// Clear java properties from native sources.
 		jni_ClearProperties(env);
 
-        // Cleanup JNI global memory.
+		// Cleanup JNI global memory.
 		jni_DestroyGlobals(env);
 	}
 	else {
