@@ -59,7 +59,7 @@ void jni_SetProperties(JNIEnv *env) {
 
 	long delay = hook_get_auto_repeat_delay();
 	if (delay >= 0) {
-		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_auto_repeat_delay(): successful. (%li)\n",
+		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: hook_get_auto_repeat_delay(): successful. (%li)\n",
 				__FUNCTION__, __LINE__, delay);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", delay) >= 0) {
@@ -119,7 +119,7 @@ void jni_SetProperties(JNIEnv *env) {
 
 	long threshold = hook_get_pointer_acceleration_threshold();
 	if (threshold >= 0) {
-		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_acceleration_threshold(): successful. (%li)\n",
+		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: hook_get_pointer_acceleration_threshold(): successful. (%li)\n",
 				__FUNCTION__, __LINE__, threshold);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", threshold) >= 0) {
@@ -149,7 +149,7 @@ void jni_SetProperties(JNIEnv *env) {
 
 	long sensitivity = hook_get_pointer_sensitivity();
 	if (sensitivity >= 0) {
-		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_pointer_sensitivity(): successful. (%li)\n",
+		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: hook_get_pointer_sensitivity(): successful. (%li)\n",
 				__FUNCTION__, __LINE__, sensitivity);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", sensitivity) >= 0) {
@@ -179,7 +179,7 @@ void jni_SetProperties(JNIEnv *env) {
 
 	long clicktime = hook_get_multi_click_time();
 	if (clicktime >= 0) {
-		jni_Logger(env, LOG_LEVEL_DEBUG,	"%s [%u]: hook_get_multi_click_time(): successful. (%li)\n",
+		jni_Logger(env, LOG_LEVEL_DEBUG, "%s [%u]: hook_get_multi_click_time(): successful. (%li)\n",
 				__FUNCTION__, __LINE__, clicktime);
 
 		if (snprintf(buffer, sizeof(buffer), "%li", clicktime) >= 0) {
