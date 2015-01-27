@@ -167,6 +167,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</fail>
 
 
+		<!-- Set the default javac build properties. -->
+		<property name="ant.build.javac.compiler" value="modern" />
+		<property name="ant.build.javac.source" value="${ant.java.version}" />
+		<property name="ant.build.javac.target" value="${ant.java.version}" />
+		<property name="ant.build.javac.args" value="" />
+
+
 		<!-- Define the JNI Tasks provided by classpathref. -->
 		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" onerror="failall" />
 
