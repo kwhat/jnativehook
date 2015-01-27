@@ -166,6 +166,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</condition>
 		</fail>
 
+		<!-- Set the default javac build properties. -->
+		<property name="ant.build.javac.compiler" value="modern" />
+		<property name="ant.build.javac.source" value="${ant.java.version}" />
+		<property name="ant.build.javac.target" value="${ant.java.version}" />
+		<property name="ant.build.javac.args" value="" />
 
 		<!-- Define the JNI Tasks provided by classpathref. -->
 		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" onerror="failall" />
@@ -303,10 +308,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Downloading libUIOHook source...</echo>
 		<mkdir dir="${dir.src}/libuiohook" />
 
-		<get src="https://github.com/kwhat/libuiohook/archive/master.zip" dest="${dir.bin}/libuiohook-master.zip" verbose="true" />
+		<get src="https://github.com/kwhat/libuiohook/archive/1.0.zip" dest="${dir.bin}/libuiohook-1.0.zip" verbose="true" />
 
-		<unzip src="${dir.bin}/libuiohook-master.zip" dest="${dir.src}/libuiohook">
-			<mapper type="glob" from="libuiohook-master/*" to="*" />
+		<unzip src="${dir.bin}/libuiohook-1.0.zip" dest="${dir.src}/libuiohook">
+			<mapper type="glob" from="libuiohook-1.0/*" to="*" />
 		</unzip>
 	</target>
 
