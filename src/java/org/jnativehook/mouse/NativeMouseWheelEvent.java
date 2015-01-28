@@ -66,32 +66,32 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	public static final int	WHEEL_BLOCK_SCROLL	= 2;
 
 	/**
-     * Only valid for scrollType WHEEL_UNIT_SCROLL. Indicates number of units
-     * that should be scrolled per click of mouse wheel rotation, based on
-     * platform settings.
-     *
-     * @see #getScrollAmount
-     * @see #getScrollType
-     */
+	 * Only valid for scrollType WHEEL_UNIT_SCROLL. Indicates number of units
+	 * that should be scrolled per click of mouse wheel rotation, based on
+	 * platform settings.
+	 *
+	 * @see #getScrollAmount
+	 * @see #getScrollType
+	 */
 	private int scrollAmount;
 
     /**
-     * Indicates what sort of scrolling should take place in response to this
-     * event, based on platform settings.  Legal values are:
-     * <ul>
-     * 	<li> WHEEL_UNIT_SCROLL
-     * 	<li> WHEEL_BLOCK_SCROLL
-     * </ul>
-     *
-     * @see #getScrollType
-     */
+	 * Indicates what sort of scrolling should take place in response to this
+	 * event, based on platform settings.  Legal values are:
+	 * <ul>
+	 * 	<li> WHEEL_UNIT_SCROLL
+	 * 	<li> WHEEL_BLOCK_SCROLL
+	 * </ul>
+	 *
+	 * @see #getScrollType
+	 */
 	private int scrollType;
 
     /**
-     * Indicates how far the mouse wheel was rotated.
-     *
-     * @see #getWheelRotation
-     */
+	 * Indicates how far the mouse wheel was rotated.
+	 *
+	 * @see #getWheelRotation
+	 */
 	private int wheelRotation;
 
 	/**
@@ -107,15 +107,15 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * @param x the x coordinate of the native pointer.
 	 * @param y the y coordinate of the native pointer.
 	 * @param clickCount the number of button clicks associated with this event.
-     * @param scrollType the type of scrolling which should take place in
-     * response to this event;  valid values are <code>WHEEL_UNIT_SCROLL</code>
-     * and <code>WHEEL_BLOCK_SCROLL</code>.
-     * @param scrollAmount for scrollType <code>WHEEL_UNIT_SCROLL</code>, the
-     * number of units to be scrolled.
-     * @param wheelRotation the amount that the mouse wheel was rotated (the
-     * number of "clicks")
-     *
-     * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)
+	 * @param scrollType the type of scrolling which should take place in
+	 * response to this event;  valid values are <code>WHEEL_UNIT_SCROLL</code>
+	 * and <code>WHEEL_BLOCK_SCROLL</code>.
+	 * @param scrollAmount for scrollType <code>WHEEL_UNIT_SCROLL</code>, the
+	 * number of units to be scrolled.
+	 * @param wheelRotation the amount that the mouse wheel was rotated (the
+	 * number of "clicks")
+	 *
+	 * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)
 	 */
 	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation) {
 		super(id, when, modifiers, x, y, clickCount);
@@ -141,33 +141,33 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	}
 
     /**
-     * Returns the type of scrolling that should take place in response to this
-     * event.  This is determined by the native platform.  Legal values are:
-     * <ul>
-     * 	<li> MouseWheelEvent.WHEEL_UNIT_SCROLL
-     * 	<li> MouseWheelEvent.WHEEL_BLOCK_SCROLL
-     * </ul>
-     *
-     * @return either NativeMouseWheelEvent.WHEEL_UNIT_SCROLL or
-     *  NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL, depending on the configuration of
-     *  the native platform.
-     * @see java.awt.Adjustable#getUnitIncrement
-     * @see java.awt.Adjustable#getBlockIncrement
-     * @see javax.swing.Scrollable#getScrollableUnitIncrement
-     * @see javax.swing.Scrollable#getScrollableBlockIncrement
-     */
+	 * Returns the type of scrolling that should take place in response to this
+	 * event.  This is determined by the native platform.  Legal values are:
+	 * <ul>
+	 * 	<li> MouseWheelEvent.WHEEL_UNIT_SCROLL
+	 * 	<li> MouseWheelEvent.WHEEL_BLOCK_SCROLL
+	 * </ul>
+	 *
+	 * @return either NativeMouseWheelEvent.WHEEL_UNIT_SCROLL or
+	 *  NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL, depending on the configuration of
+	 *  the native platform.
+	 * @see java.awt.Adjustable#getUnitIncrement
+	 * @see java.awt.Adjustable#getBlockIncrement
+	 * @see javax.swing.Scrollable#getScrollableUnitIncrement
+	 * @see javax.swing.Scrollable#getScrollableBlockIncrement
+	 */
 	public int getScrollType() {
 		return scrollType;
 	}
 
 
     /**
-     * Returns the number of "clicks" the mouse wheel was rotated.
-     *
-     * @return negative values if the mouse wheel was rotated up/away from
-     * the user, and positive values if the mouse wheel was rotated down/
-     * toward(s) the user.
-     */
+	 * Returns the number of "clicks" the mouse wheel was rotated.
+	 *
+	 * @return negative values if the mouse wheel was rotated up/away from
+	 * the user, and positive values if the mouse wheel was rotated down/
+	 * toward(s) the user.
+	 */
 	public int getWheelRotation() {
 		return wheelRotation;
 	}
