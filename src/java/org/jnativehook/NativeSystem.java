@@ -17,6 +17,8 @@
  */
 package org.jnativehook;
 
+import java.util.Locale;
+
 /**
  * A small class to determine the native system's operating system family and
  * architecture. The class is only used to determine which native library to
@@ -58,7 +60,7 @@ public class NativeSystem {
 
 		@Override
 		public String toString() {
-			return super.toString().toLowerCase();
+			return super.toString().toLowerCase(Locale.ROOT);
 		}
 	}
 
@@ -94,7 +96,7 @@ public class NativeSystem {
 
 		@Override
 		public String toString() {
-			return super.toString().toLowerCase();
+			return super.toString().toLowerCase(Locale.ROOT);
 		}
 	}
 
@@ -123,7 +125,7 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("linux")) {
 			family = Family.LINUX;
 		}
-		else if (osName.toLowerCase().startsWith("windows")) {
+		else if (osName.toLowerCase(Locale.ROOT).startsWith("windows")) {
 			family = Family.WINDOWS;
 		}
 		else {
