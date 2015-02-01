@@ -1,5 +1,8 @@
 ## News
 
+**JNativeHook 2.0.0 Major Release (Jan 27, 2015)**
+Version 2.0 is now offically avaiable.  After reviewing the GlobalScreen API, I decided to make a few minor changes.  I have removed the GlobalScreen singlton and convert all object methods to static methods.  Additionally the `DefaultDispatchService` was externalized to its own public class and a new `SwingDispatchService` was added for those working with swing.  There is also an all new `NativeLibraryLocator` interface contribued by Aidas Adomkus that will allow you to override the default native libary unpacking and loading.  You can specifiy an implemetning class with the `jnativehook.lib.locator` property prior to the class being loaded.
+
 **JNativeHook 2.0.0-RC5 General Preview (Jan 02, 2015)**
 
 Version 1.2 has now been bumped to 2.0 ahead of the official release.  Sorry for the late version change.  I didn't feel like it was appropriate to keep this in the 1.X branch because it shares almost no code in common.  The fifth release candidate addresses two small issues that have resulted in some radical changes to the code base.  
