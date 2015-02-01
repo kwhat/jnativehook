@@ -556,8 +556,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<mkdir dir="${dir.doc}" />
 
 		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
-			<arg line="${ant.build.javac.args}" />
-
 			<packageset dir="${dir.src}/java" defaultexcludes="yes">
 				<include name="org/jnativehook/**" />
 				<exclude name="org/jnativehook/example/**" />

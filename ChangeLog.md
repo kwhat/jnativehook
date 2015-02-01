@@ -1,4 +1,4 @@
-**JNativeHook 2.0.0 (Tentative)**
+**JNativeHook 2.0.0 (Jan 27, 2015)**
  * Total rewrite and fork of the native code to its own [standalone project](https://github.com/kwhat/libuiohook).
  * Transitioned to virutal keycodes backed by scancode set 1.
  * Added Java's ExecutorService support for event delivery.
