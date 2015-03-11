@@ -125,17 +125,17 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 		this.wheelRotation = wheelRotation;
 	}
 
-    /**
-     * Returns the number of units that should be scrolled per
-     * click of mouse wheel rotation.
-     * Only valid if <code>getScrollType</code> returns
-     * <code>NativeMouseWheelEvent.WHEEL_UNIT_SCROLL</code>
-     *
-     * @return number of units to scroll, or an undefined value if
-     *  <code>getScrollType</code> returns
-     *  <code>NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL</code>
-     * @see #getScrollType
-     */
+	/**
+	 * Returns the number of units that should be scrolled per
+	 * click of mouse wheel rotation.
+	 * Only valid if <code>getScrollType</code> returns
+	 * <code>NativeMouseWheelEvent.WHEEL_UNIT_SCROLL</code>
+	 *
+	 * @return number of units to scroll, or an undefined value if
+	 *  <code>getScrollType</code> returns
+	 *  <code>NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL</code>
+	 * @see #getScrollType
+	 */
 	public int getScrollAmount() {
 		return scrollAmount;
 	}

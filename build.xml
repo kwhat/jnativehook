@@ -174,7 +174,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 		<!-- Preform libuiohook target checks. -->
-		<available file="${dir.src}/libuiohook" property="project.check.libuiohook.download" />
+		<fileset dir="${dir.src}/libuiohook" id="src-libuiohook" />
+		<pathconvert refid="src-libuiohook" property="project.check.libuiohook.download" setonempty="false" />
 		<available file="${dir.src}/libuiohook/configure" property="project.check.libuiohook.bootstrap" />
 		<available file="${dir.bin}/libuiohook/Makefile" property="project.check.libuiohook.configure" />
 		<available file="${dir.doc}/" property="project.check.javadoc" />
