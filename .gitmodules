@@ -1,0 +1,3 @@
+[submodule "src/libuiohook"]
+	path = src/libuiohook
+	url = git@github.com:kwhat/libuiohook.git
