@@ -592,7 +592,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<exclude name="jni/include/org_jnativehook_GlobalScreen.h" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h" />
-				<exclude name="jnitasks/" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}/libuiohook" prefix="${ant.project.name}/src/libuiohook">
@@ -615,6 +614,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<include name="build.*" />
 				<include name="AUTHORS" />
 				<include name="*.md" />
+
+				<exclude name="build.properties" />
 			</zipfileset>
 		</zip>
 	</target>

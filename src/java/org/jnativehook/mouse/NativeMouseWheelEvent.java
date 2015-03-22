@@ -75,7 +75,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 */
 	private int scrollAmount;
 
-    /**
+	/**
 	 * Indicates what sort of scrolling should take place in response to this
 	 * event, based on platform settings.  Legal values are:
 	 * <ul>
@@ -87,7 +87,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 */
 	private int scrollType;
 
-    /**
+	/**
 	 * Indicates how far the mouse wheel was rotated.
 	 *
 	 * @see #getWheelRotation
@@ -140,7 +140,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 		return scrollAmount;
 	}
 
-    /**
+	/**
 	 * Returns the type of scrolling that should take place in response to this
 	 * event.  This is determined by the native platform.  Legal values are:
 	 * <ul>
@@ -161,7 +161,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	}
 
 
-    /**
+	/**
 	 * Returns the number of "clicks" the mouse wheel was rotated.
 	 *
 	 * @return negative values if the mouse wheel was rotated up/away from
