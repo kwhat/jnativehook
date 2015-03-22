@@ -1,3 +1,11 @@
+**JNativeHook 2.0.1 (Mar 21, 2015)**
+ * Added support for dispatch_sync_f when available on OS X.
+ * Added libuiohook as a git submodule.
+ * Changed hard coded dlsym() paths to RTLD_DEFAULT on OS X.
+ * Fixed a memory leak in event posting on OS X.
+ * Fixed an LTO related crash on Linux.
+ * Fixed missing button number for mouse pressed events on Windows.
+
 **JNativeHook 2.0.0 (Jan 27, 2015)**
  * Total rewrite and fork of the native code to its own [standalone project](https://github.com/kwhat/libuiohook).
  * Transitioned to virutal keycodes backed by scancode set 1.
