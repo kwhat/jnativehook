@@ -209,24 +209,19 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		ItemSelectable item = e.getItemSelectable();
 
 		if (item == menuItemEnable) {
-			// Keyboard checkbox was changed, adjust listeners accordingly.
-			if (e.getStateChange() == ItemEvent.SELECTED) {
-				try {
+			try {
+				// Keyboard checkbox was changed, adjust listeners accordingly.
+				if (e.getStateChange() == ItemEvent.SELECTED) {
 					// Initialize native hook.  This is done on window open because the
 					// listener requires the txtEventInfo object to be constructed.
 					GlobalScreen.registerNativeHook();
 				}
-				catch (NativeHookException ex) {
-					txtEventInfo.append("Error: " + ex.getMessage() + "\n");
-				}
-			}
-			else {
-				try {
+				else {
 					GlobalScreen.unregisterNativeHook();
 				}
-				catch (NativeHookException ex) {
-					txtEventInfo.append("Error: " + ex.getMessage() + "\n");
-				}
+			}
+			catch (NativeHookException ex) {
+				txtEventInfo.append("Error: " + ex.getMessage() + "\n");
 			}
 
 			// Set the enable menu item to the state of the hook.
