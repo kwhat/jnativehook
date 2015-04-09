@@ -1,0 +1,9 @@
+ant.importBuild("build.xml")
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+}
