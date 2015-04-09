@@ -6,4 +6,3 @@
 /src/jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h
 /src/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h
 build.properties
-/JNITasks.jar
