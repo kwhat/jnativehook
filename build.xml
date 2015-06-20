@@ -512,7 +512,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</target>
 
 
-	<target name="jar" description="Creates the jar library.">
+	<target name="jar" depends="javadoc" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.bin}/class/java/org/jnativehook/lib" />
 		<copy overwrite="true" todir="${dir.bin}/class/java/org/jnativehook/lib">
@@ -523,7 +523,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<mkdir dir="${dir.jar}" />
 		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
 			<include name="org/jnativehook/**" />
-			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
+
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
 				<section name="org/jnativehook">
@@ -619,7 +619,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</target>
 
 
-	<target name="package" depends="javadoc,jar" description="Creates zip files for distribution.">
+	<target name="package" depends="jar,maven" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
@@ -658,7 +658,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<include name="*.md" />
 				<include name="*.ac" />
 			</zipfileset>
-
 
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
 				<include name="build.*" />
