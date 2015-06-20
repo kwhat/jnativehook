@@ -519,9 +519,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<fileset dir="${dir.lib}" includes="**/*" />
 		</copy>
 
-		<echo>Creating ${ant.project.name}.jar...</echo>
+		<echo>Creating jar files...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/${ant.project.name}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
+		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
 			<include name="org/jnativehook/**" />
 			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
 			<manifest>
@@ -536,6 +536,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					<attribute name="Implementation-Vendor" value="${ant.project.vendor}" />
 				</section>
 			</manifest>
+		</jar>
+
+		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-sources.jar" basedir="${dir.src}" update="true" compress="true" level="9">
+			<include name="**/*" />
+		</jar>
+
+		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-javadoc.jar" basedir="${dir.doc}" update="true" compress="true" level="9">
+			<include name="**/*" />
 		</jar>
 	</target>
 
@@ -570,7 +578,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</target>
 
 
-	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution.">
+	<target name="maven" description="Creates files required for maven deployment.">
+		<echo>Creating pom.xml file...</echo>
+		<copy file="${dir.src}/pom.xml.in" tofile="pom.xml" />
+		<replace file="pom.xml">
+			<replacefilter token="@version@" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
+		</replace>
+
+		<echo>Creating GPG signature for jars...</echo>
+		<delete verbose="true" failonerror="false">
+			<fileset dir="${dir.jar}" includes="**/*.jar.asc" />
+		</delete>
+
+		<!-- We maybe able to replace this garbage with commons-openpgp.jar if I could only find it.  -->
+		<exec executable="gpg" failonerror="true">
+			<arg value="-abv" />
+			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" />
+		</exec>
+
+		<exec executable="gpg" failonerror="true">
+			<arg value="-abv" />
+			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-sources.jar" />
+		</exec>
+
+		<exec executable="gpg" failonerror="true">
+			<arg value="-abv" />
+			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-javadoc.jar" />
+		</exec>
+
+		<!-- Unfortunately we cannot use the maven ant tasks to sign because Gentoo does not support maven.  -->
+		<!-- mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+			<arg value="-Durl=file://${dir.maven}" />
+			<arg value="-DrepositoryId=local" />
+			<arg value="-Darguments=&quot;gpg.passphrase=jnativehook-debug&quot;" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${dir.maven}/${jar.maven.name}.jar" />
+			<arg value="-Pgpg" />
+		</mvn -->
+	</target>
+
+
+	<target name="package" depends="javadoc,jar" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
@@ -581,13 +630,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</zipfileset>
 
 			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
-				<include name="${ant.project.name}.jar" />
+				<include name="*.jar*" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
 				<include name="java/**/*" />
 				<include name="jni/**/*" />
 				<include name="test/**/*" />
+				<include name="pom.xml.in" />
 
 				<exclude name="jni/include/org_jnativehook_GlobalScreen.h" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />

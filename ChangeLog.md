@@ -1,3 +1,11 @@
+**JNativeHook 2.0.2**
+ * Added support for maven.
+ * Added modifier polling to hook start procedure.
+ * Fixed a bug on OS X where the hook would always succeed.
+ * Fixed event timing issues for all platforms.
+ * Fixed issue with build.property file being included.
+ * Various cleanups throughout the code base.
+
 **JNativeHook 2.0.1 (Mar 21, 2015)**
  * Added support for dispatch_sync_f when available on OS X.
  * Added libuiohook as a git submodule.

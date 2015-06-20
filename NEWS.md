@@ -1,5 +1,8 @@
 ## News
 
+**JNativeHook 2.0.2 Maintenance Release**
+Finally added maven support.
+
 **JNativeHook 2.0.1 Maintenance Release (Mar 21, 2015)**
 This release addresses several issues on OS X including a memory leak.  Other bug fixes include a missing button number on windows and LTO related compiler issues.
 

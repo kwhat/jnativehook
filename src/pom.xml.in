@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jnativehook</groupId>
+	<artifactId>jnativehook</artifactId>
+	<version>@version@</version>
+	<packaging>jar</packaging>
+	<name>JNativeHook</name>
+	<description>Global keyboard and mouse listeners for Java.</description>
+	<url>https://github.com/kwhat/jnativehook</url>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License (GPL), Version 3.0</name>
+			<url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+		</license>
+
+		<license>
+			<name>GNU Lesser General Public License (LGPL), Version 3.0</name>
+			<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Alex Barker</name>
+			<email>alex@1stleg.com</email>
+			<organization>Personal</organization>
+			<organizationUrl>https://github.com/kwhat/</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git@github.com:kwhat/jnativehook.git</connection>
+		<developerConnection>scm:git:git@github.com:kwhat/jnativehook.git</developerConnection>
+		<url>git@github.com:kwhat/jnativehook.git</url>
+	</scm>
+</project>
