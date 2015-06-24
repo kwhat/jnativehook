@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			<fileset dir="${dir.dist}" />
 			<fileset dir="${dir.doc}" />
-			<fileset file="${dir.jar}/${ant.project.name}.jar" />
+			<fileset dir="${dir.jar}" />
 
 			<fileset dir="${dir.src}/libuiohook" casesensitive="yes">
 				<include name="autom4te.cache" />
@@ -521,7 +521,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<echo>Creating jar files...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
+		<jar jarfile="${dir.jar}/jnativehook-${ant.project.version}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
 			<include name="org/jnativehook/**" />
 
 			<manifest>
@@ -537,14 +537,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				</section>
 			</manifest>
 		</jar>
-
-		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-sources.jar" basedir="${dir.src}" update="true" compress="true" level="9">
-			<include name="**/*" />
-		</jar>
-
-		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-javadoc.jar" basedir="${dir.doc}" update="true" compress="true" level="9">
-			<include name="**/*" />
-		</jar>
 	</target>
 
 
@@ -552,7 +544,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}" />
 			<classpath>
-				<pathelement location="${dir.jar}/${ant.project.name}.jar" />
+				<pathelement location="${dir.jar}/jnativehook-${ant.project.version}.jar" />
 				<pathelement path="${dir.bin}/class/java" />
 				<pathelement path="${java.class.path}" />
 			</classpath>
@@ -570,56 +562,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<exclude name="org/jnativehook/example/**" />
 			</packageset>
 
-			<doctitle><![CDATA[<h1>${ant.project.name} API Documentation</h1>]]></doctitle>
+			<doctitle><![CDATA[<h1>${ant.project.name}-${ant.build.major}.${ant.build.minor} API Documentation</h1>]]></doctitle>
 			<bottom><![CDATA[<i>Copyright &#169; 2006-2015 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
-			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 		</javadoc>
 	</target>
 
 
-	<target name="maven" description="Creates files required for maven deployment.">
-		<echo>Creating pom.xml file...</echo>
-		<copy file="${dir.src}/pom.xml.in" tofile="pom.xml" />
-		<replace file="pom.xml">
-			<replacefilter token="@version@" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
-		</replace>
-
-		<echo>Creating GPG signature for jars...</echo>
-		<delete verbose="true" failonerror="false">
-			<fileset dir="${dir.jar}" includes="**/*.jar.asc" />
-		</delete>
-
-		<!-- We maybe able to replace this garbage with commons-openpgp.jar if I could only find it.  -->
-		<exec executable="gpg" failonerror="true">
-			<arg value="-abv" />
-			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" />
-		</exec>
-
-		<exec executable="gpg" failonerror="true">
-			<arg value="-abv" />
-			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-sources.jar" />
-		</exec>
-
-		<exec executable="gpg" failonerror="true">
-			<arg value="-abv" />
-			<arg value="${dir.jar}/${ant.project.name}-${ant.build.major}.${ant.build.minor}.${ant.build.revision}-javadoc.jar" />
-		</exec>
-
-		<!-- Unfortunately we cannot use the maven ant tasks to sign because Gentoo does not support maven.  -->
-		<!-- mvn>
-			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-			<arg value="-Durl=file://${dir.maven}" />
-			<arg value="-DrepositoryId=local" />
-			<arg value="-Darguments=&quot;gpg.passphrase=jnativehook-debug&quot;" />
-			<arg value="-DpomFile=pom.xml" />
-			<arg value="-Dfile=${dir.maven}/${jar.maven.name}.jar" />
-			<arg value="-Pgpg" />
-		</mvn -->
-	</target>
-
-
-	<target name="package" depends="jar,maven" description="Creates zip files for distribution.">
+	<target name="package" depends="jar" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
