@@ -581,14 +581,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</zipfileset>
 
 			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
-				<include name="*.jar*" />
+				<include name="*.jar" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
 				<include name="java/**/*" />
 				<include name="jni/**/*" />
 				<include name="test/**/*" />
-				<include name="pom.xml.in" />
 
 				<exclude name="jni/include/org_jnativehook_GlobalScreen.h" />
 				<exclude name="jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />
