@@ -1,9 +1,11 @@
-**JNativeHook 2.0.2**
- * Added support for maven.
+## ChangeLog
+
+**JNativeHook 2.0.2 (Jun 28, 2015)**
+ * Added support for Maven central repository.
  * Added modifier polling to hook start procedure.
  * Fixed a bug on OS X where the hook would always succeed.
  * Fixed event timing issues for all platforms.
- * Fixed issue with build.property file being included.
+ * Fixed issue with build.property file being included in the release package.
  * Various cleanups throughout the code base.
 
 **JNativeHook 2.0.1 (Mar 21, 2015)**
