@@ -1,5 +1,9 @@
 ## ChangeLog
 
+**JNativeHook 2.0.3**
+ * Added support for media keys on OS X.
+ * Fixed caps-lock key release on OS X.
+ 
 **JNativeHook 2.0.2 (Jun 28, 2015)**
  * Added support for Maven central repository.
  * Added modifier polling to hook start procedure.
