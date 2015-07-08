@@ -26,6 +26,9 @@ guarantee that any of these properties will be available.
 * jnativehook.pointer.sensitivity
 * jnativehook.pointer.acceleration.multiplier
 * jnativehook.pointer.acceleration.threshold
+ 
+## Releases
+To save having to build and compile manually, releases of JNativeHook can be found in the releases page, [here](https://github.com/kwhat/jnativehook/releases).
 
 ## Software and Hardware Requirements
 * Java 1.5 - 1.8
