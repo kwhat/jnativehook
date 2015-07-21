@@ -29,7 +29,7 @@
 JavaVM *jvm;
 JavaVMAttachArgs jvm_attach_args = {
 	.version = JNI_VERSION_1_4,
-	.name = "JNativeHook Hook Thread",
+	.name = "JNativeHook Library",
 	.group = NULL
 };
 
