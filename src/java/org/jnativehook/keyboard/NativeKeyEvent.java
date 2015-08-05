@@ -36,7 +36,7 @@ import java.awt.Toolkit;
  *
  * All <code>NativeKeyEvent</code> objects are dependent on the native platform and
  * keyboard layout. <code>NATIVE_KEY_PRESSED</code> and <code>NATIVE_KEY_RELEASED</code>
- * are generated for every key code received by the native system. The key being pressed
+ * events are generated for every key code received by the native system. The key being pressed
  * or released is indicated by the getKeyCode method, which returns a virtual key code or
  * <code>VC_UNDEFINED</code>.  Please note that {@link #getKeyChar()} for events of type
  * <code>NATIVE_KEY_PRESSED</code> and <code>NATIVE_KEY_RELEASED</code> will always return
@@ -52,9 +52,9 @@ import java.awt.Toolkit;
  *
  * Virtual key codes only represent the physical key that has been pressed and
  * should not be mistaken with the character mapped to that key by the operating
- * system.  To determine the Unicode representation of the <code>NativeKeyEvent</code>,
- * please use the {@link #getKeyChar()} method for the <code>NATIVE_KEY_TYPED</code>
- * event associated with that virtual key code.
+ * system.  <code>NATIVE_KEY_PRESSED</code> and <code>NATIVE_KEY_RELEASED</code> events
+ * should only be used to determin phisical key state, while <code>NATIVE_KEY_TYPED</code>
+ * events can be used to determine the Unicode representation of the <code>NativeKeyEvent</code>.
  * <p>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
@@ -392,7 +392,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 	}
 
 	/**
-	 * Returns the keyCode associated with this event.
+	 * Returns the keyCode associated with this event.  Note,
+	 * this method will always return <code>VC_UNDEFINED</code> for the
+	 * <code>NATIVE_KEY_TYPED</code> event types.
 	 *
 	 * @return the native virtual key code.
 	 */
@@ -410,7 +412,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 	}
 
 	/**
-	 * Returns the native Unicode character associated with this event.
+	 * Returns the native Unicode character associated with this event.  Note,
+	 * this method will always return <code>CHAR_UNDEFINED</code> for
+	 * <code>NATIVE_KEY_PRESSED</code> and <code>NATIVE_KEY_RELEASED</code>
+	 * event types.
 	 *
 	 * @return the Unicode character defined for this key event. If no valid
 	 * Unicode character exists for this key event, <code>CHAR_UNDEFINED</code>
