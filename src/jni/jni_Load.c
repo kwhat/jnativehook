@@ -72,16 +72,13 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	// system properties set on load.
 	JNIEnv *env = NULL;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
+		// It is not critical that these values are cleared so no exception
+		// will be thrown if this does not succeed.
+
 		// Clear java properties from native sources.
 		jni_ClearProperties(env);
 
 		// Cleanup JNI global memory.
 		jni_DestroyGlobals(env);
-	}
-	else {
-		// It is not critical that these values are cleared so no exception
-		// will be thrown.
-		jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Failed to acquire JNI interface pointer!\n",
-				__FUNCTION__, __LINE__);
 	}
 }
