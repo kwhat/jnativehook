@@ -116,68 +116,75 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 			}
 
 
-			try {
-				// The temp file for this instance of the library.
-				File libFile;
+			// The temp file for this instance of the library.
+			File libFile = null;
+			if (libNativeVersion != null) {
+				// Use the library version from the manifest to create a file.
+				libFile = new File(System.getProperty("java.io.tmpdir"),
+						libNativePrefix + libNativeVersion + libNativeSuffix);
 
-				if (libNativeVersion != null) {
-					// Use the library version from the manifest to create a file.
-					libFile = new File(System.getProperty("java.io.tmpdir"),
-							libNativePrefix + libNativeVersion + libNativeSuffix);
+				if (libFile.exists()) {
+					// Add the native library to the list.
+					libraries.add(libFile);
 				}
-				else {
-					// If we were unable to extract a library version from the manifest, create a new tmp file.
-					libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
-				}
+			}
 
-				byte[] buffer = new byte[4 * 1024];
-				int size;
-
-				// Check and see if a copy of the native lib already exists.
-				FileOutputStream libOutputStream = new FileOutputStream(libFile);
-
-				// Setup a digest...
-				MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-				DigestInputStream digestInputStream = new DigestInputStream(libInputStream, sha1);
-
-				// Read from the digest stream and write to the file steam.
-				while ((size = digestInputStream.read(buffer)) != -1) {
-					libOutputStream.write(buffer, 0, size);
-				}
-
-				// Close all the streams.
-				digestInputStream.close();
-				libInputStream.close();
-				libOutputStream.close();
-
-				// Convert the digest from byte[] to hex string.
-				String sha1Sum = new BigInteger(1, sha1.digest()).toString(16).toUpperCase();
-				if (libNativeVersion == null) {
-					// Use the sha1 sum as a version finger print.
-					libNativeVersion = sha1Sum;
-
-					// Better late than never.
-					File newFile = new File(System.getProperty("java.io.tmpdir"),
-							libNativePrefix + libNativeVersion + libNativeSuffix);
-					if (libFile.renameTo(newFile)) {
-						libFile = newFile;
+			if (libraries.isEmpty()) {
+				try {
+					if (libFile == null) {
+						// If we were unable to extract a library version from the manifest, create a new tmp file.
+						libFile = File.createTempFile(libNativePrefix, libNativeSuffix);
 					}
+
+					byte[] buffer = new byte[4 * 1024];
+					int size;
+
+					// Check and see if a copy of the native lib already exists.
+					FileOutputStream libOutputStream = new FileOutputStream(libFile);
+
+					// Setup a digest...
+					MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+					DigestInputStream digestInputStream = new DigestInputStream(libInputStream, sha1);
+
+					// Read from the digest stream and write to the file steam.
+					while ((size = digestInputStream.read(buffer)) != -1) {
+						libOutputStream.write(buffer, 0, size);
+					}
+
+					// Close all the streams.
+					digestInputStream.close();
+					libInputStream.close();
+					libOutputStream.close();
+
+					// Convert the digest from byte[] to hex string.
+					String sha1Sum = new BigInteger(1, sha1.digest()).toString(16).toUpperCase();
+					if (libNativeVersion == null) {
+						// Use the sha1 sum as a version finger print.
+						libNativeVersion = sha1Sum;
+
+						// Better late than never.
+						File newFile = new File(System.getProperty("java.io.tmpdir"),
+								libNativePrefix + libNativeVersion + libNativeSuffix);
+						if (libFile.renameTo(newFile)) {
+							libFile = newFile;
+						}
+					}
+
+					// Set the library version property.
+					System.setProperty("jnativehook.lib.version", libNativeVersion);
+
+					// Add the native library to the list.
+					libraries.add(libFile);
+
+					// Log the file path and checksum.
+					logger.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
 				}
-
-				// Set the library version property.
-				System.setProperty("jnativehook.lib.version", libNativeVersion);
-
-				// Add the native library to the list.
-				libraries.add(libFile);
-
-				// Log the file path and checksum.
-				logger.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
-			}
-			catch (IOException e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-			catch (NoSuchAlgorithmException e) {
-				throw new IllegalStateException(e.getMessage(), e);
+				catch (IOException e) {
+					throw new IllegalStateException(e.getMessage(), e);
+				}
+				catch (NoSuchAlgorithmException e) {
+					throw new IllegalStateException(e.getMessage(), e);
+				}
 			}
 		}
 		else {
