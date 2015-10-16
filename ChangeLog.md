@@ -1,9 +1,14 @@
 ## ChangeLog
 
-**JNativeHook 2.0.3**
+**JNativeHook 2.0.3 (Tentative)**
  * Added support for media keys on OS X.
+ * Added wiki pages to the project.
  * Fixed caps-lock key release on OS X.
- 
+ * Fixed posting number keys on Windows.
+ * Fixed segfault with multiple instances on Linux.
+ * Fixed SetWindowsHookEx failed with 0X7E error on Windows.
+ * Small documentation updates.
+
 **JNativeHook 2.0.2 (Jun 28, 2015)**
  * Added support for Maven central repository.
  * Added modifier polling to hook start procedure.
