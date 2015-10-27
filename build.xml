@@ -358,7 +358,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Configuring libUIOHook source...</echo>
 		<mkdir dir="${dir.bin}/libuiohook" />
 
-		<configure toolchain="${ant.build.native.toolchain}" dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}">
+		<configure toolchain="${ant.build.native.toolchain}" dir="${dir.bin}/libuiohook" script="${dir.src}/libuiohook/configure" prefix="${dir.bin}" lib="${dir.bin}/lib">
 			<env key="CFLAGS" value="${ant.build.native.cflags}" />
 			<env key="LDFLAGS" value="${ant.build.native.ldflags}" />
 
