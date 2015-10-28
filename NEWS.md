@@ -1,5 +1,9 @@
 ## News
 
+**JNativeHook 2.0.3 Maintenance Release (Oct 27, 2015)**
+
+Maintenance release 3 addresses a few small issues across all supported platforms.  Please see the [ChangeLog](ChangeLog.md) for more information. Work as now started on version 2.1 of the library.  Future work will include better language support for X11 and possibly Wayland support.
+
 **JNativeHook 2.0.2 Maintenance Release (Jun 28, 2015)**
 
 Maintenance release 2 addresses a few small issues across all supported platforms.  The biggest change is the addition of this library to the maven central repository.  You should now be able to add JNativeHook to your project via the groupId=com.1stleg and artifactId=jnativehook.
