@@ -64,7 +64,7 @@ The graphical example application was created to provided a real-time
 demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided.
 
-## Sample Code
+## Example Code
 * [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-keyboard-listener)
 * [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-mouse-listener)
 * [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/Usage#global-mouse-wheel-listener)
