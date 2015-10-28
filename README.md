@@ -64,7 +64,7 @@ If you have found this library useful, please consider making a donation.
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UPMHT4ZFBTCBL)
 
 ## Compiling Instructions
-Detailed instructions to [compile from source](Compile.md) are available in the wiki.
+Detailed instructions to [compile from source](wiki/Compile.md) are available in the wiki.
 
 ## Demo Applicaiton
 The graphical example application was created to provided a real-time
@@ -73,13 +73,13 @@ application simply execute the jar file provided. Source code available at
 [src/java/org/jnativehook/example/NativeHookDemo.java](src/java/org/jnativehook/example/NativeHookDemo.java).
 
 ## Sample Code
-* [Global Keyboard Listener](src/wiki/examples/Keyboard.md)
-* [Global Mouse Listener](src/wiki/examples/Mouse.md)
-* [Global Mouse Wheel Listener](src/wiki/examples/MouseWheel.md)
-* [Working with Swing](src/wiki/examples/Swing.md)
-* [Logging and Console Output](src/wiki/examples/ConsoleOutput.md)
-* [Advanced Library Loading](src/wiki/examples/LibraryLoading.md)
-* [Consuming Events (Unsupported)](src/wiki/examples/ConsoleOutput.md)
+* [Global Keyboard Listener](wiki/examples/Keyboard.md)
+* [Global Mouse Listener](wiki/examples/Mouse.md)
+* [Global Mouse Wheel Listener](wiki/examples/MouseWheel.md)
+* [Working with Swing](wiki/examples/Swing.md)
+* [Logging and Console Output](wiki/examples/ConsoleOutput.md)
+* [Advanced Library Loading](wiki/examples/LibraryLoading.md)
+* [Consuming Events (Unsupported)](wiki/examples/ConsoleOutput.md)
 
 ## Additional Information
 Up to date source code and documentation available at:
