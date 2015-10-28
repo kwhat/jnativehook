@@ -201,6 +201,7 @@ public class NativeHookException extends Exception {
 	/**
 	 * Instantiates a new <code>NativeHookException</code> with a specified error code and cause.
 	 *
+	 * @param code The native error code.
 	 * @param cause The cause of the exception. A null value is permitted, and indicates that the cause is unknown.
 	 */
 	public NativeHookException(int code, Throwable cause) {

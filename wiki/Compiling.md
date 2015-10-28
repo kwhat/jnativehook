@@ -1,5 +1,5 @@
 ## Introduction
-  JNativeHook should compile on all operating systems that support Java. Unix and Linux based systems will require the X Window System for compilation and execution.  You will need to add [JNITasks v0.2](https://github.com/kwhat/jnitasks) to your Ant class path prior to compiling.  As a convenience, you can place the jar in the `jnativehook/` folder to have it automatically added to the class path for you.
+JNativeHook should compile on all operating systems that support Java. Unix and Linux based systems will require the X Window System for compilation and execution.  You will need to add [JNITasks v0.2](https://github.com/kwhat/jnitasks) to your Ant class path prior to compiling.  As a convenience, you can place the jar in the `jnativehook/` folder to have it automatically added to the class path for you.
 
 ## Platform Specific Setup
 Begin by downloading and installing a recent version of [Oracle's JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) for your specific platform.

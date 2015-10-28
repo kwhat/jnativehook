@@ -2,7 +2,7 @@
 
 **JNativeHook 2.0.3 Maintenance Release (Oct 27, 2015)**
 
-Maintenance release 3 addresses a few small issues across all supported platforms.  Please see the [ChangeLog](ChangeLog.md) for more information. Work as now started on version 2.1 of the library.  Future work will include better language support for X11 and possibly Wayland support.
+Maintenance release 3 addresses a few small issues across all supported platforms.  Please see the [ChangeLog](ChangeLog.md) for more information. Work has now started on version 2.1 of the library.  Future work will include better language support for X11 and possibly Wayland support.
 
 **JNativeHook 2.0.2 Maintenance Release (Jun 28, 2015)**
 

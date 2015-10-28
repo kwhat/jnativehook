@@ -309,6 +309,8 @@ public final class GlobalScreen {
 	 * Disable the native hook if it is currently registered. If the native
 	 * hook it is not registered the function has no effect.
 	 *
+	 * @throws NativeHookException hook interrupted by Java.
+	 *
 	 * @since 1.1
 	 */
 	public static void unregisterNativeHook() throws NativeHookException {
