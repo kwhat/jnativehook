@@ -580,6 +580,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<include name="**/*" />
 			</zipfileset>
 
+			<zipfileset dir="${basedir}/wiki" prefix="${ant.project.name}/wiki">
+				<include name="**/*" />
+			</zipfileset>
+
 			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
 				<include name="*.jar" />
 			</zipfileset>

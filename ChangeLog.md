@@ -1,9 +1,10 @@
 ## ChangeLog
 
-**JNativeHook 2.0.3 (Oct 28, 2015)**
+**JNativeHook 2.0.3 (Nov 02, 2015)**
  * Added support for media keys on OS X.
  * Added wiki pages to the project.
  * Fixed caps-lock key release on OS X.
+ * Fixed posting mouse coordinates on Windows and Linux.
  * Fixed posting number keys on Windows.
  * Fixed segfault with multiple instances on Linux.
  * Fixed SetWindowsHookEx failed with 0X7E error on Windows.
