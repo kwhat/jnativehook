@@ -21,6 +21,11 @@ public class UrlLibraryLocator implements NativeLibraryLocator {
 		libFile.deleteOnExit(); 
 		
 		FileUtils.copyURLToFile(libUrl, libFile);
+		
+		ArrayList<libFile> list = new ArrayList(1);
+		list.add(file);
+		
+		return list;
 	}
 }
 ```

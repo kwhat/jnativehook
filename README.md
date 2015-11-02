@@ -72,7 +72,7 @@ demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided. Source code available at 
 [src/java/org/jnativehook/example/NativeHookDemo.java](src/java/org/jnativehook/example/NativeHookDemo.java).
 
-## Sample Code
+## Example Code
 * [Global Keyboard Listener](wiki/examples/Keyboard.md)
 * [Global Mouse Listener](wiki/examples/Mouse.md)
 * [Global Mouse Wheel Listener](wiki/examples/MouseWheel.md)
