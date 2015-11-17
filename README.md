@@ -31,8 +31,9 @@ guarantee that any of these properties will be available.
 Binary distribution for JNativeHook can be found at the 
 [releases](https://github.com/kwhat/jnativehook/releases) section of the 
 [project page](https://github.com/kwhat/jnativehook/).  Maven users can 
-use the artifact id JNativeHook with the group id com.1stleg to include 
-this library automatically.  The nightly builds can be found at the maven 
+use the group id `<groupId>com.1stleg</groupId>` and artifact id 
+`<artifactId>jnativehook</artifactId>` to include this library automatically.  
+The nightly builds can be found at the maven 
 [snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/).
 
 ## Software and Hardware Requirements
