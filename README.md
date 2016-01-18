@@ -64,7 +64,7 @@ If you have found this library useful, please consider making a donation.
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UPMHT4ZFBTCBL)
 
 ## Compiling Instructions
-Detailed instructions to [compile from source](wiki/Compile.md) are available in the wiki.
+Detailed instructions to [compile from source](https://github.com/kwhat/jnativehook/wiki/Compiling) are available in the wiki.
 
 ## Demo Applicaiton
 The graphical example application was created to provided a real-time
@@ -73,13 +73,13 @@ application simply execute the jar file provided. Source code available at
 [src/java/org/jnativehook/example/NativeHookDemo.java](src/java/org/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
-* [Global Keyboard Listener](wiki/examples/Keyboard.md)
-* [Global Mouse Listener](wiki/examples/Mouse.md)
-* [Global Mouse Wheel Listener](wiki/examples/MouseWheel.md)
-* [Working with Swing](wiki/examples/Swing.md)
-* [Logging and Console Output](wiki/examples/ConsoleOutput.md)
-* [Advanced Library Loading](wiki/examples/LibraryLoading.md)
-* [Consuming Events (Unsupported)](wiki/examples/ConsoleOutput.md)
+* [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/examples/Keyboard)
+* [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/examples/Mouse)
+* [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/examples/MouseWheel)
+* [Working with Swing](https://github.com/kwhat/jnativehook/wiki/examples/Swing)
+* [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/examples/ConsoleOutput)
+* [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/examples/LibraryLoading)
+* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/examples/ConsoleOutput)
 
 ## Additional Information
 Up to date source code and documentation available at:
