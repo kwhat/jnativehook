@@ -15,7 +15,7 @@ public class UrlLibraryLocator implements NativeLibraryLocator {
 		
 		String libExt = libNativeName.substring(libNativeName.lastIndexOf('.'));
 		
-		URL libUrl = new URL("http://www.mydomain.told/pathToFile/" + libNativeName);
+		URL libUrl = new URL("http://www.mydomain.tld/pathToFile/" + libNativeName);
 		File libFile = File.createTempFile(tempFile, libExt);
 		
 		libFile.deleteOnExit(); 
