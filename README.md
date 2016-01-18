@@ -73,13 +73,13 @@ application simply execute the jar file provided. Source code available at
 [src/java/org/jnativehook/example/NativeHookDemo.java](src/java/org/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
-* [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/examples/Keyboard)
-* [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/examples/Mouse)
-* [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/examples/MouseWheel)
-* [Working with Swing](https://github.com/kwhat/jnativehook/wiki/examples/Swing)
-* [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/examples/ConsoleOutput)
-* [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/examples/LibraryLoading)
-* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/examples/ConsoleOutput)
+* [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/Keyboard)
+* [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/Mouse)
+* [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/MouseWheel)
+* [Working with Swing](https://github.com/kwhat/jnativehook/wiki/Swing)
+* [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
+* [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/LibraryLoading)
+* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
 
 ## Additional Information
 Up to date source code and documentation available at:
