@@ -1,3 +1,6 @@
 [submodule "src/libuiohook"]
 	path = src/libuiohook
 	url = git@github.com:kwhat/libuiohook.git
+[submodule "wiki"]
+	path = wiki
+	url = git@github.com:kwhat/jnativehook.wiki.git
