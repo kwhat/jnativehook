@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/..">
+      <sourceFolder url="file://$MODULE_DIR$/jnitasks/test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/jnitasks/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../lib" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../jar" type="java-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/jnitasks" />
+      <excludeFolder url="file://$MODULE_DIR$/libuiohook" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" scope="TEST" name="junit-4.11" level="application" />
+    <orderEntry type="library" name="hamcrest-core-1.3" level="application" />
+    <orderEntry type="library" name="JNativeHook" level="project" />
+    <orderEntry type="library" name="JNITasks" level="project" />
+  </component>
+</module>
+
