@@ -337,10 +337,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Downloading libUIOHook source...</echo>
 		<mkdir dir="${dir.src}/libuiohook" />
 
-		<get src="https://github.com/kwhat/libuiohook/archive/1.0.zip" dest="${dir.bin}/libuiohook-1.0.zip" verbose="true" />
+		<get src="https://github.com/kwhat/libuiohook/archive/master.zip" dest="${dir.bin}/libuiohook-master.zip" verbose="true" />
 
-		<unzip src="${dir.bin}/libuiohook-1.0.zip" dest="${dir.src}/libuiohook">
-			<mapper type="glob" from="libuiohook-1.0/*" to="*" />
+		<unzip src="${dir.bin}/libuiohook-master.zip" dest="${dir.src}/libuiohook">
+			<mapper type="glob" from="libuiohook-master/*" to="*" />
 		</unzip>
 	</target>
 
