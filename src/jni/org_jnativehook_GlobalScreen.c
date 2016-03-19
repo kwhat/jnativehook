@@ -31,7 +31,7 @@
 
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject Thread_obj) {
-	int status = hook_run();
+	int status = hook_run(UIOHOOK_ALL_LISTEN_MASK);
 
 	switch (status) {
 		// System level errors.
