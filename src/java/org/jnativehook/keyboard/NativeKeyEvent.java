@@ -66,7 +66,7 @@ import java.awt.Toolkit;
  */
 public class NativeKeyEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -1324603336271643339L;
+	private static final long serialVersionUID = 2909754235120335950L;
 
 	/** The raw native key code. */
 	private int rawCode;
@@ -213,6 +213,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** Begin Cursor Key Zone */
 	public static final int VC_UP							= 0xE048;
 	public static final int VC_LEFT							= 0xE04B;
+	public static final int VC_CLEAR						= 0xE04C;
 	public static final int VC_RIGHT						= 0xE04D;
 	public static final int VC_DOWN							= 0xE050;
 
@@ -652,12 +653,14 @@ public class NativeKeyEvent extends NativeInputEvent {
 			// Begin Cursor Key Zone
 			case VC_UP:
 				return Toolkit.getProperty("AWT.up", "Up");
-			case VC_DOWN:
-				return Toolkit.getProperty("AWT.down", "Down");
 			case VC_LEFT:
 				return Toolkit.getProperty("AWT.left", "Left");
+			case VC_CLEAR:
+				return Toolkit.getProperty("AWT.clear", "Clear");
 			case VC_RIGHT:
 				return Toolkit.getProperty("AWT.right", "Right");
+			case VC_DOWN:
+				return Toolkit.getProperty("AWT.down", "Down");
 			// End Cursor Key Zone
 
 
@@ -880,9 +883,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			// Cursor Key Zone
 			case VC_UP:
-			case VC_DOWN:
 			case VC_LEFT:
+			case VC_CLEAR:
 			case VC_RIGHT:
+			case VC_DOWN:
 
 			// Numeric Zone
 			case VC_NUM_LOCK:
