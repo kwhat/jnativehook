@@ -20,7 +20,7 @@ package org.jnativehook.keyboard;
 /**
  * Adapter implementation of the NativeKeyListener interface.
  * The methods are empty so the super call is obsolete.
- * @author Sogomn
+ * @author Johannes Boczek
  *
  */
 public class NativeKeyAdapter implements NativeKeyListener {
