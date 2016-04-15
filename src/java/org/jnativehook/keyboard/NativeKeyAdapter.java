@@ -20,6 +20,12 @@ package org.jnativehook.keyboard;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+/**
+ * Adapter implementation of the NativeKeyListener interface.
+ * The methods are empty so the super call is obsolete.
+ * @author Sogomn
+ *
+ */
 public class NativeKeyAdapter implements NativeKeyListener {
 	
 	@Override
