@@ -20,7 +20,7 @@ package org.jnativehook.mouse;
 /**
  * Adapter implementation of the NativeMouseListener interface.
  * The methods are empty so the super call is obsolete.
- * @author Sogomn
+ * @author Johannes Boczek
  *
  */
 public class NativeMouseAdapter implements NativeMouseListener {
