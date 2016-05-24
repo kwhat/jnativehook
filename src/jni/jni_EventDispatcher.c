@@ -29,8 +29,6 @@
 #include "org_jnativehook_mouse_NativeMouseEvent.h"
 #include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
 
-//static jobject nativeInputEventPool[9] = { NULL };
-
 // Simple function to notify() the hook thread.
 static inline void notifyHookThread(JNIEnv *env) {
 	jobject hookThread_obj = (*env)->GetStaticObjectField(
@@ -48,26 +46,6 @@ static inline void notifyHookThread(JNIEnv *env) {
 	}
 }
 
-//NativeInputEventPool = mallc(sizeof(jobject * 9));
-	/*
-static void createNativeInputEvent(event_type type) {
-	// Skip the first two and the offset of one.
-	if (nativeInputEventPool[type - 3] == NULL) {
-
-                          	EVENT_KEY_TYPED,
-                          	EVENT_KEY_PRESSED,
-                          	EVENT_KEY_RELEASED,
-                          	EVENT_MOUSE_CLICKED,
-                          	EVENT_MOUSE_PRESSED,
-                          	EVENT_MOUSE_RELEASED,
-                          	EVENT_MOUSE_MOVED,
-                          	EVENT_MOUSE_DRAGGED,
-                          	EVENT_MOUSE_WHEEL
-
-	};
-}
-                          	*/
-
 // NOTE: This function executes on the hook thread!  If you need to block
 // please do so on another thread via your own event dispatcher.
 void jni_EventDispatcher(uiohook_event * const event) {
@@ -77,17 +55,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		jint location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
 		switch (event->type) {
 			case EVENT_HOOK_DISABLED:
-			/*
-				for (int i = 0; i < sizeof(nativeInputEventPool); i++) {
-					if (nativeInputEventPool[i] != NULL) {
-
-						// FIXME FREE MEMORY
-
-						nativeInputEventPool[i] = NULL;
-					}
-
-				}*/
-
 			case EVENT_HOOK_ENABLED:
 				notifyHookThread(env);
 				return;
@@ -227,9 +194,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			default:
-				// We didn't receive an event we know what to do with.
-//				jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid native event type! (%#X)\n",
-//						__FUNCTION__, __LINE__, event->type);
+				jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Unknown native event type: %#X\n",
+						__FUNCTION__, __LINE__, event->type);
 				break;
 		}
 

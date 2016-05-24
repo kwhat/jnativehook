@@ -1,3 +1,4 @@
+/.idea/
 /bin/
 /doc/
 /jar/
@@ -5,6 +6,8 @@
 /src/jni/include/org_jnativehook_GlobalScreen.h
 /src/jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h
 /src/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h
+/src/JNativeHook.iml
+*.jar
 build.properties
 *.project
 *.classpath

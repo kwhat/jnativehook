@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<project name="JNativeHook" default="all" basedir=".">
+<project name="jnativehook" default="all" basedir=".">
 	<!-- Project Settings -->
 	<property file="build.num" />
 	<tstamp>
@@ -34,9 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!-- Path Settings -->
 	<property name="dir.src"		value="${basedir}/src" />
 	<property name="dir.doc"		value="${basedir}/doc" />
-	<property name="dir.jar"		value="${basedir}/jar" />
 	<property name="dir.dist"		value="${basedir}/dist" />
 	<property name="dir.lib"		value="${basedir}/lib" />
+	<property name="dir.jar"		value="${basedir}/jar" />
 	<property name="dir.bin"		value="${basedir}/bin" />
 
 	<!-- Class Path Settings -->
@@ -289,13 +289,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<property name="ant.build.javac.args" value="" />
 
 		<!-- Set system specific library name. -->
-		<condition property="ant.build.native.executable" value="lib${ant.project.name}.dylib">
+		<condition property="ant.build.native.executable" value="libJNativeHook.dylib">
 			<isset property="native.os.isDarwin" />
 		</condition>
-		<condition property="ant.build.native.executable" value="${ant.project.name}.dll">
+		<condition property="ant.build.native.executable" value="JNativeHook.dll">
 			<isset property="native.os.isWindows" />
 		</condition>
-		<property name="ant.build.native.executable" value="lib${ant.project.name}.so" />
+		<property name="ant.build.native.executable" value="libJNativeHook.so" />
 
 
 		<!-- Print the relevant Ant properties for logging. -->
@@ -521,7 +521,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<echo>Creating jar files...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/jnativehook-${ant.project.version}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
+		<jar jarfile="${dir.jar}/${ant.project.name}-${ant.project.version}.jar" basedir="${dir.bin}/class/java" update="true" compress="true" level="9">
 			<include name="org/jnativehook/**" />
 
 			<manifest>
@@ -544,7 +544,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${ant.build.native.os}/${ant.build.native.arch}" />
 			<classpath>
-				<pathelement location="${dir.jar}/jnativehook-${ant.project.version}.jar" />
+				<pathelement location="${dir.jar}/${ant.project.name}-${ant.project.version}.jar" />
 				<pathelement path="${dir.bin}/class/java" />
 				<pathelement path="${java.class.path}" />
 			</classpath>
@@ -562,7 +562,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				<exclude name="org/jnativehook/example/**" />
 			</packageset>
 
-			<doctitle><![CDATA[<h1>${ant.project.name}-${ant.build.major}.${ant.build.minor} API Documentation</h1>]]></doctitle>
+			<doctitle><![CDATA[<h1>JNativeHook-${ant.build.major}.${ant.build.minor} API Documentation</h1>]]></doctitle>
 			<bottom><![CDATA[<i>Copyright &#169; 2006-2015 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
@@ -585,7 +585,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</zipfileset>
 
 			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
-				<include name="*.jar" />
+				<include name="${ant.project.name}-${ant.project.version}.jar" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">

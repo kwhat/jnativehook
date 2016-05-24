@@ -42,10 +42,13 @@ import java.util.logging.Logger;
  * listeners.
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version 2.0
+ * @version 2.1
  * @since 1.0
  */
 public final class GlobalScreen {
+	/**
+	 * Logging service for the native library.
+	 */
 	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
@@ -62,7 +65,6 @@ public final class GlobalScreen {
 	 * The list of event listeners to notify.
 	 */
 	private static EventListenerList eventListeners = new EventListenerList();
-
 
 	static {
 		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
@@ -270,11 +272,10 @@ public final class GlobalScreen {
 
 
 	/**
-	 * Enable the native hook if it is not currently running. If it is running,
-	 * the function has no effect.
+	 * Enable the native hook. If the hooks is currently enabled, this function has no effect.
 	 * <p>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
-	 * if specific operating system features are unavailable or disabled.
+	 * if specific operating system feature is unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
 	 * Access section of the System Preferences on Apple's OS X platform or
 	 * <code>Load "record"</code> is missing for the xorg.conf file on
@@ -439,7 +440,7 @@ public final class GlobalScreen {
 		 * @see NativeKeyListener
 		 * @see #addNativeKeyListener(NativeKeyListener)
 		 */
-		private void processKeyEvent(final NativeKeyEvent e) {
+		private void processKeyEvent(NativeKeyEvent e) {
 			NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
 			switch (e.getID()) {
@@ -472,7 +473,7 @@ public final class GlobalScreen {
 		 * @see NativeMouseListener
 		 * @see #addNativeMouseListener(NativeMouseListener)
 		 */
-		private void processButtonEvent(final NativeMouseEvent e) {
+		private void processButtonEvent(NativeMouseEvent e) {
 			NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
 
 			switch (e.getID()) {
@@ -505,7 +506,7 @@ public final class GlobalScreen {
 		 * @see NativeMouseMotionListener
 		 * @see #addNativeMouseMotionListener(NativeMouseMotionListener)
 		 */
-		private void processMouseEvent(final NativeMouseEvent e) {
+		private void processMouseEvent(NativeMouseEvent e) {
 			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
 
 			switch (e.getID()) {
@@ -533,7 +534,7 @@ public final class GlobalScreen {
 		 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
 		 * @since 1.1
 		 */
-		private void processMouseWheelEvent(final NativeMouseWheelEvent e) {
+		private void processMouseWheelEvent(NativeMouseWheelEvent e) {
 			NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {

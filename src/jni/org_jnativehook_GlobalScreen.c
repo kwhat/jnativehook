@@ -31,7 +31,7 @@
 
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_enable(JNIEnv *env, jobject Thread_obj) {
-	int status = hook_run(UIOHOOK_ALL_LISTEN_MASK);
+	int status = hook_run();
 
 	switch (status) {
 		// System level errors.
@@ -127,7 +127,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_d
 }
 
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass GlobalScreen_cls, jobject NativeInputEvent_obj) {
-	// Convert the event type.
+	// Get the event type.
 	jint javaType = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getID);
 
 	// Allocate memory for the virtual event and set the type.
@@ -155,23 +155,23 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-			virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
-			virtualEvent.data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
 			virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
 			virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+			virtualEvent.data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getClickCount);
+			virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getButton);
 			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-			virtualEvent.data.mouse.button = MOUSE_NOBUTTON;
-			virtualEvent.data.mouse.clicks = 0;
 			virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getX);
 			virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseEvent->getY);
+			virtualEvent.data.mouse.button = MOUSE_NOBUTTON;
+			virtualEvent.data.mouse.clicks = 0;
 			break;
 
 		case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-			virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
 			virtualEvent.data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
 			virtualEvent.data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
+			virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
 			virtualEvent.data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
 			virtualEvent.data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
 			virtualEvent.data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
