@@ -1,5 +1,9 @@
 ## ChangeLog
 
+**JNativeHook 2.1.0**
+ * All events now use the native time source instead of the Unix epoch.
+ * Added adapter classes
+ 
 **JNativeHook 2.0.3 (Nov 02, 2015)**
  * Added support for media keys on OS X.
  * Added wiki pages to the project.
