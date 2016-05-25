@@ -69,18 +69,19 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 		// Hack for OS X JRE 1.6 and earlier.
 		libNativeName = libNativeName.replaceAll("\\.jnilib$", "\\.dylib");
 
+		// Slice up the library name.
+		int i = libNativeName.lastIndexOf('.');
+		String libNativePrefix = libNativeName.substring(0, i) + '-';
+		String libNativeArch = NativeSystem.getArchitecture().toString().toLowerCase();
+		String libNativeSuffix = '.' + libNativeArch + libNativeName.substring(i);
+		String libNativeVersion = null;
+
 		// Compile the resource path for the native library.
 		StringBuilder libResourcePath = new StringBuilder("/");
 		libResourcePath.append(basePackage).append("/lib/");
 		libResourcePath.append(NativeSystem.getFamily().toString().toLowerCase()).append('/');
-		libResourcePath.append(NativeSystem.getArchitecture().toString().toLowerCase()).append('/');
+		libResourcePath.append(libNativeArch).append('/');
 		libResourcePath.append(libNativeName);
-
-		// Slice up the library name.
-		int i = libNativeName.lastIndexOf('.');
-		String libNativePrefix = libNativeName.substring(0, i) + '-';
-		String libNativeSuffix = libNativeName.substring(i);
-		String libNativeVersion = null;
 
 		// This may return null in some circumstances.
 		InputStream libInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath.toString());
