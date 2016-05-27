@@ -127,11 +127,14 @@ static inline int create_NativeInputEvent(JNIEnv *env) {
 	// Class and Constructor for the NativeInputEvent Object.
 	jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
 	if (NativeInputEvent_class != NULL) {
+		// Get the field ID for NativeInputEvent.when.
+		jfieldID when = (*env)->GetFieldID(env, NativeInputEvent_class, "when", "J");
+
 		// Get the field ID for NativeInputEvent.reserved.
 		jfieldID reserved = (*env)->GetFieldID(env, NativeInputEvent_class, "reserved", "S");
 
 		// Get the method ID for NativeInputEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeInputEvent_class, "<init>", "(Ljava/lang/Class;IJI)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeInputEvent_class, "<init>", "(Ljava/lang/Class;II)V");
 
 		// Get the method ID for NativeInputEvent.getID().
 		jmethodID getID = (*env)->GetMethodID(env, NativeInputEvent_class, "getID", "()I");
@@ -144,6 +147,7 @@ static inline int create_NativeInputEvent(JNIEnv *env) {
 			if (org_jnativehook_NativeInputEvent != NULL) {
 				// Populate our structure for later use.
 				org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
+				org_jnativehook_NativeInputEvent->when = when;
 				org_jnativehook_NativeInputEvent->reserved = reserved;
 				org_jnativehook_NativeInputEvent->init = init;
 				org_jnativehook_NativeInputEvent->getID = getID;
@@ -182,7 +186,7 @@ static inline int create_NativeKeyEvent(JNIEnv *env) {
 	jclass NativeKeyEvent_class = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
 	if (NativeKeyEvent_class != NULL) {
 		// Get the method ID for NativeKeyEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeKeyEvent_class, "<init>", "(IJIIICI)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeKeyEvent_class, "<init>", "(IIIICI)V");
 
 		// Get the method ID for NativeKeyEvent.getKeyCode().
 		jmethodID getKeyCode = (*env)->GetMethodID(env, NativeKeyEvent_class, "getKeyCode", "()I");
@@ -237,7 +241,7 @@ static inline int create_NativeMouseEvent(JNIEnv *env) {
 	jclass NativeMouseEvent_class = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
 	if (NativeMouseEvent_class != NULL) {
 		// Get the method ID for NativeMouseEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IJIIIII)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IIIIII)V");
 
 		// Get the method ID for NativeMouseEvent.getButton().
 		jmethodID getButton = (*env)->GetMethodID(env, NativeMouseEvent_class, "getButton", "()I");
@@ -296,7 +300,7 @@ static inline int create_NativeMouseWheelEvent(JNIEnv *env) {
 	jclass NativeMouseWheelEvent_class = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 	if (NativeMouseWheelEvent_class != NULL) {
 		// Get the method ID for NativeMouseWheelEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IJIIIIIII)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIII)V");
 
 		// Get the method ID for NativeMouseWheelEvent.getScrollAmount().
 		jmethodID getScrollAmount = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getScrollAmount", "()I");

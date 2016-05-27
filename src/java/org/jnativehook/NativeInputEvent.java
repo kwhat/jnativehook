@@ -39,13 +39,10 @@ import java.util.EventObject;
  * @see org.jnativehook.mouse.NativeMouseWheelListener
  */
 public class NativeInputEvent extends EventObject {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -6960142969790223296L;
-
 	/** The type of event. */
 	private int id;
 
-	/** The time the event occurred. */
+	/** The platform dependent time the event occured at. */
 	private long when;
 
 	/** The modifier keys down during event. */
@@ -132,17 +129,16 @@ public class NativeInputEvent extends EventObject {
 	 *
 	 * @param source The source of the event.
 	 * @param id The type of event.
-	 * @param when The timestamp for the event.
 	 * @param modifiers the modifier keys down during event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
 	 */
-	public NativeInputEvent(Class<GlobalScreen> source, int id, long when, int modifiers) {
+	public NativeInputEvent(Class<GlobalScreen> source, int id, int modifiers) {
 		super(source);
 
 		this.id = id;
-		this.when = when;
+		this.when = 0;
 		this.modifiers = modifiers;
 		this.reserved = 0x00;
 	}
@@ -157,9 +153,9 @@ public class NativeInputEvent extends EventObject {
 	}
 
 	/**
-	 * Gets the timestamp for when this event occurred.
+	 * Gets the platform dependent native interval for chronological event sequencing.
 	 *
-	 * @return the timestamp in milliseconds
+	 * @return the native timestamp
 	 */
 	public long getWhen() {
 		return when;

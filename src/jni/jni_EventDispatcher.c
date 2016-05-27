@@ -67,7 +67,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 							org_jnativehook_keyboard_NativeKeyEvent->cls,
 							org_jnativehook_keyboard_NativeKeyEvent->init,
 							org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
-							(jlong)	event->time,
 							(jint)	event->mask,
 							(jint)	event->data.keyboard.rawcode,
 							(jint)	event->data.keyboard.keycode,
@@ -83,7 +82,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 								org_jnativehook_keyboard_NativeKeyEvent->cls,
 								org_jnativehook_keyboard_NativeKeyEvent->init,
 								org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-								(jlong)	event->time,
 								(jint)	event->mask,
 								(jint)	event->data.keyboard.rawcode,
 								(jint)	event->data.keyboard.keycode,
@@ -98,7 +96,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 							org_jnativehook_keyboard_NativeKeyEvent->cls,
 							org_jnativehook_keyboard_NativeKeyEvent->init,
 							org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED,
-							(jlong)	event->time,
 							(jint)	event->mask,
 							(jint)	event->data.keyboard.rawcode,
 							(jint)	org_jnativehook_keyboard_NativeKeyEvent_VC_UNDEFINED,
@@ -113,7 +110,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.mouse.x,
 						(jint)	event->data.mouse.y,
@@ -127,7 +123,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.mouse.x,
 						(jint)	event->data.mouse.y,
@@ -141,7 +136,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.mouse.x,
 						(jint)	event->data.mouse.y,
@@ -155,7 +149,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.mouse.x,
 						(jint)	event->data.mouse.y,
@@ -169,7 +162,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseEvent->cls,
 						org_jnativehook_mouse_NativeMouseEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.mouse.x,
 						(jint)	event->data.mouse.y,
@@ -183,7 +175,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						org_jnativehook_mouse_NativeMouseWheelEvent->cls,
 						org_jnativehook_mouse_NativeMouseWheelEvent->init,
 						org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
-						(jlong)	event->time,
 						(jint)	event->mask,
 						(jint)	event->data.wheel.x,
 						(jint)	event->data.wheel.y,
@@ -200,6 +191,12 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		}
 
 		if (NativeInputEvent_obj != NULL) {
+			(*env)->SetShortField(
+								env,
+								NativeInputEvent_obj,
+								org_jnativehook_NativeInputEvent->when,
+								(jlong)	event->time);
+
 			// Dispatch the event.
 			(*env)->CallStaticVoidMethod(
 					env,

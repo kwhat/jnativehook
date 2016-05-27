@@ -25,9 +25,6 @@ package org.jnativehook;
  * @version	2.0
  */
 public class NativeHookException extends Exception {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 8952825837670265527L;
-
 	/** The error code associated with this exception. */
 	private int code = NativeHookException.UNSPECIFIED_FAILURE;
 

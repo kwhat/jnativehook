@@ -315,7 +315,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
 	 * @param id an integer that identifies the native event type.
-	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with AWT's <code>InputEvent</code> _DOWN_MASK or the older
@@ -331,8 +330,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation) {
-		super(GlobalScreen.class, id, when, modifiers);
+	public NativeKeyEvent(int id, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation) {
+		super(GlobalScreen.class, id, modifiers);
 
 		this.rawCode = rawCode;
 		this.keyCode = keyCode;
@@ -349,7 +348,6 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
 	 * @param id an integer that identifies the native event type.
-	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with AWT's <code>InputEvent</code> _DOWN_MASK or the older
@@ -364,8 +362,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar) {
-		this(id, when, modifiers, rawCode, keyCode, keyChar, KEY_LOCATION_UNKNOWN);
+	public NativeKeyEvent(int id, int modifiers, int rawCode, int keyCode, char keyChar) {
+		this(id, modifiers, rawCode, keyCode, keyChar, KEY_LOCATION_UNKNOWN);
 	}
 
 	/**

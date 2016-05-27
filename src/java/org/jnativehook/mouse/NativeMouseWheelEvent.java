@@ -50,9 +50,6 @@ import org.jnativehook.GlobalScreen;
  * @see NativeMouseWheelListener
  */
 public class NativeMouseWheelEvent extends NativeMouseEvent {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -183110294708745910L;
-
 	/**
 	 * Constant representing scrolling by "units" (like scrolling with the
 	 * arrow keys).
@@ -117,7 +114,6 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * Instantiates a new <code>NativeMouseWheelEvent</code> object with a vertical direction.
 	 *
 	 * @param id an integer that identifies the native event type.
-	 * @param when a long integer that gives the time the event occurred.
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
@@ -134,18 +130,17 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * @param wheelRotation the amount that the mouse wheel was rotated (the
 	 * number of "clicks")
 	 *
-	 * @see #NativeMouseWheelEvent(int, long, int, int, int, int, int, int, int, int)
-	 * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)
+	 * @see #NativeMouseWheelEvent(int, int, int, int, int, int, int, int, int)
+	 * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
 	 */
-	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation) {
-		this(id, when, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation, WHEEL_VERTICAL_DIRECTION);
+	public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation) {
+		this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation, WHEEL_VERTICAL_DIRECTION);
 	}
 
 	/**
 	 * Instantiates a new <code>NativeMouseWheelEvent</code> object.
 	 *
 	 * @param id an integer that identifies the native event type.
-	 * @param when a long integer that gives the time the event occurred.
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
@@ -166,10 +161,10 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 	 * and <code>WHEEL_HORIZONTAL_DIRECTION</code>.
 	 *
 	 * @since 2.1
-	 * @see NativeMouseEvent#NativeMouseEvent(int, long, int, int, int, int)
+	 * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
 	 */
-	public NativeMouseWheelEvent(int id, long when, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation, int wheelDirection) {
-		super(id, when, modifiers, x, y, clickCount);
+	public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount, int scrollType, int scrollAmount, int wheelRotation, int wheelDirection) {
+		super(id, modifiers, x, y, clickCount);
 
 		this.scrollType = scrollType;
 		this.scrollAmount = scrollAmount;

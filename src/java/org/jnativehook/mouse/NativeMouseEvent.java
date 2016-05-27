@@ -77,9 +77,6 @@ import java.awt.Point;
  * @see NativeMouseMotionListener
  */
 public class NativeMouseEvent extends NativeInputEvent {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 5891184453781453671L;
-
 	/**
 	 * The native mouse event's x pointer position.
 	 *
@@ -181,7 +178,6 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 * Instantiates a new <code>NativeMouseEvent</code> object.
 	 *
 	 * @param id an integer that identifies the native event type.
-	 * @param when a long integer that gives the time the event occurred
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent _MASK</code> modifiers should be used as they are
@@ -193,15 +189,14 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount) {
-		this(id, when, modifiers, x, y, clickCount, NOBUTTON);
+	public NativeMouseEvent(int id, int modifiers, int x, int y, int clickCount) {
+		this(id, modifiers, x, y, clickCount, NOBUTTON);
 	}
 
 	/**
 	 * Instantiates a new <code>NativeMouseEvent</code> object.
 	 *
 	 * @param id an integer that identifies the native event type.
-	 * @param when a long integer that gives the time the event occurred
 	 * @param modifiers a modifier mask describing the modifier keys and mouse
 	 * buttons active for the event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
@@ -215,8 +210,8 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeMouseEvent(int id, long when, int modifiers, int x, int y, int clickCount, int button) {
-		super(GlobalScreen.class, id, when, modifiers);
+	public NativeMouseEvent(int id, int modifiers, int x, int y, int clickCount, int button) {
+		super(GlobalScreen.class, id, modifiers);
 
 		this.x = x;
 		this.y = y;

@@ -45,6 +45,7 @@ typedef struct _org_jnativehook_NativeHookException {
 
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
+	jfieldID when;
 	jfieldID reserved;
 	jmethodID init;
 	jmethodID getID;
