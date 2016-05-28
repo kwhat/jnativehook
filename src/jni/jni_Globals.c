@@ -300,7 +300,7 @@ static inline int create_NativeMouseWheelEvent(JNIEnv *env) {
 	jclass NativeMouseWheelEvent_class = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
 	if (NativeMouseWheelEvent_class != NULL) {
 		// Get the method ID for NativeMouseWheelEvent constructor.
-		jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIII)V");
+		jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIIII)V");
 
 		// Get the method ID for NativeMouseWheelEvent.getScrollAmount().
 		jmethodID getScrollAmount = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getScrollAmount", "()I");

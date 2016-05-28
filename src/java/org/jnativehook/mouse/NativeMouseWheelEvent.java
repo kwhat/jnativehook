@@ -269,7 +269,19 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 		param.append(getWheelRotation());
 
 		param.append(",wheelDirection=");
-		param.append(getWheelDirection());
+		switch (getWheelDirection()) {
+			case WHEEL_VERTICAL_DIRECTION:
+				param.append("WHEEL_VERTICAL_DIRECTION");
+				break;
+
+			case WHEEL_HORIZONTAL_DIRECTION:
+				param.append("WHEEL_HORIZONTAL_DIRECTION");
+				break;
+
+			default:
+				param.append("unknown scroll direction");
+				break;
+		}
 
 		return param.toString();
 	}

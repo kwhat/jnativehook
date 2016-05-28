@@ -181,7 +181,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 						(jint)	event->data.wheel.clicks,
 						(jint)	event->data.wheel.type,
 						(jint)	event->data.wheel.amount,
-						(jint)	event->data.wheel.rotation);
+						(jint)	event->data.wheel.rotation,
+						(jint)	event->data.wheel.direction);
 				break;
 
 			default:
@@ -191,6 +192,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 		}
 
 		if (NativeInputEvent_obj != NULL) {
+			// Set the private when field to the native event time.
 			(*env)->SetShortField(
 								env,
 								NativeInputEvent_obj,
