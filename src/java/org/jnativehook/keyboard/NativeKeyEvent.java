@@ -239,6 +239,17 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_KP_9							= 0x0049;
 	public static final int VC_KP_0							= 0x0052;
 
+	public static final int VC_KP_END						= 0xEE00 | VC_KP_1;
+	public static final int VC_KP_DOWN						= 0xEE00 | VC_KP_2;
+	public static final int VC_KP_PAGE_DOWN					= 0xEE00 | VC_KP_3;
+	public static final int VC_KP_LEFT						= 0xEE00 | VC_KP_4;
+	public static final int VC_KP_CLEAR						= 0xEE00 | VC_KP_5;
+	public static final int VC_KP_RIGHT						= 0xEE00 | VC_KP_6;
+	public static final int VC_KP_HOME						= 0xEE00 | VC_KP_7;
+	public static final int VC_KP_UP						= 0xEE00 | VC_KP_8;
+	public static final int VC_KP_PAGE_UP					= 0xEE00 | VC_KP_9;
+	public static final int VC_KP_INSERT					= 0xEE00 | VC_KP_0;
+	public static final int VC_KP_DELETE					= 0xEE00 | VC_KP_SEPARATOR;
 
 	/**  Modifier and Control Keys */
 	public static final int VC_SHIFT_L						= 0x002A;
@@ -636,7 +647,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_INSERT:
 				return Toolkit.getProperty("AWT.insert", "Insert");
 			case VC_DELETE:
-				return Toolkit.getProperty("AWT.delete", "NumPad Delete");
+				return Toolkit.getProperty("AWT.delete", "Delete");
 			case VC_HOME:
 				return Toolkit.getProperty("AWT.home", "Home");
 			case VC_END:
@@ -700,6 +711,29 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.numpad_9", "NumPad 9");
 			case VC_KP_0:
 				return Toolkit.getProperty("AWT.numpad_0", "NumPad 0");
+
+			case VC_KP_END:
+				return Toolkit.getProperty("AWT.numpad_end", "NumPad End");
+			case VC_KP_DOWN:
+				return Toolkit.getProperty("AWT.numpad_down", "NumPad Down");
+			case VC_KP_PAGE_DOWN:
+				return Toolkit.getProperty("AWT.numpad_pgdn", "NumPad Page Down");
+			case VC_KP_LEFT:
+				return Toolkit.getProperty("AWT.numpad_left", "NumPad Left");
+			case VC_KP_CLEAR:
+				return Toolkit.getProperty("AWT.numpad_clear", "NumPad Clear");
+			case VC_KP_RIGHT:
+				return Toolkit.getProperty("AWT.numpad_right", "NumPad Right");
+			case VC_KP_HOME:
+				return Toolkit.getProperty("AWT.numpad_home", "NumPad Home");
+			case VC_KP_UP:
+				return Toolkit.getProperty("AWT.numpad_up", "NumPad Up");
+			case VC_KP_PAGE_UP:
+				return Toolkit.getProperty("AWT.numpad_pgup", "NumPad Page Up");
+			case VC_KP_INSERT:
+				return Toolkit.getProperty("AWT.numpad_insert", "NumPad Insert");
+			case VC_KP_DELETE:
+				return Toolkit.getProperty("AWT.numpad_delete", "NumPad Delete");
 			// End Numeric Zone
 
 			// Begin Modifier and Control Keys
