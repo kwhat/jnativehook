@@ -61,7 +61,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 
 			case EVENT_KEY_PRESSED:
-				if (jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location) == JNI_OK) {
+				// FIXME We really shouldnt be wrighting to that memory.
+				if (jni_ConvertToJavaLocation(&(event->data.keyboard.keycode), &location) == JNI_OK) {
 					NativeInputEvent_obj = (*env)->NewObject(
 							env,
 							org_jnativehook_keyboard_NativeKeyEvent->cls,
@@ -76,7 +77,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 				break;
 
 			case EVENT_KEY_RELEASED:
-					if (jni_ConvertToJavaLocation(event->data.keyboard.keycode, &location) == JNI_OK) {
+					// FIXME We really shouldnt be wrighting to that memory.
+					if (jni_ConvertToJavaLocation(&(event->data.keyboard.keycode), &location) == JNI_OK) {
 						NativeInputEvent_obj = (*env)->NewObject(
 								env,
 								org_jnativehook_keyboard_NativeKeyEvent->cls,

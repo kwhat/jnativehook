@@ -91,11 +91,11 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 	return status;
 }
 
-jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLocation) {
+jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyLocation) {
 	jint status = JNI_ERR;
 
-	if (javaKeyLocation != NULL) {
-		switch (nativeKeyCode) {
+	if (nativeKeyCode != NULL && javaKeyLocation != NULL) {
+		switch (*nativeKeyCode) {
 			case VC_SHIFT_L:
 			case VC_CONTROL_L:
 			case VC_ALT_L:
@@ -106,41 +106,67 @@ jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLo
 			case VC_SHIFT_R:
 			case VC_CONTROL_R:
 			case VC_ALT_R:
-			case VC_META_R:
+				*nativeKeyCode ^= 0x0E00;
 				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
 				break;
 
+			case VC_META_R:
+				*nativeKeyCode -= 1;
+				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
+				break;
+
+			case VC_KP_COMMA:
+				*nativeKeyCode = VC_COMMA;
+
 			case VC_NUM_LOCK:
+			case VC_KP_SEPARATOR:
+				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+				break;
+
 			case VC_KP_ENTER:
 			case VC_KP_MULTIPLY:
 			case VC_KP_ADD:
-			case VC_KP_SEPARATOR:
 			case VC_KP_SUBTRACT:
 			case VC_KP_DIVIDE:
-			case VC_KP_COMMA:
+
+			case VC_KP_DOWN:
+			case VC_KP_LEFT:
+			case VC_KP_CLEAR:
+			case VC_KP_RIGHT:
+			case VC_KP_UP:
+				*nativeKeyCode ^= 0x0E00;
+                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                break;
+
+			case VC_KP_0:
+                *nativeKeyCode = VC_0;
+				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+				break;
 
 			case VC_KP_1:
 			case VC_KP_2:
 			case VC_KP_3:
+				*nativeKeyCode -= ((VC_KP_1 - VC_1) - (VC_KP_4 - VC_4) ); // 0x4D - 0x46
+
 			case VC_KP_4:
 			case VC_KP_5:
 			case VC_KP_6:
+				*nativeKeyCode -= ((VC_KP_4 - VC_4) - (VC_KP_7 - VC_7) ); // 0x46 - 0x3F
+
 			case VC_KP_7:
 			case VC_KP_8:
 			case VC_KP_9:
-			case VC_KP_0:
+				*nativeKeyCode -= (VC_KP_7 - VC_7); // 0x3F
+				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+				break;
 
 			case VC_KP_END:
-			case VC_KP_DOWN:
 			case VC_KP_PAGE_DOWN:
-			case VC_KP_LEFT:
-			case VC_KP_CLEAR:
-			case VC_KP_RIGHT:
 			case VC_KP_HOME:
-			case VC_KP_UP:
 			case VC_KP_PAGE_UP:
 			case VC_KP_INSERT:
 			case VC_KP_DELETE:
+				*nativeKeyCode ^= 0xE000;
 				*javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
 				break;
 
