@@ -52,7 +52,6 @@ void jni_EventDispatcher(uiohook_event * const event) {
 	JNIEnv *env;
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 		jobject NativeInputEvent_obj = NULL;
-
 		jint location = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
 		switch (event->type) {
 			case EVENT_HOOK_DISABLED:
