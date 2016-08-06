@@ -39,6 +39,9 @@ import java.util.EventObject;
  * @see org.jnativehook.mouse.NativeMouseWheelListener
  */
 public class NativeInputEvent extends EventObject {
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 2306729722565226621L;
+
 	/** The type of event. */
 	private int id;
 
@@ -122,6 +125,15 @@ public class NativeInputEvent extends EventObject {
 
 	/** The Button5 modifier constant. */
 	public static final int BUTTON5_MASK		= 1 << 12;
+
+	/** The Number Lock modifier constant. */
+	public static final int NUM_LOCK_MASK		= 1 << 13;
+
+	/** The Caps Lock modifier constant. */
+	public static final int CAPS_LOCK_MASK		= 1 << 14;
+
+	/** The Scroll Lock modifier constant. */
+	public static final int SCROLL_LOCK_MASK	= 1 << 15;
 
 
 	/**

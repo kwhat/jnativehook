@@ -66,7 +66,7 @@ import java.awt.Toolkit;
  */
 public class NativeKeyEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 2909754235120335950L;
+	private static final long serialVersionUID = 8608981443834617646L;
 
 	/** The raw native key code. */
 	private int rawCode;

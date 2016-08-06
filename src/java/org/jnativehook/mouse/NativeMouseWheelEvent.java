@@ -50,6 +50,9 @@ import org.jnativehook.GlobalScreen;
  * @see NativeMouseWheelListener
  */
 public class NativeMouseWheelEvent extends NativeMouseEvent {
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 2112217673594181259L;
+
 	/**
 	 * Constant representing scrolling by "units" (like scrolling with the
 	 * arrow keys).

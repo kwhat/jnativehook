@@ -3,6 +3,7 @@
 **JNativeHook 2.1.0**
  * All events now use the native time source instead of the Unix epoch.
  * Added adapter classes
+ * Added support for keyboard lock masks.
  * Fixed language support on X11 platforms.
  
 **JNativeHook 2.0.3 (Nov 02, 2015)**

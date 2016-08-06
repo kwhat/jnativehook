@@ -77,6 +77,9 @@ import java.awt.Point;
  * @see NativeMouseMotionListener
  */
 public class NativeMouseEvent extends NativeInputEvent {
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = -1093048990695350863L;
+
 	/**
 	 * The native mouse event's x pointer position.
 	 *
