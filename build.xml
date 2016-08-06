@@ -2,7 +2,7 @@
 
 <!--
 JNativeHook: Global keyboard and mouse hooking for Java.
-Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
+Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
 http://code.google.com/p/jnativehook/
 
 JNativeHook is free software: you can redistribute it and/or modify
@@ -563,7 +563,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</packageset>
 
 			<doctitle><![CDATA[<h1>${ant.project.name}-${ant.build.major}.${ant.build.minor} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2015 ${project.vendor}. All Rights Received.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2016 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 		</javadoc>
