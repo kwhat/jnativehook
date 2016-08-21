@@ -43,6 +43,11 @@ typedef struct _org_jnativehook_NativeHookException {
 	jmethodID init;
 } NativeHookException;
 
+typedef struct _org_jnativehook_NativeMonitorInfo {
+	jclass cls;
+	jmethodID init;
+} NativeMonitorInfo;
+
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
 	jfieldID when;
@@ -85,6 +90,11 @@ typedef struct _java_lang_Object {
 	jmethodID notify;
 } Object;
 
+typedef struct _java_lang_Integer {
+	jclass cls;
+	jmethodID init;
+} Integer;
+
 typedef struct _java_lang_System {
 	jclass cls;
 	jmethodID setProperty;
@@ -103,11 +113,13 @@ typedef struct _java_util_logging_Logger {
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
 extern NativeHookException *org_jnativehook_NativeHookException;
+extern NativeMonitorInfo *org_jnativehook_NativeMonitorInfo;
 extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;
 extern Object *java_lang_Object;
+extern Integer *java_lang_Integer;
 extern System *java_lang_System;
 extern Logger *java_util_logging_Logger;
 

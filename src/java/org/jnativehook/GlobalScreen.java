@@ -214,6 +214,55 @@ public final class GlobalScreen {
 	}
 
 	/**
+	 * Get information about the native monitor configuration and layout.
+	 *
+	 * @since 2.1
+	 */
+	public static native NativeMonitorInfo[] getNativeMonitors();
+
+	/**
+	 * Retrieves the keyboard auto repeat rate.
+	 *
+	 * @since 2.1
+ 	 */
+	public static native Integer getAutoRepeatRate();
+
+	/**
+	 * Retrieves the keyboard auto repeat delay.
+	 *
+	 * @since 2.1
+	 */
+	public static native Integer getAutoRepeatDelay();
+
+	/**
+	 * Retrieves the mouse acceleration multiplier.
+	 *
+	 * @since 2.1
+	 */
+	public static native Integer getPointerAccelerationMultiplier();
+
+	/**
+	 * Retrieves the mouse acceleration threshold.
+	 *
+	 * @since 2.1
+	 */
+	public static native Integer getPointerAccelerationThreshold();
+
+	/**
+	 * Retrieves the mouse sensitivity.
+	 *
+	 * @since 2.1
+	 */
+	public static native Integer getPointerSensitivity();
+
+	/**
+	 * Retrieves the double/triple click interval in milliseconds.
+	 *
+	 * @since 2.1
+	 */
+	public static native Integer getMultiClickTime();
+
+	/**
 	 * Specialized thread implementation for the native hook.
 	 */
 	private static class NativeHookThread extends Thread {

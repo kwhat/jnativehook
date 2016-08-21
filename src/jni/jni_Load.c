@@ -23,7 +23,6 @@
 #include "jni_EventDispathcer.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
-#include "jni_Properties.h"
 
 // JNI Related global references.
 JavaVM *jvm;
@@ -45,9 +44,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 		if (jni_CreateGlobals(env) == JNI_OK) {
 			// Set Java logger for native code messages.
 			hook_set_logger_proc(&uiohook_LoggerCallback);
-
-			// Set java properties from native sources.
-			jni_SetProperties(env);
 
 			// Set the hook callback function to dispatch events.
 			hook_set_dispatch_proc(&jni_EventDispatcher);
@@ -74,9 +70,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 	if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
 		// It is not critical that these values are cleared so no exception
 		// will be thrown if this does not succeed.
-
-		// Clear java properties from native sources.
-		jni_ClearProperties(env);
 
 		// Cleanup JNI global memory.
 		jni_DestroyGlobals(env);

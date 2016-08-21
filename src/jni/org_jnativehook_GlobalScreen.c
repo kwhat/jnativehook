@@ -126,6 +126,12 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_d
 	}
 }
 
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    postNativeEvent
+ * Signature: (Lorg/jnativehook/NativeInputEvent;)V
+ */
+
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass GlobalScreen_cls, jobject NativeInputEvent_obj) {
 	// Get the event type.
 	jint javaType = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getID);
@@ -185,4 +191,182 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 	}
 
 	hook_post_event(&virtualEvent);
+}
+
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getNativeMonitors
+ * Signature: ()[Lorg/jnativehook/MonitorInfo;
+ */
+JNIEXPORT jobjectArray JNICALL Java_org_jnativehook_GlobalScreen_getNativeMonitors(JNIEnv *env, jclass GlobalScreen_cls) {
+	unsigned char count;
+	screen_data *screens = hook_create_screen_info(&count);
+
+	jobjectArray result = (*env)->NewObjectArray(env, (jsize) count, org_jnativehook_NativeMonitorInfo->cls, NULL);
+ 	if (result != NULL) {
+		for (int i = 0; i < count; i++) {
+			jobject monitor = (*env)->NewObject(
+					env,
+					org_jnativehook_NativeMonitorInfo->cls,
+					org_jnativehook_NativeMonitorInfo->init,
+					(jshort) screens[i].number,
+					(jint) screens[i].x,
+					(jint) screens[i].y,
+					(jshort) screens[i].width,
+					(jshort) screens[i].height);
+
+			(*env)->SetObjectArrayElement(env, result, (jsize) i, monitor);
+		}
+ 	}
+ 	else {
+ 		jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+ 	}
+
+ 	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatRate
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JNIEnv *env, jclass GlobalScreen_cls) {
+	jobject result = NULL;
+
+	// Set the native keyboard auto repeat rate.
+	long rate = hook_get_auto_repeat_rate();
+	if (rate >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) rate);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_auto_repeat_rate()!\n",
+    			__FUNCTION__, __LINE__);
+	}
+
+	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getAutoRepeatDelay
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(JNIEnv *env, jclass GlobalScreen_cls) {
+	jobject result = NULL;
+
+	long delay = hook_get_auto_repeat_delay();
+	if (delay >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) delay);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n",
+				__FUNCTION__, __LINE__);
+	}
+
+	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getPointerAccelerationMultiplier
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationMultiplier(JNIEnv *env, jclass GlobalScreen_cls) {
+    jobject result = NULL;
+
+	long multiplier = hook_get_pointer_acceleration_multiplier();
+	if (multiplier >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) multiplier);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_acceleration_multiplier()!\n",
+				__FUNCTION__, __LINE__);
+	}
+
+	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getPointerAccelerationThreshold
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerationThreshold(JNIEnv *env, jclass GlobalScreen_cls) {
+	jobject result = NULL;
+
+	long threshold = hook_get_pointer_acceleration_threshold();
+	if (threshold >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) threshold);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_acceleration_threshold()!\n",
+				__FUNCTION__, __LINE__);
+	}
+
+	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getPointerSensitivity
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivity(JNIEnv *env, jclass GlobalScreen_cls) {
+	jobject result = NULL;
+
+	long sensitivity = hook_get_pointer_sensitivity();
+	if (sensitivity >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) sensitivity);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_pointer_sensitivity()!\n",
+				__FUNCTION__, __LINE__);
+	}
+
+	return result;
+}
+
+/*
+ * Class:     org_jnativehook_GlobalScreen
+ * Method:    getMultiClickTime
+ * Signature: ()Ljava/lang/Integer;
+ */
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getMultiClickTime(JNIEnv *env, jclass GlobalScreen_cls) {
+	jobject result = NULL;
+
+	long clicktime = hook_get_multi_click_time();
+	if (clicktime >= 0) {
+		result = (*env)->NewObject(
+				env,
+				java_lang_Integer->cls,
+				java_lang_Integer->init,
+				(jint) clicktime);
+	}
+	else {
+		jni_Logger(env, LOG_LEVEL_WARN,	"%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
+				__FUNCTION__, __LINE__);
+	}
+
+	return result;
 }
