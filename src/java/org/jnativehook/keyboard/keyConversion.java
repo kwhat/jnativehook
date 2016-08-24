@@ -161,7 +161,6 @@ public final class keyConversion {
 			put(new Integer(0xDE), 0x0028); // Quotes
             put(new Integer(0x0f1), 0x0070); // KATAKANA
             put(new Integer(0x0f2), 0x007B); // Hiragana
-            put(new Integer()
 		}	
 
 	};
