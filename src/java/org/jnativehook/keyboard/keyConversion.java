@@ -5,6 +5,21 @@
  LIST OF VK KEYS HERE: 
  https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
  
+ 
+ MISSING FROM THIS TABLE:
+ 
+ VC_POWER
+ VC_WAKE
+ VC_MEDIA_EJECT
+ VC_APP_CALCULATOR
+ VC_APP_MUSIC
+ VC_APP_PICTURES
+ VC_BROWSWER_HOME
+ VC_UNDERSCORE
+ VC_FURIGANA
+ VC_KANJI
+ VC_YEN
+ ALL OF THE SUN KEYBOARD KEYS
  */
 
 package org.jnativehook.keyboard;
@@ -71,7 +86,6 @@ public final class keyConversion {
 			put(new Integer(0x5A), 0x002C); // Z
 			put(new Integer(0x5B), 0x0E5B); // Windows
 			put(new Integer(0x5C), 0x0E5C); // Windows
-			put(new Integer(0x9D), 0x0E5B); // Command Key (Mac)
 			put(new Integer(0x5D), 0x0E5D); // Context Menu
 			put(new Integer(0x5F), 0xE05F); // Sleep
 			put(new Integer(0x60), 0x0052); // KP 0
@@ -145,7 +159,10 @@ public final class keyConversion {
 			put(new Integer(0xDD), 0x001B); // ]
 			put(new Integer(0xDC), 0x002B); // Backslash
 			put(new Integer(0xDE), 0x0028); // Quotes
+            put(new Integer(0x0f1), 0x0070); // KATAKANA
+            put(new Integer(0x0f2), 0x007B); // Hiragana
+            put(new Integer()
 		}	
-			
+
 	};
 }
