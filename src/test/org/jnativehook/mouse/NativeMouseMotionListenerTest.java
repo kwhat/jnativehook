@@ -36,7 +36,6 @@ public class NativeMouseMotionListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_MOVED,
-				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
@@ -58,7 +57,6 @@ public class NativeMouseMotionListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_DRAGGED,
-				System.currentTimeMillis(),
 				NativeMouseEvent.BUTTON1_MASK,
 				50,		// X
 				75,		// Y

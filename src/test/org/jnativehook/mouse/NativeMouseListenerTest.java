@@ -36,7 +36,6 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_CLICKED,
-				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
@@ -58,7 +57,6 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
@@ -80,7 +78,6 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_RELEASED,
-				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y

@@ -34,7 +34,6 @@ public class NativeInputEventTest {
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00);
 
 		assertEquals(event.getID(), NativeKeyEvent.NATIVE_KEY_PRESSED);
@@ -47,12 +46,11 @@ public class NativeInputEventTest {
 	public void testGetWhen() {
 		System.out.println("getWhen");
 
-		long when = System.currentTimeMillis();
+		long when = 0;
 
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				when,
 				0x00);
 
 		assertEquals(event.getWhen(), when);
@@ -73,7 +71,6 @@ public class NativeInputEventTest {
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				mask);
 
 		assertEquals(event.getModifiers(), mask);
@@ -95,7 +92,6 @@ public class NativeInputEventTest {
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00);
 
 		event.setModifiers(mask);
@@ -125,7 +121,6 @@ public class NativeInputEventTest {
 		NativeInputEvent event = new NativeInputEvent(
 				GlobalScreen.class,
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				NativeInputEvent.SHIFT_MASK |
 				NativeInputEvent.BUTTON5_MASK);
 

@@ -32,7 +32,6 @@ public class NativeKeyListenerTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
 				NativeKeyEvent.VC_A,
@@ -54,7 +53,6 @@ public class NativeKeyListenerTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_RELEASED,
-				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
 				NativeKeyEvent.VC_A,
@@ -76,7 +74,6 @@ public class NativeKeyListenerTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_TYPED,
-				System.currentTimeMillis(),
 				NativeKeyEvent.SHIFT_MASK,
 				0x41,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,

@@ -36,7 +36,6 @@ public class NativeMouseWheelListenerTest {
 
 		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
 				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y

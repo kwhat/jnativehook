@@ -37,7 +37,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x41,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -56,7 +55,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -76,7 +74,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_A,
@@ -95,7 +92,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -115,7 +111,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -134,7 +129,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -154,7 +148,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -183,7 +176,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_F1,
@@ -205,7 +197,6 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -244,7 +235,7 @@ public class NativeKeyEventTest {
 			}
 		}
 
-		// Convert the key sets to arrays for comparision.
+		// Convert the key sets to arrays for comparison.
 		String[] nativeSet = nativeKeyCodes.keySet().toArray(new String[0]);
 		String[] javaSet = javaKeyCodes.keySet().toArray(new String[0]);
 
