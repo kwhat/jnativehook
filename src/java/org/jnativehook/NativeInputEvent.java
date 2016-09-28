@@ -31,7 +31,7 @@ import java.util.EventObject;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	2.0
+ * @version	2.1
  *
  * @see org.jnativehook.keyboard.NativeKeyListener
  * @see org.jnativehook.mouse.NativeMouseListener
@@ -267,6 +267,22 @@ public class NativeInputEvent extends EventObject {
 
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button5", "Button5"));
+			param.append('+');
+		}
+
+
+		if ((modifiers & NativeInputEvent.NUM_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.numLock", "Num Lock"));
+			param.append('+');
+		}
+
+		if ((modifiers & NativeInputEvent.CAPS_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.capsLock", "Caps Lock"));
+			param.append('+');
+		}
+
+		if ((modifiers & NativeInputEvent.SCROLL_LOCK_MASK) != 0) {
+			param.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
 			param.append('+');
 		}
 
