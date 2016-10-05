@@ -17,15 +17,8 @@ The following events are available via their respective listeners.
 * Mouse Drag Events
 * Mouse Wheel Events
 
-In addition to global keyboard and mouse events, the following system
-properties are exposed by the native library.  Please note that there is no
-guarantee that any of these properties will be available.
-* jnativehook.key.repeat.rate
-* jnativehook.key.repeat.delay
-* jnativehook.button.multiclick.iterval
-* jnativehook.pointer.sensitivity
-* jnativehook.pointer.acceleration.multiplier
-* jnativehook.pointer.acceleration.threshold
+In addition to global event listners, this library has the ability to post native events back to the native operating 
+system.
  
 ## Download
 Binary distribution for JNativeHook can be found at the 
