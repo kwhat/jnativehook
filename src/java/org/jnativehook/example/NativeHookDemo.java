@@ -21,7 +21,6 @@ package org.jnativehook.example;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
-import org.jnativehook.NativeMonitorInfo;
 import org.jnativehook.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -404,16 +403,12 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
 		// Please note that these properties are not available until after the GlobalScreen class is initialized.
 		txtEventInfo.append("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
-		txtEventInfo.append("\n" + "Auto Repeat Rate: " + GlobalScreen.getAutoRepeatRate());
-		txtEventInfo.append("\n" + "Auto Repeat Delay: " + GlobalScreen.getAutoRepeatDelay());
-		txtEventInfo.append("\n" + "Double Click Time: " + GlobalScreen.getMultiClickTime());
-		txtEventInfo.append("\n" + "Pointer Sensitivity: " + GlobalScreen.getPointerSensitivity());
-		txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + GlobalScreen.getPointerAccelerationMultiplier());
-		txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + GlobalScreen.getPointerAccelerationThreshold());
-
-		// TODO Add more detail
-		NativeMonitorInfo[] monitors = GlobalScreen.getNativeMonitors();
-		txtEventInfo.append("\n" + "Screen Count: " + monitors.length);
+		txtEventInfo.append("\nAuto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
+		txtEventInfo.append("\n" + "Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
+		txtEventInfo.append("\n" + "Double Click Time: " + System.getProperty("jnativehook.button.multiclick.iterval"));
+		txtEventInfo.append("\n" + "Pointer Sensitivity: " + System.getProperty("jnativehook.pointer.sensitivity"));
+		txtEventInfo.append("\n" + "Pointer Acceleration Multiplier: " + System.getProperty("jnativehook.pointer.acceleration.multiplier"));
+		txtEventInfo.append("\n" + "Pointer Acceleration Threshold: " + System.getProperty("jnativehook.pointer.acceleration.threshold"));
 
 		try {
 			txtEventInfo.setCaretPosition(txtEventInfo.getLineStartOffset(txtEventInfo.getLineCount() - 1));
