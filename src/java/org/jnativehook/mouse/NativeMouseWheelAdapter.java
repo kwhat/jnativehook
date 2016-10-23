@@ -18,8 +18,9 @@
 package org.jnativehook.mouse;
 
 public class NativeMouseWheelAdapter implements NativeMouseWheelListener {
-	
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-		//...
+
+	@Override
+	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
+		// Do Nothing.
 	}
 }

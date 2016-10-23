@@ -131,7 +131,6 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_00024NativeHookThread_d
  * Method:    postNativeEvent
  * Signature: (Lorg/jnativehook/NativeInputEvent;)V
  */
-
 JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv *env, jclass GlobalScreen_cls, jobject NativeInputEvent_obj) {
 	// Get the event type.
 	jint javaType = (*env)->CallIntMethod(env, NativeInputEvent_obj, org_jnativehook_NativeInputEvent->getID);
@@ -352,7 +351,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivit
  * Method:    getMultiClickTime
  * Signature: ()Ljava/lang/Integer;
  */
-JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getMultiClickTime(JNIEnv *env, jclass GlobalScreen_cls) {
+JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getMultiClickIterval(JNIEnv *env, jclass GlobalScreen_cls) {
 	jobject result = NULL;
 
 	long clicktime = hook_get_multi_click_time();

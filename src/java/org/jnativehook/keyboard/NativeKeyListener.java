@@ -39,26 +39,27 @@ import java.util.EventListener;
  * @see NativeKeyEvent
  */
 public interface NativeKeyListener extends EventListener {
-	/**
-	 * Invoked when a key has been pressed.
-	 *
-	 * @param e the native key event.
-	 */
-	public void nativeKeyPressed(NativeKeyEvent e);
-
-	/**
-	 * Invoked when a key has been released.
-	 *
-	 * @param e the native key event.
-	 */
-	public void nativeKeyReleased(NativeKeyEvent e);
 
 	/**
 	 * Invoked when a key has been typed.
 	 *
-	 * @param e the native key event.
+	 * @param nativeEvent the native key event.
 	 *
 	 * @since 1.1
 	 */
-	public void nativeKeyTyped(NativeKeyEvent e);
+	public void nativeKeyTyped(NativeKeyEvent nativeEvent);
+
+	/**
+	 * Invoked when a key has been pressed.
+	 *
+	 * @param nativeEvent the native key event.
+	 */
+	public void nativeKeyPressed(NativeKeyEvent nativeEvent);
+
+	/**
+	 * Invoked when a key has been released.
+	 *
+	 * @param nativeEvent the native key event.
+	 */
+	public void nativeKeyReleased(NativeKeyEvent nativeEvent);
 }

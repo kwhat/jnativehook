@@ -22,19 +22,23 @@ package org.jnativehook.keyboard;
  * The methods are empty so the super call is obsolete.
  * @author Johannes Boczek
  *
+ * @since 2.1
  */
 public class NativeKeyAdapter implements NativeKeyListener {
-	
-	public void nativeKeyPressed(final NativeKeyEvent n) {
-		//...
+
+	@Override
+	public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
+		// Do Nothing.
 	}
-	
-	public void nativeKeyReleased(final NativeKeyEvent n) {
-		//...
+
+	@Override
+	public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
+		// Do Nothing.
 	}
-	
-	public void nativeKeyTyped(final NativeKeyEvent n) {
-		//...
+
+	@Override
+	public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
+		// Do Nothing.
 	}
 
 }

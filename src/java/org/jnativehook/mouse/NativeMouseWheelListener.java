@@ -44,7 +44,7 @@ public interface NativeMouseWheelListener extends EventListener {
 	/**
 	 * Invoked when the mouse wheel is rotated.
 	 *
-	 * @param e the native mouse wheel event.
+	 * @param nativeEvent the native mouse wheel event.
 	 */
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent e);
+	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent);
 }

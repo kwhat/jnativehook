@@ -404,7 +404,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<target name="compile-jni" depends="compile-libuiohook,compile-java" description="Compiles JNI source files.">
 		<echo>Creating JNI Headers...</echo>
 		<javah destdir="${dir.src}/jni/include" verbose="true">
-			<class name="org.jnativehook.GlobalScreen"/>
+			<class name="org.jnativehook.GlobalScreen" />
 			<classpath refid="ant.project.class.path" />
 		</javah>
 

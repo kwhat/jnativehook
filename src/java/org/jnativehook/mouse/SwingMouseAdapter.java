@@ -17,37 +17,69 @@
  */
 package org.jnativehook.mouse;
 
+import org.jnativehook.AbstractSwingInputAdapter;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 /**
- * Adapter implementation of the NativeMouseInputListener interface.
+ * Adapter to convert NativeKeyEvents to Java KeyEvents.
  * The methods are empty so the super call is obsolete.
- * @author Johannes Boczek
  *
  * @since 2.1
  */
-public class NativeMouseInputAdapter implements NativeMouseInputListener {
+public class SwingMouseAdapter extends AbstractSwingInputAdapter implements NativeMouseListener, MouseListener {
 
 	@Override
 	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
+		this.mouseClicked(this.getJavaKeyEvent(nativeEvent));
 	}
 
 	@Override
 	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
+		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
 	}
 
 	@Override
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
+		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
 	@Override
-	public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
+	public void mousePressed(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
 	@Override
-	public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
+	public void mouseReleased(MouseEvent mouseEvent) {
 		// Do Nothing.
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent mouseEvent) {
+		// Do Nothing.
+	}
+
+	@Override
+	public void mouseExited(MouseEvent mouseEvent) {
+		// Do Nothing.
+	}
+
+	protected MouseEvent getJavaKeyEvent(NativeMouseEvent nativeEvent) {
+		return new MouseEvent(
+				this,
+				nativeEvent.getID() - (NativeMouseEvent.NATIVE_MOUSE_FIRST - NativeMouseEvent.NATIVE_MOUSE_FIRST),
+				System.currentTimeMillis(),
+				this.getJavaModifiers(nativeEvent.getModifiers()),
+				nativeEvent.getX(),
+				nativeEvent.getY(),
+				nativeEvent.getClickCount(),
+				false,
+				nativeEvent.getButton());
 	}
 }

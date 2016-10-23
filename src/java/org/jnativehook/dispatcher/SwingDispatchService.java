@@ -18,7 +18,8 @@
 package org.jnativehook.dispatcher;
 
 // Imports.
-import java.awt.EventQueue;
+
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -64,6 +65,6 @@ public class SwingDispatchService extends AbstractExecutorService {
 	}
 
 	public void execute(Runnable r) {
-		EventQueue.invokeLater(r);
+		SwingUtilities.invokeLater(r);
 	}
 }

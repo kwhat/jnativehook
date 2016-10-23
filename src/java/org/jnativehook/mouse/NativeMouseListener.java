@@ -40,25 +40,26 @@ import java.util.EventListener;
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
+
 	/**
 	 * Invoked when a mouse button has been clicked (pressed and released)
 	 * without being moved.
 	 *
-	 * @param e the native mouse event.
+	 * @param nativeEvent the native mouse event.
 	 */
-	public void nativeMouseClicked(NativeMouseEvent e);
+	public void nativeMouseClicked(NativeMouseEvent nativeEvent);
 
 	/**
 	 * Invoked when a mouse button has been pressed
 	 *
-	 * @param e the native mouse event.
+	 * @param nativeEvent the native mouse event.
 	 */
-	public void nativeMousePressed(NativeMouseEvent e);
+	public void nativeMousePressed(NativeMouseEvent nativeEvent);
 
 	/**
 	 * Invoked when a mouse button has been released
 	 *
-	 * @param e the native mouse event.
+	 * @param nativeEvent the native mouse event.
 	 */
-	public void nativeMouseReleased(NativeMouseEvent e);
+	public void nativeMouseReleased(NativeMouseEvent nativeEvent);
 }

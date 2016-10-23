@@ -46,26 +46,26 @@ import java.util.logging.Logger;
  * @version 2.1
  * @since 1.0
  */
-public final class GlobalScreen {
+public class GlobalScreen {
 	/**
 	 * Logging service for the native library.
 	 */
-	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+	protected static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
 	 * The service to control the hook.
 	 */
-	private static NativeHookThread hookThread;
+	protected static NativeHookThread hookThread;
 
 	/**
 	 * The service to dispatch events.
 	 */
-	private static ExecutorService eventExecutor = new DefaultDispatchService();
+	protected static ExecutorService eventExecutor = new DefaultDispatchService();
 
 	/**
 	 * The list of event listeners to notify.
 	 */
-	private static EventListenerList eventListeners = new EventListenerList();
+	protected static EventListenerList eventListeners = new EventListenerList();
 
 	static {
 		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
@@ -96,11 +96,18 @@ public final class GlobalScreen {
 				throw new UnsatisfiedLinkError(e.getMessage());
 			}
 		}
+
+		// Add some 2.0 backward comparability.
+		System.setProperty("jnativehook.key.repeat.rate", GlobalScreen.getAutoRepeatRate().toString());
+		System.setProperty("jnativehook.key.repeat.delay", GlobalScreen.getAutoRepeatDelay().toString());
+		System.setProperty("jnativehook.button.multiclick.iterval", GlobalScreen.getMultiClickIterval().toString());
+		System.setProperty("jnativehook.pointer.sensitivity", GlobalScreen.getPointerSensitivity().toString());
+		System.setProperty("jnativehook.pointer.acceleration.multiplier", GlobalScreen.getPointerAccelerationMultiplier().toString());
+		System.setProperty("jnativehook.pointer.acceleration.threshold", GlobalScreen.getPointerAccelerationThreshold().toString());
 	}
 
 
-	private GlobalScreen() { }
-
+	protected GlobalScreen() { }
 
 	/**
 	 * Adds the specified native key listener to receive key events from the
@@ -261,12 +268,12 @@ public final class GlobalScreen {
 	 *
 	 * @since 2.1
 	 */
-	public static native Integer getMultiClickTime();
+	public static native Integer getMultiClickIterval();
 
 	/**
 	 * Specialized thread implementation for the native hook.
 	 */
-	private static class NativeHookThread extends Thread {
+	protected static class NativeHookThread extends Thread {
 		/**
 		 * Exception thrown by this thread.
 		 */
@@ -431,10 +438,10 @@ public final class GlobalScreen {
 	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
-	 * @param e the <code>NativeInputEvent</code> sent to the native system.
+	 * @param event the <code>NativeInputEvent</code> sent to the native system.
 	 * @since 2.0
 	 */
-	public static native void postNativeEvent(NativeInputEvent e);
+	public static native void postNativeEvent(NativeInputEvent event);
 
 	/**
 	 * Internal class to handle event dispatching via the executor service.
@@ -606,11 +613,11 @@ public final class GlobalScreen {
 	 * Failure to do so might result in the delay of user input and the automatic
 	 * removal of the native hook.
 	 *
-	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
+	 * @param event the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
-	public static void dispatchEvent(NativeInputEvent e) {
+	protected static void dispatchEvent(NativeInputEvent event) {
 		if (eventExecutor != null) {
-			eventExecutor.execute(new EventDispatchTask(e));
+			eventExecutor.execute(new EventDispatchTask(event));
 		}
 	}
 
