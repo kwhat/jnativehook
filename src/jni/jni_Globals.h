@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -43,14 +43,8 @@ typedef struct _org_jnativehook_NativeHookException {
 	jmethodID init;
 } NativeHookException;
 
-typedef struct _org_jnativehook_NativeMonitorInfo {
-	jclass cls;
-	jmethodID init;
-} NativeMonitorInfo;
-
 typedef struct _org_jnativehook_NativeInputEvent {
 	jclass cls;
-	jfieldID when;
 	jfieldID reserved;
 	jmethodID init;
 	jmethodID getID;
@@ -64,6 +58,7 @@ typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
 	jmethodID getKeyCode;
 	jmethodID getKeyLocation;
 	jmethodID getKeyChar;
+	jmethodID getKeyboardName;
 } NativeKeyEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseEvent {
@@ -90,11 +85,6 @@ typedef struct _java_lang_Object {
 	jmethodID notify;
 } Object;
 
-typedef struct _java_lang_Integer {
-	jclass cls;
-	jmethodID init;
-} Integer;
-
 typedef struct _java_lang_System {
 	jclass cls;
 	jmethodID setProperty;
@@ -113,13 +103,11 @@ typedef struct _java_util_logging_Logger {
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
 extern NativeHookException *org_jnativehook_NativeHookException;
-extern NativeMonitorInfo *org_jnativehook_NativeMonitorInfo;
 extern NativeInputEvent *org_jnativehook_NativeInputEvent;
 extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;
 extern Object *java_lang_Object;
-extern Integer *java_lang_Integer;
 extern System *java_lang_System;
 extern Logger *java_util_logging_Logger;
 

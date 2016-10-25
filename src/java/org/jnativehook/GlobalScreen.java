@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
 package org.jnativehook;
 
 // Imports.
-import org.jnativehook.dispatcher.DefaultDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -43,33 +42,30 @@ import java.util.logging.Logger;
  * listeners.
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version 2.1
+ * @version 2.0
  * @since 1.0
  */
-public class GlobalScreen {
-	/**
-	 * Logging service for the native library.
-	 */
-	protected static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+public final class GlobalScreen {
+	private static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 
 	/**
 	 * The service to control the hook.
 	 */
-	protected static NativeHookThread hookThread;
+	private static NativeHookThread hookThread;
 
 	/**
 	 * The service to dispatch events.
 	 */
-	protected static ExecutorService eventExecutor = new DefaultDispatchService();
+	private static ExecutorService eventExecutor = new DefaultDispatchService();
 
 	/**
 	 * The list of event listeners to notify.
 	 */
-	protected static EventListenerList eventListeners = new EventListenerList();
+	private static EventListenerList eventListeners = new EventListenerList();
+
 
 	static {
 		String libName = System.getProperty("jnativehook.lib.name", "JNativeHook");
-
 		try {
 			// Try to load the native library assuming the java.library.path was set correctly at launch.
 			System.loadLibrary(libName);
@@ -96,18 +92,11 @@ public class GlobalScreen {
 				throw new UnsatisfiedLinkError(e.getMessage());
 			}
 		}
-
-		// Add some 2.0 backward comparability.
-		System.setProperty("jnativehook.key.repeat.rate", GlobalScreen.getAutoRepeatRate().toString());
-		System.setProperty("jnativehook.key.repeat.delay", GlobalScreen.getAutoRepeatDelay().toString());
-		System.setProperty("jnativehook.button.multiclick.iterval", GlobalScreen.getMultiClickIterval().toString());
-		System.setProperty("jnativehook.pointer.sensitivity", GlobalScreen.getPointerSensitivity().toString());
-		System.setProperty("jnativehook.pointer.acceleration.multiplier", GlobalScreen.getPointerAccelerationMultiplier().toString());
-		System.setProperty("jnativehook.pointer.acceleration.threshold", GlobalScreen.getPointerAccelerationThreshold().toString());
 	}
 
 
-	protected GlobalScreen() { }
+	private GlobalScreen() { }
+
 
 	/**
 	 * Adds the specified native key listener to receive key events from the
@@ -222,58 +211,9 @@ public class GlobalScreen {
 	}
 
 	/**
-	 * Get information about the native monitor configuration and layout.
-	 *
-	 * @since 2.1
-	 */
-	public static native NativeMonitorInfo[] getNativeMonitors();
-
-	/**
-	 * Retrieves the keyboard auto repeat rate.
-	 *
-	 * @since 2.1
- 	 */
-	public static native Integer getAutoRepeatRate();
-
-	/**
-	 * Retrieves the keyboard auto repeat delay.
-	 *
-	 * @since 2.1
-	 */
-	public static native Integer getAutoRepeatDelay();
-
-	/**
-	 * Retrieves the mouse acceleration multiplier.
-	 *
-	 * @since 2.1
-	 */
-	public static native Integer getPointerAccelerationMultiplier();
-
-	/**
-	 * Retrieves the mouse acceleration threshold.
-	 *
-	 * @since 2.1
-	 */
-	public static native Integer getPointerAccelerationThreshold();
-
-	/**
-	 * Retrieves the mouse sensitivity.
-	 *
-	 * @since 2.1
-	 */
-	public static native Integer getPointerSensitivity();
-
-	/**
-	 * Retrieves the double/triple click interval in milliseconds.
-	 *
-	 * @since 2.1
-	 */
-	public static native Integer getMultiClickIterval();
-
-	/**
 	 * Specialized thread implementation for the native hook.
 	 */
-	protected static class NativeHookThread extends Thread {
+	private static class NativeHookThread extends Thread {
 		/**
 		 * Exception thrown by this thread.
 		 */
@@ -329,10 +269,11 @@ public class GlobalScreen {
 
 
 	/**
-	 * Enable the native hook. If the hooks is currently enabled, this function has no effect.
+	 * Enable the native hook if it is not currently running. If it is running,
+	 * the function has no effect.
 	 * <p>
 	 * <b>Note:</b> This method will throw a <code>NativeHookException</code>
-	 * if specific operating system feature is unavailable or disabled.
+	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
 	 * Access section of the System Preferences on Apple's OS X platform or
 	 * <code>Load "record"</code> is missing for the xorg.conf file on
@@ -438,10 +379,10 @@ public class GlobalScreen {
 	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
-	 * @param event the <code>NativeInputEvent</code> sent to the native system.
+	 * @param e the <code>NativeInputEvent</code> sent to the native system.
 	 * @since 2.0
 	 */
-	public static native void postNativeEvent(NativeInputEvent event);
+	public static native void postNativeEvent(NativeInputEvent e);
 
 	/**
 	 * Internal class to handle event dispatching via the executor service.
@@ -497,7 +438,7 @@ public class GlobalScreen {
 		 * @see NativeKeyListener
 		 * @see #addNativeKeyListener(NativeKeyListener)
 		 */
-		private void processKeyEvent(NativeKeyEvent e) {
+		private void processKeyEvent(final NativeKeyEvent e) {
 			NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
 			switch (e.getID()) {
@@ -530,7 +471,7 @@ public class GlobalScreen {
 		 * @see NativeMouseListener
 		 * @see #addNativeMouseListener(NativeMouseListener)
 		 */
-		private void processButtonEvent(NativeMouseEvent e) {
+		private void processButtonEvent(final NativeMouseEvent e) {
 			NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
 
 			switch (e.getID()) {
@@ -563,7 +504,7 @@ public class GlobalScreen {
 		 * @see NativeMouseMotionListener
 		 * @see #addNativeMouseMotionListener(NativeMouseMotionListener)
 		 */
-		private void processMouseEvent(NativeMouseEvent e) {
+		private void processMouseEvent(final NativeMouseEvent e) {
 			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
 
 			switch (e.getID()) {
@@ -591,7 +532,7 @@ public class GlobalScreen {
 		 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
 		 * @since 1.1
 		 */
-		private void processMouseWheelEvent(NativeMouseWheelEvent e) {
+		private void processMouseWheelEvent(final NativeMouseWheelEvent e) {
 			NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {
@@ -613,11 +554,11 @@ public class GlobalScreen {
 	 * Failure to do so might result in the delay of user input and the automatic
 	 * removal of the native hook.
 	 *
-	 * @param event the <code>NativeInputEvent</code> sent to the registered event listeners.
+	 * @param e the <code>NativeInputEvent</code> sent to the registered event listeners.
 	 */
-	protected static void dispatchEvent(NativeInputEvent event) {
+	public static void dispatchEvent(NativeInputEvent e) {
 		if (eventExecutor != null) {
-			eventExecutor.execute(new EventDispatchTask(event));
+			eventExecutor.execute(new EventDispatchTask(e));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -39,27 +39,26 @@ import java.util.EventListener;
  * @see NativeKeyEvent
  */
 public interface NativeKeyListener extends EventListener {
-
-	/**
-	 * Invoked when a key has been typed.
-	 *
-	 * @param nativeEvent the native key event.
-	 *
-	 * @since 1.1
-	 */
-	public void nativeKeyTyped(NativeKeyEvent nativeEvent);
-
 	/**
 	 * Invoked when a key has been pressed.
 	 *
-	 * @param nativeEvent the native key event.
+	 * @param e the native key event.
 	 */
-	public void nativeKeyPressed(NativeKeyEvent nativeEvent);
+	public void nativeKeyPressed(NativeKeyEvent e);
 
 	/**
 	 * Invoked when a key has been released.
 	 *
-	 * @param nativeEvent the native key event.
+	 * @param e the native key event.
 	 */
-	public void nativeKeyReleased(NativeKeyEvent nativeEvent);
+	public void nativeKeyReleased(NativeKeyEvent e);
+
+	/**
+	 * Invoked when a key has been typed.
+	 *
+	 * @param e the native key event.
+	 *
+	 * @since 1.1
+	 */
+	public void nativeKeyTyped(NativeKeyEvent e);
 }

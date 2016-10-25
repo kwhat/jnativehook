@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -40,26 +40,25 @@ import java.util.EventListener;
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
-
 	/**
 	 * Invoked when a mouse button has been clicked (pressed and released)
 	 * without being moved.
 	 *
-	 * @param nativeEvent the native mouse event.
+	 * @param e the native mouse event.
 	 */
-	public void nativeMouseClicked(NativeMouseEvent nativeEvent);
+	public void nativeMouseClicked(NativeMouseEvent e);
 
 	/**
 	 * Invoked when a mouse button has been pressed
 	 *
-	 * @param nativeEvent the native mouse event.
+	 * @param e the native mouse event.
 	 */
-	public void nativeMousePressed(NativeMouseEvent nativeEvent);
+	public void nativeMousePressed(NativeMouseEvent e);
 
 	/**
 	 * Invoked when a mouse button has been released
 	 *
-	 * @param nativeEvent the native mouse event.
+	 * @param e the native mouse event.
 	 */
-	public void nativeMouseReleased(NativeMouseEvent nativeEvent);
+	public void nativeMouseReleased(NativeMouseEvent e);
 }

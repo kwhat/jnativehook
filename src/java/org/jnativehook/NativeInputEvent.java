@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import java.util.EventObject;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	2.1
+ * @version	2.0
  *
  * @see org.jnativehook.keyboard.NativeKeyListener
  * @see org.jnativehook.mouse.NativeMouseListener
@@ -40,12 +40,12 @@ import java.util.EventObject;
  */
 public class NativeInputEvent extends EventObject {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 2306729722565226621L;
+	private static final long serialVersionUID = -6960142969790223296L;
 
 	/** The type of event. */
 	private int id;
 
-	/** The platform dependent time the event occured at. */
+	/** The time the event occurred. */
 	private long when;
 
 	/** The modifier keys down during event. */
@@ -126,31 +126,23 @@ public class NativeInputEvent extends EventObject {
 	/** The Button5 modifier constant. */
 	public static final int BUTTON5_MASK		= 1 << 12;
 
-	/** The Number Lock modifier constant. */
-	public static final int NUM_LOCK_MASK		= 1 << 13;
-
-	/** The Caps Lock modifier constant. */
-	public static final int CAPS_LOCK_MASK		= 1 << 14;
-
-	/** The Scroll Lock modifier constant. */
-	public static final int SCROLL_LOCK_MASK	= 1 << 15;
-
 
 	/**
 	 * Instantiates a new native input event.
 	 *
 	 * @param source The source of the event.
 	 * @param id The type of event.
+	 * @param when The timestamp for the event.
 	 * @param modifiers the modifier keys down during event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with the extended _DOWN_MASK or the old _MASK
 	 * <code>InputEvent</code> modifiers.
 	 */
-	public NativeInputEvent(Class<GlobalScreen> source, int id, int modifiers) {
+	public NativeInputEvent(Class<GlobalScreen> source, int id, long when, int modifiers) {
 		super(source);
 
 		this.id = id;
-		this.when = 0;
+		this.when = when;
 		this.modifiers = modifiers;
 		this.reserved = 0x00;
 	}
@@ -165,9 +157,9 @@ public class NativeInputEvent extends EventObject {
 	}
 
 	/**
-	 * Gets the platform dependent native interval for chronological event sequencing.
+	 * Gets the timestamp for when this event occurred.
 	 *
-	 * @return the native timestamp
+	 * @return the timestamp in milliseconds
 	 */
 	public long getWhen() {
 		return when;
@@ -267,22 +259,6 @@ public class NativeInputEvent extends EventObject {
 
 		if ((modifiers & NativeInputEvent.BUTTON5_MASK) != 0) {
 			param.append(Toolkit.getProperty("AWT.button5", "Button5"));
-			param.append('+');
-		}
-
-
-		if ((modifiers & NativeInputEvent.NUM_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.numLock", "Num Lock"));
-			param.append('+');
-		}
-
-		if ((modifiers & NativeInputEvent.CAPS_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.capsLock", "Caps Lock"));
-			param.append('+');
-		}
-
-		if ((modifiers & NativeInputEvent.SCROLL_LOCK_MASK) != 0) {
-			param.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
 			param.append('+');
 		}
 

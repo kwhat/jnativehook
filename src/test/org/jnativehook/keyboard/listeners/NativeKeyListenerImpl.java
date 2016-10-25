@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,13 +18,8 @@
 package org.jnativehook.keyboard.listeners;
 
 // Imports.
-
-import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-
-import java.lang.reflect.Field;
-
 import static org.junit.Assert.fail;
 
 public class NativeKeyListenerImpl implements NativeKeyListener {
@@ -42,15 +37,6 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 		synchronized(this) {
 			this.notifyAll();
 		}
-
-		try {
-			Field f = NativeInputEvent.class.getDeclaredField("reserved");
-			f.setAccessible(true);
-			f.setShort(e, (short) 0x01);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-		}
 	}
 
 	public void nativeKeyReleased(NativeKeyEvent e) {
@@ -65,15 +51,6 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 		synchronized(this) {
 			this.notifyAll();
 		}
-
-		try {
-			Field f = NativeInputEvent.class.getDeclaredField("reserved");
-			f.setAccessible(true);
-			f.setShort(e, (short) 0x01);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-		}
 	}
 
 	public void nativeKeyTyped(NativeKeyEvent e) {
@@ -87,15 +64,6 @@ public class NativeKeyListenerImpl implements NativeKeyListener {
 
 		synchronized(this) {
 			this.notifyAll();
-		}
-
-		try {
-			Field f = NativeInputEvent.class.getDeclaredField("reserved");
-			f.setAccessible(true);
-			f.setShort(e, (short) 0x01);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
 		}
 	}
 

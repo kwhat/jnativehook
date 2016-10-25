@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jnativehook.mouse;
 
-public class NativeMouseWheelAdapter implements NativeMouseWheelListener {
+#ifndef _Included_jni_Properties_h
+#define _Included_jni_Properties_h
 
-	@Override
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
-		// Do Nothing.
-	}
-}
+#include <jni.h>
+
+extern void jni_SetProperties(JNIEnv *env);
+
+extern void jni_ClearProperties(JNIEnv *env);
+
+#endif

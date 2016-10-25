@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -37,6 +37,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x41,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -55,6 +56,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -74,6 +76,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_A,
@@ -92,6 +95,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -111,6 +115,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -129,6 +134,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -148,6 +154,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -176,6 +183,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_F1,
@@ -197,6 +205,7 @@ public class NativeKeyEventTest {
 
 		NativeKeyEvent event = new NativeKeyEvent(
 				NativeKeyEvent.NATIVE_KEY_PRESSED,
+				System.currentTimeMillis(),
 				0x00,		// Modifiers
 				0x00,		// Raw Code
 				NativeKeyEvent.VC_UNDEFINED,
@@ -235,7 +244,7 @@ public class NativeKeyEventTest {
 			}
 		}
 
-		// Convert the key sets to arrays for comparison.
+		// Convert the key sets to arrays for comparision.
 		String[] nativeSet = nativeKeyCodes.keySet().toArray(new String[0]);
 		String[] javaSet = javaKeyCodes.keySet().toArray(new String[0]);
 
