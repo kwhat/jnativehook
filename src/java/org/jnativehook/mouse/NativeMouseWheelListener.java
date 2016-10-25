@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ public interface NativeMouseWheelListener extends EventListener {
 	/**
 	 * Invoked when the mouse wheel is rotated.
 	 *
-	 * @param nativeEvent the native mouse wheel event.
+	 * @param e the native mouse wheel event.
 	 */
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent);
+	public void nativeMouseWheelMoved(NativeMouseWheelEvent e);
 }

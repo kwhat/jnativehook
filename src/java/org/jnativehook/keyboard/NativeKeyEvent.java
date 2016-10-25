@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -18,10 +18,8 @@
 package org.jnativehook.keyboard;
 
 // Imports.
-
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
-
 import java.awt.Toolkit;
 
 /**
@@ -68,7 +66,7 @@ import java.awt.Toolkit;
  */
 public class NativeKeyEvent extends NativeInputEvent {
 	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 8608981443834617646L;
+	private static final long serialVersionUID = -1324603336271643339L;
 
 	/** The raw native key code. */
 	private int rawCode;
@@ -81,6 +79,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 	/** The virtual key location. */
 	private int keyLocation;
+	
+	private String keyboardName;
 
 
 	/** The first number in the range of ID's used for native key events. */
@@ -215,21 +215,41 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** Begin Cursor Key Zone */
 	public static final int VC_UP							= 0xE048;
 	public static final int VC_LEFT							= 0xE04B;
-	public static final int VC_CLEAR						= 0xE04C;
 	public static final int VC_RIGHT						= 0xE04D;
 	public static final int VC_DOWN							= 0xE050;
 
 
 	/** Begin Numeric Zone */
 	public static final int VC_NUM_LOCK						= 0x0045;
-	public static final int VC_SEPARATOR					= 0x0053;
+	public static final int VC_KP_DIVIDE					= 0x0E35;
+	public static final int VC_KP_MULTIPLY					= 0x0037;
+	public static final int VC_KP_SUBTRACT					= 0x004A;
+	public static final int VC_KP_EQUALS					= 0x0E0D;
+	public static final int VC_KP_ADD						= 0x004E;
+	public static final int VC_KP_ENTER						= 0x0E1C;
+	public static final int VC_KP_SEPARATOR					= 0x0053;
+
+	public static final int VC_KP_1							= 0x004F;
+	public static final int VC_KP_2							= 0x0050;
+	public static final int VC_KP_3							= 0x0051;
+	public static final int VC_KP_4							= 0x004B;
+	public static final int VC_KP_5							= 0x004C;
+	public static final int VC_KP_6							= 0x004D;
+	public static final int VC_KP_7							= 0x0047;
+	public static final int VC_KP_8							= 0x0048;
+	public static final int VC_KP_9							= 0x0049;
+	public static final int VC_KP_0							= 0x0052;
 
 
 	/**  Modifier and Control Keys */
-	public static final int VC_SHIFT						= 0x002A;
-	public static final int VC_CONTROL						= 0x001D;
-	public static final int VC_ALT							= 0x0038;	// Option or Alt Key
-	public static final int VC_META							= 0x0E5B;	// Windows or Command Key
+	public static final int VC_SHIFT_L						= 0x002A;
+	public static final int VC_SHIFT_R						= 0x0036;
+	public static final int VC_CONTROL_L					= 0x001D;
+	public static final int VC_CONTROL_R					= 0x0E1D;
+	public static final int VC_ALT_L						= 0x0038;	// Option or Alt Key
+	public static final int VC_ALT_R						= 0x0E38;	// Option or Alt Key
+	public static final int VC_META_L						= 0x0E5B;	// Windows or Command Key
+	public static final int VC_META_R						= 0x0E5C;	// Windows or Command Key
 	public static final int VC_CONTEXT_MENU					= 0x0E5D;
 
 
@@ -269,6 +289,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	public static final int VC_KANJI						= 0x0079;
 	public static final int VC_HIRAGANA						= 0x007B;
 	public static final int VC_YEN							= 0x007D;
+	public static final int VC_KP_COMMA						= 0x007E;
 
 	/** Sun keyboards */
 	public static final int VC_SUN_HELP						= 0xFF75;
@@ -295,6 +316,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
 	 * @param id an integer that identifies the native event type.
+	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with AWT's <code>InputEvent</code> _DOWN_MASK or the older
@@ -310,13 +332,14 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeKeyEvent(int id, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation) {
-		super(GlobalScreen.class, id, modifiers);
+	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar, int keyLocation, String keyboardName) {
+		super(GlobalScreen.class, id, when, modifiers);
 
 		this.rawCode = rawCode;
 		this.keyCode = keyCode;
 		this.keyChar = keyChar;
 		this.keyLocation = keyLocation;
+		this.keyboardName = keyboardName;
 
 		if (id == NATIVE_KEY_TYPED && (keyChar == CHAR_UNDEFINED || keyCode != VC_UNDEFINED)) {
 			throw new IllegalArgumentException();
@@ -328,6 +351,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 * <p>
 	 * Note that passing in an invalid ID results in unspecified behavior.
 	 * @param id an integer that identifies the native event type.
+	 * @param when the timestamp for the native event.
 	 * @param modifiers the modifier mask for the native event.
 	 * <code>NativeInputEvent</code> _MASK modifiers should be used as they are
 	 * not compatible with AWT's <code>InputEvent</code> _DOWN_MASK or the older
@@ -342,8 +366,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 	 *
 	 * @since 1.1
 	 */
-	public NativeKeyEvent(int id, int modifiers, int rawCode, int keyCode, char keyChar) {
-		this(id, modifiers, rawCode, keyCode, keyChar, KEY_LOCATION_UNKNOWN);
+	public NativeKeyEvent(int id, long when, int modifiers, int rawCode, int keyCode, char keyChar, String keyboardName) {
+		this(id, when, modifiers, rawCode, keyCode, keyChar, KEY_LOCATION_UNKNOWN, keyboardName);
 	}
 
 	/**
@@ -616,7 +640,7 @@ public class NativeKeyEvent extends NativeInputEvent {
 			case VC_INSERT:
 				return Toolkit.getProperty("AWT.insert", "Insert");
 			case VC_DELETE:
-				return Toolkit.getProperty("AWT.delete", "Delete");
+				return Toolkit.getProperty("AWT.delete", "NumPad Delete");
 			case VC_HOME:
 				return Toolkit.getProperty("AWT.home", "Home");
 			case VC_END:
@@ -631,33 +655,72 @@ public class NativeKeyEvent extends NativeInputEvent {
 			// Begin Cursor Key Zone
 			case VC_UP:
 				return Toolkit.getProperty("AWT.up", "Up");
-			case VC_LEFT:
-				return Toolkit.getProperty("AWT.left", "Left");
-			case VC_CLEAR:
-				return Toolkit.getProperty("AWT.clear", "Clear");
-			case VC_RIGHT:
-				return Toolkit.getProperty("AWT.right", "Right");
 			case VC_DOWN:
 				return Toolkit.getProperty("AWT.down", "Down");
+			case VC_LEFT:
+				return Toolkit.getProperty("AWT.left", "Left");
+			case VC_RIGHT:
+				return Toolkit.getProperty("AWT.right", "Right");
 			// End Cursor Key Zone
 
 
 			// Begin Numeric Zone
 			case VC_NUM_LOCK:
-				return Toolkit.getProperty("AWT.numLock", "Num Lock");
-			case VC_SEPARATOR:
-				return Toolkit.getProperty("AWT.separator", "NumPad ,");
+				return Toolkit.getProperty("AWT.numpad_numLock", "Num Lock");
+			case VC_KP_DIVIDE:
+				return Toolkit.getProperty("AWT.numpad_divide", "NumPad Divide");
+			case VC_KP_MULTIPLY:
+				return Toolkit.getProperty("AWT.numpad_multiply", "NumPad Multiply");
+			case VC_KP_SUBTRACT:
+				return Toolkit.getProperty("AWT.numpad_subtract", "NumPad Subtract");
+			case VC_KP_EQUALS:
+				return Toolkit.getProperty("AWT.numpad_equals", "NumPad Equals");
+			case VC_KP_ADD:
+				return Toolkit.getProperty("AWT.numpad_add", "NumPad Add");
+			case VC_KP_ENTER:
+				return Toolkit.getProperty("AWT.numpad_enter", "NumPad Enter");
+			case VC_KP_SEPARATOR:
+				return Toolkit.getProperty("AWT.numpad_separator", "NumPad Separator");
+
+			case VC_KP_1:
+				return Toolkit.getProperty("AWT.numpad_1", "NumPad 1");
+			case VC_KP_2:
+				return Toolkit.getProperty("AWT.numpad_2", "NumPad 2");
+			case VC_KP_3:
+				return Toolkit.getProperty("AWT.numpad_3", "NumPad 3");
+			case VC_KP_4:
+				return Toolkit.getProperty("AWT.numpad_4", "NumPad 4");
+			case VC_KP_5:
+				return Toolkit.getProperty("AWT.numpad_5", "NumPad 5");
+			case VC_KP_6:
+				return Toolkit.getProperty("AWT.numpad_6", "NumPad 6");
+			case VC_KP_7:
+				return Toolkit.getProperty("AWT.numpad_7", "NumPad 7");
+			case VC_KP_8:
+				return Toolkit.getProperty("AWT.numpad_8", "NumPad 8");
+			case VC_KP_9:
+				return Toolkit.getProperty("AWT.numpad_9", "NumPad 9");
+			case VC_KP_0:
+				return Toolkit.getProperty("AWT.numpad_0", "NumPad 0");
 			// End Numeric Zone
 
 			// Begin Modifier and Control Keys
-			case VC_SHIFT:
-				return	Toolkit.getProperty("AWT.shift", "Shift");
-			case VC_CONTROL:
-				return Toolkit.getProperty("AWT.control", "Control");
-			case VC_ALT:
-				return Toolkit.getProperty("AWT.alt", "Alt");
-			case VC_META:
-				return Toolkit.getProperty("AWT.meta", "Meta");
+			case VC_SHIFT_L:
+				return	Toolkit.getProperty("AWT.shift_l", "Left Shift");
+			case VC_SHIFT_R:
+				return	Toolkit.getProperty("AWT.shift_r", "Right Shift");
+			case VC_CONTROL_L:
+				return Toolkit.getProperty("AWT.control_l", "Left Control");
+			case VC_CONTROL_R:
+				return Toolkit.getProperty("AWT.control_r", "Right Control");
+			case VC_ALT_L:
+				return Toolkit.getProperty("AWT.alt_l", "Left Alt");
+			case VC_ALT_R:
+				return Toolkit.getProperty("AWT.alt_r", "Right Alt");
+			case VC_META_L:
+				return Toolkit.getProperty("AWT.meta_l", "Left Meta");
+			case VC_META_R:
+				return Toolkit.getProperty("AWT.meta_r", "Right Meta");
 			case VC_CONTEXT_MENU:
 				return Toolkit.getProperty("AWT.context", "Context Menu");
 			// End Modifier and Control Keys
@@ -729,6 +792,8 @@ public class NativeKeyEvent extends NativeInputEvent {
 				return Toolkit.getProperty("AWT.hiragana", "Hiragana");
 			case VC_YEN:
 				return Toolkit.getProperty("AWT.yen", Character.toString((char) 0x00A5));
+			case VC_KP_COMMA:
+				return Toolkit.getProperty("AWT.numpad_comma", "NumPad Comma");
 			// End Japanese Language Keys
 
 
@@ -818,19 +883,22 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 			// Cursor Key Zone
 			case VC_UP:
-			case VC_LEFT:
-			case VC_CLEAR:
-			case VC_RIGHT:
 			case VC_DOWN:
+			case VC_LEFT:
+			case VC_RIGHT:
 
 			// Numeric Zone
 			case VC_NUM_LOCK:
 
 			// Modifier and Control Keys
-			case VC_SHIFT:
-			case VC_CONTROL:
-			case VC_ALT:
-			case VC_META:
+			case VC_SHIFT_L:
+			case VC_SHIFT_R:
+			case VC_CONTROL_L:
+			case VC_CONTROL_R:
+			case VC_ALT_L:
+			case VC_ALT_R:
+			case VC_META_L:
+			case VC_META_R:
 			case VC_CONTEXT_MENU:
 
 			// Media Control Keys
@@ -887,7 +955,14 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 		return false;
 	}
-
+	
+	public void setKeyboardName(String keyboardName) {
+		this.keyboardName = keyboardName;
+	}
+	
+	public String getKeyboardName() {
+		return this.keyboardName;
+	}
 
 	/**
 	 * Returns a parameter string identifying this event. This method is useful
@@ -983,6 +1058,10 @@ public class NativeKeyEvent extends NativeInputEvent {
 
 		param.append("rawCode=");
 		param.append(rawCode);
+		
+		param.append(',');
+		param.append("keyboardName=");
+		param.append(keyboardName);
 
 		return param.toString();
 	}

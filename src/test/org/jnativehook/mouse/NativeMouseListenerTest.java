@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2015 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_CLICKED,
+				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
@@ -57,6 +58,7 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
@@ -78,6 +80,7 @@ public class NativeMouseListenerTest {
 
 		NativeMouseEvent event = new NativeMouseEvent(
 				NativeMouseEvent.NATIVE_MOUSE_RELEASED,
+				System.currentTimeMillis(),
 				0x00,	// Modifiers
 				50,		// X
 				75,		// Y
