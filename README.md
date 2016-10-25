@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
+
 ## About
 JNativeHook is a library to provide global keyboard and mouse listeners for
 Java.  This will allow you to listen for global shortcuts or mouse motion that
