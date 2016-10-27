@@ -325,6 +325,27 @@ public class GlobalScreen {
 		 * Native implementation to stop the input hook.  There is no other way to stop the hook.
 		 */
 		public native void disable() throws NativeHookException;
+
+		/**
+		 * Dispatches an event to the appropriate processor.  This method is
+		 * generally called by the native library but may be used to synthesize
+		 * native events from Java without replaying them on the native system.  If
+		 * you would like to send events to other applications, please use
+		 * {@link #postNativeEvent},
+		 * <p>
+		 *
+		 * <b>Note:</b> This method executes on the native system's event queue.
+		 * It is imperative that all processing be off-loaded to other threads.
+		 * Failure to do so might result in the delay of user input and the automatic
+		 * removal of the native hook.
+		 *
+		 * @param event the <code>NativeInputEvent</code> sent to the registered event listeners.
+		 */
+		protected static void dispatchEvent(NativeInputEvent event) {
+			if (eventExecutor != null) {
+				eventExecutor.execute(new EventDispatchTask(event));
+			}
+		}
 	}
 
 
@@ -500,24 +521,20 @@ public class GlobalScreen {
 		private void processKeyEvent(NativeKeyEvent e) {
 			NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
-			switch (e.getID()) {
-				case NativeKeyEvent.NATIVE_KEY_PRESSED:
-					for (int i = 0; i < listeners.length; i++) {
+			for (int i = 0; i < listeners.length; i++) {
+				switch (e.getID()) {
+					case NativeKeyEvent.NATIVE_KEY_PRESSED:
 						listeners[i].nativeKeyPressed(e);
-					}
-					break;
+						break;
 
-				case NativeKeyEvent.NATIVE_KEY_TYPED:
-					for (int i = 0; i < listeners.length; i++) {
+					case NativeKeyEvent.NATIVE_KEY_TYPED:
 						listeners[i].nativeKeyTyped(e);
-					}
-					break;
+						break;
 
-				case NativeKeyEvent.NATIVE_KEY_RELEASED:
-					for (int i = 0; i < listeners.length; i++) {
+					case NativeKeyEvent.NATIVE_KEY_RELEASED:
 						listeners[i].nativeKeyReleased(e);
-					}
-					break;
+						break;
+				}
 			}
 		}
 
@@ -533,24 +550,20 @@ public class GlobalScreen {
 		private void processButtonEvent(NativeMouseEvent e) {
 			NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
 
-			switch (e.getID()) {
-				case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-					for (int i = 0; i < listeners.length; i++) {
+			for (int i = 0; i < listeners.length; i++) {
+				switch (e.getID()) {
+					case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
 						listeners[i].nativeMouseClicked(e);
-					}
-					break;
+						break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-					for (int i = 0; i < listeners.length; i++) {
+					case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
 						listeners[i].nativeMousePressed(e);
-					}
-					break;
+						break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-					for (int i = 0; i < listeners.length; i++) {
+					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
 						listeners[i].nativeMouseReleased(e);
-					}
-					break;
+						break;
+				}
 			}
 		}
 
@@ -566,18 +579,16 @@ public class GlobalScreen {
 		private void processMouseEvent(NativeMouseEvent e) {
 			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
 
-			switch (e.getID()) {
-				case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-					for (int i = 0; i < listeners.length; i++) {
+			for (int i = 0; i < listeners.length; i++) {
+				switch (e.getID()) {
+					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
 						listeners[i].nativeMouseMoved(e);
-					}
-					break;
+						break;
 
-				case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-					for (int i = 0; i < listeners.length; i++) {
+					case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
 						listeners[i].nativeMouseDragged(e);
-					}
-					break;
+						break;
+				}
 			}
 		}
 
@@ -597,27 +608,6 @@ public class GlobalScreen {
 			for (int i = 0; i < listeners.length; i++) {
 				listeners[i].nativeMouseWheelMoved(e);
 			}
-		}
-	}
-
-	/**
-	 * Dispatches an event to the appropriate processor.  This method is
-	 * generally called by the native library but may be used to synthesize
-	 * native events from Java without replaying them on the native system.  If
-	 * you would like to send events to other applications, please use
-	 * {@link #postNativeEvent},
-	 * <p>
-	 *
-	 * <b>Note:</b> This method executes on the native system's event queue.
-	 * It is imperative that all processing be off-loaded to other threads.
-	 * Failure to do so might result in the delay of user input and the automatic
-	 * removal of the native hook.
-	 *
-	 * @param event the <code>NativeInputEvent</code> sent to the registered event listeners.
-	 */
-	protected static void dispatchEvent(NativeInputEvent event) {
-		if (eventExecutor != null) {
-			eventExecutor.execute(new EventDispatchTask(event));
 		}
 	}
 

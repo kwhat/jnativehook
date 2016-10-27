@@ -35,8 +35,12 @@ extern JavaVMAttachArgs jvm_attach_args;
 typedef struct _org_jnativehook_GlobalScreen {
 	jclass cls;
 	jfieldID hookThread;
-	jmethodID dispatchEvent;
 } GlobalScreen;
+
+typedef struct org_jnativehook_GlobalScreen$NativeHookThread {
+	jclass cls;
+	jmethodID dispatchEvent;
+} NativeHookThread;
 
 typedef struct _org_jnativehook_NativeHookException {
 	jclass cls;
@@ -112,6 +116,7 @@ typedef struct _java_util_logging_Logger {
 
 // Global variables for Java object struct representation.
 extern GlobalScreen *org_jnativehook_GlobalScreen;
+extern NativeHookThread *org_jnativehook_GlobalScreen$NativeHookThread;
 extern NativeHookException *org_jnativehook_NativeHookException;
 extern NativeMonitorInfo *org_jnativehook_NativeMonitorInfo;
 extern NativeInputEvent *org_jnativehook_NativeInputEvent;

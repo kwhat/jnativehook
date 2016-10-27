@@ -24,6 +24,7 @@
 #include "jni_Logger.h"
 
 GlobalScreen *org_jnativehook_GlobalScreen = NULL;
+NativeHookThread *org_jnativehook_GlobalScreen$NativeHookThread = NULL;
 NativeHookException *org_jnativehook_NativeHookException = NULL;
 NativeMonitorInfo *org_jnativehook_NativeMonitorInfo = NULL;
 NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
@@ -44,16 +45,12 @@ static int create_GlobalScreen(JNIEnv *env) {
 		// Get the field ID for hookThread.
 		jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
 
-		// Get the method ID for GlobalScreen.dispatchEvent().
-		jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, GlobalScreen_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
-
 		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
 			org_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
 			if (org_jnativehook_GlobalScreen != NULL) {
 				// Populate our structure for later use.
 				org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
 				org_jnativehook_GlobalScreen->hookThread = hookThread;
-				org_jnativehook_GlobalScreen->dispatchEvent = dispatchEvent;
 
 				status = JNI_OK;
 			}
@@ -77,6 +74,48 @@ static void destroy_GlobalScreen(JNIEnv *env) {
 		// Free struct memory.
 		free(org_jnativehook_GlobalScreen);
 		org_jnativehook_GlobalScreen = NULL;
+	}
+}
+
+
+static int create_NativeHookThread(JNIEnv *env) {
+	int status = JNI_ERR;
+
+	// Class and Constructor for the GlobalScreen Object.
+	jclass NativeHookThread_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen$NativeHookThread");
+	if (NativeHookThread_class != NULL) {
+		// Get the method ID for GlobalScreen.dispatchEvent().
+		jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, NativeHookThread_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+
+		if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
+			org_jnativehook_GlobalScreen$NativeHookThread = malloc(sizeof(NativeHookThread));
+			if (org_jnativehook_GlobalScreen$NativeHookThread != NULL) {
+				// Populate our structure for later use.
+				org_jnativehook_GlobalScreen$NativeHookThread->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookThread_class);
+				org_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent = dispatchEvent;
+
+				status = JNI_OK;
+			}
+			else {
+				jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+				status = JNI_ENOMEM;
+			}
+		}
+	}
+
+	return status;
+}
+
+static void destroy_NativeHookThread(JNIEnv *env) {
+	if (org_jnativehook_GlobalScreen != NULL) {
+		// The class *should* never be null if the struct was allocated, but we will check anyway.
+		if (org_jnativehook_GlobalScreen$NativeHookThread->cls != NULL) {
+			(*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen$NativeHookThread->cls);
+		}
+
+		// Free struct memory.
+		free(org_jnativehook_GlobalScreen$NativeHookThread);
+		org_jnativehook_GlobalScreen$NativeHookThread = NULL;
 	}
 }
 
@@ -582,6 +621,10 @@ int jni_CreateGlobals(JNIEnv *env) {
 	int status = create_GlobalScreen(env);
 
 	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
+		status = create_NativeHookThread(env);
+	}
+
+	if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
 		status = create_NativeHookException(env);
 	}
 
@@ -631,6 +674,7 @@ int jni_CreateGlobals(JNIEnv *env) {
 
 int jni_DestroyGlobals(JNIEnv *env) {
 	destroy_GlobalScreen(env);
+	destroy_NativeHookThread(env);
 	destroy_NativeHookException(env);
 	destroy_NativeMonitorInfo(env);
 	destroy_NativeInputEvent(env);

@@ -204,8 +204,8 @@ void jni_EventDispatcher(uiohook_event * const event) {
 			// Dispatch the event.
 			(*env)->CallStaticVoidMethod(
 					env,
-					org_jnativehook_GlobalScreen->cls,
-					org_jnativehook_GlobalScreen->dispatchEvent,
+					org_jnativehook_GlobalScreen$NativeHookThread->cls,
+					org_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
 					NativeInputEvent_obj);
 
 			// Set the propagate flag from java.
