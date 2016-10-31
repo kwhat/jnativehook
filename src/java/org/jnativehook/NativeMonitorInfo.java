@@ -77,7 +77,9 @@ public class NativeMonitorInfo {
 	}
 
 	/**
-	 * Get the logical number for this display.  The primary display will always be zero.
+	 * Get the logical number of this display.  The primary display will always be zero.
+	 *
+	 * @return the logical number of this display.
 	 */
 	public short getNumber() {
 		return number;
@@ -85,6 +87,8 @@ public class NativeMonitorInfo {
 
 	/**
 	 * Set the logical number for this display.
+	 *
+	 * @param number the logical number of this display.
 	 */
 	public void setNumber(short number) {
 		this.number = number;

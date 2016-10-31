@@ -224,6 +224,7 @@ public class GlobalScreen {
 	/**
 	 * Get information about the native monitor configuration and layout.
 	 *
+	 * @return an array of <code>NativeMonitorInfo</code> objects.
 	 * @since 2.1
 	 */
 	public static native NativeMonitorInfo[] getNativeMonitors();
@@ -231,6 +232,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the keyboard auto repeat rate.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
  	 */
 	public static native Integer getAutoRepeatRate();
@@ -238,6 +240,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the keyboard auto repeat delay.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
 	 */
 	public static native Integer getAutoRepeatDelay();
@@ -245,6 +248,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the mouse acceleration multiplier.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
 	 */
 	public static native Integer getPointerAccelerationMultiplier();
@@ -252,6 +256,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the mouse acceleration threshold.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
 	 */
 	public static native Integer getPointerAccelerationThreshold();
@@ -259,6 +264,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the mouse sensitivity.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
 	 */
 	public static native Integer getPointerSensitivity();
@@ -266,6 +272,7 @@ public class GlobalScreen {
 	/**
 	 * Retrieves the double/triple click interval in milliseconds.
 	 *
+	 * @return <code>Integer</code> or null.
 	 * @since 2.1
 	 */
 	public static native Integer getMultiClickIterval();
@@ -277,7 +284,7 @@ public class GlobalScreen {
 		/**
 		 * Exception thrown by this thread.
 		 */
-		private NativeHookException exception;
+		protected NativeHookException exception;
 
 		/**
 		 * Default constructor.
@@ -318,11 +325,15 @@ public class GlobalScreen {
 		 * Native implementation to start the input hook.  This method blocks and should only be called by this
 		 * specialized thread implementation.  This method will notifyAll() after passing any exception exception
 		 * throwing code.
+		 *
+		 * @throws NativeHookException problem registering the native hook with the underlying operating system.
 		 */
-		private native void enable() throws NativeHookException;
+		protected native void enable() throws NativeHookException;
 
 		/**
 		 * Native implementation to stop the input hook.  There is no other way to stop the hook.
+		 *
+		 * @throws NativeHookException problem un-registering the native hook with the underlying operating system.
 		 */
 		public native void disable() throws NativeHookException;
 
@@ -359,8 +370,7 @@ public class GlobalScreen {
 	 * <code>Load "record"</code> is missing for the xorg.conf file on
 	 * Unix/Linux/Solaris platforms.
 	 *
-	 * @throws NativeHookException problem registering the native hook with
-	 *                             the underlying operating system.
+	 * @throws NativeHookException problem registering the native hook with the underlying operating system.
 	 * @since 1.1
 	 */
 	public static void registerNativeHook() throws NativeHookException {
@@ -389,7 +399,6 @@ public class GlobalScreen {
 	 * hook it is not registered the function has no effect.
 	 *
 	 * @throws NativeHookException hook interrupted by Java.
-	 *
 	 * @since 1.1
 	 */
 	public static void unregisterNativeHook() throws NativeHookException {
