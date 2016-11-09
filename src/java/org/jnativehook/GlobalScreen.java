@@ -98,12 +98,36 @@ public class GlobalScreen {
 		}
 
 		// Add some 2.0 backward comparability.
-		System.setProperty("jnativehook.key.repeat.rate", GlobalScreen.getAutoRepeatRate().toString());
-		System.setProperty("jnativehook.key.repeat.delay", GlobalScreen.getAutoRepeatDelay().toString());
-		System.setProperty("jnativehook.button.multiclick.iterval", GlobalScreen.getMultiClickIterval().toString());
-		System.setProperty("jnativehook.pointer.sensitivity", GlobalScreen.getPointerSensitivity().toString());
-		System.setProperty("jnativehook.pointer.acceleration.multiplier", GlobalScreen.getPointerAccelerationMultiplier().toString());
-		System.setProperty("jnativehook.pointer.acceleration.threshold", GlobalScreen.getPointerAccelerationThreshold().toString());
+		Integer autoRepeatRate = GlobalScreen.getAutoRepeatRate();
+		if (autoRepeatRate != null) {
+			System.setProperty("jnativehook.key.repeat.rate", autoRepeatRate.toString());
+		}
+
+		Integer autoRepeatDelay = GlobalScreen.getAutoRepeatDelay();
+		if (autoRepeatDelay != null) {
+			System.setProperty("jnativehook.key.repeat.delay", autoRepeatDelay.toString());
+		}
+
+		Integer multiClickIterval = GlobalScreen.getMultiClickIterval();
+		if (multiClickIterval != null) {
+			System.setProperty("jnativehook.button.multiclick.iterval", multiClickIterval.toString());
+		}
+
+		Integer pointerSensitivity = GlobalScreen.getPointerSensitivity();
+		if (multiClickIterval != null) {
+			System.setProperty("jnativehook.pointer.sensitivity", pointerSensitivity.toString());
+		}
+
+		Integer pointerAccelerationMultiplier = GlobalScreen.getPointerAccelerationMultiplier();
+		if (multiClickIterval != null) {
+			System.setProperty("jnativehook.pointer.acceleration.multiplier", pointerAccelerationMultiplier.toString());
+		}
+
+
+		Integer pointerAccelerationThreshold = GlobalScreen.getPointerAccelerationThreshold();
+		if (multiClickIterval != null) {
+			System.setProperty("jnativehook.pointer.acceleration.threshold", pointerAccelerationThreshold.toString());
+		}
 	}
 
 

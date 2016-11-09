@@ -1,10 +1,17 @@
 ## ChangeLog
 
-**JNativeHook 2.1.0**
+**JNativeHook 2.1.0 (Pending)**
  * All events now use the native time source instead of the Unix epoch.
- * Added adapter classes
+ * Added adapter classes.
+ * Added native monitor properties.
+ * Added method calls for global properties.
  * Added support for keyboard lock masks.
+ * Added support for Swing event conversion.
+ * Relaxed GlobalScreen scope restrictions.
+ * Fixed a major issue with UTF-16 support on Linux.
+ * Fixed key mapping for the numberpad on Linux.
  * Fixed language support on X11 platforms.
+ * Code refactroing and orginization.
  
 **JNativeHook 2.0.3 (Nov 02, 2015)**
  * Added support for media keys on OS X.
