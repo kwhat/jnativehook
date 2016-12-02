@@ -17,8 +17,6 @@
  */
 package org.jnativehook;
 
-import java.util.Locale;
-
 /**
  * A small class to determine the native system's operating system family and
  * architecture. The class is only used to determine which native library to
@@ -27,7 +25,7 @@ import java.util.Locale;
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @since	1.0
- * @version	2.0
+ * @version	2.1
  */
 public class NativeSystem {
 
@@ -57,11 +55,6 @@ public class NativeSystem {
 
 		/** Any unsupported operating system family. */
 		UNSUPPORTED;
-
-		@Override
-		public String toString() {
-			return super.toString().toLowerCase(Locale.ROOT);
-		}
 	}
 
 	/**
@@ -70,8 +63,11 @@ public class NativeSystem {
 	 * @see NativeSystem
 	 */
 	public enum Arch {
-		/** The arm architecture. */
-		ARM,
+		/** The arm6j architecture. */
+		ARM6,
+
+		/** The arm7a architecture. */
+		ARM7,
 
 		/** The sparc architecture. */
 		SPARC,
@@ -93,11 +89,6 @@ public class NativeSystem {
 
 		/** Any unsupported system architecture. */
 		UNSUPPORTED;
-
-		@Override
-		public String toString() {
-			return super.toString().toLowerCase(Locale.ROOT);
-		}
 	}
 
 	/**
@@ -125,7 +116,7 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("linux")) {
 			family = Family.LINUX;
 		}
-		else if (osName.toLowerCase(Locale.ROOT).startsWith("windows")) {
+		else if (osName.toLowerCase().startsWith("windows")) {
 			family = Family.WINDOWS;
 		}
 		else {
@@ -144,8 +135,13 @@ public class NativeSystem {
 		String osArch = System.getProperty("os.arch");
 		Arch arch;
 
-		if (osArch.equalsIgnoreCase("arm")) {
-			arch = Arch.ARM;
+		if (osArch.equalsIgnoreCase("arm") ||
+				osArch.toLowerCase().startsWith("arm6")) {
+			arch = Arch.ARM6;
+		}
+		else if (osArch.toLowerCase().startsWith("arm7")) {
+			// FIXME Arm7 is not supported by Java... Yes, seriously.
+			arch = Arch.ARM7;
 		}
 		else if (osArch.equalsIgnoreCase("sparc")) {
 			arch = Arch.SPARC;
