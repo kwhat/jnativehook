@@ -135,13 +135,14 @@ public class NativeSystem {
 		String osArch = System.getProperty("os.arch");
 		Arch arch;
 
-		if (osArch.equalsIgnoreCase("arm") ||
-				osArch.toLowerCase().startsWith("arm6")) {
+		if (osArch.equalsIgnoreCase("arm")) {
 			arch = Arch.ARM6;
-		}
-		else if (osArch.toLowerCase().startsWith("arm7")) {
-			// FIXME Arm7 is not supported by Java... Yes, seriously.
-			arch = Arch.ARM7;
+
+			/* FIXME Arm7 is not supported by Java... Yes, seriously.
+			if (???) {
+				arch = Arch.ARM7;
+			}
+			*/
 		}
 		else if (osArch.equalsIgnoreCase("sparc")) {
 			arch = Arch.SPARC;
