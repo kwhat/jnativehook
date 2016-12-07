@@ -17,6 +17,13 @@
  */
 package org.jnativehook;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A small class to determine the native system's operating system family and
  * architecture. The class is only used to determine which native library to
@@ -138,11 +145,32 @@ public class NativeSystem {
 		if (osArch.equalsIgnoreCase("arm")) {
 			arch = Arch.ARM6;
 
-			/* FIXME Arm7 is not supported by Java... Yes, seriously.
-			if (???) {
-				arch = Arch.ARM7;
+			// Arm7 is not supported by Java... Yes, seriously.
+			if (NativeSystem.getFamily() == Family.LINUX) {
+				File fin = new File("/proc/cpuinfo");
+				if (fin.exists() && fin.canRead()) {
+					Pattern p = Pattern.compile("arm7]", Pattern.CASE_INSENSITIVE);
+
+					try {
+						BufferedReader br = new BufferedReader(new FileReader(fin));
+
+						String line = null;
+						while ((line = br.readLine()) != null) {
+							Matcher m = p.matcher(line);
+
+							if (m.find()) {
+								arch = Arch.ARM7;
+								break;
+							}
+						}
+
+						br.close();
+					}
+					catch (IOException e) {
+						// Assume Arm6.
+					}
+				}
 			}
-			*/
 		}
 		else if (osArch.equalsIgnoreCase("sparc")) {
 			arch = Arch.SPARC;
