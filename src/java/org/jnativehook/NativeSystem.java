@@ -149,7 +149,7 @@ public class NativeSystem {
 			if (NativeSystem.getFamily() == Family.LINUX) {
 				File fin = new File("/proc/cpuinfo");
 				if (fin.exists() && fin.canRead()) {
-					Pattern p = Pattern.compile("arm7]", Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("ARMv7", Pattern.CASE_INSENSITIVE);
 
 					try {
 						BufferedReader br = new BufferedReader(new FileReader(fin));
@@ -187,10 +187,10 @@ public class NativeSystem {
 			arch = Arch.PPC64;
 		}
 		else if (osArch.equalsIgnoreCase("x86") ||
-			osArch.equalsIgnoreCase("i386") ||
-			osArch.equalsIgnoreCase("i486") ||
-			osArch.equalsIgnoreCase("i586") ||
-			osArch.equalsIgnoreCase("i686")) {
+				osArch.equalsIgnoreCase("i386") ||
+				osArch.equalsIgnoreCase("i486") ||
+				osArch.equalsIgnoreCase("i586") ||
+				osArch.equalsIgnoreCase("i686")) {
 			arch = Arch.x86;
 		}
 		else if (osArch.equalsIgnoreCase("x86_64") ||
