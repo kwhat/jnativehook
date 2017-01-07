@@ -62,33 +62,21 @@ GUI Demo Application:
 
 
 *** License ***
-Copyright (C) 2006-2011 Alexander Barker.  All Rights Received.
+Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+https://github.com/kwhat/jnativehook/
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+JNativeHook is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
+JNativeHook is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-Alternate Licensing Options
-
-In addition to the GNU General Public License, I offer business-friendly 
-licensing options for JNativeHook.  If you wish to incorporate JNativeHook 
-into your commercial software package where the terms of the GPL are not a 
-viable option, you may choose to obtain a commercial license.  For more 
-information on available licensing options, please contact me via email at 
-alex@1stleg.com or by paper mail at the following address:
-
-Alexander Barker
-3946 Verde Vista Dr.
-Thousand Oaks CA 91360 
 
 
 *** Compiling ***
