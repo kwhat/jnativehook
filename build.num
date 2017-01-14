@@ -1,3 +1,4 @@
-#Build Number for ANT. Do not edit!
-#Fri Sep 23 11:45:15 PDT 2011
-build.number=2288
+# Build number properties for Ant.
+
+ant.build.major=1
+ant.build.minor=0
