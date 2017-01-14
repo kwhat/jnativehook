@@ -114,18 +114,18 @@ public class GlobalScreen {
 		}
 
 		Integer pointerSensitivity = GlobalScreen.getPointerSensitivity();
-		if (multiClickIterval != null) {
+		if (pointerSensitivity != null) {
 			System.setProperty("jnativehook.pointer.sensitivity", pointerSensitivity.toString());
 		}
 
 		Integer pointerAccelerationMultiplier = GlobalScreen.getPointerAccelerationMultiplier();
-		if (multiClickIterval != null) {
+		if (pointerAccelerationMultiplier != null) {
 			System.setProperty("jnativehook.pointer.acceleration.multiplier", pointerAccelerationMultiplier.toString());
 		}
 
 
 		Integer pointerAccelerationThreshold = GlobalScreen.getPointerAccelerationThreshold();
-		if (multiClickIterval != null) {
+		if (pointerAccelerationThreshold != null) {
 			System.setProperty("jnativehook.pointer.acceleration.threshold", pointerAccelerationThreshold.toString());
 		}
 	}
