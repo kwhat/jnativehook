@@ -319,8 +319,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</propertyfile>
 	</target>
 
-	
-	<target name="compile" depends="init" description="Compiles all Java and C source files.">
+
+	<target name="compile-java" depends="init" description="Compiles Java source files.">
 		<echo>Compiling Java source...</echo>
 		<mkdir dir="${dir.bin}/class/java" />
 		<javac
@@ -339,8 +339,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			<classpath refid="ant.project.class.path" />
 		</javac>
+	</target>
 
 
+	<target name="compile-jni" depends="compile-java" description="Compiles JNI source files.">
 		<echo>Creating JNI Headers...</echo>
 		<javah destdir="${dir.src}/native/jni" verbose="true">
 			<class name="org.jnativehook.GlobalScreen" />
@@ -417,6 +419,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- Linking order matters and libraries should come after obj files. -->
 			<arg value="${ant.build.native.ld.libs}" />
 		</ld>
+	</target>
+
+
+	<target name="compile" depends="compile-java,compile-jni" description="Compiles both Java and C source files.">
 	</target>
 
 	

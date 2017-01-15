@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-	JNativeHook: Global keyboard and mouse hooking for Java.
-	Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
-	http://code.google.com/p/jnativehook/
+JNativeHook: Global keyboard and mouse hooking for Java.
+Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
+https://github.com/kwhat/jnativehook/
 
-	JNativeHook is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published
-	by the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+JNativeHook is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	JNativeHook is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+JNativeHook is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <project name="Cross-Compile" default="all" basedir=".">
 	<!-- Project Settings -->
-	<property file="cross.build.properties" />
-	<property environment="env" />
-	
-	<property name="ant.build.major" value="2" />
-	<property name="ant.build.minor" value="1" />
+	<property file="build.num" />
 	<tstamp>
 		<format property="ant.build.date" pattern="yyyyMMdd" />
 	</tstamp>
 	<property name="ant.build.revision" value="${ant.build.date}" />
-	
+
+	<property file="cross.build.properties" />
+	<property environment="env" />
+
 	<!-- Path Settings -->
-	<property name="dir.maven"		value="${basedir}/maven" />
+	<property name="dir.maven" value="${basedir}/maven" />
 	
 	<!-- Class Path Settings -->
 	<path id="ant.project.class.path">
@@ -183,9 +182,9 @@
 	<target name="download-jnativehook" depends="configure" unless="project.check.jnativehook.download" description="Download and initialize the native library.">
 		<echo>Downloading JNativeHook source...</echo>
 
-		<get src="https://github.com/kwhat/jnativehook/archive/master.zip" dest="jnativehook-2.1.zip" verbose="true" />
-		<unzip src="jnativehook-2.1.zip" dest="jnativehook">
-			<mapper type="glob" from="jnativehook-master/*" to="*"/>
+		<get src="https://github.com/kwhat/jnativehook/archive/${ant.build.major}.${ant.build.minor}.zip" dest="jnativehook-${ant.build.major}.${ant.build.minor}.zip" verbose="true" />
+		<unzip src="jnativehook-${ant.build.major}.${ant.build.minor}.zip" dest="jnativehook">
+			<mapper type="glob" from="jnativehook-${ant.build.major}.${ant.build.minor}/*" to="*"/>
 		</unzip>
 		
 		<!-- Fix clock skew. -->
@@ -229,7 +228,15 @@
 			
 			<property name="ant.build.javac.args" value="-bootclasspath ${ant.build.javac.bootclasspath}" />
 		</ant>
-		
+
+		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
+			<property file="targets/armv6j-hardfloat-linux-gnueabihf.properties" />
+		</ant>
+
+		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
+			<property file="targets/armv7a-hardfloat-linux-gnueabihf.properties" />
+		</ant>
+
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
 			<property file="targets/x86_64-w64-mingw32.properties" />
 		</ant>
@@ -253,13 +260,13 @@
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
 			<property file="targets/i586-apple-darwin9.properties" />
 		</ant>
-		
+
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/armv6j-hardfloat-linux-gnueabihf.properties" />
+			<property file="targets/powerpc-apple-darwin9.properties" />
 		</ant>
 
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/armv7a-hardfloat-linux-gnueabihf.properties" />
+			<property file="targets/powerpc64-apple-darwin9.properties" />
 		</ant>
 	</target>
 	
