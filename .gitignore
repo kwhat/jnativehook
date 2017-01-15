@@ -1,0 +1,11 @@
+/.idea/
+/bin/
+/doc/
+/jar/
+/lib/
+/src/native/jni/org_jnativehook_GlobalScreen.h
+/src/JNativeHook.iml
+*.jar
+build.properties
+*.project
+*.classpath
