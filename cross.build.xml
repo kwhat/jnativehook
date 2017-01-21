@@ -167,7 +167,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<!-- We need to override the src and bin locations. -->
 			<property name="dir.bin" value="${basedir}/jnitasks/bin" />
 			<property name="dir.src" value="${basedir}/jnitasks/src" />
-			<property name="dir.jar" value="${basedir}/jnativehook" />
+			<property name="dir.jar" value="${basedir}" />
 
 			<!-- Set a few of the configurable properties. -->
 			<property name="ant.build.debug" value="${ant.build.debug}" />
@@ -202,7 +202,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 	<target name="compile" depends="compile-jnitasks" description="Compiles both Java and C source files.">
-		<ant antfile="build.xml" dir="jnativehook" inheritAll="false">
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="false">
 			<target name="compile-java" />
 
 			<property name="ant.build.javac.source" value="${ant.build.javac.source}" />
@@ -251,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	
 	<target name="package" depends="" description="Creates zip files for distribution.">
 
-		<ant antfile="build.xml" dir="jnativehook" target="package" inheritAll="false">
+		<ant antfile="build.xml" dir="${basedir}" target="package" inheritAll="false">
 			<property name="ant.build.major" value="${ant.build.major}" />
 			<property name="ant.build.minor" value="${ant.build.minor}" />
 			<property name="ant.build.revision" value="${ant.build.revision}" />
