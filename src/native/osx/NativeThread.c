@@ -567,7 +567,7 @@ static CGEventRef LowLevelProc(CGEventTapProxy UNUSED(proxy), CGEventType type, 
 		}
 	}
 
-	return noErr;
+	return event;
 }
 
 // This method will be externalized with 1.2

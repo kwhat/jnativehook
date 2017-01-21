@@ -19,6 +19,14 @@
 #ifndef _Included_NativeErrors_h
 #define _Included_NativeErrors_h
 
+#ifdef DEBUG
+#include <stdio.h>
+#include <unistd.h>
+#endif
+
+#include <jni.h>
+#include <stdlib.h>
+
 #ifdef UNUSED
 #elif defined(__GNUC__)
 #define UNUSED(x) UNUSED_ ## x __attribute__((unused))
@@ -27,14 +35,6 @@
 #else
 #define UNUSED(x) x
 #endif
-
-#ifdef DEBUG
-#include <stdio.h>
-#include <unistd.h>
-#endif
-
-#include <jni.h>
-#include <stdlib.h>
 
 // Exception class definitions.
 #define INTERNAL_ERROR				"java/lang/InternalError"

@@ -27,7 +27,6 @@ import java.util.EventObject;
  * no method for listeners or subclasses to prevent delivery of the event to
  * the native system. There is no guarantee that the events will be received by
  * Java before they are delivered natively.
- * <p/>
  *
  * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version	1.1

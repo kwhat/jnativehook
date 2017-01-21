@@ -40,7 +40,7 @@ import java.util.concurrent.ThreadFactory;
  * GlobalScreen is used to represent the native screen area that Java does not
  * usually have access to. This class can be thought of as the source component
  * for native input events.
- * <p />
+ * <p>
  * This class also handles the loading, unpacking and communication with the
  * native library. That includes registering and unregistering the native hook
  * with the underlying operating system and adding global keyboard and mouse
@@ -216,7 +216,7 @@ public class GlobalScreen {
 	/**
 	 * Enable the native hook if it is not currently running. If it is running
 	 * the function has no effect.
-	 * <p />
+	 * <p>
 	 * <b>Note: </b> This method will throw a <code>NativeHookException</code>
 	 * if specific operating system features are unavailable or disabled.
 	 * For example: Access for assistive devices is unchecked in the Universal
@@ -243,7 +243,6 @@ public class GlobalScreen {
 	 * Returns <code>true</code> if the native hook is currently registered.
 	 *
 	 * @return true if the native hook is currently registered.
-	 * @throws NativeHookException the native hook exception
 	 *
 	 * @since 1.1
 	 */
@@ -469,7 +468,7 @@ public class GlobalScreen {
 	 * Perform procedures to cleanup the native library. This method is called
 	 * on garbage collection to ensure proper native cleanup.
 	 */
-	protected static void unloadNativeLibrary() throws NativeHookException {
+	protected static void unloadNativeLibrary() {
 		//Make sure the native thread has stopped.
 		unregisterNativeHook();
 	}

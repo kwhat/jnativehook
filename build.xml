@@ -425,7 +425,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<target name="compile" depends="compile-java,compile-jni" description="Compiles both Java and C source files.">
 	</target>
 
-	
+
 	<target name="jar" description="Creates the jar library.">
 		<echo>Copying libs...</echo>
 		<mkdir dir="${dir.bin}/class/java/org/jnativehook/lib" />
@@ -452,70 +452,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</manifest>
 		</jar>
 	</target>
-	
+
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documenation...</echo>
-	
+
 		<!-- Delete any previous javadocs -->
 		<mkdir dir="${dir.doc}"/>
 		<delete includeemptydirs="true">
 			<fileset dir="${dir.doc}" includes="**/*"/>
 		</delete>
-		
-		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
-			<packageset dir="src" defaultexcludes="yes">
+
+		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
+			<packageset dir="${dir.src}/java" defaultexcludes="yes">
 				<include name="org/jnativehook/**"/>
 				<exclude name="org/jnativehook/c_source/**"/>
 				<exclude name="org/jnativehook/lib/**"/>
 			</packageset>
-			
+
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2011 Alexander Barker. All Rights Reserved.</i>]]></bottom>
-			
-			<!--
-			<tag name="to.do" scope="all" description="To Do:"/>
-			<tag name="fix.me" scope="all" description="Fix Needed:"/>
-			-->
-			
-			<link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2017 ${project.vendor}. All Rights Received.</i>]]></bottom>
+
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 		</javadoc>
 	</target>
-	
+
 	<target name="package" depends="jar,javadoc" description="Creates zip files for distribution.">
 		<!-- Copy Files To Dist Locations -->
 		<echo>Creating Distribution Archive...</echo>
-		<zip destfile="${dir.dist}/${project.name}-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.jar}" prefix="${project.name}/jar">
-				<include name="*.jar"/>
+		<mkdir dir="${dir.dist}" />
+
+		<zip destfile="${dir.dist}/${ant.project.name}-${ant.project.version}.zip" level="9">
+			<zipfileset dir="targets" prefix="${ant.project.name}/targets">
+				<include name="**/*.properties" />
 			</zipfileset>
-			
-			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<include name="license*.txt"/>
-				<include name="readme.txt"/>
+
+			<zipfileset dir="${dir.doc}" prefix="${ant.project.name}/doc">
+				<include name="**/*" />
 			</zipfileset>
-		</zip>
-		
-		<zip destfile="${dir.dist}/${project.name}-doc-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.doc}" prefix="${project.name}/doc">
-				<exclude name="**/.*"/>
+
+			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
+				<include name="${ant.project.name}-${ant.project.version}.jar" />
 			</zipfileset>
-		</zip>
-		
-		<zip destfile="${dir.dist}/${project.name}-src-${project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${basedir}" prefix="${project.name}">
-				<include name="*.txt"/>
-				<include name="build.*"/>
-				<include name="Makefile"/>
-				<exclude name="build.properties*"/>
+
+			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
+				<include name="java/**/*" />
+				<include name="native/**/*" />
+
+				<exclude name="native/jni/org_jnativehook_GlobalScreen.h" />
 			</zipfileset>
-			
-			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
-				<exclude name="**/.*"/>
-				<exclude name="org/jnativehook/lib/**"/>
+
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
+				<include name="build.num" />
+				<include name="build.xml" />
+				<include name="cross.build.xml" />
+				<include name="AUTHORS" />
+				<include name="*.md" />
+
+				<exclude name="*.properties" />
 			</zipfileset>
 		</zip>
 	</target>
-	
+
 	<target name="all" depends="compile,jar" description="Compile all source files and create the jar library.">
 	</target>
 </project>

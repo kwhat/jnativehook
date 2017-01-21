@@ -39,7 +39,7 @@ to include this library automatically.  The nightly builds can be found at the m
 * Windows 2000 - 7
   * i586, amd64
 * X11 Linux
-  * i586, amd64, arm6j, arm7a
+  * i586, amd64, arm6j
   * libX11.so.6
   * libXt.so.6
   * libXtst.so.6

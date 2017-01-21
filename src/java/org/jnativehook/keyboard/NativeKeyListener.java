@@ -24,9 +24,8 @@ import java.util.EventListener;
 
 /**
  * The listener interface for receiving global <code>NativeKeyEvents</code>.
- * <p/>
- *
- * The class that is interested in processing a <code>NativeKeyEvent</code>
+ * <p>
+  * The class that is interested in processing a <code>NativeKeyEvent</code>
  * implements this interface, and the object created with that class is
  * registered with the <code>GlobalScreen</code> using the
  * {@link GlobalScreen#addNativeKeyListener(NativeKeyListener)} method. When the

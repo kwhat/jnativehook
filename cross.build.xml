@@ -19,7 +19,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<project name="Cross-Compile" default="all" basedir=".">
+<project name="cross-compile" default="all" basedir=".">
 	<!-- Project Settings -->
 	<property file="build.num" />
 	<tstamp>
@@ -179,21 +179,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</target>
 
 
-	<target name="download-jnativehook" depends="configure" unless="project.check.jnativehook.download" description="Download and initialize the native library.">
-		<echo>Downloading JNativeHook source...</echo>
-
-		<get src="https://github.com/kwhat/jnativehook/archive/${ant.build.major}.${ant.build.minor}.zip" dest="jnativehook-${ant.build.major}.${ant.build.minor}.zip" verbose="true" />
-		<unzip src="jnativehook-${ant.build.major}.${ant.build.minor}.zip" dest="jnativehook">
-			<mapper type="glob" from="jnativehook-${ant.build.major}.${ant.build.minor}/*" to="*"/>
-		</unzip>
-		
-		<!-- Fix clock skew. -->
-		<touch>
-			<fileset dir="jnativehook" includes="**/*" />
-		</touch>
-	</target>
-
-
 	<!-- Note: This target is called recursivly from the compile task with the aproprate properties. -->
 	<target name="-compile-cross" description="Cross compile the native portions of the project.">
 		<fail message="You must set ant.build.native.host to cross compile.">
@@ -205,24 +190,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</fail>
 		
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
-			<fileset dir="jnativehook/bin/libuiohook" />
-			<fileset dir="jnativehook/bin/obj" />
-			<fileset dir="jnativehook/bin/lib" />
+			<fileset dir="bin/obj" />
+			<fileset dir="bin/lib" />
 		</delete>
 		
 		<echo>Compiling for ${ant.build.native.host}...</echo>
-		<ant antfile="build.xml" dir="jnativehook" inheritAll="true">
-			<target name="compile-libuiohook" />
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="true">
 			<target name="compile-jni" />
 		</ant>
 	</target>
 
 
-	<target name="compile" depends="compile-jnitasks,download-jnativehook" description="Compiles both Java and C source files.">
+	<target name="compile" depends="compile-jnitasks" description="Compiles both Java and C source files.">
 		<ant antfile="build.xml" dir="jnativehook" inheritAll="false">
 			<target name="compile-java" />
-			<target name="bootstrap-libuiohook" />
-			
+
 			<property name="ant.build.javac.source" value="${ant.build.javac.source}" />
 			<property name="ant.build.javac.target" value="${ant.build.javac.target}" />
 			
@@ -231,10 +213,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
 			<property file="targets/armv6j-hardfloat-linux-gnueabihf.properties" />
-		</ant>
-
-		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/armv7a-hardfloat-linux-gnueabihf.properties" />
 		</ant>
 
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
@@ -303,37 +281,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<fileset dir="${dir.maven}" includes="**/*" />
 		</delete>
 
-		<copy file="jnativehook/jar/jnativehook-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" tofile="${dir.maven}/${maven.jar.base}.jar"/>
+		<copy file="${basedir}/jar/jnativehook-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" tofile="${dir.maven}/${maven.jar.base}.jar"/>
 		
-		<jar jarfile="${dir.maven}/${maven.jar.base}-sources.jar" basedir="jnativehook" update="true" compress="true" level="9">
+		<jar jarfile="${dir.maven}/${maven.jar.base}-sources.jar" basedir="${basedir}" update="true" compress="true" level="9">
+			<include name="targets/**/*.properties" />
+
 			<include name="src/java/**/*" />
-			<include name="src/jni/**/*" />
-			<include name="src/test/**/*" />
+			<include name="src/native/**/*" />
+			
 			<exclude name="src/jni/include/org_jnativehook_GlobalScreen.h" />
-			<exclude name="src/jni/include/org_jnativehook_GlobalScreen_EventDispatchTask.h" />
-			<exclude name="src/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h" />
 
-			<include name="src/libuiohook/include/uiohook.h" />
-			<include name="src/libuiohook/m4/ax_*.m4" />
-			<include name="src/libuiohook/man/*" />
-			<include name="src/libuiohook/pc/uiohook.pc.in" />
-			<include name="src/libuiohook/src/**/*" />
-			<include name="src/libuiohook/test/**/*" />
-
-			<include name="src/libuiohook/AUTHORS" />
-			<include name="src/libuiohook/bootstrap.sh" />
-			<include name="src/libuiohook/*.am" />
-			<include name="src/libuiohook/*.md" />
-			<include name="src/libuiohook/*.ac" />
-
-			<include name="build.*" />
+			<include name="build.num" />
+			<include name="build.xml" />
+			<include name="cross.build.xml" />
 			<include name="AUTHORS" />
 			<include name="*.md" />
 
-			<exclude name="build.properties" />
+			<exclude name="*.properties" />
 		</jar>
 
-		<jar jarfile="${dir.maven}/${maven.jar.base}-javadoc.jar" basedir="jnativehook/doc" update="true" compress="true" level="9">
+		<jar jarfile="${dir.maven}/${maven.jar.base}-javadoc.jar" basedir="${basedir}/doc" update="true" compress="true" level="9">
 			<include name="**/*" />
 		</jar>
 		
