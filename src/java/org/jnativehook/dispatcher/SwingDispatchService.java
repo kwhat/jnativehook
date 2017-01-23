@@ -18,7 +18,6 @@
 package org.jnativehook.dispatcher;
 
 // Imports.
-
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;

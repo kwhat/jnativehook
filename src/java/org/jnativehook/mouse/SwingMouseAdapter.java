@@ -30,42 +30,34 @@ import java.awt.event.MouseListener;
  */
 public class SwingMouseAdapter extends AbstractSwingInputAdapter implements NativeMouseListener, MouseListener {
 
-	@Override
 	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
 		this.mouseClicked(this.getJavaKeyEvent(nativeEvent));
 	}
 
-	@Override
 	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
 		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
 	}
 
-	@Override
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
 		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
 	}
 
-	@Override
 	public void mouseClicked(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void mousePressed(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void mouseReleased(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void mouseEntered(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void mouseExited(MouseEvent mouseEvent) {
 		// Do Nothing.
 	}

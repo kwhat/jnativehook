@@ -26,17 +26,14 @@ package org.jnativehook.keyboard;
  */
 public class NativeKeyAdapter implements NativeKeyListener {
 
-	@Override
 	public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
 		// Do Nothing.
 	}

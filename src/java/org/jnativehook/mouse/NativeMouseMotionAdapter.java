@@ -25,12 +25,10 @@ package org.jnativehook.mouse;
  */
 public class NativeMouseMotionAdapter implements NativeMouseMotionListener {
 
-	@Override
 	public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}

@@ -257,10 +257,6 @@
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
 			<property file="targets/armv6j-hardfloat-linux-gnueabihf.properties" />
 		</ant>
-
-		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/armv7a-hardfloat-linux-gnueabihf.properties" />
-		</ant>
 	</target>
 	
 	
@@ -296,7 +292,7 @@
 			<fileset dir="${dir.maven}" includes="**/*" />
 		</delete>
 
-		<copy file="jnativehook/jar/jnativehook-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" tofile="${dir.maven}/${maven.jar.base}.jar"/>
+		<copy file="${basedir}/jar/jnativehook-${ant.build.major}.${ant.build.minor}.${ant.build.revision}.jar" tofile="${dir.maven}/${maven.jar.base}.jar"/>
 		
 		<jar jarfile="${dir.maven}/${maven.jar.base}-sources.jar" basedir="jnativehook" update="true" compress="true" level="9">
 			<include name="src/java/**/*" />

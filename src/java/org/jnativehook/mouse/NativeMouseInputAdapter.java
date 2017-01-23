@@ -26,27 +26,22 @@ package org.jnativehook.mouse;
  */
 public class NativeMouseInputAdapter implements NativeMouseInputListener {
 
-	@Override
 	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}
 
-	@Override
 	public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
 		// Do Nothing.
 	}

@@ -63,7 +63,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</target>
 
 
-
 	<target name="mostlyclean" depends="clean" description="Removes all items except previously built libs.">
 		<echo>Cleaning all build related items...</echo>
 
@@ -106,11 +105,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Cleaning all build related items...</echo>
 
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
-			<!-- Brilliant!
-			<fileset dir="${dir.src}/jnitasks" />
-			<fileset dir="${dir.src}/libuiohook" />
-			-->
-
 			<fileset dir="${dir.lib}" />
 		</delete>
 	</target>
@@ -173,7 +167,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<typedef resource="org/jnitasks/antlib.xml" classpathref="ant.project.class.path" onerror="failall" />
 
 
-		<!-- Preform libuiohook target checks. -->
+		<!-- Preform target checks. -->
 		<fileset dir="${dir.src}/libuiohook" id="src-libuiohook" />
 		<pathconvert refid="src-libuiohook" property="project.check.libuiohook.download" setonempty="false" />
 		<available file="${dir.src}/libuiohook/configure" property="project.check.libuiohook.bootstrap" />
@@ -435,8 +429,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<include path="${dir.src}/jni/include" />
 
 			<include path="${ant.build.javac.include}" />
-			<include path="${ant.build.javac.include}/win32" if="native.os.isWindows"/>
-			<include path="${ant.build.javac.include}/${ant.build.native.os}" unless="native.os.isWindows"/>
+			<include path="${ant.build.javac.include}/win32" if="native.os.isWindows" />
+			<include path="${ant.build.javac.include}/${ant.build.native.os}" unless="native.os.isWindows" />
 
 			<fileset dir="${dir.src}/jni">
 				<include name="**/*.c" />
@@ -563,7 +557,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</packageset>
 
 			<doctitle><![CDATA[<h1>JNativeHook-${ant.build.major}.${ant.build.minor} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2016 ${project.vendor}. All Rights Received.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2006-2017 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 		</javadoc>
@@ -576,6 +570,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<mkdir dir="${dir.dist}" />
 
 		<zip destfile="${dir.dist}/${ant.project.name}-${ant.project.version}.zip" level="9">
+			<zipfileset dir="targets" prefix="${ant.project.name}/targets">
+				<include name="**/*.properties" />
+			</zipfileset>
+
 			<zipfileset dir="${dir.doc}" prefix="${ant.project.name}/doc">
 				<include name="**/*" />
 			</zipfileset>
@@ -614,7 +612,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</zipfileset>
 
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
-				<include name="build.*" />
+				<include name="build.num" />
+				<include name="build.xml" />
+				<include name="cross.build.xml" />
 				<include name="AUTHORS" />
 				<include name="*.md" />
 
