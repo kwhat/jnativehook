@@ -312,7 +312,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			version="${maven.pom.version}"
 			name="JNativeHook"
 			description="Global keyboard and mouse listeners for Java."
-	        url="https://github.com/kwhat/jnativehook"
+			url="https://github.com/kwhat/jnativehook"
 		>
 			<license name="GNU General Public License (GPL), Version 3.0" url="https://www.gnu.org/licenses/gpl-3.0.txt" />
 			<license name="GNU Lesser General Public License (LGPL), Version 3.0" url="https://www.gnu.org/licenses/lgpl-3.0.txt" />
