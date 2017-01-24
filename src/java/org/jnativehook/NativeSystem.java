@@ -31,6 +31,11 @@ import java.util.Locale;
  * @version	2.1
  */
 public class NativeSystem {
+	/**
+	 * According to the docs, Locale.ROOT is the same as the locale whose language, country, and variant are
+	 * empty ("") strings.  This is required to maintain Java 1.5 compatibility.
+	 */
+	protected static final Locale ROOT_LOCALE = new Locale("", "", "");
 
 	/**
 	 * The operating system family enum.
@@ -58,10 +63,10 @@ public class NativeSystem {
 
 		/** Any unsupported operating system family. */
 		UNSUPPORTED;
-		
-		@Override		
-		public String toString() {		
-			return super.toString().toLowerCase(Locale.ROOT);		
+
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
 		}
 	}
 
@@ -94,10 +99,10 @@ public class NativeSystem {
 
 		/** Any unsupported system architecture. */
 		UNSUPPORTED;
-				
-		@Override		
-		public String toString() {		
-			return super.toString().toLowerCase(Locale.ROOT);		
+
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
 		}
 	}
 
@@ -126,7 +131,7 @@ public class NativeSystem {
 		else if (osName.equalsIgnoreCase("linux")) {
 			family = Family.LINUX;
 		}
-		else if (osName.toLowerCase(Locale.ROOT).startsWith("windows")) {
+		else if (osName.toLowerCase(NativeSystem.ROOT_LOCALE).startsWith("windows")) {
 			family = Family.WINDOWS;
 		}
 		else {
