@@ -17,6 +17,9 @@
  */
 package org.jnativehook;
 
+// Imports.
+import java.util.Locale;
+
 /**
  * A small class to determine the native system's operating system family and
  * architecture. The class is only used to determine which native library to
