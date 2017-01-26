@@ -40,19 +40,27 @@ to include this library automatically.  The nightly builds can be found at the m
   * i586, amd64
 * X11 Linux
   * i586, amd64, arm6j
+  * libxkbfile.so.1
+  * libxkbcommon-x11.so.0
+  * libxkbcommon.so.0
+  * libX11-xcb.so.1
   * libX11.so.6
+  * libxcb.so.1
+  * libXinerama.so.1
   * libXt.so.6
   * libXtst.so.6
-  * libXext.so.6
-  * libXdmcp.so.6
-  * libXau.so.6
-  * libICE.so.6
-  * libSM.so.6
-  * libxcb.so.1
   * libc.so.6
+  * libxcb-xkb.so.1
   * libdl.so.2
+  * libXau.so.6
+  * libXdmcp.so.6
+  * libXext.so.6
+  * libSM.so.6
+  * libICE.so.6
+  * libbsd.so.0
   * libuuid.so.1
-  * libXinerama.so.1
+  * librt.so.1
+  * libpthread.so.0
 
 ## Donate
 If you have found this library useful, please consider making a donation.
