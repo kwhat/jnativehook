@@ -1,6 +1,6 @@
 ## ChangeLog
 
-**JNativeHook 2.1.0 (Pending)**
+**JNativeHook 2.1.0 (Jan 25, 2015)**
  * All events now use the native time source instead of the Unix epoch.
  * Added adapter classes.
  * Added native monitor properties.
