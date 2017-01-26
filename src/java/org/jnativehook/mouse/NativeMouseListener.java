@@ -40,7 +40,6 @@ import java.util.EventListener;
  * @see NativeMouseEvent
  */
 public interface NativeMouseListener extends EventListener {
-
 	/**
 	 * Invoked when a mouse button has been clicked (pressed and released)
 	 * without being moved.
@@ -63,3 +62,4 @@ public interface NativeMouseListener extends EventListener {
 	 */
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent);
 }
+

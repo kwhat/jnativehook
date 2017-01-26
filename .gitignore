@@ -8,6 +8,6 @@
 /src/jni/include/org_jnativehook_GlobalScreen_NativeHookThread.h
 /src/JNativeHook.iml
 *.jar
-build.properties
+*build.properties
 *.project
 *.classpath

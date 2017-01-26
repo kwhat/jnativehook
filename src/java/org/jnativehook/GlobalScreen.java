@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -492,10 +492,10 @@ public class GlobalScreen {
 	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
-	 * @param event the <code>NativeInputEvent</code> sent to the native system.
+	 * @param nativeEvent the <code>NativeInputEvent</code> sent to the native system.
 	 * @since 2.0
 	 */
-	public static native void postNativeEvent(NativeInputEvent event);
+	public static native void postNativeEvent(NativeInputEvent nativeEvent);
 
 	/**
 	 * Internal class to handle event dispatching via the executor service.
@@ -546,26 +546,26 @@ public class GlobalScreen {
 		 * Processes native key events by dispatching them to all registered
 		 * <code>NativeKeyListener</code> objects.
 		 *
-		 * @param e the <code>NativeKeyEvent</code> to dispatch.
+		 * @param nativeEvent the <code>NativeKeyEvent</code> to dispatch.
 		 * @see NativeKeyEvent
 		 * @see NativeKeyListener
 		 * @see #addNativeKeyListener(NativeKeyListener)
 		 */
-		private void processKeyEvent(NativeKeyEvent e) {
+		private void processKeyEvent(NativeKeyEvent nativeEvent) {
 			NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {
-				switch (e.getID()) {
+				switch (nativeEvent.getID()) {
 					case NativeKeyEvent.NATIVE_KEY_PRESSED:
-						listeners[i].nativeKeyPressed(e);
+						listeners[i].nativeKeyPressed(nativeEvent);
 						break;
 
 					case NativeKeyEvent.NATIVE_KEY_TYPED:
-						listeners[i].nativeKeyTyped(e);
+						listeners[i].nativeKeyTyped(nativeEvent);
 						break;
 
 					case NativeKeyEvent.NATIVE_KEY_RELEASED:
-						listeners[i].nativeKeyReleased(e);
+						listeners[i].nativeKeyReleased(nativeEvent);
 						break;
 				}
 			}
@@ -575,26 +575,26 @@ public class GlobalScreen {
 		 * Processes native mouse button events by dispatching them to all registered
 		 * <code>NativeMouseListener</code> objects.
 		 *
-		 * @param e the <code>NativeMouseEvent</code> to dispatch.
+		 * @param nativeEvent the <code>NativeMouseEvent</code> to dispatch.
 		 * @see NativeMouseEvent
 		 * @see NativeMouseListener
 		 * @see #addNativeMouseListener(NativeMouseListener)
 		 */
-		private void processButtonEvent(NativeMouseEvent e) {
+		private void processButtonEvent(NativeMouseEvent nativeEvent) {
 			NativeMouseListener[] listeners = eventListeners.getListeners(NativeMouseListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {
-				switch (e.getID()) {
+				switch (nativeEvent.getID()) {
 					case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-						listeners[i].nativeMouseClicked(e);
+						listeners[i].nativeMouseClicked(nativeEvent);
 						break;
 
 					case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-						listeners[i].nativeMousePressed(e);
+						listeners[i].nativeMousePressed(nativeEvent);
 						break;
 
 					case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-						listeners[i].nativeMouseReleased(e);
+						listeners[i].nativeMouseReleased(nativeEvent);
 						break;
 				}
 			}
@@ -604,22 +604,22 @@ public class GlobalScreen {
 		 * Processes native mouse events by dispatching them to all registered
 		 * <code>NativeMouseListener</code> objects.
 		 *
-		 * @param e the <code>NativeMouseEvent</code> to dispatch.
+		 * @param nativeEvent the <code>NativeMouseEvent</code> to dispatch.
 		 * @see NativeMouseEvent
 		 * @see NativeMouseMotionListener
 		 * @see #addNativeMouseMotionListener(NativeMouseMotionListener)
 		 */
-		private void processMouseEvent(NativeMouseEvent e) {
+		private void processMouseEvent(NativeMouseEvent nativeEvent) {
 			NativeMouseMotionListener[] listeners = eventListeners.getListeners(NativeMouseMotionListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {
-				switch (e.getID()) {
+				switch (nativeEvent.getID()) {
 					case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-						listeners[i].nativeMouseMoved(e);
+						listeners[i].nativeMouseMoved(nativeEvent);
 						break;
 
 					case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-						listeners[i].nativeMouseDragged(e);
+						listeners[i].nativeMouseDragged(nativeEvent);
 						break;
 				}
 			}
@@ -629,17 +629,17 @@ public class GlobalScreen {
 		 * Processes native mouse wheel events by dispatching them to all registered
 		 * <code>NativeMouseWheelListener</code> objects.
 		 *
-		 * @param e The <code>NativeMouseWheelEvent</code> to dispatch.
+		 * @param nativeEvent The <code>NativeMouseWheelEvent</code> to dispatch.
 		 * @see NativeMouseWheelEvent
 		 * @see NativeMouseWheelListener
 		 * @see #addNativeMouseWheelListener(NativeMouseWheelListener)
 		 * @since 1.1
 		 */
-		private void processMouseWheelEvent(NativeMouseWheelEvent e) {
+		private void processMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
 			NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
 			for (int i = 0; i < listeners.length; i++) {
-				listeners[i].nativeMouseWheelMoved(e);
+				listeners[i].nativeMouseWheelMoved(nativeEvent);
 			}
 		}
 	}
