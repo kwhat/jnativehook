@@ -32,7 +32,7 @@
 	<property name="ant.build.revision" value="${ant.build.date}" />
 	
 	<!-- Path Settings -->
-	<property name="dir.maven"		value="${basedir}/maven" />
+	<property name="dir.maven" value="${basedir}/maven" />
 	
 	<!-- Class Path Settings -->
 	<path id="ant.project.class.path">
@@ -261,7 +261,6 @@
 	
 	
 	<target name="package" depends="" description="Creates zip files for distribution.">
-
 		<ant antfile="build.xml" dir="jnativehook" target="package" inheritAll="false">
 			<property name="ant.build.major" value="${ant.build.major}" />
 			<property name="ant.build.minor" value="${ant.build.minor}" />
