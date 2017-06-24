@@ -128,7 +128,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
 			<fileset dir="jnitasks" />
             <fileset file="jnitasks-0.2.zip" />
-            
+
 			<fileset dir="${dir.maven}" />
 			<fileset file="cross.build.properties" />
 
