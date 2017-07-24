@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2016 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -94,7 +94,7 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 jint jni_ConvertToJavaLocation(unsigned short int nativeKeyCode, jint *javaKeyLocation) {
 	jint status = JNI_ERR;
 
-	if (nativeKeyCode != NULL && javaKeyLocation != NULL) {
+	if (javaKeyLocation != NULL) {
 		switch (nativeKeyCode) {
 			case VC_SHIFT_L:
 			case VC_CONTROL_L:
