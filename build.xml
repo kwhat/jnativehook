@@ -520,7 +520,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 			<manifest>
 				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
-				<section name="org/jnativehook">
+				<section name="org/jnativehook/">
 					<attribute name="Specification-Title" value="${ant.project.name} Library" />
 					<attribute name="Specification-Version" value="${ant.build.major}.${ant.build.minor}" />
 					<attribute name="Specification-Vendor" value="${ant.project.vendor}" />
