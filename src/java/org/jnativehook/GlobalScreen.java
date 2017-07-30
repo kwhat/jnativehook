@@ -60,7 +60,7 @@ public class GlobalScreen {
 	/**
 	 * The service to dispatch events.
 	 */
-	protected static ExecutorService eventExecutor = new DefaultDispatchService();
+	protected static ExecutorService eventExecutor;
 
 	/**
 	 * The list of event listeners to notify.
@@ -320,14 +320,14 @@ public class GlobalScreen {
 		}
 
 		public void run() {
-			exception = null;
+			this.exception = null;
 
 			try {
 				// NOTE enable() will call notifyAll() on this object after passing exception throwing code.
 				this.enable();
 			}
 			catch (NativeHookException e) {
-				exception = e;
+				this.exception = e;
 			}
 
 			synchronized (this) {
@@ -342,7 +342,7 @@ public class GlobalScreen {
 		 * @return the <code>NativeHookException</code> or null.
 		 */
 		public NativeHookException getException() {
-			return exception;
+			return this.exception;
 		}
 
 		/**
@@ -398,11 +398,26 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static void registerNativeHook() throws NativeHookException {
+		if (eventExecutor == null || eventExecutor.isShutdown()) {
+			while (! eventExecutor.isTerminated()) {
+				try {
+					Thread.sleep(500);
+				}
+				catch (InterruptedException e) {
+					log.warning(e.getMessage());
+					break;
+				}
+			}
+
+			eventExecutor = new DefaultDispatchService();
+		}
+
 		if (hookThread == null || !hookThread.isAlive()) {
 			hookThread = new NativeHookThread();
 
 			synchronized (hookThread) {
 				hookThread.start();
+
 				try {
 					hookThread.wait();
 				}
@@ -427,16 +442,18 @@ public class GlobalScreen {
 	 */
 	public static void unregisterNativeHook() throws NativeHookException {
 		if (isNativeHookRegistered()) {
-			synchronized (hookThread) {
-				hookThread.disable();
 
+			synchronized (hookThread) {
 				try {
+					hookThread.disable();
 					hookThread.join();
 				}
-				catch (InterruptedException e) {
+				catch (Exception e) {
 					throw new NativeHookException(e.getCause());
 				}
 			}
+
+			eventExecutor.shutdown();
 		}
 	}
 
