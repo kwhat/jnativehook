@@ -398,10 +398,14 @@ public class GlobalScreen {
 	 * @since 1.1
 	 */
 	public static void registerNativeHook() throws NativeHookException {
-		if (eventExecutor == null || eventExecutor.isShutdown()) {
+		if (eventExecutor != null) {
+			if (! eventExecutor.isShutdown()) {
+				eventExecutor.shutdown();
+			}
+
 			while (! eventExecutor.isTerminated()) {
 				try {
-					Thread.sleep(500);
+					Thread.sleep(250);
 				}
 				catch (InterruptedException e) {
 					log.warning(e.getMessage());
