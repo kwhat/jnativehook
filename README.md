@@ -19,7 +19,7 @@ The following events are available via their respective listeners.
 * Mouse Drag Events
 * Mouse Wheel Events
 
-In addition to global event listners, this library has the ability to post native events back to the native operating 
+In addition to global event listeners, this library has the ability to post native events back to the native operating 
 system.
  
 ## Download
@@ -61,7 +61,7 @@ If you have found this library useful, please consider making a donation.
 ## Compiling Instructions
 Detailed instructions to [compile from source](https://github.com/kwhat/jnativehook/wiki/Compiling) are available in the wiki.
 
-## Demo Applicaiton
+## Demo Application
 The graphical example application was created to provided a real-time
 demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided. Source code available at 
