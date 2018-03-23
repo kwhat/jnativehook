@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -117,6 +117,7 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
 
 			case VC_KP_COMMA:
 				*nativeKeyCode = VC_COMMA;
+				/* fall-thru */
 
 			case VC_NUM_LOCK:
 			case VC_KP_SEPARATOR:
@@ -147,11 +148,15 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
 			case VC_KP_2:
 			case VC_KP_3:
 				*nativeKeyCode -= ((VC_KP_1 - VC_1) - (VC_KP_4 - VC_4) ); // 0x4D - 0x46
+				// FIXME Should this fall though?
+				/* fall-thru */
 
 			case VC_KP_4:
 			case VC_KP_5:
 			case VC_KP_6:
 				*nativeKeyCode -= ((VC_KP_4 - VC_4) - (VC_KP_7 - VC_7) ); // 0x46 - 0x3F
+				// FIXME Should this fall though?
+				/* fall-thru */
 
 			case VC_KP_7:
 			case VC_KP_8:

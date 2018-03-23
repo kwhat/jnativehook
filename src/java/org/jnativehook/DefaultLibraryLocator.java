@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2017 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -127,6 +127,11 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 				if (libFile.exists()) {
 					// Add the native library to the list.
 					libraries.add(libFile);
+
+					// Set the library version property.
+					System.setProperty("jnativehook.lib.version", libNativeVersion);
+
+					logger.info("Found existing library: " + libFile.getPath() + " (" + libNativeVersion + ").\n");
 				}
 			}
 
@@ -171,14 +176,14 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 						}
 					}
 
-					// Set the library version property.
-					System.setProperty("jnativehook.lib.version", libNativeVersion);
-
 					// Add the native library to the list.
 					libraries.add(libFile);
 
+					// Set the library version property.
+					System.setProperty("jnativehook.lib.version", libNativeVersion);
+
 					// Log the file path and checksum.
-					logger.info("Library extracted successfully: " + libFile.getPath() + " (0x" + sha1Sum + ").\n");
+					logger.info("Library extracted successfully: " + libFile.getPath() + " (0X" + sha1Sum + ").\n");
 				}
 				catch (IOException e) {
 					throw new IllegalStateException(e.getMessage(), e);

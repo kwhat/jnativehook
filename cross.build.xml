@@ -141,9 +141,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Downloading JNITasks source...</echo>
 		<mkdir dir="${basedir}/jnitasks" />
 
-		<get src="https://github.com/kwhat/jnitasks/archive/0.2.zip" dest="jnitasks-0.2.zip" verbose="true" />
+		<get src="https://github.com/kwhat/jnitasks/archive/0.3.zip" dest="jnitasks-0.3.zip" verbose="true" />
 
-		<unzip src="jnitasks-0.2.zip" dest="${basedir}/jnitasks">
+		<unzip src="jnitasks-0.3.zip" dest="${basedir}/jnitasks">
 			<mapper type="glob" from="jnitasks-0.2/*" to="*"/>
 		</unzip>
 		

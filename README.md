@@ -21,6 +21,14 @@ The following events are available via their respective listeners.
 
 In addition to global event listners, this library has the ability to post native events back to the native operating 
 system.
+
+## Licensing
+JNativeHook is covered under *both* the [GNU General Public](LESSER.md) *and* 
+[GNU Lesser General Public](COPYING.LESSER.md) Licenses as the latter is an extension of the former granting you 
+additional distribution rights.  As I understand it, you may use this library in proprietary projects so long as it 
+remains an external library with the same binary interface.  You may modify the source code of this library to fulfill 
+a propritary need, so long as that source code is made public under the aforementioned terms.  Please consult with a 
+licenced attorney if you have licence compatibility questions or concerns.
  
 ## Download
 Binary distribution for JNativeHook can be found at the 
@@ -79,7 +87,7 @@ application simply execute the jar file provided. Source code available at
 * [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/Keyboard)
 * [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/Mouse)
 * [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/MouseWheel)
-* [Working with Swing](https://github.com/kwhat/jnativehook/wiki/Swing)
+* [Thread Safety for AWT, Swing and JavaFX](https://github.com/kwhat/jnativehook/wiki/ThreadSafety)
 * [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
 * [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/LibraryLoading)
 * [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
