@@ -39,7 +39,7 @@ public class SwingMouseAdapter extends AbstractSwingInputAdapter implements Nati
 	}
 
 	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
-		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
+		this.mouseReleased(this.getJavaKeyEvent(nativeEvent));
 	}
 
 	public void mouseClicked(MouseEvent mouseEvent) {
