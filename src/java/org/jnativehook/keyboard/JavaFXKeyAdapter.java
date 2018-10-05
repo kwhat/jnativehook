@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package java.org.jnativehook.keyboard;
+package org.jnativehook.keyboard;
 
 import javafx.event.EventType;
 import javafx.scene.input.KeyCode;
@@ -563,7 +563,7 @@ public class JavaFXKeyAdapter implements NativeKeyListener{
 
 
         String unicodeCharacter = KeyEvent.CHAR_UNDEFINED;
-        if (eventType.equals(KeyEvent.KEY_TYPED))){
+        if (eventType.equals(KeyEvent.KEY_TYPED)){
             unicodeCharacter = String.valueOf(nativeKeyEvent.getKeyChar());
         }
 
