@@ -27,6 +27,4 @@ package org.jnativehook.mouse;
  *
  * @see NativeMouseEvent
  */
-public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {
-
-}
+public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {}

@@ -45,7 +45,7 @@ public interface NativeMouseMotionListener extends EventListener {
 	 *
 	 * @param nativeEvent the native mouse event.
 	 */
-	public void nativeMouseMoved(NativeMouseEvent nativeEvent);
+	default void nativeMouseMoved(NativeMouseEvent nativeEvent) {}
 
 
 	/**
@@ -55,5 +55,5 @@ public interface NativeMouseMotionListener extends EventListener {
 	 *
 	 * @since 1.1
 	 */
-	public void nativeMouseDragged(NativeMouseEvent nativeEvent);
+	default void nativeMouseDragged(NativeMouseEvent nativeEvent) {}
 }

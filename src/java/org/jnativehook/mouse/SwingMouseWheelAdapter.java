@@ -28,10 +28,12 @@ import java.awt.event.MouseWheelListener;
  */
 public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener, MouseWheelListener {
 
+	@Override
 	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
 		this.mouseWheelMoved(this.getJavaMouseWheelEvent(nativeEvent));
 	}
 
+	@Override
 	public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
 		// Do Nothing.
 	}

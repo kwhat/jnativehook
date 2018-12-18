@@ -30,26 +30,32 @@ import java.awt.event.KeyListener;
  */
 public class SwingKeyAdapter extends AbstractSwingInputAdapter implements NativeKeyListener, KeyListener {
 
+	@Override
 	public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
 		this.keyTyped(this.getJavaKeyEvent(nativeEvent));
 	}
 
+	@Override
 	public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
 		this.keyPressed(this.getJavaKeyEvent(nativeEvent));
 	}
 
+	@Override
 	public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
 		this.keyReleased(this.getJavaKeyEvent(nativeEvent));
 	}
 
+	@Override
 	public void keyTyped(KeyEvent keyEvent) {
 		// Do Nothing.
 	}
 
+	@Override
 	public void keyPressed(KeyEvent keyEvent) {
 		// Do Nothing.
 	}
 
+	@Override
 	public void keyReleased(KeyEvent keyEvent) {
 		// Do Nothing.
 	}
