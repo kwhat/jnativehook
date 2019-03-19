@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2018 Alexander Barker. All Rights Received.
  * https://github.com/kwhat/jnativehook/
  * 
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -9,11 +9,11 @@
  *
  * JNativeHook is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.jnativehook;
 
@@ -30,6 +30,7 @@ import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +51,13 @@ public class GlobalScreen {
 	/**
 	 * Logging service for the native library.
 	 */
-	protected static Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+	protected static Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+	static {
+		logger.setLevel(Level.WARNING);
+		logger.setUseParentHandlers(false);
+	}
+	
+	protected GlobalScreen() { }
 
 	/**
 	 * The service to control the hook.
@@ -91,7 +98,7 @@ public class GlobalScreen {
 			}
 			catch (Exception e) {
 				// There was a problem instantiating the library loader.
-				log.severe(e.getMessage());
+				logger.severe(e.getMessage());
 
 				throw new UnsatisfiedLinkError(e.getMessage());
 			}
@@ -130,13 +137,10 @@ public class GlobalScreen {
 		}
 	}
 
-
-	protected GlobalScreen() { }
-
 	/**
 	 * Adds the specified native key listener to receive key events from the
-	 * native system. If listener is null, no exception is thrown and no action
-	 * is performed.
+	 * native system.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native key listener object
 	 */
@@ -149,8 +153,8 @@ public class GlobalScreen {
 	/**
 	 * Removes the specified native key listener so that it no longer receives
 	 * key events from the native system. This method performs no function if
-	 * the listener specified by the argument was not previously added.  If
-	 * listener is null, no exception is thrown and no action is performed.
+	 * the listener specified by the argument was not previously added.I
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native key listener object
 	 */
@@ -162,8 +166,8 @@ public class GlobalScreen {
 
 	/**
 	 * Adds the specified native mouse listener to receive mouse events from the
-	 * native system. If listener is null, no exception is thrown and no action
-	 * is performed.
+	 * native system.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse listener object
 	 */
@@ -176,8 +180,8 @@ public class GlobalScreen {
 	/**
 	 * Removes the specified native mouse listener so that it no longer receives
 	 * mouse events from the native system. This method performs no function if
-	 * the listener specified by the argument was not previously added.  If
-	 * listener is null, no exception is thrown and no action is performed.
+	 * the listener specified by the argument was not previously added.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse listener object
 	 */
@@ -189,8 +193,8 @@ public class GlobalScreen {
 
 	/**
 	 * Adds the specified native mouse motion listener to receive mouse motion
-	 * events from the native system. If listener is null, no exception is
-	 * thrown and no action is performed.
+	 * events from the native system.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse motion listener object
 	 */
@@ -204,8 +208,8 @@ public class GlobalScreen {
 	 * Removes the specified native mouse motion listener so that it no longer
 	 * receives mouse motion events from the native system. This method performs
 	 * no function if the listener specified by the argument was not previously
-	 * added.  If listener is null, no exception is thrown and no action is
-	 * performed.
+	 * added.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse motion listener object
 	 */
@@ -217,8 +221,8 @@ public class GlobalScreen {
 
 	/**
 	 * Adds the specified native mouse wheel listener to receive mouse wheel
-	 * events from the native system. If listener is null, no exception is
-	 * thrown and no action is performed.
+	 * events from the native system.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse wheel listener object
 	 * @since 1.1
@@ -233,8 +237,8 @@ public class GlobalScreen {
 	 * Removes the specified native mouse wheel listener so that it no longer
 	 * receives mouse wheel events from the native system. This method performs
 	 * no function if the listener specified by the argument was not previously
-	 * added.  If listener is null, no exception is thrown and no action is
-	 * performed.
+	 * added.
+	 * If listener is null, no exception is thrown and no action is performed.
 	 *
 	 * @param listener a native mouse wheel listener object
 	 * @since 1.1
@@ -346,8 +350,8 @@ public class GlobalScreen {
 		}
 
 		/**
-		 * Native implementation to start the input hook.  This method blocks and should only be called by this
-		 * specialized thread implementation.  This method will notifyAll() after passing any exception exception
+		 * Native implementation to start the input hook. This method blocks and should only be called by this
+		 * specialized thread implementation. This method will notifyAll() after passing any exception exception
 		 * throwing code.
 		 *
 		 * @throws NativeHookException problem registering the native hook with the underlying operating system.
@@ -355,16 +359,16 @@ public class GlobalScreen {
 		protected native void enable() throws NativeHookException;
 
 		/**
-		 * Native implementation to stop the input hook.  There is no other way to stop the hook.
+		 * Native implementation to stop the input hook. There is no other way to stop the hook.
 		 *
 		 * @throws NativeHookException problem un-registering the native hook with the underlying operating system.
 		 */
 		public native void disable() throws NativeHookException;
 
 		/**
-		 * Dispatches an event to the appropriate processor.  This method is
+		 * Dispatches an event to the appropriate processor. This method is
 		 * generally called by the native library but may be used to synthesize
-		 * native events from Java without replaying them on the native system.  If
+		 * native events from Java without replaying them on the native system. If
 		 * you would like to send events to other applications, please use
 		 * {@link #postNativeEvent},
 		 * <p>
@@ -408,7 +412,7 @@ public class GlobalScreen {
 					Thread.sleep(250);
 				}
 				catch (InterruptedException e) {
-					log.warning(e.getMessage());
+					logger.warning(e.getMessage());
 					break;
 				}
 			}
@@ -480,36 +484,36 @@ public class GlobalScreen {
 	 *
 	 * For both <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
-	 * mask are used in the creation of the native event.  Please note that some
+	 * mask are used in the creation of the native event. Please note that some
 	 * platforms may generate <code>NATIVE_KEY_PRESSED</code> and
 	 * <code>NATIVE_KEY_RELEASED</code> events for each required modifier.
 	 * <code>NATIVE_KEY_TYPED</code> events will first translate the associated
 	 * keyChar to its respective virtual code and then produce a
 	 * <code>NATIVE_KEY_PRESSED</code> followed by a <code>NATIVE_KEY_RELEASED</code>
-	 * event using that virtual code.  If the JNativeHook is unable to translate
+	 * event using that virtual code. If the JNativeHook is unable to translate
 	 * the keyChar to its respective virtual code, the event is ignored.
 	 * <p>
 	 *
 	 * <code>NativeMouseEvents</code> are processed in much the same way as the
-	 * <code>NativeKeyEvents</code>.  Both <code>NATIVE_MOUSE_PRESSED</code> and
+	 * <code>NativeKeyEvents</code>. Both <code>NATIVE_MOUSE_PRESSED</code> and
 	 * <code>NATIVE_MOUSE_RELEASED</code> produce events corresponding to the
-	 * event's button code.  Keyboard modifiers may be used in conjunction with
+	 * event's button code. Keyboard modifiers may be used in conjunction with
 	 * button press and release events, however, they might produce events for each
-	 * modifier.  <code>NATIVE_MOUSE_CLICKED</code> events produce a
+	 * modifier. <code>NATIVE_MOUSE_CLICKED</code> events produce a
 	 * <code>NATIVE_MOUSE_PRESSED</code> event followed by a
 	 * <code>NATIVE_MOUSE_RELEASED</code> for the assigned event button.
 	 * <p>
 	 *
 	 * <code>NATIVE_MOUSE_DRAGGED</code> and <code>NATIVE_MOUSE_MOVED</code> events
-	 * are handled identically.  In order to produce a <code>NATIVE_MOUSE_DRAGGED</code>
+	 * are handled identically. In order to produce a <code>NATIVE_MOUSE_DRAGGED</code>
 	 * event, you must specify a button modifier mask that contains at least one
-	 * button modifier and assign it to the event.  Failure to do so will produce a
+	 * button modifier and assign it to the event. Failure to do so will produce a
 	 * <code>NATIVE_MOUSE_MOVED</code> event even if the event id was set to
 	 * <code>NATIVE_MOUSE_DRAGGED</code>.
 	 * <p>
 	 *
 	 * <code>NATIVE_MOUSE_WHEEL</code> events are identical to
-	 * <code>NATIVE_MOUSE_PRESSED</code> events.  Wheel events will only produce
+	 * <code>NATIVE_MOUSE_PRESSED</code> events. Wheel events will only produce
 	 * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
 	 * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
 	 *
@@ -666,9 +670,9 @@ public class GlobalScreen {
 	}
 
 	/**
-	 * Set a different executor service for native event delivery.  By default,
+	 * Set a different executor service for native event delivery. By default,
 	 * JNativeHook utilizes a single thread executor to dispatch events from
-	 * the native event queue.  You may choose to use an alternative approach
+	 * the native event queue. You may choose to use an alternative approach
 	 * for event delivery by implementing an <code>ExecutorService</code>.
 	 * <p>
 	 * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
