@@ -90,7 +90,7 @@ application simply execute the jar file provided. Source code available at
 * [Thread Safety for AWT, Swing and JavaFX](https://github.com/kwhat/jnativehook/wiki/ThreadSafety)
 * [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
 * [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/LibraryLoading)
-* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
+* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/ConsumingEvents)
 
 ## Additional Information
 Up to date source code and documentation available at:
