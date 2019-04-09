@@ -4,6 +4,6 @@ module org.jnativehook {
 	exports org.jnativehook.keyboard;
 	exports org.jnativehook.mouse;
 
-	requires java.desktop;
-	requires java.logging;
+	requires transitive java.desktop;
+	requires transitive java.logging;
 }
