@@ -79,7 +79,7 @@ public class GlobalScreen {
 
 			try {
 				// Use the specified class to locator the native library.
-				NativeLibraryLocator locator = Class.forName(libLoader).asSubclass(NativeLibraryLocator.class).newInstance();
+				NativeLibraryLocator locator = Class.forName(libLoader).asSubclass(NativeLibraryLocator.class).getDeclaredConstructor().newInstance();
 
 				Iterator<File> libs = locator.getLibraries();
 				while (libs.hasNext()) {
