@@ -342,9 +342,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<target name="bootstrap-libuiohook" depends="download-libuiohook" unless="project.check.libuiohook.bootstrap" description="Initialize the native library build system.">
 		<echo>Bootstrapping libUIOHook...</echo>
 
-		<autoreconf dir="${dir.src}/libuiohook" force="true" install="true">
-			<include path="/opt/local/share/aclocal" if="native.os.isDarwin" />
-		</autoreconf>
+		<autoreconf dir="${dir.src}/libuiohook" force="true" install="true" />
 	</target>
 
 

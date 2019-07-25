@@ -141,10 +141,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Downloading JNITasks source...</echo>
 		<mkdir dir="${basedir}/jnitasks" />
 
-		<get src="https://github.com/kwhat/jnitasks/archive/0.3.zip" dest="jnitasks-0.3.zip" verbose="true" />
+		<get src="https://github.com/kwhat/jnitasks/archive/0.3.zip" dest="ant-jnitasks-0.3.zip" verbose="true" />
 
-		<unzip src="jnitasks-0.3.zip" dest="${basedir}/jnitasks">
-			<mapper type="glob" from="jnitasks-0.2/*" to="*"/>
+		<unzip src="ant-jnitasks-0.3.zip" dest="${basedir}/jnitasks">
+			<mapper type="glob" from="ant-jnitasks-0.3/*" to="*"/>
 		</unzip>
 		
 		<!-- Fix clock skew. -->
@@ -224,7 +224,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</ant>
 		
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/x86_64-apple-darwin9.properties" />
+			<property file="targets/x86_64-apple-darwin.properties" />
 		</ant>
 		
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
@@ -236,13 +236,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</ant>
 		
 		<ant antfile="cross.build.xml" target="-compile-cross" dir="${basedir}" inheritAll="false">
-			<property file="targets/i586-apple-darwin9.properties" />
+			<property file="targets/i586-apple-darwin.properties" />
 		</ant>
 	</target>
 	
 	
 	<target name="package" depends="" description="Creates zip files for distribution.">
-
 		<ant antfile="build.xml" dir="${basedir}" target="package" inheritAll="false">
 			<property name="ant.build.major" value="${ant.build.major}" />
 			<property name="ant.build.minor" value="${ant.build.minor}" />
@@ -339,7 +338,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<arg value="-DrepositoryId=${maven.repository.id}" />
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dir.maven}/${maven.jar.base}.jar" />
-			<arg value="-Pgpg" />
+			<!-- arg value="-Pgpg" /-->
 		</mvn>
 
 		<mvn mavenVersion="2.2.1">
@@ -349,7 +348,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dir.maven}/${maven.jar.base}-sources.jar" />
 			<arg value="-Dclassifier=sources" />
-			<arg value="-Pgpg" />
+			<!-- arg value="-Pgpg" /-->
 		</mvn>
 		
 		<mvn mavenVersion="2.2.1">
@@ -359,7 +358,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<arg value="-DpomFile=pom.xml" />
 			<arg value="-Dfile=${dir.maven}/${maven.jar.base}-javadoc.jar" />
 			<arg value="-Dclassifier=javadoc" />
-			<arg value="-Pgpg" />
+			<!-- arg value="-Pgpg" /-->
 		</mvn>
 	</target>
 	
