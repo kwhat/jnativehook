@@ -387,6 +387,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			<compilerarg line="${ant.build.javac.args}"/>
 
 			<src path="${dir.src}/java" />
+			
+			<!-- FIXME Java 9 -->
+			<exclude name="module-info.java" />
 
 			<classpath refid="ant.project.class.path" />
 		</javac>

@@ -1,0 +1,3 @@
+dev-java/icedtea -source -webstart 
+x11-libs/libxkbcommon X
+x11-libs/libxcb xkb
