@@ -287,7 +287,7 @@ public class NativeMouseEvent extends NativeInputEvent {
 	 */
 	@Override
 	public String paramString() {
-		StringBuilder param = new StringBuilder(255);
+		StringBuilder param = new StringBuilder(super.paramString());
 
 		switch(getID()) {
 			case NATIVE_MOUSE_CLICKED:

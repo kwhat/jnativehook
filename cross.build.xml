@@ -157,7 +157,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<echo>Compiling JNITasks source...</echo>
 		<mkdir dir="${basedir}/jnitasks" />
 
-		<ant antfile="${basedir}/jnitasks/build.xml" dir="${basedir}/jnitasks">
+		<ant antfile="${basedir}/jnitasks/build.xml" dir="${basedir}/jnitasks" inheritAll="false">
 			<target name="compile" />
 			<target name="jar" />
 			
