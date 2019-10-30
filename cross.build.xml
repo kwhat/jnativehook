@@ -53,7 +53,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 		<!-- Preform download target checks. -->
 		<available file="jnitasks/build.xml" property="project.check.jnitasks.download" />
-		<available file="jnativehook/build.xml" property="project.check.jnativehook.download" />
 
 		<!-- Try to locate the rt.jar location for ant.build.javac.bootclasspath -->
 		<condition property="ant.build.javac.bootclasspath" value="${env.JDK_HOME}/jre/lib/rt.jar">
@@ -123,11 +122,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 	<target name="clean" description="Removes downloaded project files.">
-		<delete dir="jnativehook" includeEmptyDirs="true" verbose="true" failonerror="false" />
+		<ant antfile="build.xml" dir="${basedir}" inheritAll="true">
+			<target name="distclean" />
+		</ant>
 		
 		<delete includeEmptyDirs="true" verbose="true" failonerror="false">
 			<fileset dir="jnitasks" />
-            <fileset file="jnitasks-0.2.zip" />
+            <fileset file="jnitasks-0.3.zip" />
 
 			<fileset dir="${dir.maven}" />
 			<fileset file="cross.build.properties" />
