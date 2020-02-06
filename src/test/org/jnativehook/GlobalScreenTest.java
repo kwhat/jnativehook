@@ -446,7 +446,7 @@ public class GlobalScreenTest {
 				NativeKeyEvent.KEY_LOCATION_STANDARD);
 
 		synchronized (keyListener) {
-			GlobalScreen.dispatchEvent(keyEvent);
+			GlobalScreen.postNativeEvent(keyEvent);
 			keyListener.wait(3000);
 			assertEquals(keyEvent, keyListener.getLastEvent());
 		}
@@ -462,7 +462,7 @@ public class GlobalScreenTest {
 				NativeMouseEvent.BUTTON1);
 
 		synchronized (mouseListener) {
-			GlobalScreen.dispatchEvent(mouseEvent);
+			GlobalScreen.postNativeEvent(mouseEvent);
 			mouseListener.wait(3000);
 			assertEquals(mouseEvent, mouseListener.getLastEvent());
 		}
@@ -479,7 +479,7 @@ public class GlobalScreenTest {
 				-1);	// Wheel Rotation
 
 		synchronized (wheelListener) {
-			GlobalScreen.dispatchEvent(wheelEvent);
+			GlobalScreen.postNativeEvent(wheelEvent);
 			wheelListener.wait(3000);
 			assertEquals(wheelEvent, wheelListener.getLastEvent());
 		}
@@ -514,7 +514,7 @@ public class GlobalScreenTest {
 				NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
 		synchronized (listener) {
-			GlobalScreen.dispatchEvent(event);
+			GlobalScreen.postNativeEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
@@ -543,7 +543,7 @@ public class GlobalScreenTest {
 				NativeMouseEvent.BUTTON1);
 
 		synchronized (listener) {
-			GlobalScreen.dispatchEvent(event);
+			GlobalScreen.postNativeEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
@@ -574,7 +574,7 @@ public class GlobalScreenTest {
 				-1);	// Wheel Rotation
 
 		synchronized (listener) {
-			GlobalScreen.dispatchEvent(event);
+			GlobalScreen.postNativeEvent(event);
 			listener.wait(3000);
 			assertEquals(event, listener.getLastEvent());
 		}
