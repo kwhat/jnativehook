@@ -412,9 +412,8 @@ public class GlobalScreen {
 					break;
 				}
 			}
-
-			eventExecutor = new DefaultDispatchService();
 		}
+		eventExecutor = new DefaultDispatchService();
 
 		if (hookThread == null || !hookThread.isAlive()) {
 			hookThread = new NativeHookThread();
