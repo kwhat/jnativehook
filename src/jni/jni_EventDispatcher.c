@@ -195,7 +195,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
 
 		if (NativeInputEvent_obj != NULL) {
 			// Set the private when field to the native event time.
-			(*env)->SetShortField(
+			(*env)->SetLongField(
 					env,
 					NativeInputEvent_obj,
 					org_jnativehook_NativeInputEvent->when,
