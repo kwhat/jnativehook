@@ -33,7 +33,7 @@ RUN emerge -1vuDN world
 
 # Setup the new gcc and binutils
 RUN gcc-config x86_64-pc-linux-gnu-9.2.0
-RUN binutils-config --linker ld.gold
+RUN LDFLAGS=-fuse-ld=gold LD=${CHOST}-ld.gold
 RUN . /etc/profile
 
 # We need to install git so that we can sync our custom apple overlay
@@ -51,7 +51,7 @@ RUN emerge -vu crossdev
 
 # Install Java via IcedTea
 RUN emerge -vu icedtea
-RUN emerge -vu ant
+RUN emerge -vu ant-core
 RUN eselect java-vm set system icedtea-8
 
 # Get the Windows JNI headers from AdoptOpenJDK
@@ -79,7 +79,7 @@ RUN emerge -vu libxcb
 #RUN i686-cc-linux-gnu-emerge -uv libXtst
 #RUN i686-cc-linux-gnu-emerge -uv libXinerama
 #RUN i686-cc-linux-gnu-emerge -uv libxkbcommon
-#RUN i686-cc-linux-gnu-emerge -uv libxkbfile 
+#RUN i686-cc-linux-gnu-emerge -uv libxkbfile
 #RUN i686-cc-linux-gnu-emerge -uv libxcb
 #RUN gcc-config i686-cc-linux-gnu-9.2.0
 
