@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -24,35 +24,35 @@
 #include "jni_Logger.h"
 
 void jni_ThrowFatalError(JNIEnv *env, const char *message) {
-	// Throw a fatal error to the JVM.
-	(*env)->FatalError(env, message);
+    // Throw a fatal error to the JVM.
+    (*env)->FatalError(env, message);
 
-	exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);
 }
 
 void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
-	// Locate our exception class.
-	jclass Exception_class = (*env)->FindClass(env, classname);
-	if (Exception_class != NULL) {
-		(*env)->ThrowNew(env, Exception_class, message);
-		(*env)->DeleteLocalRef(env, Exception_class);
-	}
-	else {
-		// Throw a ClassNotFoundException if we could not locate the exception class above.
-		Exception_class = (*env)->FindClass(env, "java/lang/ClassNotFoundException");
-		if (Exception_class != NULL) {
-			(*env)->ThrowNew(env, Exception_class, classname);
-			(*env)->DeleteLocalRef(env, Exception_class);
-		}
-		else {
-			jni_ThrowFatalError(env, "Failed to locate core class: java.lang.ClassNotFoundException");
-		}
-	}
+    // Locate our exception class.
+    jclass Exception_class = (*env)->FindClass(env, classname);
+    if (Exception_class != NULL) {
+        (*env)->ThrowNew(env, Exception_class, message);
+        (*env)->DeleteLocalRef(env, Exception_class);
+    }
+    else {
+        // Throw a ClassNotFoundException if we could not locate the exception class above.
+        Exception_class = (*env)->FindClass(env, "java/lang/ClassNotFoundException");
+        if (Exception_class != NULL) {
+            (*env)->ThrowNew(env, Exception_class, classname);
+            (*env)->DeleteLocalRef(env, Exception_class);
+        }
+        else {
+            jni_ThrowFatalError(env, "Failed to locate core class: java.lang.ClassNotFoundException");
+        }
+    }
 }
 
 void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) {
-	jobject Exception_object = (*env)->NewObject(env, org_jnativehook_NativeHookException->cls,
-			org_jnativehook_NativeHookException->init, (jint) code, (*env)->NewStringUTF(env, message));
-	(*env)->Throw(env, (jthrowable) Exception_object);
-	(*env)->DeleteLocalRef(env, Exception_object);
+    jobject Exception_object = (*env)->NewObject(env, org_jnativehook_NativeHookException->cls,
+            org_jnativehook_NativeHookException->init, (jint) code, (*env)->NewStringUTF(env, message));
+    (*env)->Throw(env, (jthrowable) Exception_object);
+    (*env)->DeleteLocalRef(env, Exception_object);
 }

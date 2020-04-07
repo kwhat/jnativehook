@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 #ifndef _Included_org_jnativehook_mouse_NativeMouseWheelEvent
 #define _Included_org_jnativehook_mouse_NativeMouseWheelEvent
 
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL	0
-#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL	1
+#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_UNIT_SCROLL   0
+#define org_jnativehook_mouse_NativeMouseWheelEvent_WHEEL_BLOCK_SCROLL  1
 
 #endif

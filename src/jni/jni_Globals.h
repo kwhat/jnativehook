@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse hooking for Java.
- * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -33,85 +33,85 @@ extern JavaVMAttachArgs jvm_attach_args;
  * included.
  */
 typedef struct _org_jnativehook_GlobalScreen {
-	jclass cls;
-	jfieldID hookThread;
+    jclass cls;
+    jfieldID hookThread;
 } GlobalScreen;
 
 typedef struct org_jnativehook_GlobalScreen$NativeHookThread {
-	jclass cls;
-	jmethodID dispatchEvent;
+    jclass cls;
+    jmethodID dispatchEvent;
 } NativeHookThread;
 
 typedef struct _org_jnativehook_NativeHookException {
-	jclass cls;
-	jmethodID init;
+    jclass cls;
+    jmethodID init;
 } NativeHookException;
 
 typedef struct _org_jnativehook_NativeMonitorInfo {
-	jclass cls;
-	jmethodID init;
+    jclass cls;
+    jmethodID init;
 } NativeMonitorInfo;
 
 typedef struct _org_jnativehook_NativeInputEvent {
-	jclass cls;
-	jfieldID when;
-	jfieldID reserved;
-	jmethodID init;
-	jmethodID getID;
-	jmethodID getModifiers;
+    jclass cls;
+    jfieldID when;
+    jfieldID reserved;
+    jmethodID init;
+    jmethodID getID;
+    jmethodID getModifiers;
 } NativeInputEvent;
 
 typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
-	jclass cls;
-	jmethodID init;
-	NativeInputEvent *parent;
-	jmethodID getKeyCode;
-	jmethodID getKeyLocation;
-	jmethodID getKeyChar;
+    jclass cls;
+    jmethodID init;
+    NativeInputEvent *parent;
+    jmethodID getKeyCode;
+    jmethodID getKeyLocation;
+    jmethodID getKeyChar;
 } NativeKeyEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseEvent {
-	jclass cls;
-	jmethodID init;
-	NativeInputEvent *parent;
-	jmethodID getButton;
-	jmethodID getClickCount;
-	jmethodID getX;
-	jmethodID getY;
+    jclass cls;
+    jmethodID init;
+    NativeInputEvent *parent;
+    jmethodID getButton;
+    jmethodID getClickCount;
+    jmethodID getX;
+    jmethodID getY;
 } NativeMouseEvent;
 
 typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
-	jclass cls;
-	jmethodID init;
-	NativeMouseEvent *parent;
-	jmethodID getScrollAmount;
-	jmethodID getScrollType;
-	jmethodID getWheelRotation;
+    jclass cls;
+    jmethodID init;
+    NativeMouseEvent *parent;
+    jmethodID getScrollAmount;
+    jmethodID getScrollType;
+    jmethodID getWheelRotation;
 } NativeMouseWheelEvent;
 
 typedef struct _java_lang_Object {
-	jclass cls;
-	jmethodID notify;
+    jclass cls;
+    jmethodID notify;
 } Object;
 
 typedef struct _java_lang_Integer {
-	jclass cls;
-	jmethodID init;
+    jclass cls;
+    jmethodID init;
 } Integer;
 
 typedef struct _java_lang_System {
-	jclass cls;
-	jmethodID setProperty;
-	jmethodID clearProperty;
+    jclass cls;
+    jmethodID setProperty;
+    jmethodID clearProperty;
 } System;
 
 typedef struct _java_util_logging_Logger {
-	jclass cls;
-	jmethodID getLogger;
-	jmethodID fine;
-	jmethodID info;
-	jmethodID warning;
-	jmethodID severe;
+    jclass cls;
+    jmethodID getLogger;
+    jmethodID fine;
+    jmethodID info;
+    jmethodID warning;
+    jmethodID severe;
 } Logger;
 
 // Global variables for Java object struct representation.
