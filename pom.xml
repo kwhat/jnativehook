@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.1stleg</groupId>
+	<artifactId>jnativehook</artifactId>
+	<version>2.1-SNAPSHOT</version>
+
+	<name>JNativeHook</name>
+	<description>Global keyboard and mouse listeners for Java.</description>
+	<url>https://github.com/kwhat/jnativehook</url>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License (GPL), Version 3.0</name>
+			<url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+		</license>
+		<license>
+			<name>GNU Lesser General Public License (LGPL), Version 3.0</name>
+			<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Alexander Barker</name>
+			<email>alex@1stleg.com</email>
+			<organization>Personal</organization>
+			<organizationUrl>https://github.com/kwhat/</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git@github.com:kwhat/jnativehook.git</connection>
+		<developerConnection>scm:git:git@github.com:kwhat/jnativehook.git</developerConnection>
+		<url>git@github.com:kwhat/jnativehook.git</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<maven.compiler.debug>true</maven.compiler.debug>
+		<maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
+		<maven.compiler.compilerId>javac</maven.compiler.compilerId>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>java-jdk8</id>
+			<activation>
+				<jdk>[8,)</jdk>
+			</activation>
+
+			<properties>
+				<maven.compiler.source>5</maven.compiler.source>
+				<maven.compiler.target>8</maven.compiler.target>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>java-jdk11</id>
+			<activation>
+				<jdk>[11,)</jdk>
+			</activation>
+
+			<properties>
+				<maven.compiler.source>6</maven.compiler.source>
+				<maven.compiler.target>11</maven.compiler.target>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>arch-win32</id>
+
+			<activation>
+				<os>
+					<family>Windows</family>
+					<arch>x86</arch>
+				</os>
+			</activation>
+		</profile>
+
+	</profiles>
+
+
+	<build>
+		<directory>${project.basedir}/build</directory>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.cmake-maven-project</groupId>
+				<artifactId>cmake-maven-plugin</artifactId>
+				<version>3.16.3-b2</version>
+
+				<executions>
+					<execution>
+						<id>cmake-generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+
+						<configuration>
+							<sourcePath>${basedir}/src/libuiohook</sourcePath>
+							<targetPath>${project.build.directory}/libuiohook</targetPath>
+
+							<options>
+								<option>-DENABLE_STATIC=ON</option>
+								<option>-DENABLE_SHARED=OFF</option>
+								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/dependency/libuiohook</option>
+							</options>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cmake-compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+
+						<configuration>
+							<projectDirectory>${project.build.directory}/libuiohook</projectDirectory>
+
+							<options>
+								<option>--target</option>
+								<option>install</option>
+							</options>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>native-maven-plugin</artifactId>
+				<version>1.0-alpha-11</version>
+				<extensions>true</extensions>
+
+				<configuration>
+					<compilerProvider>generic-classic</compilerProvider>
+					<compilerExecutable>gcc</compilerExecutable>
+					<linkerExecutable>gcc</linkerExecutable>
+
+					<compilerStartOptions>
+						<compilerStartOption>-fPIC</compilerStartOption>
+					</compilerStartOptions>
+
+					<linkerStartOptions>
+						<linkerStartOption>-shared</linkerStartOption>
+					</linkerStartOptions>
+
+					<sources>
+						<source>
+							<directory>${basedir}/src/jni</directory>
+							<fileNames>
+								<fileName>jni_Converter.c</fileName>
+								<fileName>jni_Converter.h</fileName>
+								<fileName>jni_Errors.c</fileName>
+								<fileName>jni_Errors.h</fileName>
+								<fileName>jni_EventDispatcher.c</fileName>
+								<fileName>jni_EventDispathcer.h</fileName>
+								<fileName>jni_Globals.c</fileName>
+								<fileName>jni_Globals.h</fileName>
+								<fileName>jni_Load.c</fileName>
+								<fileName>jni_Logger.c</fileName>
+								<fileName>jni_Logger.h</fileName>
+								<fileName>org_jnativehook_GlobalScreen.c</fileName>
+							</fileNames>
+						</source>
+
+						<source>
+							<directory>${basedir}/src/jni/include</directory>
+						</source>
+
+						<source>
+							<directory>${project.build.directory}/generated-sources/include</directory>
+						</source>
+
+						<source>
+							<directory>${project.build.directory}/dependency/libuiohook/include</directory>
+							<dependencyAnalysisParticipation>false</dependencyAnalysisParticipation>
+						</source>
+					</sources>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>jni-compile</id>
+						
+						<configuration>
+							<compilerOutputDirectory>${project.build.directory}/obj</compilerOutputDirectory>
+
+							<jdkIncludePath>${java.home}/include</jdkIncludePath>
+							<javahOS>linux</javahOS>
+
+							<workingDirectory>${basedir}</workingDirectory>
+						</configuration>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>jni-link</id>
+
+						<configuration>
+							<compilerOutputDirectory>${project.build.directory}/obj</compilerOutputDirectory>
+
+							<workingDirectory>${basedir}</workingDirectory>
+						</configuration>
+						<goals>
+							<goal>link</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+
+				<executions>
+					<execution>
+						<id>default-compile</id>
+
+						<configuration>
+							<release>11</release>
+							<outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>base-compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+
+						<!-- recompile everything for target VM except the module-info.java -->
+						<configuration>
+							<outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory>
+							<excludes>
+								<exclude>module-info.java</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+
+				<configuration>
+					<verbose>true</verbose>
+					<fork>true</fork>
+
+					<compileSourceRoots>
+						<compileSourceRoot>${basedir}/src/java</compileSourceRoot>
+					</compileSourceRoots>
+
+					<compilerArgs>
+						<arg>-h</arg>
+						<arg>${project.build.directory}/generated-sources/include</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
