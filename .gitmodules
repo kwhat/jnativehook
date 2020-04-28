@@ -1,6 +1,7 @@
-[submodule "src/libuiohook"]
-	path = src/libuiohook
-	url = git@github.com:kwhat/libuiohook.git
 [submodule "wiki"]
-	path = wiki
+	path = docs
 	url = git@github.com:kwhat/jnativehook.wiki.git
+[submodule "libuiohook"]
+	path = src/external/libuiohook
+	url = git@github.com:kwhat/libuiohook.git
+	branch = cmake

@@ -75,7 +75,7 @@
 			</activation>
 
 			<properties>
-				<maven.compiler.source>6</maven.compiler.source>
+				<maven.compiler.source>11</maven.compiler.source>
 				<maven.compiler.target>11</maven.compiler.target>
 			</properties>
 		</profile>
@@ -93,9 +93,7 @@
 
 	</profiles>
 
-
 	<build>
-		<directory>${project.basedir}/build</directory>
 		<plugins>
 			<plugin>
 				<groupId>com.googlecode.cmake-maven-project</groupId>
@@ -110,7 +108,7 @@
 						</goals>
 
 						<configuration>
-							<sourcePath>${basedir}/src/libuiohook</sourcePath>
+							<sourcePath>${basedir}/src/external/libuiohook</sourcePath>
 							<targetPath>${project.build.directory}/libuiohook</targetPath>
 
 							<options>
@@ -156,29 +154,26 @@
 
 					<linkerStartOptions>
 						<linkerStartOption>-shared</linkerStartOption>
+						<linkerStartOption>-L${project.build.directory}/dependency/libuiohook/lib</linkerStartOption>
+						<linkerStartOption>-luiohook</linkerStartOption>
 					</linkerStartOptions>
 
 					<sources>
 						<source>
-							<directory>${basedir}/src/jni</directory>
+							<directory>${basedir}/src/main/jni</directory>
 							<fileNames>
 								<fileName>jni_Converter.c</fileName>
-								<fileName>jni_Converter.h</fileName>
 								<fileName>jni_Errors.c</fileName>
-								<fileName>jni_Errors.h</fileName>
 								<fileName>jni_EventDispatcher.c</fileName>
-								<fileName>jni_EventDispathcer.h</fileName>
 								<fileName>jni_Globals.c</fileName>
-								<fileName>jni_Globals.h</fileName>
 								<fileName>jni_Load.c</fileName>
 								<fileName>jni_Logger.c</fileName>
-								<fileName>jni_Logger.h</fileName>
 								<fileName>org_jnativehook_GlobalScreen.c</fileName>
 							</fileNames>
 						</source>
 
 						<source>
-							<directory>${basedir}/src/jni/include</directory>
+							<directory>${basedir}/src/main/jni/include</directory>
 						</source>
 
 						<source>
@@ -213,7 +208,9 @@
 						<id>jni-link</id>
 
 						<configuration>
-							<compilerOutputDirectory>${project.build.directory}/obj</compilerOutputDirectory>
+							<!-- linkerOutputDirectory>${project.build.directory}/generated-resources/lib</linkerOutputDirectory-->
+							<linkerFinalName>libJNativeHook</linkerFinalName>
+							<linkerFinalNameExt>so</linkerFinalNameExt>
 
 							<workingDirectory>${basedir}</workingDirectory>
 						</configuration>
@@ -235,7 +232,7 @@
 
 						<configuration>
 							<release>11</release>
-							<outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory>
+							<!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
 						</configuration>
 					</execution>
 
@@ -247,7 +244,7 @@
 
 						<!-- recompile everything for target VM except the module-info.java -->
 						<configuration>
-							<outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory>
+							<!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
 							<excludes>
 								<exclude>module-info.java</exclude>
 							</excludes>
@@ -260,7 +257,7 @@
 					<fork>true</fork>
 
 					<compileSourceRoots>
-						<compileSourceRoot>${basedir}/src/java</compileSourceRoot>
+						<compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
 					</compileSourceRoots>
 
 					<compilerArgs>
@@ -269,7 +266,22 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
-
 </project>
