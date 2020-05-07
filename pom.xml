@@ -43,7 +43,11 @@
 		<maven.compiler.debug>true</maven.compiler.debug>
 		<maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
 		<maven.compiler.compilerId>javac</maven.compiler.compilerId>
+
+		<cmake.download>false</cmake.download>
 	</properties>
+
+	<packaging>nar</packaging>
 
 	<dependencies>
 		<dependency>
@@ -96,132 +100,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.googlecode.cmake-maven-project</groupId>
-				<artifactId>cmake-maven-plugin</artifactId>
-				<version>3.16.3-b2</version>
-
-				<executions>
-					<execution>
-						<id>cmake-generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-
-						<configuration>
-							<sourcePath>${basedir}/src/external/libuiohook</sourcePath>
-							<targetPath>${project.build.directory}/libuiohook</targetPath>
-
-							<options>
-								<option>-DENABLE_STATIC=ON</option>
-								<option>-DENABLE_SHARED=OFF</option>
-								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/dependency/libuiohook</option>
-							</options>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>cmake-compile</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-
-						<configuration>
-							<projectDirectory>${project.build.directory}/libuiohook</projectDirectory>
-
-							<options>
-								<option>--target</option>
-								<option>install</option>
-							</options>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>native-maven-plugin</artifactId>
-				<version>1.0-alpha-11</version>
-				<extensions>true</extensions>
-
-				<configuration>
-					<compilerProvider>generic-classic</compilerProvider>
-					<compilerExecutable>gcc</compilerExecutable>
-					<linkerExecutable>gcc</linkerExecutable>
-
-					<compilerStartOptions>
-						<compilerStartOption>-fPIC</compilerStartOption>
-					</compilerStartOptions>
-
-					<linkerStartOptions>
-						<linkerStartOption>-shared</linkerStartOption>
-						<linkerStartOption>-L${project.build.directory}/dependency/libuiohook/lib</linkerStartOption>
-						<linkerStartOption>-luiohook</linkerStartOption>
-					</linkerStartOptions>
-
-					<sources>
-						<source>
-							<directory>${basedir}/src/main/jni</directory>
-							<fileNames>
-								<fileName>jni_Converter.c</fileName>
-								<fileName>jni_Errors.c</fileName>
-								<fileName>jni_EventDispatcher.c</fileName>
-								<fileName>jni_Globals.c</fileName>
-								<fileName>jni_Load.c</fileName>
-								<fileName>jni_Logger.c</fileName>
-								<fileName>org_jnativehook_GlobalScreen.c</fileName>
-							</fileNames>
-						</source>
-
-						<source>
-							<directory>${basedir}/src/main/jni/include</directory>
-						</source>
-
-						<source>
-							<directory>${project.build.directory}/generated-sources/include</directory>
-						</source>
-
-						<source>
-							<directory>${project.build.directory}/dependency/libuiohook/include</directory>
-							<dependencyAnalysisParticipation>false</dependencyAnalysisParticipation>
-						</source>
-					</sources>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>jni-compile</id>
-						
-						<configuration>
-							<compilerOutputDirectory>${project.build.directory}/obj</compilerOutputDirectory>
-
-							<jdkIncludePath>${java.home}/include</jdkIncludePath>
-							<javahOS>linux</javahOS>
-
-							<workingDirectory>${basedir}</workingDirectory>
-						</configuration>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-
-					<execution>
-						<id>jni-link</id>
-
-						<configuration>
-							<!-- linkerOutputDirectory>${project.build.directory}/generated-resources/lib</linkerOutputDirectory-->
-							<linkerFinalName>libJNativeHook</linkerFinalName>
-							<linkerFinalNameExt>so</linkerFinalNameExt>
-
-							<workingDirectory>${basedir}</workingDirectory>
-						</configuration>
-						<goals>
-							<goal>link</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
@@ -229,6 +107,10 @@
 				<executions>
 					<execution>
 						<id>default-compile</id>
+						<phase>compile</phase>
+						<!--goals>
+							<goal>compile</goal>
+						</goals-->
 
 						<configuration>
 							<release>11</release>
@@ -236,20 +118,16 @@
 						</configuration>
 					</execution>
 
-					<execution>
+					<!--execution>
 						<id>base-compile</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
+						<phase>compile</phase>
 
-						<!-- recompile everything for target VM except the module-info.java -->
 						<configuration>
-							<!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
 							<excludes>
 								<exclude>module-info.java</exclude>
 							</excludes>
 						</configuration>
-					</execution>
+					</execution-->
 				</executions>
 
 				<configuration>
@@ -265,6 +143,180 @@
 						<arg>${project.build.directory}/generated-sources/include</arg>
 					</compilerArgs>
 				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>com.googlecode.cmake-maven-project</groupId>
+				<artifactId>cmake-maven-plugin</artifactId>
+				<version>3.16.3-b2</version>
+
+				<executions>
+					<execution>
+						<id>cmake-generate</id>
+						<!--phase>compile</phase-->
+						<goals>
+							<goal>generate</goal>
+						</goals>
+
+						<configuration>
+							<sourcePath>${basedir}/src/external/libuiohook</sourcePath>
+							<targetPath>${project.build.directory}/generated-libuiohook</targetPath>
+
+							<options>
+								<option>-DENABLE_STATIC=ON</option>
+								<option>-DENABLE_SHARED=OFF</option>
+								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
+
+								<option>-DUSE_XKB=ON</option>
+								<option>-DUSE_XKB_FILE=ON</option>
+								<option>-DUSE_XT=ON</option>
+								<option>-DUSE_XTEST=ON</option>
+								<option>-DUSE_XINERAMA=ON</option>
+
+								<option>-DUSE_XF86MISC=OFF</option>
+								<option>-DUSE_XRANDR=OFF</option>
+								<option>-DUSE_XRECORD_ASYNC=OFF</option>
+
+								<option>-DUSE_XCB=ON</option>
+								<option>-DUSE_XKBCOMMON=ON</option>
+							</options>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cmake-compile</id>
+						<!--phase>compile</phase-->
+						<goals>
+							<goal>compile</goal>
+						</goals>
+
+						<configuration>
+							<projectDirectory>${project.build.directory}/generated-libuiohook</projectDirectory>
+
+							<options>
+								<option>--target</option>
+								<option>install</option>
+							</options>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.maven-nar</groupId>
+				<artifactId>nar-maven-plugin</artifactId>
+				<version>3.5.1</version>
+				<extensions>true</extensions>
+
+				<configuration>
+					<resourceDirectory>${basedir}/src/main/resources</resourceDirectory>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<goals>
+							<goal>nar-compile</goal>
+						</goals>
+
+						<configuration>
+							<output>${project.artifactId}</output>
+
+							<libraries>
+								<library>
+									<type>jni</type>
+									<linkCPP>false</linkCPP>
+								</library>
+							</libraries>
+
+							<c>
+								<!-- add your equivalent of C:\cygwin64\bin to your PATH environment variable -->
+								<name>gcc</name>
+
+								<includes>
+									<include>jni/*.c</include>
+								</includes>
+
+								<options>
+									<option>-fPIC</option>
+									<option>-I${basedir}/src/main/jni/include</option>
+									<option>-I${project.build.directory}/generated-sources/include</option>
+									<option>-I${JAVA_HOME}/include</option>
+									<option>-I${JAVA_HOME}/include/linux</option>
+								</options>
+							</c>
+
+							<linker>
+								<name>gcc</name>
+
+								<libs>
+									<lib>
+										<name>uiohook</name>
+										<type>static</type>
+										<directory>${project.build.directory}/generated-sources/lib</directory>
+									</lib>
+								</libs>
+
+								<sysLibs>
+									<sysLib>
+										<name>X11</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>xkbfile</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>Xt</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>Xtst</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>Xinerama</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>xcb</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>X11-xcb</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>xkbcommon</name>
+										<type>shared</type>
+									</sysLib>
+
+									<sysLib>
+										<name>xkbcommon-x11</name>
+										<type>shared</type>
+									</sysLib>
+								</sysLibs>
+
+								<options>
+									<option>-Wl,-z,defs</option>
+								</options>
+							</linker>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>default-nar-javah</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
