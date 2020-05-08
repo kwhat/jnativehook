@@ -164,9 +164,12 @@
 							<targetPath>${project.build.directory}/generated-libuiohook</targetPath>
 
 							<options>
+								<option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
+								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
+								<option>-DCMAKE_INSTALL_LIBDIR=lib</option>
+
 								<option>-DENABLE_STATIC=ON</option>
 								<option>-DENABLE_SHARED=OFF</option>
-								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
 
 								<option>-DUSE_XKB=ON</option>
 								<option>-DUSE_XKB_FILE=ON</option>
