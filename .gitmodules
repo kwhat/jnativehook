@@ -4,4 +4,4 @@
 [submodule "libuiohook"]
 	path = src/external/libuiohook
 	url = git@github.com:kwhat/libuiohook.git
-	branch = cmake
+	branch = 1.2

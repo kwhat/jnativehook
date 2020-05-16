@@ -1,0 +1,246 @@
+name: nightly build
+on:
+  push:
+    branches:
+      - cmake
+
+jobs:
+  build_apple:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Compile x86_64-apple-darwin9
+        shell: bash
+        run: |
+          mkdir ${{github.workspace}}\build\x86_64-apple-darwin9
+          cd ${{github.workspace}}\build\x86_64-apple-darwin9
+
+          cmake -S ${{github.workspace}} -G "Unix Makefiles" \
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/x86_64-apple-darwin9.cmake \
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/x86_64-apple-darwin9 \
+            -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          make -j2
+          make install
+
+      - name: Upload x86_64-apple-darwin9
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-apple-darwin9.zip
+          path: ${{github.workspace}}/dist/x86_64-apple-darwin9/**/*
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Setup
+        shell: bash
+        run: |
+          sudo bash -c 'source /etc/lsb-release && echo "
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME} main universe
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-updates main universe
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-backports main universe
+
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME} main universe
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-updates main universe
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-backports main universe
+          " > /etc/apt/sources.list'
+
+          sudo rm -Rf /etc/apt/sources.list.d
+
+          sudo dpkg --add-architecture i386
+          sudo dpkg --add-architecture armhf
+
+          sudo apt-get update -m
+
+
+          #sudo apt-get install \
+            #binutils-x86-64-linux-gnu:amd64  \
+            #gcc-x86-64-linux-gnu:amd64  \
+
+          sudo apt-get install \
+            libx11-dev:amd64 \
+            libxtst-dev:amd64 \
+            libxt-dev:amd64 \
+            libxinerama-dev:amd64 \
+            libx11-xcb-dev:amd64 \
+            libxkbcommon-dev:amd64 \
+            libxkbcommon-x11-dev:amd64 \
+            libxkbfile-dev:amd64
+
+
+          sudo apt-get install \
+            binutils-i686-linux-gnu \
+            gcc-i686-linux-gnu
+
+          sudo apt-get install \
+            libx11-dev:i386 \
+            libxtst-dev:i386 \
+            libxt-dev:i386 \
+            libxinerama-dev:i386 \
+            libx11-xcb-dev:i386 \
+            libxkbcommon-dev:i386 \
+            libxkbcommon-x11-dev:i386 \
+            libxkbfile-dev:i386
+
+
+
+          sudo apt-get install \
+            binutils-arm-linux-gnueabihf \
+            gcc-arm-linux-gnueabihf
+
+          sudo apt-get install \
+            libx11-dev:armhf \
+            libxtst-dev:armhf \
+            libxt-dev:armhf \
+            libxinerama-dev:armhf \
+            libx11-xcb-dev:armhf \
+            libxkbcommon-dev:armhf \
+            libxkbcommon-x11-dev:armhf \
+            libxkbfile-dev:armhf
+
+
+      - name: Compile armv7a-hardfloat-linux-gnueabihf
+        shell: bash
+        run: |
+          mkdir ${{github.workspace}}\build\armv7a-hardfloat-linux-gnueabihf
+          cd ${{github.workspace}}\build\armv7a-hardfloat-linux-gnueabihf
+
+          cmake -S ${{github.workspace}} -G "Unix Makefiles" \
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/armv7a-hardfloat-linux-gnueabihf.cmake \
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/armv7a-hardfloat-linux-gnueabihf \
+          -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          make -j2
+          make install
+
+      - name: Upload armv7a-hardfloat-linux-gnueabihf
+        uses: actions/upload-artifact@v2
+        with:
+          name: armv7a-hardfloat-linux-gnueabihf.zip
+          path: ${{github.workspace}}/dist/armv7a-hardfloat-linux-gnueabihf/**/*
+
+
+      - name: Compile i386-linux-gnu
+        shell: bash
+        run: |
+          mkdir ${{github.workspace}}\build\i386-linux-gnu
+          cd ${{github.workspace}}\build\i386-linux-gnu
+
+          cmake -S ${{github.workspace}} -G "Unix Makefiles" \
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/i386-linux-gnu.cmake \
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/i386-linux-gnu \
+          -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          make -j2
+          make install
+
+      - name: Upload i386-linux-gnu
+        uses: actions/upload-artifact@v2
+        with:
+          name: i386-linux-gnu.zip
+          path: ${{github.workspace}}/dist/i386-linux-gnu/**/*
+
+
+      - name: Compile x86_64-linux-gnu
+        shell: bash
+        run: |
+          mkdir ${{github.workspace}}\build\x86_64-linux-gnu
+          cd ${{github.workspace}}\build\x86_64-linux-gnu
+
+          cmake -S ${{github.workspace}} -G "Unix Makefiles" \
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/x86_64-linux-gnu.cmake \
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/x86_64-linux-gnu \
+          -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          make -j2
+          make install
+
+      - name: Upload x86_64-linux-gnu
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-linux-gnu.zip
+          path: ${{github.workspace}}/dist/x86_64-linux-gnu/**/*
+
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Setup arm7ve-win32-msvc
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm
+
+      - name: Compile arm7ve-win32-msvc
+        run: |
+          mkdir ${{github.workspace}}\build\arm7ve-win32-msvc
+          cd ${{github.workspace}}\build\arm7ve-win32-msvc
+
+          cmake -S ${{github.workspace}} -G "NMake Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/arm7ve-win32-msvc.cmake `
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/arm7ve-win32-msvc `
+            -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          nmake
+          nmake install
+
+      - name: Upload arm7ve-win32-msvc
+        uses: actions/upload-artifact@v2
+        with:
+          name: arm7ve-win32-msvc.zip
+          path: ${{github.workspace}}\dist\arm7ve-win32-msvc\**\*
+
+
+      - name: Setup i386-win32-msvc
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+
+      - name: Compile i386-win32-msvc
+        run: |
+          mkdir ${{github.workspace}}\build\i386-win32-msvc
+          cd ${{github.workspace}}\build\i386-win32-msvc
+
+          cmake -S ${{github.workspace}} -G "NMake Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/i386-win32-msvc.cmake `
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/i386-win32-msvc `
+            -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          nmake
+          nmake install
+
+      - name: Upload i386-win32-msvc
+        uses: actions/upload-artifact@v2
+        with:
+          name: i386-win32-msvc.zip
+          path: ${{github.workspace}}\dist\i386-win32-msvc\**\*
+
+
+      - name: Setup x86_64-win32-msvc
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Compile x86_64-win32-msvc
+        run: |
+          mkdir ${{github.workspace}}\build\x86_64-win32-msvc
+          cd ${{github.workspace}}\build\x86_64-win32-msvc
+
+          cmake -S ${{github.workspace}} -G "NMake Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/toolchain/x86_64-win32-msvc.cmake `
+            -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist/x86_64-win32-msvc `
+            -DCMAKE_VERBOSE_MAKEFILE=true -DENABLE_DEMO=ON -DENABLE_STATIC=ON -DENABLE_SHARED=ON
+          nmake
+          nmake install
+
+      - name: Upload x86_64-win32-msvc
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-win32-msvc.zip
+          path: ${{github.workspace}}\dist\x86_64-win32-msvc\**\*

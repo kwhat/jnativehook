@@ -1,342 +1,601 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-		 xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.1stleg</groupId>
-	<artifactId>jnativehook</artifactId>
-	<version>2.1-SNAPSHOT</version>
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.1stleg</groupId>
+  <artifactId>jnativehook</artifactId>
+  <version>2.1-SNAPSHOT</version>
 
-	<name>JNativeHook</name>
-	<description>Global keyboard and mouse listeners for Java.</description>
-	<url>https://github.com/kwhat/jnativehook</url>
+  <name>JNativeHook</name>
+  <description>Global keyboard and mouse listeners for Java.</description>
+  <url>https://github.com/kwhat/jnativehook</url>
 
-	<licenses>
-		<license>
-			<name>GNU General Public License (GPL), Version 3.0</name>
-			<url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
-		</license>
-		<license>
-			<name>GNU Lesser General Public License (LGPL), Version 3.0</name>
-			<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>GNU General Public License (GPL), Version 3.0</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+    </license>
+    <license>
+      <name>GNU Lesser General Public License (LGPL), Version 3.0</name>
+      <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+    </license>
+  </licenses>
 
-	<developers>
-		<developer>
-			<name>Alexander Barker</name>
-			<email>alex@1stleg.com</email>
-			<organization>Personal</organization>
-			<organizationUrl>https://github.com/kwhat/</organizationUrl>
-		</developer>
-	</developers>
+  <developers>
+    <developer>
+      <name>Alexander Barker</name>
+      <email>alex@1stleg.com</email>
+      <organization>Personal</organization>
+      <organizationUrl>https://github.com/kwhat/</organizationUrl>
+    </developer>
+  </developers>
 
-	<scm>
-		<connection>scm:git:git@github.com:kwhat/jnativehook.git</connection>
-		<developerConnection>scm:git:git@github.com:kwhat/jnativehook.git</developerConnection>
-		<url>git@github.com:kwhat/jnativehook.git</url>
-	</scm>
+  <scm>
+    <connection>scm:git:git@github.com:kwhat/jnativehook.git</connection>
+    <developerConnection>scm:git:git@github.com:kwhat/jnativehook.git</developerConnection>
+    <url>git@github.com:kwhat/jnativehook.git</url>
+  </scm>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.debug>true</maven.compiler.debug>
-		<maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
-		<maven.compiler.compilerId>javac</maven.compiler.compilerId>
+    <maven.compiler.debug>true</maven.compiler.debug>
+    <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
+    <maven.compiler.compilerId>javac</maven.compiler.compilerId>
 
-		<cmake.download>false</cmake.download>
-	</properties>
+    <native.compiler>cc</native.compiler>
 
-	<packaging>nar</packaging>
+    <cmake.download>false</cmake.download>
+  </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+  <packaging>jar</packaging>
 
-
-	<profiles>
-		<profile>
-			<id>java-jdk8</id>
-			<activation>
-				<jdk>[8,)</jdk>
-			</activation>
-
-			<properties>
-				<maven.compiler.source>5</maven.compiler.source>
-				<maven.compiler.target>8</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>java-jdk11</id>
-			<activation>
-				<jdk>[11,)</jdk>
-			</activation>
-
-			<properties>
-				<maven.compiler.source>11</maven.compiler.source>
-				<maven.compiler.target>11</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>arch-win32</id>
-
-			<activation>
-				<os>
-					<family>Windows</family>
-					<arch>x86</arch>
-				</os>
-			</activation>
-		</profile>
-
-	</profiles>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-
-				<executions>
-					<execution>
-						<id>default-compile</id>
-						<phase>compile</phase>
-						<!--goals>
-							<goal>compile</goal>
-						</goals-->
-
-						<configuration>
-							<release>11</release>
-							<!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
-						</configuration>
-					</execution>
-
-					<!--execution>
-						<id>base-compile</id>
-						<phase>compile</phase>
-
-						<configuration>
-							<excludes>
-								<exclude>module-info.java</exclude>
-							</excludes>
-						</configuration>
-					</execution-->
-				</executions>
-
-				<configuration>
-					<verbose>true</verbose>
-					<fork>true</fork>
-
-					<compileSourceRoots>
-						<compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
-					</compileSourceRoots>
-
-					<compilerArgs>
-						<arg>-h</arg>
-						<arg>${project.build.directory}/generated-sources/include</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 
-			<plugin>
-				<groupId>com.googlecode.cmake-maven-project</groupId>
-				<artifactId>cmake-maven-plugin</artifactId>
-				<version>3.16.3-b2</version>
+  <profiles>
+    <profile>
+      <id>compiler-cl</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
 
-				<executions>
-					<execution>
-						<id>cmake-generate</id>
-						<!--phase>compile</phase-->
-						<goals>
-							<goal>generate</goal>
-						</goals>
+      <properties>
+        <native.compiler>cl</native.compiler>
+      </properties>
+    </profile>
 
-						<configuration>
-							<sourcePath>${basedir}/src/external/libuiohook</sourcePath>
-							<targetPath>${project.build.directory}/generated-libuiohook</targetPath>
+    <profile>
+      <id>compiler-clang</id>
+      <activation>
+        <os>
+          <name>!Linux</name>
+          <family>unix</family>
+        </os>
+      </activation>
 
-							<options>
-								<option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
-								<option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
-								<option>-DCMAKE_INSTALL_LIBDIR=lib</option>
+      <properties>
+        <native.compiler>clang</native.compiler>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>compiler-gcc</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+          <family>unix</family>
+        </os>
+      </activation>
 
-								<option>-DENABLE_STATIC=ON</option>
-								<option>-DENABLE_SHARED=OFF</option>
+      <properties>
+        <native.compiler>gcc</native.compiler>
+      </properties>
+    </profile>
 
-								<option>-DUSE_XKB=ON</option>
-								<option>-DUSE_XKB_FILE=ON</option>
-								<option>-DUSE_XT=ON</option>
-								<option>-DUSE_XTEST=ON</option>
-								<option>-DUSE_XINERAMA=ON</option>
 
-								<option>-DUSE_XF86MISC=OFF</option>
-								<option>-DUSE_XRANDR=OFF</option>
-								<option>-DUSE_XRECORD_ASYNC=OFF</option>
+    <profile>
+      <id>family-darwin</id>
+      <activation>
+        <os>
+          <name>Mac OS X</name>
+          <family>mac</family>
+        </os>
+      </activation>
 
-								<option>-DUSE_XCB=ON</option>
-								<option>-DUSE_XKBCOMMON=ON</option>
-							</options>
-						</configuration>
-					</execution>
+      <properties>
+        <native.family>darwin</native.family>
+      </properties>
+    </profile>
 
-					<execution>
-						<id>cmake-compile</id>
-						<!--phase>compile</phase-->
-						<goals>
-							<goal>compile</goal>
-						</goals>
+    <profile>
+      <id>family-freebsd</id>
+      <activation>
+        <os>
+          <name>FreeBSD</name>
+          <family>unix</family>
+        </os>
+      </activation>
 
-						<configuration>
-							<projectDirectory>${project.build.directory}/generated-libuiohook</projectDirectory>
+      <properties>
+        <native.family>freebsd</native.family>
+      </properties>
+    </profile>
 
-							<options>
-								<option>--target</option>
-								<option>install</option>
-							</options>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+    <profile>
+      <id>family-linux</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+          <family>unix</family>
+        </os>
+      </activation>
 
-			<plugin>
-				<groupId>com.github.maven-nar</groupId>
-				<artifactId>nar-maven-plugin</artifactId>
-				<version>3.5.1</version>
-				<extensions>true</extensions>
+      <properties>
+        <native.family>linux</native.family>
+      </properties>
+    </profile>
 
-				<configuration>
-					<resourceDirectory>${basedir}/src/main/resources</resourceDirectory>
-				</configuration>
+    <profile>
+      <id>family-openbsd</id>
+      <activation>
+        <os>
+          <name>OpenBSD</name>
+          <family>unix</family>
+        </os>
+      </activation>
 
-				<executions>
-					<execution>
-						<id>default-compile</id>
-						<goals>
-							<goal>nar-compile</goal>
-						</goals>
+      <properties>
+        <native.family>openbsd</native.family>
+      </properties>
+    </profile>
 
-						<configuration>
-							<output>${project.artifactId}</output>
+    <profile>
+      <id>family-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
 
-							<libraries>
-								<library>
-									<type>jni</type>
-									<linkCPP>false</linkCPP>
-								</library>
-							</libraries>
+      <properties>
+        <native.family>windows</native.family>
+      </properties>
+    </profile>
 
-							<c>
-								<!-- add your equivalent of C:\cygwin64\bin to your PATH environment variable -->
-								<name>gcc</name>
 
-								<includes>
-									<include>jni/*.c</include>
-								</includes>
+    <profile>
+      <id>arch-arm</id>
+      <activation>
+        <os>
+          <arch>arm</arch>
+        </os>
+      </activation>
 
-								<options>
-									<option>-fPIC</option>
-									<option>-I${basedir}/src/main/jni/include</option>
-									<option>-I${project.build.directory}/generated-sources/include</option>
-									<option>-I${JAVA_HOME}/include</option>
-									<option>-I${JAVA_HOME}/include/linux</option>
-								</options>
-							</c>
+      <properties>
+        <native.arch>arm</native.arch>
+      </properties>
+    </profile>
 
-							<linker>
-								<name>gcc</name>
+    <profile>
+      <id>arch-arm64</id>
+      <activation>
+        <os>
+          <arch>arm</arch>
+        </os>
+      </activation>
 
-								<libs>
-									<lib>
-										<name>uiohook</name>
-										<type>static</type>
-										<directory>${project.build.directory}/generated-sources/lib</directory>
-									</lib>
-								</libs>
+      <properties>
+        <native.arch>arm64</native.arch>
+      </properties>
+    </profile>
 
-								<sysLibs>
-									<sysLib>
-										<name>X11</name>
-										<type>shared</type>
-									</sysLib>
+    <profile>
+      <id>arch-x86</id>
+      <activation>
+        <os>
+          <arch>x86</arch>
+        </os>
+      </activation>
 
-									<sysLib>
-										<name>xkbfile</name>
-										<type>shared</type>
-									</sysLib>
+      <properties>
+        <native.arch>x86</native.arch>
+      </properties>
+    </profile>
 
-									<sysLib>
-										<name>Xt</name>
-										<type>shared</type>
-									</sysLib>
+    <profile>
+      <id>arch-x86_64</id>
+      <activation>
+        <os>
+          <arch>amd64</arch>
+        </os>
+      </activation>
 
-									<sysLib>
-										<name>Xtst</name>
-										<type>shared</type>
-									</sysLib>
+      <properties>
+        <native.arch>x86_64</native.arch>
+      </properties>
+    </profile>
 
-									<sysLib>
-										<name>Xinerama</name>
-										<type>shared</type>
-									</sysLib>
 
-									<sysLib>
-										<name>xcb</name>
-										<type>shared</type>
-									</sysLib>
+    <profile>
+      <id>platform-unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
 
-									<sysLib>
-										<name>X11-xcb</name>
-										<type>shared</type>
-									</sysLib>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.maven-nar</groupId>
+            <artifactId>nar-maven-plugin</artifactId>
 
-									<sysLib>
-										<name>xkbcommon</name>
-										<type>shared</type>
-									</sysLib>
+            <executions>
+              <execution>
+                <id>default-compile</id>
+                <goals>
+                  <goal>nar-compile</goal>
+                </goals>
 
-									<sysLib>
-										<name>xkbcommon-x11</name>
-										<type>shared</type>
-									</sysLib>
-								</sysLibs>
+                <configuration>
+                  <c>
+                    <options combine.children="append">
+                      <option>-fPIC</option>
+                      <option>-g</option>
+                      <option>-I${project.basedir}/src/main/jni/include</option>
+                      <option>-I${project.build.directory}/generated-sources/include</option>
+                      <option>-I${env.JAVA_HOME}/include</option>
+                      <option>-I${env.JAVA_HOME}/include/${native.family}</option>
+                    </options>
+                  </c>
 
-								<options>
-									<option>-Wl,-z,defs</option>
-								</options>
-							</linker>
-						</configuration>
-					</execution>
+                  <linker>
+                    <options>
+                      <option>-Wl,-z,defs</option>
+                    </options>
+                  </linker>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
-					<execution>
-						<id>default-nar-javah</id>
-						<phase>none</phase>
-					</execution>
-				</executions>
-			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
+    <profile>
+      <id>platform-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
 
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.maven-nar</groupId>
+            <artifactId>nar-maven-plugin</artifactId>
 
-		</plugins>
-	</build>
+            <executions>
+              <execution>
+                <id>default-compile</id>
+                <goals>
+                  <goal>nar-compile</goal>
+                </goals>
+
+                <configuration>
+                  <c>
+                    <options combine.children="append">
+                      <option>/Zi</option>
+                      <option>/I${project.basedir}\src\main\jni\include</option>
+                      <option>/I${project.build.directory}\generated-sources\include</option>
+                      <option>/I${env.JAVA_HOME}\include\${native.family}</option>
+                    </options>
+                  </c>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>link-x11</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <name>!Mac OS X</name>
+        </os>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.maven-nar</groupId>
+            <artifactId>nar-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>default-compile</id>
+                <goals>
+                  <goal>nar-compile</goal>
+                </goals>
+
+                <configuration>
+                  <linker>
+                    <sysLibs>
+                      <sysLib>
+                        <name>X11</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>xkbfile</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>Xt</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>Xtst</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>Xinerama</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>xcb</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>X11-xcb</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>xkbcommon</name>
+                        <type>shared</type>
+                      </sysLib>
+
+                      <sysLib>
+                        <name>xkbcommon-x11</name>
+                        <type>shared</type>
+                      </sysLib>
+                    </sysLibs>
+                  </linker>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>java-jdk8</id>
+      <activation>
+        <jdk>[8,)</jdk>
+      </activation>
+
+      <properties>
+        <maven.compiler.source>5</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>java-jdk11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+
+      <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+      </properties>
+    </profile>
+
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <phase>compile</phase>
+            <!--goals>
+              <goal>compile</goal>
+            </goals-->
+
+            <configuration>
+              <release>11</release>
+              <!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
+            </configuration>
+          </execution>
+
+          <!--execution>
+            <id>base-compile</id>
+            <phase>compile</phase>
+
+            <configuration>
+              <excludes>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </configuration>
+          </execution-->
+        </executions>
+
+        <configuration>
+          <verbose>true</verbose>
+          <fork>true</fork>
+
+          <compileSourceRoots>
+            <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
+          </compileSourceRoots>
+
+          <compilerArgs>
+            <arg>-h</arg>
+            <arg>${project.build.directory}/generated-sources/include</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
+
+      <plugin>
+        <groupId>com.googlecode.cmake-maven-project</groupId>
+        <artifactId>cmake-maven-plugin</artifactId>
+        <version>3.16.3-b2</version>
+
+        <executions>
+          <execution>
+            <id>cmake-generate</id>
+            <!--phase>compile</phase-->
+            <goals>
+              <goal>generate</goal>
+            </goals>
+
+            <configuration>
+              <sourcePath>${project.basedir}/src/external/libuiohook</sourcePath>
+              <targetPath>${project.build.directory}/generated-libuiohook</targetPath>
+
+              <options>
+                <option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
+                <option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
+                <option>-DCMAKE_INSTALL_LIBDIR=lib</option>
+
+                <option>-DENABLE_STATIC=ON</option>
+                <option>-DENABLE_SHARED=OFF</option>
+              </options>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>cmake-compile</id>
+            <!--phase>compile</phase-->
+            <goals>
+              <goal>compile</goal>
+            </goals>
+
+            <configuration>
+              <projectDirectory>${project.build.directory}/generated-libuiohook</projectDirectory>
+
+              <options>
+                <option>--target</option>
+                <option>install</option>
+              </options>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.maven-nar</groupId>
+        <artifactId>nar-maven-plugin</artifactId>
+        <version>3.5.1</version>
+        <extensions>true</extensions>
+
+        <configuration>
+          <resourceDirectory>${basedir}/src/main/resources</resourceDirectory>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <goals>
+              <goal>nar-compile</goal>
+            </goals>
+
+            <configuration>
+              <output>${project.artifactId}</output>
+              <commandLogLevel>2</commandLogLevel>
+              <os>${native.family}</os>
+
+              <libraries>
+                <library>
+                  <type>jni</type>
+                  <linkCPP>false</linkCPP>
+                </library>
+              </libraries>
+
+              <c>
+                <name>${native.compiler}</name>
+
+                <includes>
+                  <include>jni/*.c</include>
+                </includes>
+
+                <optionSet>${env.CFLAGS}</optionSet>
+              </c>
+
+              <linker>
+                <name>${native.compiler}</name>
+                
+                <libs>
+                  <lib>
+                    <name>uiohook</name>
+                    <type>static</type>
+                    <directory>${project.build.directory}/generated-sources/lib</directory>
+                  </lib>
+                </libs>
+              </linker>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>default-nar-javah</id>
+            <phase>none</phase>
+          </execution>
+
+          <execution>
+            <id>default-nar-package</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
 </project>
