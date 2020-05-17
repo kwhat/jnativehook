@@ -21,10 +21,9 @@ package org.jnativehook.mouse;
  * A listener implementing all the methods in both the NativeMouseListener and
  * NativeMouseMotionListener interfaces.
  *
- * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	2.0
- * @since	1.0
- *
+ * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version 2.0
+ * @since 1.0
  * @see NativeMouseEvent
  */
 public interface NativeMouseInputListener extends NativeMouseListener, NativeMouseMotionListener {

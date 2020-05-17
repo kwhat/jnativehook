@@ -17,61 +17,61 @@
  */
 package org.jnativehook.mouse;
 
-import org.jnativehook.AbstractSwingInputAdapter;
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import org.jnativehook.AbstractSwingInputAdapter;
 
 /**
- * Adapter to convert NativeKeyEvents to Java KeyEvents.
- * The methods are empty so the super call is obsolete.
+ * Adapter to convert NativeKeyEvents to Java KeyEvents. The methods are empty so the super call is
+ * obsolete.
  *
  * @since 2.1
  */
 public class SwingMouseAdapter extends AbstractSwingInputAdapter implements NativeMouseListener, MouseListener {
 
-	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
-		this.mouseClicked(this.getJavaKeyEvent(nativeEvent));
-	}
+    public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
+        this.mouseClicked(this.getJavaKeyEvent(nativeEvent));
+    }
 
-	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
-		this.mousePressed(this.getJavaKeyEvent(nativeEvent));
-	}
+    public void nativeMousePressed(NativeMouseEvent nativeEvent) {
+        this.mousePressed(this.getJavaKeyEvent(nativeEvent));
+    }
 
-	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
-		this.mouseReleased(this.getJavaKeyEvent(nativeEvent));
-	}
+    public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
+        this.mouseReleased(this.getJavaKeyEvent(nativeEvent));
+    }
 
-	public void mouseClicked(MouseEvent mouseEvent) {
-		// Do Nothing.
-	}
+    public void mouseClicked(MouseEvent mouseEvent) {
+        // Do Nothing.
+    }
 
-	public void mousePressed(MouseEvent mouseEvent) {
-		// Do Nothing.
-	}
+    public void mousePressed(MouseEvent mouseEvent) {
+        // Do Nothing.
+    }
 
-	public void mouseReleased(MouseEvent mouseEvent) {
-		// Do Nothing.
-	}
+    public void mouseReleased(MouseEvent mouseEvent) {
+        // Do Nothing.
+    }
 
-	public void mouseEntered(MouseEvent mouseEvent) {
-		// Do Nothing.
-	}
+    public void mouseEntered(MouseEvent mouseEvent) {
+        // Do Nothing.
+    }
 
-	public void mouseExited(MouseEvent mouseEvent) {
-		// Do Nothing.
-	}
+    public void mouseExited(MouseEvent mouseEvent) {
+        // Do Nothing.
+    }
 
-	protected MouseEvent getJavaKeyEvent(NativeMouseEvent nativeEvent) {
-		return new MouseEvent(
-				this,
-				nativeEvent.getID() - (NativeMouseEvent.NATIVE_MOUSE_FIRST - NativeMouseEvent.NATIVE_MOUSE_FIRST),
-				System.currentTimeMillis(),
-				this.getJavaModifiers(nativeEvent.getModifiers()),
-				nativeEvent.getX(),
-				nativeEvent.getY(),
-				nativeEvent.getClickCount(),
-				false,
-				nativeEvent.getButton());
-	}
+    protected MouseEvent getJavaKeyEvent(NativeMouseEvent nativeEvent) {
+        return new MouseEvent(
+            this,
+            nativeEvent.getID() - (NativeMouseEvent.NATIVE_MOUSE_FIRST
+                - NativeMouseEvent.NATIVE_MOUSE_FIRST),
+            System.currentTimeMillis(),
+            this.getJavaModifiers(nativeEvent.getModifiers()),
+            nativeEvent.getX(),
+            nativeEvent.getY(),
+            nativeEvent.getClickCount(),
+            false,
+            nativeEvent.getButton());
+    }
 }

@@ -17,173 +17,128 @@
  */
 package org.jnativehook;
 
-// Imports.
 import java.util.Locale;
 
 /**
- * A small class to determine the native system's operating system family and
- * architecture. The class is only used to determine which native library to
- * unpack and load at runtime. This class is never used if the native library
- * is loaded using the <code>java.library.path</code> property.
+ * A small class to determine the native system's operating system family and architecture. The
+ * class is only used to determine which native library to unpack and load at runtime. This class is
+ * never used if the native library is loaded using the <code>java.library.path</code> property.
  *
- * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @since	1.0
- * @version	2.1
+ * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version 2.2
+ * @since   1.0
  */
 public class NativeSystem {
-	/**
-	 * According to the docs, Locale.ROOT is the same as the locale whose language, country, and variant are
-	 * empty ("") strings.  This is required to maintain Java 1.5 compatibility.
-	 */
-	protected static final Locale ROOT_LOCALE = new Locale("", "", "");
+    /**
+     * According to the docs, Locale.ROOT is the same as the locale whose language, country, and
+     * variant are empty ("") strings.  This is required to maintain Java 1.5 compatibility.
+     */
+    protected static final Locale ROOT_LOCALE = new Locale("", "", "");
 
-	/**
-	 * The operating system family enum.
-	 *
-	 * @see NativeSystem
-	 */
-	public enum Family {
-		/** The FreeBSD operating system family. */
-		FREEBSD,
+    /**
+     * The operating system family enum.
+     *
+     * @see NativeSystem
+     */
+    public enum Family {
+        FREEBSD,
+        OPENBSD,
+        DARWIN,
+        SOLARIS,
+        LINUX,
+        WINDOWS,
 
-		/** The OpenBSD operating system family. */
-		OPENBSD,
+        UNSUPPORTED;
 
-		/** The Apple OS X operating system family. */
-		DARWIN,
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
+        }
+    }
 
-		/** The Solaris operating system family. */
-		SOLARIS,
+    /**
+     * The system architecture enum.
+     *
+     * @see NativeSystem
+     */
+    public enum Arch {
+        ARM,
+        ARM64,
+        SPARC,
+        SPARC64,
+        PPC,
+        PPC64,
+        x86,
+        x86_64,
 
-		/** The Linux operating system family. */
-		LINUX,
+        UNSUPPORTED;
 
-		/** The Windows operating system family. */
-		WINDOWS,
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
+        }
+    }
 
-		/** Any unsupported operating system family. */
-		UNSUPPORTED;
+    /**
+     * Determines the current operating system family.
+     *
+     * @return The current operating system family enum item.
+     */
+    public static Family getFamily() {
+        final String osName = System.getProperty("os.name").toLowerCase(NativeSystem.ROOT_LOCALE);
+        Family family = Family.UNSUPPORTED;
 
-		@Override
-		public String toString() {
-			return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
-		}
-	}
+        if (osName.equals("freebsd")) {
+            family = Family.FREEBSD;
+        } else if (osName.equals("openbsd")) {
+            family = Family.OPENBSD;
+        } else if (osName.equals("mac os x")) {
+            family = Family.DARWIN;
+        } else if (osName.equals("solaris")
+                || osName.equals("sunos")) {
+            family = Family.SOLARIS;
+        } else if (osName.equals("linux")) {
+            family = Family.LINUX;
+        } else if (osName.startsWith("windows")) {
+            family = Family.WINDOWS;
+        }
 
-	/**
-	 * The system architecture enum.
-	 *
-	 * @see NativeSystem
-	 */
-	public enum Arch {
-		/** The arm6j architecture. */
-		ARM,
+        return family;
+    }
 
-		/** The sparc architecture. */
-		SPARC,
+    /**
+     * Determines the current system architecture.
+     *
+     * @return The current system architecture.
+     */
+    public static Arch getArchitecture() {
+        final String osArch = System.getProperty("os.arch").toLowerCase(NativeSystem.ROOT_LOCALE);
+        Arch arch = Arch.UNSUPPORTED;
 
-		/** The sparc64 architecture. */
-		SPARC64,
+        if (osArch.equals("arm")) {
+            arch = Arch.ARM;
+        } else if (osArch.equals("sparc")) {
+            arch = Arch.SPARC;
+        } else if (osArch.equals("sparc64")) {
+            arch = Arch.SPARC64;
+        } else if (osArch.equals("ppc")
+                || osArch.equals("powerpc")) {
+            arch = Arch.PPC;
+        } else if (osArch.equals("ppc64")
+                || osArch.equals("powerpc64")) {
+            arch = Arch.PPC64;
+        } else if (osArch.equals("x86")
+                || osArch.equals("i386")
+                || osArch.equals("i486")
+                || osArch.equals("i586")
+                || osArch.equals("i686")) {
+            arch = Arch.x86;
+        } else if (osArch.equals("x86_64")
+                || osArch.equals("amd64")
+                || osArch.equals("k8")) {
+            arch = Arch.x86_64;
+        }
 
-		/** The ppc architecture. */
-		PPC,
-
-		/** The ppc64 architecture. */
-		PPC64,
-
-		/** The x86 architecture. */
-		x86,
-
-		/** The amd64 architecture. */
-		x86_64,
-
-		/** Any unsupported system architecture. */
-		UNSUPPORTED;
-
-		@Override
-		public String toString() {
-			return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
-		}
-	}
-
-	/**
-	 * Determines the current operating system family.
-	 *
-	 * @return The current operating system family enum item.
-	 */
-	public static Family getFamily() {
-		String osName = System.getProperty("os.name");
-		Family family;
-
-		if (osName.equalsIgnoreCase("freebsd")) {
-			family = Family.FREEBSD;
-		}
-		else if (osName.equalsIgnoreCase("openbsd")) {
-			family = Family.OPENBSD;
-		}
-		else if (osName.equalsIgnoreCase("mac os x")) {
-			family = Family.DARWIN;
-		}
-		else if (osName.equalsIgnoreCase("solaris") ||
-				osName.equalsIgnoreCase("sunos")) {
-			family = Family.SOLARIS;
-		}
-		else if (osName.equalsIgnoreCase("linux")) {
-			family = Family.LINUX;
-		}
-		else if (osName.toLowerCase(NativeSystem.ROOT_LOCALE).startsWith("windows")) {
-			family = Family.WINDOWS;
-		}
-		else {
-			family = Family.UNSUPPORTED;
-		}
-
-		return family;
-	}
-
-	/**
-	 * Determines the current system architecture.
-	 *
-	 * @return The current system architecture.
-	 */
-	public static Arch getArchitecture() {
-		String osArch = System.getProperty("os.arch");
-		Arch arch;
-
-		if (osArch.equalsIgnoreCase("arm")) {
-			arch = Arch.ARM;
-		}
-		else if (osArch.equalsIgnoreCase("sparc")) {
-			arch = Arch.SPARC;
-		}
-		else if (osArch.equalsIgnoreCase("sparc64")) {
-			arch = Arch.SPARC64;
-		}
-		else if (osArch.equalsIgnoreCase("ppc") ||
-				osArch.equalsIgnoreCase("powerpc")) {
-			arch = Arch.PPC;
-		}
-		else if (osArch.equalsIgnoreCase("ppc64") ||
-				osArch.equalsIgnoreCase("powerpc64")) {
-			arch = Arch.PPC64;
-		}
-		else if (osArch.equalsIgnoreCase("x86") ||
-				osArch.equalsIgnoreCase("i386") ||
-				osArch.equalsIgnoreCase("i486") ||
-				osArch.equalsIgnoreCase("i586") ||
-				osArch.equalsIgnoreCase("i686")) {
-			arch = Arch.x86;
-		}
-		else if (osArch.equalsIgnoreCase("x86_64") ||
-				osArch.equalsIgnoreCase("amd64") ||
-				osArch.equalsIgnoreCase("k8")) {
-			arch = Arch.x86_64;
-		}
-
-		else {
-			arch = Arch.UNSUPPORTED;
-		}
-
-		return arch;
-	}
+        return arch;
+    }
 }

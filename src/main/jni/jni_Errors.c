@@ -36,15 +36,13 @@ void jni_ThrowException(JNIEnv *env, const char *classname, const char *message)
     if (Exception_class != NULL) {
         (*env)->ThrowNew(env, Exception_class, message);
         (*env)->DeleteLocalRef(env, Exception_class);
-    }
-    else {
+    } else {
         // Throw a ClassNotFoundException if we could not locate the exception class above.
         Exception_class = (*env)->FindClass(env, "java/lang/ClassNotFoundException");
         if (Exception_class != NULL) {
             (*env)->ThrowNew(env, Exception_class, classname);
             (*env)->DeleteLocalRef(env, Exception_class);
-        }
-        else {
+        } else {
             jni_ThrowFatalError(env, "Failed to locate core class: java.lang.ClassNotFoundException");
         }
     }

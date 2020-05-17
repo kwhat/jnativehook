@@ -18,31 +18,31 @@
 package org.jnativehook.mouse;
 
 /**
- * Adapter implementation of the NativeMouseInputListener interface.
- * The methods are empty so the super call is obsolete.
- * @author Johannes Boczek
+ * Adapter implementation of the NativeMouseInputListener interface. The methods are empty so the
+ * super call is obsolete.
  *
+ * @author Johannes Boczek
  * @since 2.1
  */
 public class NativeMouseInputAdapter implements NativeMouseInputListener {
 
-	public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
-	}
+    public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
+        // Do Nothing.
+    }
 
-	public void nativeMousePressed(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
-	}
+    public void nativeMousePressed(NativeMouseEvent nativeEvent) {
+        // Do Nothing.
+    }
 
-	public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
-	}
+    public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
+        // Do Nothing.
+    }
 
-	public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
-	}
+    public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
+        // Do Nothing.
+    }
 
-	public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
-		// Do Nothing.
-	}
+    public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
+        // Do Nothing.
+    }
 }

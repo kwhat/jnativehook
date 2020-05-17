@@ -184,7 +184,7 @@ JNIEXPORT void JNICALL Java_org_jnativehook_GlobalScreen_postNativeEvent(JNIEnv 
 
         default:
             // TODO Should this thrown an exception?
-            jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid native event type! (%#X)\n",
+            jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid native event type! (%#X)\n",
                     __FUNCTION__, __LINE__, javaType);
             break;
     }
@@ -241,7 +241,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatRate(JN
                 java_lang_Integer->init,
                 (jint) rate);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_auto_repeat_rate()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_auto_repeat_rate()!\n",
                 __FUNCTION__, __LINE__);
     }
 
@@ -264,7 +264,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getAutoRepeatDelay(J
                 java_lang_Integer->init,
                 (jint) delay);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_auto_repeat_delay()!\n",
                 __FUNCTION__, __LINE__);
     }
 
@@ -287,7 +287,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerati
                 java_lang_Integer->init,
                 (jint) multiplier);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_multiplier()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_multiplier()!\n",
                 __FUNCTION__, __LINE__);
     }
 
@@ -310,7 +310,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerAccelerati
                 java_lang_Integer->init,
                 (jint) threshold);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_threshold()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_acceleration_threshold()!\n",
                 __FUNCTION__, __LINE__);
     }
 
@@ -333,7 +333,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getPointerSensitivit
                 java_lang_Integer->init,
                 (jint) sensitivity);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_sensitivity()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_pointer_sensitivity()!\n",
                 __FUNCTION__, __LINE__);
     }
 
@@ -356,7 +356,7 @@ JNIEXPORT jobject JNICALL Java_org_jnativehook_GlobalScreen_getMultiClickIterval
                 java_lang_Integer->init,
                 (jint) clicktime);
     } else {
-        jni_Logger(env, LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
+        jni_Logger(LOG_LEVEL_WARN, "%s [%u]: Invalid result returned from hook_get_multi_click_time()!\n",
                 __FUNCTION__, __LINE__);
     }
 

@@ -17,7 +17,6 @@
  */
 package org.jnativehook;
 
-// Imports.
 import java.io.File;
 import java.util.Iterator;
 
@@ -28,19 +27,18 @@ import java.util.Iterator;
  * <code>DefaultLibraryLocator</code> will be used.
  * <p>
  *
- * @author  Aidas Adomkus (vasiukai@gmail.com)
- * @version	2.0
- * @since	2.0
+ * @author Aidas Adomkus (vasiukai@gmail.com)
+ * @version 2.0
+ * @since   2.0
  *
  * @see DefaultLibraryLocator
  */
 public interface NativeLibraryLocator {
-
-	/**
-	 * Perform procedures to interface with the native library. These procedures may include acquiring, unpacking and
-	 * loading the library into the Java Virtual Machine.
-	 *
-	 * @return Iterator of type file, where each file points to a native library to load.
-	 */
-	public Iterator<File> getLibraries();
+    /**
+     * Perform procedures to interface with the native library. These procedures may include acquiring, unpacking and
+     * loading the library into the Java Virtual Machine.
+     *
+     * @return Iterator of type file, where each file points to a native library to load.
+     */
+    public Iterator<File> getLibraries();
 }

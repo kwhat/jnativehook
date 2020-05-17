@@ -21,38 +21,40 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 /**
- * Adapter to convert NativeKeyEvents to Java KeyEvents.
- * The methods are empty so the super call is obsolete.
+ * Adapter to convert NativeKeyEvents to Java KeyEvents. The methods are empty so the super call is
+ * obsolete.
  *
  * @since 2.1
  */
-public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener, MouseWheelListener {
+public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener,
+    MouseWheelListener {
 
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
-		this.mouseWheelMoved(this.getJavaMouseWheelEvent(nativeEvent));
-	}
+    public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
+        this.mouseWheelMoved(this.getJavaMouseWheelEvent(nativeEvent));
+    }
 
-	public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
-		// Do Nothing.
-	}
+    public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
+        // Do Nothing.
+    }
 
-	protected MouseWheelEvent getJavaMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
-		int scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;
-		if (nativeEvent.getScrollType() == NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL) {
-			scrollType = MouseWheelEvent.WHEEL_BLOCK_SCROLL;
-		}
+    protected MouseWheelEvent getJavaMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
+        int scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;
+        if (nativeEvent.getScrollType() == NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+            scrollType = MouseWheelEvent.WHEEL_BLOCK_SCROLL;
+        }
 
-		return new MouseWheelEvent(
-				this,
-				nativeEvent.getID() - (NativeMouseWheelEvent.NATIVE_MOUSE_FIRST - NativeMouseWheelEvent.NATIVE_MOUSE_FIRST),
-				System.currentTimeMillis(),
-				this.getJavaModifiers(nativeEvent.getModifiers()),
-				nativeEvent.getX(),
-				nativeEvent.getY(),
-				nativeEvent.getClickCount(),
-				false,
-				scrollType,
-				nativeEvent.getScrollAmount(),
-				nativeEvent.getWheelRotation());
-	}
+        return new MouseWheelEvent(
+            this,
+            nativeEvent.getID() - (NativeMouseWheelEvent.NATIVE_MOUSE_FIRST
+                - NativeMouseWheelEvent.NATIVE_MOUSE_FIRST),
+            System.currentTimeMillis(),
+            this.getJavaModifiers(nativeEvent.getModifiers()),
+            nativeEvent.getX(),
+            nativeEvent.getY(),
+            nativeEvent.getClickCount(),
+            false,
+            scrollType,
+            nativeEvent.getScrollAmount(),
+            nativeEvent.getWheelRotation());
+    }
 }

@@ -17,43 +17,39 @@
  */
 package org.jnativehook.mouse;
 
-// Imports.
-import org.jnativehook.GlobalScreen;
 import java.util.EventListener;
+import org.jnativehook.GlobalScreen;
 
 /**
- * The listener interface for receiving native mouse motion events.
- * (For clicks and other mouse events, use the <code>NativeMouseListener</code>.)
+ * The listener interface for receiving native mouse motion events. (For clicks and other mouse
+ * events, use the <code>NativeMouseListener</code>.)
  * <p>
+ * <p>
+ * The class that is interested in processing a <code>NativeMouseMotionEvent</code> implements this
+ * interface, and the object created with that class is registered with the
+ * <code>GlobalScreen</code> using the {@link GlobalScreen#addNativeMouseMotionListener} method.
+ * When the NativeMouseMotion event occurs, that object's appropriate method is invoked.
  *
- * The class that is interested in processing a <code>NativeMouseMotionEvent</code>
- * implements this interface, and the object created with that class is
- * registered with the <code>GlobalScreen</code> using the
- * {@link GlobalScreen#addNativeMouseMotionListener} method. When the
- * NativeMouseMotion event occurs, that object's appropriate method is invoked.
- *
- * @author	Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version	2.0
- * @since	1.0
- *
+ * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
+ * @version 2.0
+ * @since 1.0
  * @see NativeMouseEvent
  */
 public interface NativeMouseMotionListener extends EventListener {
 
-	/**
-	 * Invoked when the mouse has been moved.
-	 *
-	 * @param nativeEvent the native mouse event.
-	 */
-	public void nativeMouseMoved(NativeMouseEvent nativeEvent);
+    /**
+     * Invoked when the mouse has been moved.
+     *
+     * @param nativeEvent the native mouse event.
+     */
+    public void nativeMouseMoved(NativeMouseEvent nativeEvent);
 
 
-	/**
-	 * Invoked when the mouse has been moved while a button is depressed.
-	 *
-	 * @param nativeEvent the native mouse event
-	 *
-	 * @since 1.1
-	 */
-	public void nativeMouseDragged(NativeMouseEvent nativeEvent);
+    /**
+     * Invoked when the mouse has been moved while a button is depressed.
+     *
+     * @param nativeEvent the native mouse event
+     * @since 1.1
+     */
+    public void nativeMouseDragged(NativeMouseEvent nativeEvent);
 }

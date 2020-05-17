@@ -188,7 +188,7 @@ void jni_EventDispatcher(uiohook_event * const event) {
                 break;
 
             default:
-                jni_Logger(env, LOG_LEVEL_INFO,    "%s [%u]: Unknown native event type: %#X.\n",
+                jni_Logger(LOG_LEVEL_INFO,    "%s [%u]: Unknown native event type: %#X.\n",
                         __FUNCTION__, __LINE__, event->type);
                 break;
         }
