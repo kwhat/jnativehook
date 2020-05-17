@@ -22,7 +22,7 @@
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.1stleg</groupId>
+  <groupId>com.github.kwhat</groupId>
   <artifactId>jnativehook</artifactId>
   <version>2.2-SNAPSHOT</version>
 
@@ -56,6 +56,8 @@
     <url>git@github.com:kwhat/jnativehook.git</url>
   </scm>
 
+  <packaging>jar</packaging>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -64,12 +66,18 @@
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
 
     <jni.os />
-    <jni.dir.include>${java.home}/include</jni.dir.include>
+    <jni.include.directory>${java.home}/include</jni.include.directory>
 
     <cmake.download>false</cmake.download>
   </properties>
 
-  <packaging>jar</packaging>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/kwhat/jnativehook</url>
+    </repository>
+  </distributionManagement>
 
   <dependencies>
     <dependency>
@@ -274,6 +282,7 @@
 
               <linkerStartOptions combine.children="append">
                 <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
+                <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
                 <linkerMiddleOption>-shared</linkerMiddleOption>
               </linkerStartOptions>
 
@@ -312,113 +321,84 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>native-maven-plugin</artifactId>
 
-            <executions>
-              <execution>
-                <id>default-compile</id>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
+            <configuration combine.self="override">
+              <compilerProvider>msvc</compilerProvider>
+              <javahOS>win32</javahOS>
 
-                <configuration combine.self="override">
-                  <compilerProvider>msvc</compilerProvider>
-                  <javahOS>win32</javahOS>
+              <compilerStartOptions combine.children="append">
+                <compilerStartOption>/Zi</compilerStartOption>
+              </compilerStartOptions>
 
-                  <compilerMiddleOptions>
-                    <compilerMiddleOption>/Zi</compilerMiddleOption>
-                  </compilerMiddleOptions>
+              <linkerFinalName>${project.name}</linkerFinalName>
+              <linkerFinalNameExt>dll</linkerFinalNameExt>
 
-                  <compilerEndOptions>
-                    <compilerEndOption>/I${project.basedir}\src\main\jni\include</compilerEndOption>
-                    <compilerEndOption>/I${project.build.directory}\generated-sources\include</compilerEndOption>
-                  </compilerEndOptions>
-                </configuration>
-              </execution>
-            </executions>
+              <linkerStartOptions combine.children="append">
+                <linkerMiddleOption>/DLL</linkerMiddleOption>
+              </linkerStartOptions>
+
+              <linkerMiddleOptions combine.children="override">
+                <linkerMiddleOption>/LIBPATH ${project.build.directory}/generated-sources/lib</linkerMiddleOption>
+                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
+              </linkerMiddleOptions>
+
+              <compilerEndOptions>
+                <compilerEndOption>/I${project.basedir}\src\main\jni\include</compilerEndOption>
+                <compilerEndOption>/I${project.build.directory}\generated-sources\include</compilerEndOption>
+              </compilerEndOptions>
+            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
 
-<!--
+
     <profile>
-      <id>link-x11</id>
+      <id>java-jdk5</id>
       <activation>
-        <os>
-          <family>unix</family>
-          <name>!Mac OS X</name>
-        </os>
+        <jdk>[5,)</jdk>
       </activation>
+
+      <properties>
+        <maven.compiler.source>5</maven.compiler.source>
+        <maven.compiler.target>5</maven.compiler.target>
+      </properties>
 
       <build>
         <plugins>
           <plugin>
-            <groupId>com.github.maven-nar</groupId>
-            <artifactId>nar-maven-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
 
             <executions>
               <execution>
-                <id>default-compile</id>
-                <goals>
-                  <goal>nar-compile</goal>
-                </goals>
+                <id>java-compile</id>
+                <phase>compile</phase>
+                <!--goals>
+                  <goal>compile</goal>
+                </goals-->
 
                 <configuration>
-                  <linker>
-                    <sysLibs>
-                      <sysLib>
-                        <name>X11</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>xkbfile</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>Xt</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>Xtst</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>Xinerama</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>xcb</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>X11-xcb</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>xkbcommon</name>
-                        <type>shared</type>
-                      </sysLib>
-
-                      <sysLib>
-                        <name>xkbcommon-x11</name>
-                        <type>shared</type>
-                      </sysLib>
-                    </sysLibs>
-                  </linker>
+                  <excludes>
+                    <exclude>module-info.java</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>
           </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+
+            <configuration>
+              <javahClassNames>
+                <javahClassName>org.jnativehook.GlobalScreen</javahClassName>
+              </javahClassNames>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
-    </profile>-->
-
+    </profile>
 
     <profile>
       <id>java-jdk8</id>
@@ -430,6 +410,31 @@
         <maven.compiler.source>5</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
       </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>java-compile</id>
+                <phase>compile</phase>
+                <!--goals>
+                  <goal>compile</goal>
+                </goals-->
+
+                <configuration>
+                  <excludes>
+                    <exclude>module-info.java</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
@@ -442,6 +447,29 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
       </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>java-compile</id>
+                <phase>compile</phase>
+                <!--goals>
+                  <goal>compile</goal>
+                </goals-->
+
+                <configuration>
+                  <release>11</release>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
   </profiles>
@@ -452,32 +480,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
-
-        <executions>
-          <execution>
-            <id>java-compile</id>
-            <phase>compile</phase>
-            <!--goals>
-              <goal>compile</goal>
-            </goals-->
-
-            <configuration>
-              <release>11</release>
-              <!--outputDirectory>${project.build.directory}/class/jdk${maven.compiler.target}</outputDirectory-->
-            </configuration>
-          </execution>
-
-          <!--execution>
-            <id>base-compile</id>
-            <phase>compile</phase>
-
-            <configuration>
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </execution-->
-        </executions>
 
         <configuration>
           <verbose>true</verbose>
@@ -548,7 +550,7 @@
         <version>1.0-alpha-11</version>
 
         <configuration>
-          <jdkIncludePath>${jni.dir.include}</jdkIncludePath>
+          <jdkIncludePath>${jni.include.directory}</jdkIncludePath>
 
           <compilerStartOptions>
             <compilerStartOption>${env.CFLAGS}</compilerStartOption>
@@ -685,8 +687,7 @@
             </manifest>
 
             <manifestEntries>
-              <Name>org/jnativehook</Name>
-
+              <url>https://github.com/kwhat/jnativehook</url>
             </manifestEntries>
 
             <manifestSections>
