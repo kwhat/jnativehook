@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JNativeHook: Global keyboard and mouse hooking for Java.
+  Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
+  https://github.com/kwhat/jnativehook/
+
+  JNativeHook is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as published
+  by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  JNativeHook is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.1stleg</groupId>
   <artifactId>jnativehook</artifactId>
-  <version>2.1-SNAPSHOT</version>
+  <version>2.2-SNAPSHOT</version>
 
   <name>JNativeHook</name>
   <description>Global keyboard and mouse listeners for Java.</description>
@@ -45,7 +63,8 @@
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
 
-    <native.compiler>cc</native.compiler>
+    <jni.os />
+    <jni.dir.include>${java.home}/include</jni.dir.include>
 
     <cmake.download>false</cmake.download>
   </properties>
@@ -115,7 +134,7 @@
       </activation>
 
       <properties>
-        <native.family>darwin</native.family>
+        <jni.os>darwin</jni.os>
       </properties>
     </profile>
 
@@ -129,7 +148,7 @@
       </activation>
 
       <properties>
-        <native.family>freebsd</native.family>
+        <jni.os>freebsd</jni.os>
       </properties>
     </profile>
 
@@ -143,7 +162,7 @@
       </activation>
 
       <properties>
-        <native.family>linux</native.family>
+        <jni.os>linux</jni.os>
       </properties>
     </profile>
 
@@ -157,7 +176,7 @@
       </activation>
 
       <properties>
-        <native.family>openbsd</native.family>
+        <jni.os>openbsd</jni.os>
       </properties>
     </profile>
 
@@ -170,7 +189,7 @@
       </activation>
 
       <properties>
-        <native.family>windows</native.family>
+        <jni.os>windows</jni.os>
       </properties>
     </profile>
 
@@ -184,7 +203,7 @@
       </activation>
 
       <properties>
-        <native.arch>arm</native.arch>
+        <jni.arch>arm</jni.arch>
       </properties>
     </profile>
 
@@ -197,7 +216,7 @@
       </activation>
 
       <properties>
-        <native.arch>arm64</native.arch>
+        <jni.arch>arm64</jni.arch>
       </properties>
     </profile>
 
@@ -210,7 +229,7 @@
       </activation>
 
       <properties>
-        <native.arch>x86</native.arch>
+        <jni.arch>x86</jni.arch>
       </properties>
     </profile>
 
@@ -223,7 +242,7 @@
       </activation>
 
       <properties>
-        <native.arch>x86_64</native.arch>
+        <jni.arch>x86_64</jni.arch>
       </properties>
     </profile>
 
@@ -232,6 +251,7 @@
       <id>platform-unix</id>
       <activation>
         <os>
+          <name>!Mac OS X</name>
           <family>unix</family>
         </os>
       </activation>
@@ -239,36 +259,39 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.github.maven-nar</groupId>
-            <artifactId>nar-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>native-maven-plugin</artifactId>
 
-            <executions>
-              <execution>
-                <id>default-compile</id>
-                <goals>
-                  <goal>nar-compile</goal>
-                </goals>
+            <configuration>
+              <javahOS>${jni.os}</javahOS>
+              
+              <compilerStartOptions combine.children="append">
+                <compilerStartOption>-fPIC</compilerStartOption>
+              </compilerStartOptions>
 
-                <configuration>
-                  <c>
-                    <options combine.children="append">
-                      <option>-fPIC</option>
-                      <option>-g</option>
-                      <option>-I${project.basedir}/src/main/jni/include</option>
-                      <option>-I${project.build.directory}/generated-sources/include</option>
-                      <option>-I${env.JAVA_HOME}/include</option>
-                      <option>-I${env.JAVA_HOME}/include/${native.family}</option>
-                    </options>
-                  </c>
+              <linkerFinalName>lib${project.name}</linkerFinalName>
+              <linkerFinalNameExt>so</linkerFinalNameExt>
 
-                  <linker>
-                    <options>
-                      <option>-Wl,-z,defs</option>
-                    </options>
-                  </linker>
-                </configuration>
-              </execution>
-            </executions>
+              <linkerStartOptions combine.children="append">
+                <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
+                <linkerMiddleOption>-shared</linkerMiddleOption>
+              </linkerStartOptions>
+
+              <linkerMiddleOptions combine.children="override">
+                <linkerMiddleOption>-L${project.build.directory}/generated-sources/lib</linkerMiddleOption>
+                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
+
+                <linkerMiddleOption>-Bdynamic -lX11</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lxkbfile</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lXt</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lXtst</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lXinerama</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lxcb</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lX11-xcb</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lxkbcommon</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lxkbcommon-x11</linkerMiddleOption>
+              </linkerMiddleOptions>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -286,25 +309,28 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.github.maven-nar</groupId>
-            <artifactId>nar-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>native-maven-plugin</artifactId>
 
             <executions>
               <execution>
                 <id>default-compile</id>
                 <goals>
-                  <goal>nar-compile</goal>
+                  <goal>compile</goal>
                 </goals>
 
-                <configuration>
-                  <c>
-                    <options combine.children="append">
-                      <option>/Zi</option>
-                      <option>/I${project.basedir}\src\main\jni\include</option>
-                      <option>/I${project.build.directory}\generated-sources\include</option>
-                      <option>/I${env.JAVA_HOME}\include\${native.family}</option>
-                    </options>
-                  </c>
+                <configuration combine.self="override">
+                  <compilerProvider>msvc</compilerProvider>
+                  <javahOS>win32</javahOS>
+
+                  <compilerMiddleOptions>
+                    <compilerMiddleOption>/Zi</compilerMiddleOption>
+                  </compilerMiddleOptions>
+
+                  <compilerEndOptions>
+                    <compilerEndOption>/I${project.basedir}\src\main\jni\include</compilerEndOption>
+                    <compilerEndOption>/I${project.build.directory}\generated-sources\include</compilerEndOption>
+                  </compilerEndOptions>
                 </configuration>
               </execution>
             </executions>
@@ -313,7 +339,7 @@
       </build>
     </profile>
 
-
+<!--
     <profile>
       <id>link-x11</id>
       <activation>
@@ -391,7 +417,7 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
+    </profile>-->
 
 
     <profile>
@@ -429,7 +455,7 @@
 
         <executions>
           <execution>
-            <id>default-compile</id>
+            <id>java-compile</id>
             <phase>compile</phase>
             <!--goals>
               <goal>compile</goal>
@@ -484,7 +510,7 @@
 
             <configuration>
               <sourcePath>${project.basedir}/src/external/libuiohook</sourcePath>
-              <targetPath>${project.build.directory}/generated-libuiohook</targetPath>
+              <targetPath>${project.build.directory}/libuiohook-build</targetPath>
 
               <options>
                 <option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
@@ -505,7 +531,7 @@
             </goals>
 
             <configuration>
-              <projectDirectory>${project.build.directory}/generated-libuiohook</projectDirectory>
+              <projectDirectory>${project.build.directory}/libuiohook-build</projectDirectory>
 
               <options>
                 <option>--target</option>
@@ -517,66 +543,131 @@
       </plugin>
 
       <plugin>
-        <groupId>com.github.maven-nar</groupId>
-        <artifactId>nar-maven-plugin</artifactId>
-        <version>3.5.1</version>
-        <extensions>true</extensions>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>1.0-alpha-11</version>
 
         <configuration>
-          <resourceDirectory>${basedir}/src/main/resources</resourceDirectory>
+          <jdkIncludePath>${jni.dir.include}</jdkIncludePath>
+
+          <compilerStartOptions>
+            <compilerStartOption>${env.CFLAGS}</compilerStartOption>
+          </compilerStartOptions>
+
+          <linkerOutputDirectory>${project.build.directory}/generated-sources/lib</linkerOutputDirectory>
+          <attach>false</attach>
+
+          <linkerStartOptions>
+            <linkerStartOption>${env.LDFLAGS}</linkerStartOption>
+          </linkerStartOptions>
+
+          <sources>
+            <source>
+              <directory>${project.basedir}/src/main/jni</directory>
+              <fileNames>
+                <fileName>jni_Converter.c</fileName>
+                <fileName>jni_Errors.c</fileName>
+                <fileName>jni_EventDispatcher.c</fileName>
+                <fileName>jni_Globals.c</fileName>
+                <fileName>jni_Load.c</fileName>
+                <fileName>jni_Logger.c</fileName>
+                <fileName>org_jnativehook_GlobalScreen.c</fileName>
+              </fileNames>
+            </source>
+
+            <source>
+              <directory>${project.basedir}/src/main/jni/include</directory>
+            </source>
+
+            <source>
+              <directory>${project.build.directory}/generated-sources/include</directory>
+            </source>
+          </sources>
         </configuration>
 
         <executions>
           <execution>
-            <id>default-compile</id>
+            <id>jni-compile</id>
+            <phase>compile</phase>
+
             <goals>
-              <goal>nar-compile</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>jni-link</id>
+            <phase>compile</phase>
+
+            <goals>
+              <goal>link</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+
+        <executions>
+          <execution>
+            <id>jni-resources</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy-resources</goal>
             </goals>
 
             <configuration>
-              <output>${project.artifactId}</output>
-              <commandLogLevel>2</commandLogLevel>
-              <os>${native.family}</os>
+              <outputDirectory>${project.basedir}/src/main/resources/org/${project.artifactId}/lib/${jni.os}/${jni.arch}</outputDirectory>
 
-              <libraries>
-                <library>
-                  <type>jni</type>
-                  <linkCPP>false</linkCPP>
-                </library>
-              </libraries>
-
-              <c>
-                <name>${native.compiler}</name>
-
-                <includes>
-                  <include>jni/*.c</include>
-                </includes>
-
-                <optionSet>${env.CFLAGS}</optionSet>
-              </c>
-
-              <linker>
-                <name>${native.compiler}</name>
-                
-                <libs>
-                  <lib>
-                    <name>uiohook</name>
-                    <type>static</type>
-                    <directory>${project.build.directory}/generated-sources/lib</directory>
-                  </lib>
-                </libs>
-              </linker>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/generated-sources/lib</directory>
+                  <includes>
+                    <include>*${project.name}.*</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
 
           <execution>
-            <id>default-nar-javah</id>
-            <phase>none</phase>
-          </execution>
+            <id>package-resources</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
 
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/main/resources</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.1.0</version>
+
+        <configuration>
+          <propertyPrefix>project</propertyPrefix>
+        </configuration>
+
+        <executions>
           <execution>
-            <id>default-nar-package</id>
-            <phase>none</phase>
+            <id>parse-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -592,6 +683,26 @@
               <addClasspath>true</addClasspath>
               <mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
             </manifest>
+
+            <manifestEntries>
+              <Name>org/jnativehook</Name>
+
+            </manifestEntries>
+
+            <manifestSections>
+              <manifestSection>
+                <name>org/jnativehook</name>
+                <manifestEntries>
+                  <Specification-Title>${project.name} Library"</Specification-Title>
+                  <Specification-Version>${project.majorVersion}.${project.minorVersion}</Specification-Version>
+                  <Specification-Vendor>Alexander Barker (alex@1stleg.com)</Specification-Vendor>
+
+                  <Implementation-Title>${project.groupId}</Implementation-Title>
+                  <Implementation-Version>${project.qualifier}</Implementation-Version>
+                  <Implementation-Vendor>Alexander Barker (alex@1stleg.com)</Implementation-Vendor>
+                </manifestEntries>
+              </manifestSection>
+            </manifestSections>
           </archive>
         </configuration>
       </plugin>
