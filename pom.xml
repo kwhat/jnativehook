@@ -24,12 +24,32 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.kwhat</groupId>
   <artifactId>jnativehook</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>${project.build.version}</version>
+
+  <properties>
+    <project.version.major>2</project.version.major>
+    <project.version.minor>2</project.version.minor>
+
+    <project.build.version>${project.version.major}.${project.version.minor}-SNAPSHOT</project.build.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <maven.compiler.debug>true</maven.compiler.debug>
+    <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
+    <maven.compiler.compilerId>javac</maven.compiler.compilerId>
+
+    <jni.os>linux</jni.os>
+    <jni.include.directory>${java.home}/include</jni.include.directory>
+    <jni.library.name>lib${project.name}</jni.library.name>
+    <jni.library.ext>so</jni.library.ext>
+
+    <cmake.download>false</cmake.download>
+  </properties>
 
   <name>JNativeHook</name>
   <description>Global keyboard and mouse listeners for Java.</description>
   <url>https://github.com/kwhat/jnativehook</url>
-
+  <packaging>jar</packaging>
+  
   <licenses>
     <license>
       <name>GNU General Public License (GPL), Version 3.0</name>
@@ -51,25 +71,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:kwhat/jnativehook.git</connection>
+    <connection>scm:git:https://github.com:kwhat/jnativehook</connection>
     <developerConnection>scm:git:git@github.com:kwhat/jnativehook.git</developerConnection>
-    <url>git@github.com:kwhat/jnativehook.git</url>
+    <url>https://github.com:kwhat/jnativehook</url>
   </scm>
-
-  <packaging>jar</packaging>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <maven.compiler.debug>true</maven.compiler.debug>
-    <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
-    <maven.compiler.compilerId>javac</maven.compiler.compilerId>
-
-    <jni.os />
-    <jni.include.directory>${java.home}/include</jni.include.directory>
-
-    <cmake.download>false</cmake.download>
-  </properties>
 
   <distributionManagement>
     <repository>
@@ -91,48 +96,6 @@
 
   <profiles>
     <profile>
-      <id>compiler-cl</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-
-      <properties>
-        <native.compiler>cl</native.compiler>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>compiler-clang</id>
-      <activation>
-        <os>
-          <name>!Linux</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <properties>
-        <native.compiler>clang</native.compiler>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>compiler-gcc</id>
-      <activation>
-        <os>
-          <name>Linux</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <properties>
-        <native.compiler>gcc</native.compiler>
-      </properties>
-    </profile>
-
-
-    <profile>
       <id>family-darwin</id>
       <activation>
         <os>
@@ -143,6 +106,7 @@
 
       <properties>
         <jni.os>darwin</jni.os>
+        <jni.library.ext>dylib</jni.library.ext>
       </properties>
     </profile>
 
@@ -198,6 +162,8 @@
 
       <properties>
         <jni.os>windows</jni.os>
+        <jni.library.name>${project.name}</jni.library.name>
+        <jni.library.ext>dll</jni.library.ext>
       </properties>
     </profile>
 
@@ -256,6 +222,51 @@
 
 
     <profile>
+      <id>platform-darwin</id>
+      <activation>
+        <os>
+          <name>Mac OS X</name>
+          <family>mac</family>
+        </os>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+
+            <configuration>
+              <compilerProvider>generic</compilerProvider>
+              <compilerExecutable>clang</compilerExecutable>
+              <javahOS>${jni.os}</javahOS>
+
+              <compilerStartOptions combine.children="append">
+                <compilerStartOption>-fPIC</compilerStartOption>
+              </compilerStartOptions>
+
+              <linkerStartOptions combine.children="append">
+                <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
+                <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
+                <linkerMiddleOption>-shared</linkerMiddleOption>
+              </linkerStartOptions>
+
+              <linkerMiddleOptions combine.children="override">
+                <linkerMiddleOption>-L${project.build.directory}/generated-sources/lib</linkerMiddleOption>
+                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
+
+                <linkerMiddleOption>-framework ApplicationServices</linkerMiddleOption>
+                <linkerMiddleOption>-framework Carbon</linkerMiddleOption>
+                <linkerMiddleOption>-framework IOKit</linkerMiddleOption>
+                <linkerMiddleOption>-Bdynamic -lobjc</linkerMiddleOption>
+              </linkerMiddleOptions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>platform-unix</id>
       <activation>
         <os>
@@ -271,14 +282,13 @@
             <artifactId>native-maven-plugin</artifactId>
 
             <configuration>
+              <compilerProvider>generic</compilerProvider>
+              <compilerExecutable>${env.CC}</compilerExecutable>
               <javahOS>${jni.os}</javahOS>
               
               <compilerStartOptions combine.children="append">
                 <compilerStartOption>-fPIC</compilerStartOption>
               </compilerStartOptions>
-
-              <linkerFinalName>lib${project.name}</linkerFinalName>
-              <linkerFinalNameExt>so</linkerFinalNameExt>
 
               <linkerStartOptions combine.children="append">
                 <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
@@ -321,30 +331,35 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>native-maven-plugin</artifactId>
 
-            <configuration combine.self="override">
+            <configuration>
               <compilerProvider>msvc</compilerProvider>
               <javahOS>win32</javahOS>
 
               <compilerStartOptions combine.children="append">
+                <compilerStartOption>/MDd</compilerStartOption>
                 <compilerStartOption>/Zi</compilerStartOption>
               </compilerStartOptions>
-
-              <linkerFinalName>${project.name}</linkerFinalName>
-              <linkerFinalNameExt>dll</linkerFinalNameExt>
-
-              <linkerStartOptions combine.children="append">
-                <linkerMiddleOption>/DLL</linkerMiddleOption>
-              </linkerStartOptions>
-
-              <linkerMiddleOptions combine.children="override">
-                <linkerMiddleOption>/LIBPATH ${project.build.directory}/generated-sources/lib</linkerMiddleOption>
-                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
-              </linkerMiddleOptions>
 
               <compilerEndOptions>
                 <compilerEndOption>/I${project.basedir}\src\main\jni\include</compilerEndOption>
                 <compilerEndOption>/I${project.build.directory}\generated-sources\include</compilerEndOption>
               </compilerEndOptions>
+
+              <linkerFinalName>${project.name}</linkerFinalName>
+              <linkerFinalNameExt>dll</linkerFinalNameExt>
+
+              <linkerStartOptions combine.children="append">
+                <linkerMiddleOption>/INCREMENTAL:NO</linkerMiddleOption>
+                <linkerMiddleOption>/DLL</linkerMiddleOption>
+                <linkerMiddleOption>/MACHINE:X64</linkerMiddleOption>
+              </linkerStartOptions>
+
+              <linkerMiddleOptions combine.children="override">
+                <linkerMiddleOption>/LIBPATH:${project.build.directory}/generated-sources/lib</linkerMiddleOption>
+                <linkerMiddleOption>uiohook.lib</linkerMiddleOption>
+                <linkerMiddleOption>advapi32.lib</linkerMiddleOption>
+                <linkerMiddleOption>user32.lib</linkerMiddleOption>
+              </linkerMiddleOptions>
             </configuration>
           </plugin>
         </plugins>
@@ -500,12 +515,12 @@
       <plugin>
         <groupId>com.googlecode.cmake-maven-project</groupId>
         <artifactId>cmake-maven-plugin</artifactId>
-        <version>3.16.3-b2</version>
+        <version>3.17.2-b1-SNAPSHOT</version>
+<!--        <version>3.16.3-b2</version>-->
 
         <executions>
           <execution>
             <id>cmake-generate</id>
-            <!--phase>compile</phase-->
             <goals>
               <goal>generate</goal>
             </goals>
@@ -527,7 +542,6 @@
 
           <execution>
             <id>cmake-compile</id>
-            <!--phase>compile</phase-->
             <goals>
               <goal>compile</goal>
             </goals>
@@ -551,6 +565,8 @@
 
         <configuration>
           <jdkIncludePath>${jni.include.directory}</jdkIncludePath>
+          <linkerFinalName>${jni.library.name}</linkerFinalName>
+          <linkerFinalNameExt>${jni.library.ext}</linkerFinalNameExt>
 
           <compilerStartOptions>
             <compilerStartOption>${env.CFLAGS}</compilerStartOption>
@@ -590,8 +606,6 @@
         <executions>
           <execution>
             <id>jni-compile</id>
-            <phase>compile</phase>
-
             <goals>
               <goal>compile</goal>
             </goals>
@@ -600,7 +614,6 @@
           <execution>
             <id>jni-link</id>
             <phase>compile</phase>
-
             <goals>
               <goal>link</goal>
             </goals>
@@ -610,6 +623,7 @@
 
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.1.0</version>
 
@@ -628,7 +642,7 @@
                 <resource>
                   <directory>${project.build.directory}/generated-sources/lib</directory>
                   <includes>
-                    <include>*${project.name}.*</include>
+                    <include>${jni.library.name}.${jni.library.ext}</include>
                   </includes>
                 </resource>
               </resources>
@@ -656,19 +670,15 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.1.0</version>
-
-        <configuration>
-          <propertyPrefix>project</propertyPrefix>
-        </configuration>
-
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        
         <executions>
           <execution>
-            <id>parse-version</id>
+            <id>package-javadoc</id>
             <goals>
-              <goal>parse-version</goal>
+              <goal>jar</goal>
             </goals>
           </execution>
         </executions>
@@ -684,10 +694,13 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
+
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
 
             <manifestEntries>
-              <url>https://github.com/kwhat/jnativehook</url>
+              <url>${project.scm.url}</url>
             </manifestEntries>
 
             <manifestSections>
@@ -695,19 +708,18 @@
                 <name>org/jnativehook</name>
                 <manifestEntries>
                   <Specification-Title>${project.name} Library"</Specification-Title>
-                  <Specification-Version>${project.majorVersion}.${project.minorVersion}</Specification-Version>
+                  <Specification-Version>${project.version.major}.${project.version.minor}</Specification-Version>
                   <Specification-Vendor>Alexander Barker (alex@1stleg.com)</Specification-Vendor>
 
                   <Implementation-Title>${project.groupId}</Implementation-Title>
-                  <Implementation-Version>${project.qualifier}</Implementation-Version>
-                  <Implementation-Vendor>Alexander Barker (alex@1stleg.com)</Implementation-Vendor>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Implementation-Vendor>${project.build.version}</Implementation-Vendor>
                 </manifestEntries>
               </manifestSection>
             </manifestSections>
           </archive>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 </project>
