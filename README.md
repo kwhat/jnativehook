@@ -1,4 +1,5 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
+![Nightly Build](https://github.com/kwhat/jnativehook/workflows/Nightly%20Build/badge.svg)
 
 ## About
 JNativeHook is a library to provide global keyboard and mouse listeners for
@@ -75,7 +76,7 @@ If you have found this library useful, please consider making a donation.
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UPMHT4ZFBTCBL)
 
 ## Compiling Instructions
-Detailed instructions to [compile from source](https://github.com/kwhat/jnativehook/wiki/Compiling) are available in the wiki.
+Detailed instructions to [compile from source](wiki/Compiling) are available in the wiki.
 
 ## Demo Applicaiton
 The graphical example application was created to provided a real-time
@@ -84,13 +85,13 @@ application simply execute the jar file provided. Source code available at
 [src/java/org/jnativehook/example/NativeHookDemo.java](src/java/org/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
-* [Global Keyboard Listener](https://github.com/kwhat/jnativehook/wiki/Keyboard)
-* [Global Mouse Listener](https://github.com/kwhat/jnativehook/wiki/Mouse)
-* [Global Mouse Wheel Listener](https://github.com/kwhat/jnativehook/wiki/MouseWheel)
-* [Thread Safety for AWT, Swing and JavaFX](https://github.com/kwhat/jnativehook/wiki/ThreadSafety)
-* [Logging and Console Output](https://github.com/kwhat/jnativehook/wiki/ConsoleOutput)
-* [Advanced Library Loading](https://github.com/kwhat/jnativehook/wiki/LibraryLoading)
-* [Consuming Events (Unsupported)](https://github.com/kwhat/jnativehook/wiki/ConsumingEvents)
+* [Global Keyboard Listener](wiki/Keyboard)
+* [Global Mouse Listener](wiki/Mouse)
+* [Global Mouse Wheel Listener](wiki/MouseWheel)
+* [Thread Safety for AWT, Swing and JavaFX](wiki/ThreadSafety)
+* [Logging and Console Output](wiki/ConsoleOutput)
+* [Advanced Library Loading](wiki/LibraryLoading)
+* [Consuming Events (Unsupported)](wiki/ConsumingEvents)
 
 ## Additional Information
 Up to date source code and documentation available at:

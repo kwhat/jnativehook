@@ -24,13 +24,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.kwhat</groupId>
   <artifactId>jnativehook</artifactId>
-  <version>${project.build.version}</version>
+  <version>2.2.0</version>
 
   <properties>
-    <project.version.major>2</project.version.major>
-    <project.version.minor>2</project.version.minor>
-
-    <project.build.version>${project.version.major}.${project.version.minor}-SNAPSHOT</project.build.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <maven.compiler.debug>true</maven.compiler.debug>
@@ -238,7 +234,7 @@
 
             <configuration>
               <compilerProvider>generic</compilerProvider>
-              <compilerExecutable>clang</compilerExecutable>
+              <compilerExecutable>${env.CC}</compilerExecutable>
               <javahOS>${jni.os}</javahOS>
 
               <compilerStartOptions combine.children="append">
@@ -246,7 +242,6 @@
               </compilerStartOptions>
 
               <linkerStartOptions combine.children="append">
-                <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
                 <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
                 <linkerMiddleOption>-shared</linkerMiddleOption>
               </linkerStartOptions>
@@ -282,13 +277,17 @@
             <artifactId>native-maven-plugin</artifactId>
 
             <configuration>
-              <compilerProvider>generic</compilerProvider>
-              <compilerExecutable>${env.CC}</compilerExecutable>
               <javahOS>${jni.os}</javahOS>
               
+              <compilerProvider>generic</compilerProvider>
+              <compilerExecutable>${env.CC}</compilerExecutable>
+
               <compilerStartOptions combine.children="append">
                 <compilerStartOption>-fPIC</compilerStartOption>
               </compilerStartOptions>
+
+              <linkerProvider>generic</linkerProvider>
+              <linkerExecutable>${env.CC}</linkerExecutable>
 
               <linkerStartOptions combine.children="append">
                 <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
@@ -351,7 +350,6 @@
               <linkerStartOptions combine.children="append">
                 <linkerMiddleOption>/INCREMENTAL:NO</linkerMiddleOption>
                 <linkerMiddleOption>/DLL</linkerMiddleOption>
-                <linkerMiddleOption>/MACHINE:X64</linkerMiddleOption>
               </linkerStartOptions>
 
               <linkerMiddleOptions combine.children="override">
@@ -492,6 +490,48 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.6</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>auto-clean</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
@@ -515,8 +555,7 @@
       <plugin>
         <groupId>com.googlecode.cmake-maven-project</groupId>
         <artifactId>cmake-maven-plugin</artifactId>
-        <version>3.17.2-b1-SNAPSHOT</version>
-<!--        <version>3.16.3-b2</version>-->
+        <version>3.16.3-b2</version>
 
         <executions>
           <execution>
@@ -670,6 +709,11 @@
       </plugin>
 
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M4</version>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.2.0</version>
@@ -719,6 +763,21 @@
             </manifestSections>
           </archive>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>3.0.0-M1</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>3.0.0-M1</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.9.0</version>
       </plugin>
     </plugins>
   </build>
