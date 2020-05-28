@@ -23,14 +23,14 @@ import org.jnativehook.GlobalScreen;
  * An event which indicates that the mouse wheel was rotated on the system. This event is not
  * limited to a particular component's scope or visibility.
  * <p>
- * <p>
+ *
  * A <code>NativeMouseWheelEvent</code> object is passed to every
  * <code>NativeMouseWheelListener</code> object which is registered to receive
  * mouse wheel events using the {@link GlobalScreen#addNativeMouseWheelListener(NativeMouseWheelListener)}
  * method. The <code>GlobalScreen</code> object then dispatches a
  * <code>NativeMouseWheelEvent</code> to each listener.
  * <p>
- * <p>
+ *
  * Platforms offer customization of the amount of scrolling that should take place when the mouse
  * wheel is moved. The two most common settings are to scroll a certain number of "units" (commonly
  * lines of text in a text-based component) or an entire "block" (similar to page-up/page-down).

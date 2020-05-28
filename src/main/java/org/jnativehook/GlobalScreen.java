@@ -462,7 +462,7 @@ public class GlobalScreen {
      * Add a <code>NativeInputEvent</code> to the operating system's event queue. Each type of
      * <code>NativeInputEvent</code> is processed according to its event id.
      * <p>
-     * <p>
+     *
      * For both <code>NATIVE_KEY_PRESSED</code> and
      * <code>NATIVE_KEY_RELEASED</code> events, the virtual keycode and modifier
      * mask are used in the creation of the native event.  Please note that some platforms may

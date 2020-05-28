@@ -137,15 +137,13 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
         menuItemKeyboardEvents = new JCheckBoxMenuItem("Keyboard Events");
         menuItemKeyboardEvents.addItemListener(this);
         menuItemKeyboardEvents.setMnemonic(KeyEvent.VK_K);
-        menuItemKeyboardEvents.setAccelerator(
-            KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
+        menuItemKeyboardEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
         menuSubListeners.add(menuItemKeyboardEvents);
 
         menuItemButtonEvents = new JCheckBoxMenuItem("Button Events");
         menuItemButtonEvents.addItemListener(this);
         menuItemButtonEvents.setMnemonic(KeyEvent.VK_B);
-        menuItemButtonEvents.setAccelerator(
-            KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
+        menuItemButtonEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
         menuSubListeners.add(menuItemButtonEvents);
 
         menuItemMotionEvents = new JCheckBoxMenuItem("Motion Events");
@@ -157,8 +155,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
         menuItemWheelEvents = new JCheckBoxMenuItem("Wheel Events");
         menuItemWheelEvents.addItemListener(this);
         menuItemWheelEvents.setMnemonic(KeyEvent.VK_W);
-        menuItemWheelEvents.setAccelerator(
-            KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
+        menuItemWheelEvents.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
         menuSubListeners.add(menuItemWheelEvents);
 
         setJMenuBar(menuBar);
@@ -264,7 +261,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
      * @see org.jnativehook.keyboard.NativeKeyListener#nativeKeyPressed(org.jnativehook.keyboard.NativeKeyEvent)
      */
     public void nativeKeyPressed(NativeKeyEvent e) {
-           appendDisplay(e.paramString());
+        appendDisplay(e.paramString());
     }
 
     /**

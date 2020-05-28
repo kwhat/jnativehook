@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.kwhat</groupId>
   <artifactId>jnativehook</artifactId>
-  <version>2.2.0</version>
+  <version>2.2-SNAPSHOT</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,11 +32,6 @@
     <maven.compiler.debug>true</maven.compiler.debug>
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
-
-    <jni.os>linux</jni.os>
-    <jni.include.directory>${java.home}/include</jni.include.directory>
-    <jni.library.name>lib${project.name}</jni.library.name>
-    <jni.library.ext>so</jni.library.ext>
 
     <cmake.download>false</cmake.download>
   </properties>
@@ -92,132 +87,6 @@
 
   <profiles>
     <profile>
-      <id>family-darwin</id>
-      <activation>
-        <os>
-          <name>Mac OS X</name>
-          <family>mac</family>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.os>darwin</jni.os>
-        <jni.library.ext>dylib</jni.library.ext>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>family-freebsd</id>
-      <activation>
-        <os>
-          <name>FreeBSD</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.os>freebsd</jni.os>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>family-linux</id>
-      <activation>
-        <os>
-          <name>Linux</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.os>linux</jni.os>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>family-openbsd</id>
-      <activation>
-        <os>
-          <name>OpenBSD</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.os>openbsd</jni.os>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>family-windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.os>windows</jni.os>
-        <jni.library.name>${project.name}</jni.library.name>
-        <jni.library.ext>dll</jni.library.ext>
-      </properties>
-    </profile>
-
-
-    <profile>
-      <id>arch-arm</id>
-      <activation>
-        <os>
-          <arch>arm</arch>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.arch>arm</jni.arch>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>arch-arm64</id>
-      <activation>
-        <os>
-          <arch>arm</arch>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.arch>arm64</jni.arch>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>arch-x86</id>
-      <activation>
-        <os>
-          <arch>x86</arch>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.arch>x86</jni.arch>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>arch-x86_64</id>
-      <activation>
-        <os>
-          <arch>amd64</arch>
-        </os>
-      </activation>
-
-      <properties>
-        <jni.arch>x86_64</jni.arch>
-      </properties>
-    </profile>
-
-
-    <profile>
       <id>platform-darwin</id>
       <activation>
         <os>
@@ -235,11 +104,13 @@
             <configuration>
               <compilerProvider>generic</compilerProvider>
               <compilerExecutable>${env.CC}</compilerExecutable>
-              <javahOS>${jni.os}</javahOS>
 
               <compilerStartOptions combine.children="append">
                 <compilerStartOption>-fPIC</compilerStartOption>
               </compilerStartOptions>
+
+              <linkerFinalName>lib${project.name}</linkerFinalName>
+              <linkerFinalNameExt>dylib</linkerFinalNameExt>
 
               <linkerStartOptions combine.children="append">
                 <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
@@ -277,14 +148,15 @@
             <artifactId>native-maven-plugin</artifactId>
 
             <configuration>
-              <javahOS>${jni.os}</javahOS>
-              
               <compilerProvider>generic</compilerProvider>
               <compilerExecutable>${env.CC}</compilerExecutable>
 
               <compilerStartOptions combine.children="append">
                 <compilerStartOption>-fPIC</compilerStartOption>
               </compilerStartOptions>
+
+              <linkerFinalName>lib${project.name}</linkerFinalName>
+              <linkerFinalNameExt>so</linkerFinalNameExt>
 
               <linkerProvider>generic</linkerProvider>
               <linkerExecutable>${env.CC}</linkerExecutable>
@@ -323,6 +195,11 @@
           <family>windows</family>
         </os>
       </activation>
+
+      <!-- FIXME Remove after cmake plugin hits .17 -->
+      <properties>
+        <cmake.download>true</cmake.download>
+      </properties>
 
       <build>
         <plugins>
@@ -494,6 +371,129 @@
         <artifactId>versions-maven-plugin</artifactId>
         <version>2.7</version>
       </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.1.0</version>
+
+        <executions>
+          <execution>
+            <id>parse-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+
+            <configuration>
+              <propertyPrefix>maven.version</propertyPrefix>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+
+        <executions>
+          <execution>
+            <id>ant-initialize</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+
+            <configuration>
+              <exportAntProperties>true</exportAntProperties>
+              <target>
+                <!-- Set the operating system name used for organizing native libraries -->
+                <condition property="jni.os" value="darwin">
+                  <and>
+                    <os family="mac" />
+                    <os family="unix" />
+                  </and>
+                </condition>
+                <condition property="jni.os" value="freebsd">
+                  <os family="unix" name="FreeBSD" />
+                </condition>
+                <condition property="jni.os" value="linux">
+                  <os family="unix" name="Linux" />
+                </condition>
+                <condition property="jni.os" value="openbsd">
+                  <os family="unix" name="OpenBSD" />
+                </condition>
+                <condition property="jni.os" value="solaris">
+                  <or>
+                    <os family="unix" name="Solaris" />
+                    <os family="unix" name="SunOS" />
+                  </or>
+                </condition>
+                <condition property="jni.os" value="windows">
+                  <or>
+                    <os family="windows" />
+                    <os family="winnt" />
+                  </or>
+                </condition>
+                <fail message="Could not determine jni.os.  Please set this property to your target operating systm.">
+                  <condition>
+                    <not>
+                      <isset property="jni.os" />
+                    </not>
+                  </condition>
+                </fail>
+
+                <!-- Set the system arch name used for organizing native libraries -->
+                <condition property="jni.arch" value="arm">
+                  <or>
+                    <os arch="arm" />
+                    <os arch="aarch32" />
+                  </or>
+                </condition>
+                <condition property="jni.arch" value="arm64">
+                  <or>
+                    <os arch="arm64" />
+                    <os arch="aarch64" />
+                  </or>
+                </condition>
+                <condition property="jni.arch" value="ppc">
+                  <or>
+                    <os arch="ppc" />
+                    <os arch="PowerPC" />
+                  </or>
+                </condition>
+                <condition property="jni.arch" value="ppc64">
+                  <or>
+                    <os arch="ppc64" />
+                    <os arch="PowerPC64" />
+                  </or>
+                </condition>
+                <condition property="jni.arch" value="x86">
+                  <or>
+                    <os arch="x86" />
+                    <os arch="i386" />
+                    <os arch="i486" />
+                    <os arch="i586" />
+                    <os arch="i686" />
+                  </or>
+                </condition>
+                <condition property="jni.arch" value="x86_64">
+                  <or>
+                    <os arch="x86-64" />
+                    <os arch="x86_64" />
+                    <os arch="amd64" />
+                    <os arch="k8" />
+                  </or>
+                </condition>
+                <property name="jni.arch" value="${os.arch}" />
+
+                <echo level="info">JNI OS:          ${jni.os}</echo>
+                <echo level="info">JNI Arch:        ${jni.arch}</echo>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -603,9 +603,8 @@
         <version>1.0-alpha-11</version>
 
         <configuration>
-          <jdkIncludePath>${jni.include.directory}</jdkIncludePath>
-          <linkerFinalName>${jni.library.name}</linkerFinalName>
-          <linkerFinalNameExt>${jni.library.ext}</linkerFinalNameExt>
+          <jdkIncludePath>${java.home}/include</jdkIncludePath>
+          <javahOS>${jni.os}</javahOS>
 
           <compilerStartOptions>
             <compilerStartOption>${env.CFLAGS}</compilerStartOption>
@@ -681,7 +680,7 @@
                 <resource>
                   <directory>${project.build.directory}/generated-sources/lib</directory>
                   <includes>
-                    <include>${jni.library.name}.${jni.library.ext}</include>
+                    <include>*${project.name}.*</include>
                   </includes>
                 </resource>
               </resources>
@@ -752,11 +751,11 @@
                 <name>org/jnativehook</name>
                 <manifestEntries>
                   <Specification-Title>${project.name} Library"</Specification-Title>
-                  <Specification-Version>${project.version.major}.${project.version.minor}</Specification-Version>
+                  <Specification-Version>${maven.version.majorVersion}.${maven.version.minorVersion}</Specification-Version>
                   <Specification-Vendor>Alexander Barker (alex@1stleg.com)</Specification-Vendor>
 
                   <Implementation-Title>${project.groupId}</Implementation-Title>
-                  <Implementation-Version>${project.version}</Implementation-Version>
+                  <Implementation-Version>${maven.version.incrementalVersion}${maven.version.qualifier?}</Implementation-Version>
                   <Implementation-Vendor>${project.build.version}</Implementation-Vendor>
                 </manifestEntries>
               </manifestSection>

@@ -24,7 +24,7 @@ import org.jnativehook.GlobalScreen;
  * The listener interface for receiving native mouse motion events. (For clicks and other mouse
  * events, use the <code>NativeMouseListener</code>.)
  * <p>
- * <p>
+ *
  * The class that is interested in processing a <code>NativeMouseMotionEvent</code> implements this
  * interface, and the object created with that class is registered with the
  * <code>GlobalScreen</code> using the {@link GlobalScreen#addNativeMouseMotionListener} method.
