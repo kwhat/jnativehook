@@ -25,7 +25,7 @@ jobs:
         env:
           CC: clang
           CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
-        run: mvn compile
+        run: mvn --no-transfer-progress compile
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -121,7 +121,7 @@ jobs:
           CC: arm-linux-gnueabihf-gcc
           CFLAGS: '-Os -march=armv7ve -mfpu=vfp -mfloat-abi=hard -flto -fomit-frame-pointer -fno-stack-protector -g -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-        run: mvn compile
+        run: mvn --no-transfer-progress compile
 
 
       - name: Compile i586
@@ -130,7 +130,7 @@ jobs:
           CC: i686-linux-gnu-gcc
           CFLAGS: '-O2 -march=i586 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-        run: mvn compile
+        run: mvn --no-transfer-progress compile
 
       - name: Compile x86_64
         shell: bash
@@ -138,7 +138,7 @@ jobs:
           CC: x86_64-linux-gnu-gcc
           CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-        run: mvn compile
+        run: mvn --no-transfer-progress compile
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -169,8 +169,11 @@ jobs:
 
       - name: Compile arm7ve
         env:
-          CFLAGS: '/O1 /Oy /MACHINE:ARM'
-        run: mvn compile
+          CFLAGS: '/arch:ARMv7VE /O1 /Oy'
+#          LDFLAGS: '/MACHINE:ARM'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: 'ARM'
+        run: mvn --no-transfer-progress compile
 
       - name: Setup i586
         uses: ilammy/msvc-dev-cmd@v1
@@ -179,8 +182,11 @@ jobs:
 
       - name: Compile i586
         env:
-          CFLAGS: '/O2 /Oy /MACHINE:X86'
-        run: mvn compile
+          CFLAGS: '/O2 /Oy'
+#          LDFLAGS: '/MACHINE:x86'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: 'Win32'
+        run: mvn --no-transfer-progress compile
 
       - name: Setup x86_64
         uses: ilammy/msvc-dev-cmd@v1
@@ -189,8 +195,11 @@ jobs:
 
       - name: Compile x86_64
         env:
-          CFLAGS: '/O2 /Oy /MACHINE:X86'
-        run: mvn compile
+          CFLAGS: '/O2 /Oy'
+#          LDFLAGS: '/MACHINE:x64'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: 'x64'
+        run: mvn --no-transfer-progress compile
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -218,7 +227,7 @@ jobs:
       - name: Package
         shell: bash
         run: |
-          mvn package
+          mvn -B --no-transfer-progress deploy
           mvn versions:display-plugin-updates
 
       - name: Upload

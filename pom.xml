@@ -567,8 +567,11 @@
             <configuration>
               <sourcePath>${project.basedir}/src/external/libuiohook</sourcePath>
               <targetPath>${project.build.directory}/libuiohook-build</targetPath>
+<!--              <generator>Visual Studio 16 2019</generator>-->
 
               <options>
+<!--                <option>-A</option>-->
+<!--                <option>Win32</option>-->
                 <option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
                 <option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
                 <option>-DCMAKE_INSTALL_LIBDIR=lib</option>
