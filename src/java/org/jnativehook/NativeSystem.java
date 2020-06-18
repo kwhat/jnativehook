@@ -78,6 +78,9 @@ public class NativeSystem {
 	public enum Arch {
 		/** The arm6j architecture. */
 		ARM,
+		
+		/** The aarch64 architecture. */
+		AARCH64,
 
 		/** The sparc architecture. */
 		SPARC,
@@ -152,6 +155,9 @@ public class NativeSystem {
 
 		if (osArch.equalsIgnoreCase("arm")) {
 			arch = Arch.ARM;
+		}
+	        else if (osArch.equalsIgnoreCase("aarch64")) {
+			arch = Arch.AARCH64;
 		}
 		else if (osArch.equalsIgnoreCase("sparc")) {
 			arch = Arch.SPARC;
