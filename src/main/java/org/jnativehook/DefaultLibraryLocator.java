@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -178,7 +177,7 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
 
                     // Log the file path and checksum.
                     log.info("Library extracted successfully: " + libFile.getPath() + " (0X" + sha1Sum + ").\n");
-                } catch (IOException | NoSuchAlgorithmException e) {
+                } catch (Exception e) {
                     throw new IllegalStateException(e.getMessage(), e);
                 }
             }

@@ -5,8 +5,8 @@ on:
       - maven
 
 jobs:
-  build_apple:
-    runs-on: macos-latest
+  generate_headers:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -20,14 +20,45 @@ jobs:
           java-package: jdk
           architecture: x64
 
+      - name: Generate
+        shell: bash
+        run: |
+          mvn -B --no-transfer-progress compile
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: nightly-build
+          path: ${{github.workspace}}/**/*
+
+  build_apple:
+    needs: generate_headers
+    runs-on: macos-latest
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: nightly-build
+          path: ${{github.workspace}}
+
       - name: Compile x86_64
         shell: bash
         env:
           CC: clang
           CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ \
+            -DCMAKE_VERBOSE_MAKEFILE=ON \
+            -DCMAKE_SYSTEM_NAME=darwin \
+            -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+          cmake --build target/build-jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build-jni/
+
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -36,12 +67,14 @@ jobs:
           path: ${{github.workspace}}/**/*
 
   build_linux:
+    needs: generate_headers
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Download
+        uses: actions/download-artifact@v2
         with:
-          submodules: true
+          name: nightly-build
+          path: ${{github.workspace}}
 
       - name: Setup Build
         shell: bash
@@ -109,13 +142,6 @@ jobs:
             libxkbcommon-x11-dev:armhf \
             libxkbfile-dev:armhf
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-          java-package: jdk
-          architecture: x64
-
       - name: Compile armv7ve
         shell: bash
         env:
@@ -123,9 +149,17 @@ jobs:
           CFLAGS: '-Os -march=armv7ve -mfpu=vfp -mfloat-abi=hard -flto -fomit-frame-pointer -fno-stack-protector -g -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ \
+            -DCMAKE_VERBOSE_MAKEFILE=ON \
+            -DCMAKE_SYSTEM_NAME=linux \
+            -DCMAKE_SYSTEM_PROCESSOR=arm
 
+          cmake --build target/build-jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Compile i586
         shell: bash
@@ -134,8 +168,17 @@ jobs:
           CFLAGS: '-O2 -march=i586 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ \
+            -DCMAKE_VERBOSE_MAKEFILE=ON \
+            -DCMAKE_SYSTEM_NAME=linux \
+            -DCMAKE_SYSTEM_PROCESSOR=x86
+
+          cmake --build target/build-jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Compile x86_64
         shell: bash
@@ -144,8 +187,17 @@ jobs:
           CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
           LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ \
+            -DCMAKE_VERBOSE_MAKEFILE=ON \
+            -DCMAKE_SYSTEM_NAME=linux \
+            -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+          cmake --build target/build-jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -155,19 +207,14 @@ jobs:
 
 
   build_windows:
+    needs: generate_headers
     runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Download
+        uses: actions/download-artifact@v2
         with:
-          submodules: true
-
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-          java-package: jdk
-          architecture: x64
+          name: nightly-build
+          path: ${{github.workspace}}
 
       - name: Setup arm7ve
         uses: ilammy/msvc-dev-cmd@v1
@@ -179,9 +226,19 @@ jobs:
           CFLAGS: '/arch:ARMv7VE /O1 /Oy'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: 'ARM'
+        shell: cmd
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ ^
+            -DCMAKE_VERBOSE_MAKEFILE=ON ^
+            -DCMAKE_SYSTEM_NAME=windows ^
+            -DCMAKE_SYSTEM_PROCESSOR=arm
+
+          cmake --build target/build-jni/ ^
+            --parallel 2 ^
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Setup i586
         uses: ilammy/msvc-dev-cmd@v1
@@ -193,9 +250,19 @@ jobs:
           CFLAGS: '/O2 /Oy'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: 'Win32'
+        shell: cmd
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ ^
+            -DCMAKE_VERBOSE_MAKEFILE=ON ^
+            -DCMAKE_SYSTEM_NAME=windows ^
+            -DCMAKE_SYSTEM_PROCESSOR=x86
+
+          cmake --build target/build-jni/ ^
+            --parallel 2 ^
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Setup x86_64
         uses: ilammy/msvc-dev-cmd@v1
@@ -207,9 +274,19 @@ jobs:
           CFLAGS: '/O2 /Oy'
           CMAKE_GENERATOR: 'Visual Studio 16 2019'
           CMAKE_GENERATOR_PLATFORM: 'x64'
+        shell: cmd
         run: |
-          mvn --no-transfer-progress compile
-          rm -Rf target/
+          mkdir -p target/build-jni/
+          cmake -B target/build-jni/ ^
+            -DCMAKE_VERBOSE_MAKEFILE=ON ^
+            -DCMAKE_SYSTEM_NAME=windows ^
+            -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+          cmake --build target/build-jni/ ^
+            --parallel 2 ^
+            --clean-first
+
+          cmake --install target/build-jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -238,10 +315,9 @@ jobs:
         shell: bash
         run: |
           mvn -B --no-transfer-progress package:package deploy:deploy
-          mvn versions:display-plugin-updates
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: nightly-jars
-          path: ${{github.workspace}}/target/*.jar
+          path: ${{github.workspace}}/**/*

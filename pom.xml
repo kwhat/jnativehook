@@ -33,7 +33,7 @@
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
 
-    <cmake.download>false</cmake.download>
+    <maven.test.skip>true</maven.test.skip>
   </properties>
 
   <name>JNativeHook</name>
@@ -69,10 +69,16 @@
 
   <distributionManagement>
     <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/kwhat/jnativehook</url>
+      <id>ossrh</id>
+      <name>Central Repository OSSRH</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
     </repository>
+
+    <snapshotRepository>
+      <id>ossrh-snapshots</id>
+      <name>Central Repository OSSRH Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <dependencies>
@@ -87,166 +93,10 @@
 
   <profiles>
     <profile>
-      <id>platform-darwin</id>
+      <id>target-jdk5</id>
       <activation>
-        <os>
-          <name>Mac OS X</name>
-          <family>mac</family>
-        </os>
+        <jdk>[1.5,1.7]</jdk>
       </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-
-            <configuration>
-              <compilerProvider>generic</compilerProvider>
-              <compilerExecutable>${env.CC}</compilerExecutable>
-
-              <compilerStartOptions combine.children="append">
-                <compilerStartOption>-fPIC</compilerStartOption>
-              </compilerStartOptions>
-
-              <linkerFinalName>lib${project.name}</linkerFinalName>
-              <linkerFinalNameExt>dylib</linkerFinalNameExt>
-
-              <linkerStartOptions combine.children="append">
-                <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
-                <linkerMiddleOption>-shared</linkerMiddleOption>
-              </linkerStartOptions>
-
-              <linkerMiddleOptions combine.children="override">
-                <linkerMiddleOption>-L${project.build.directory}/generated-sources/lib</linkerMiddleOption>
-                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
-
-                <linkerMiddleOption>-framework ApplicationServices</linkerMiddleOption>
-                <linkerMiddleOption>-framework Carbon</linkerMiddleOption>
-                <linkerMiddleOption>-framework IOKit</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lobjc</linkerMiddleOption>
-              </linkerMiddleOptions>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>platform-unix</id>
-      <activation>
-        <os>
-          <name>!Mac OS X</name>
-          <family>unix</family>
-        </os>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-
-            <configuration>
-              <compilerProvider>generic</compilerProvider>
-              <compilerExecutable>${env.CC}</compilerExecutable>
-
-              <compilerStartOptions combine.children="append">
-                <compilerStartOption>-fPIC</compilerStartOption>
-              </compilerStartOptions>
-
-              <linkerFinalName>lib${project.name}</linkerFinalName>
-              <linkerFinalNameExt>so</linkerFinalNameExt>
-
-              <linkerProvider>generic</linkerProvider>
-              <linkerExecutable>${env.CC}</linkerExecutable>
-
-              <linkerStartOptions combine.children="append">
-                <linkerMiddleOption>-Wl,-z,defs</linkerMiddleOption>
-                <linkerMiddleOption>-std=gnu99</linkerMiddleOption>
-                <linkerMiddleOption>-shared</linkerMiddleOption>
-              </linkerStartOptions>
-
-              <linkerMiddleOptions combine.children="override">
-                <linkerMiddleOption>-L${project.build.directory}/generated-sources/lib</linkerMiddleOption>
-                <linkerMiddleOption>-Bstatic -luiohook</linkerMiddleOption>
-
-                <linkerMiddleOption>-Bdynamic -lX11</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lxkbfile</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lXt</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lXtst</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lXinerama</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lxcb</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lX11-xcb</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lxkbcommon</linkerMiddleOption>
-                <linkerMiddleOption>-Bdynamic -lxkbcommon-x11</linkerMiddleOption>
-              </linkerMiddleOptions>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-
-    <profile>
-      <id>platform-windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-
-       <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-
-            <configuration>
-              <compilerProvider>msvc</compilerProvider>
-              <javahOS>win32</javahOS>
-
-              <compilerStartOptions combine.children="append">
-                <compilerStartOption>/MDd</compilerStartOption>
-                <compilerStartOption>/Zi</compilerStartOption>
-              </compilerStartOptions>
-
-              <compilerEndOptions>
-                <compilerEndOption>/I${project.basedir}\src\main\jni\include</compilerEndOption>
-                <compilerEndOption>/I${project.build.directory}\generated-sources\include</compilerEndOption>
-              </compilerEndOptions>
-
-              <linkerFinalName>${project.name}</linkerFinalName>
-              <linkerFinalNameExt>dll</linkerFinalNameExt>
-
-              <linkerStartOptions combine.children="append">
-                <linkerMiddleOption>/INCREMENTAL:NO</linkerMiddleOption>
-                <linkerMiddleOption>/DLL</linkerMiddleOption>
-              </linkerStartOptions>
-
-              <linkerMiddleOptions combine.children="override">
-                <linkerMiddleOption>/LIBPATH:${project.build.directory}/generated-sources/lib</linkerMiddleOption>
-                <linkerMiddleOption>uiohook.lib</linkerMiddleOption>
-                <linkerMiddleOption>advapi32.lib</linkerMiddleOption>
-                <linkerMiddleOption>user32.lib</linkerMiddleOption>
-              </linkerMiddleOptions>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-
-    <profile>
-      <id>java-jdk5</id>
-      <activation>
-        <jdk>[5,)</jdk>
-      </activation>
-
-      <properties>
-        <maven.compiler.source>5</maven.compiler.source>
-        <maven.compiler.target>5</maven.compiler.target>
-      </properties>
 
       <build>
         <plugins>
@@ -254,47 +104,56 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
 
-            <executions>
-              <execution>
-                <id>java-compile</id>
-                <phase>compile</phase>
-                <!--goals>
-                  <goal>compile</goal>
-                </goals-->
+            <configuration>
+              <source>1.5</source>
+              <target>1.5</target>
 
-                <configuration>
-                  <excludes>
-                    <exclude>module-info.java</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-            </executions>
+              <excludes>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </configuration>
           </plugin>
 
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>native-maven-plugin</artifactId>
+            <version>1.0-alpha-11</version>
 
             <configuration>
+              <javahOutputDirectory>${project.build.directory}/generated-sources/include</javahOutputDirectory>
               <javahClassNames>
                 <javahClassName>org.jnativehook.GlobalScreen</javahClassName>
               </javahClassNames>
             </configuration>
+
+            <executions>
+              <execution>
+                <id>compile-javah</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>javah</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+
+            <configuration>
+              <classifier>jdk5</classifier>
+            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
 
     <profile>
-      <id>java-jdk8</id>
+      <id>target-jdk8</id>
       <activation>
-        <jdk>[8,)</jdk>
+        <jdk>[1.8, 11)</jdk>
       </activation>
-
-      <properties>
-        <maven.compiler.source>5</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-      </properties>
 
       <build>
         <plugins>
@@ -302,61 +161,49 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
 
-            <executions>
-              <execution>
-                <id>java-compile</id>
-                <phase>compile</phase>
-                <!--goals>
-                  <goal>compile</goal>
-                </goals-->
+            <configuration combine.self="append">
+              <source>1.8</source>
+              <target>1.8</target>
 
-                <configuration>
-                  <excludes>
-                    <exclude>module-info.java</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-            </executions>
+              <compilerArgs>
+                <arg>-h</arg>
+                <arg>${project.build.directory}/generated-sources/include</arg>
+              </compilerArgs>
+
+              <excludes>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
 
+
     <profile>
-      <id>java-jdk11</id>
+      <id>target-jdk11</id>
       <activation>
         <jdk>[11,)</jdk>
       </activation>
 
-      <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-      </properties>
-
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
 
-            <executions>
-              <execution>
-                <id>java-compile</id>
-                <phase>compile</phase>
-                <!--goals>
-                  <goal>compile</goal>
-                </goals-->
+            <configuration>
+              <release>11</release>
 
-                <configuration>
-                  <release>11</release>
-                </configuration>
-              </execution>
-            </executions>
+              <compilerArgs>
+                <arg>-h</arg>
+                <arg>${project.build.directory}/generated-sources/include</arg>
+              </compilerArgs>
+            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
-
   </profiles>
 
   <build>
@@ -386,109 +233,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>3.0.0</version>
-
-        <executions>
-          <execution>
-            <id>ant-initialize</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-
-            <configuration>
-              <exportAntProperties>true</exportAntProperties>
-              <target>
-                <!-- Set the operating system name used for organizing native libraries -->
-                <condition property="jni.os" value="darwin">
-                  <and>
-                    <os family="mac" />
-                    <os family="unix" />
-                  </and>
-                </condition>
-                <condition property="jni.os" value="freebsd">
-                  <os family="unix" name="FreeBSD" />
-                </condition>
-                <condition property="jni.os" value="linux">
-                  <os family="unix" name="Linux" />
-                </condition>
-                <condition property="jni.os" value="openbsd">
-                  <os family="unix" name="OpenBSD" />
-                </condition>
-                <condition property="jni.os" value="solaris">
-                  <or>
-                    <os family="unix" name="Solaris" />
-                    <os family="unix" name="SunOS" />
-                  </or>
-                </condition>
-                <condition property="jni.os" value="windows">
-                  <or>
-                    <os family="windows" />
-                    <os family="winnt" />
-                  </or>
-                </condition>
-                <fail message="Could not determine jni.os.  Please set this property to your target operating systm.">
-                  <condition>
-                    <not>
-                      <isset property="jni.os" />
-                    </not>
-                  </condition>
-                </fail>
-
-                <!-- Set the system arch name used for organizing native libraries -->
-                <condition property="jni.arch" value="arm">
-                  <or>
-                    <os arch="arm" />
-                    <os arch="aarch32" />
-                  </or>
-                </condition>
-                <condition property="jni.arch" value="arm64">
-                  <or>
-                    <os arch="arm64" />
-                    <os arch="aarch64" />
-                  </or>
-                </condition>
-                <condition property="jni.arch" value="ppc">
-                  <or>
-                    <os arch="ppc" />
-                    <os arch="PowerPC" />
-                  </or>
-                </condition>
-                <condition property="jni.arch" value="ppc64">
-                  <or>
-                    <os arch="ppc64" />
-                    <os arch="PowerPC64" />
-                  </or>
-                </condition>
-                <condition property="jni.arch" value="x86">
-                  <or>
-                    <os arch="x86" />
-                    <os arch="i386" />
-                    <os arch="i486" />
-                    <os arch="i586" />
-                    <os arch="i686" />
-                  </or>
-                </condition>
-                <condition property="jni.arch" value="x86_64">
-                  <or>
-                    <os arch="x86-64" />
-                    <os arch="x86_64" />
-                    <os arch="amd64" />
-                    <os arch="k8" />
-                  </or>
-                </condition>
-                <property name="jni.arch" value="${os.arch}" />
-
-                <echo level="info">JNI OS:          ${jni.os}</echo>
-                <echo level="info">JNI Arch:        ${jni.arch}</echo>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -526,138 +270,28 @@
         </executions>
       </plugin>
 
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
 
-        <configuration>
-          <verbose>true</verbose>
-          <fork>true</fork>
-
-          <compileSourceRoots>
-            <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
-          </compileSourceRoots>
-
-          <compilerArgs>
-            <arg>-h</arg>
-            <arg>${project.build.directory}/generated-sources/include</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-
-
-      <plugin>
-        <groupId>com.googlecode.cmake-maven-project</groupId>
-        <artifactId>cmake-maven-plugin</artifactId>
-        <version>3.17.3-b1</version>
-
         <executions>
           <execution>
-            <id>cmake-generate</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-
-            <configuration>
-              <sourcePath>${project.basedir}/src/external/libuiohook</sourcePath>
-              <targetPath>${project.build.directory}/libuiohook-build</targetPath>
-              <!-- Required for Windows
-              <generator>Visual Studio 16 2019</generator>
-              -->
-
-              <options>
-                <!-- Required for Windows
-                <option>-A</option>
-                <option>Win32</option>
-                -->
-                
-                <option>-DCMAKE_VERBOSE_MAKEFILE=true</option>
-                <option>-DCMAKE_INSTALL_PREFIX=${project.build.directory}/generated-sources</option>
-                <option>-DCMAKE_INSTALL_LIBDIR=lib</option>
-
-                <option>-DENABLE_STATIC=ON</option>
-                <option>-DENABLE_SHARED=OFF</option>
-              </options>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>cmake-compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-
-            <configuration>
-              <projectDirectory>${project.build.directory}/libuiohook-build</projectDirectory>
-
-              <options>
-                <option>--target</option>
-                <option>install</option>
-              </options>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>native-maven-plugin</artifactId>
-        <version>1.0-alpha-11</version>
-
-        <configuration>
-          <jdkIncludePath>${java.home}/include</jdkIncludePath>
-          <javahOS>${jni.os}</javahOS>
-
-          <compilerStartOptions>
-            <compilerStartOption>${env.CFLAGS}</compilerStartOption>
-          </compilerStartOptions>
-
-          <linkerOutputDirectory>${project.build.directory}/generated-sources/lib</linkerOutputDirectory>
-          <attach>false</attach>
-
-          <linkerStartOptions>
-            <linkerStartOption>${env.LDFLAGS}</linkerStartOption>
-          </linkerStartOptions>
-
-          <sources>
-            <source>
-              <directory>${project.basedir}/src/main/jni</directory>
-              <fileNames>
-                <fileName>jni_Converter.c</fileName>
-                <fileName>jni_Errors.c</fileName>
-                <fileName>jni_EventDispatcher.c</fileName>
-                <fileName>jni_Globals.c</fileName>
-                <fileName>jni_Load.c</fileName>
-                <fileName>jni_Logger.c</fileName>
-                <fileName>org_jnativehook_GlobalScreen.c</fileName>
-              </fileNames>
-            </source>
-
-            <source>
-              <directory>${project.basedir}/src/main/jni/include</directory>
-            </source>
-
-            <source>
-              <directory>${project.build.directory}/generated-sources/include</directory>
-            </source>
-          </sources>
-        </configuration>
-
-        <executions>
-          <execution>
-            <id>jni-compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-
-          <execution>
-            <id>jni-link</id>
+            <id>compile-java</id>
             <phase>compile</phase>
             <goals>
-              <goal>link</goal>
+              <goal>compile</goal>
             </goals>
+
+            <configuration>
+              <verbose>true</verbose>
+              <fork>true</fork>
+
+              <compileSourceRoots>
+                <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
+              </compileSourceRoots>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -669,27 +303,6 @@
         <version>3.1.0</version>
 
         <executions>
-          <execution>
-            <id>jni-resources</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-
-            <configuration>
-              <outputDirectory>${project.basedir}/src/main/resources/org/${project.artifactId}/lib/${jni.os}/${jni.arch}</outputDirectory>
-
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/generated-sources/lib</directory>
-                  <includes>
-                    <include>*${project.name}.*</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-
           <execution>
             <id>package-resources</id>
             <phase>prepare-package</phase>
@@ -719,6 +332,12 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.2.0</version>
+
+        <configuration>
+          <sourceFileExcludes>
+            <sourceFileExclude>**/module-info.java</sourceFileExclude>
+          </sourceFileExcludes>
+        </configuration>
         
         <executions>
           <execution>
