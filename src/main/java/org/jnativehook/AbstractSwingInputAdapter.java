@@ -27,7 +27,7 @@ import java.awt.event.KeyEvent;
  * @since 2.1
  */
 public abstract class AbstractSwingInputAdapter extends Component {
-
+    @SuppressWarnings("deprecation")
     protected int getJavaModifiers(int nativeModifiers) {
         int modifiers = 0x00;
         if ((nativeModifiers & NativeInputEvent.SHIFT_MASK) != 0) {

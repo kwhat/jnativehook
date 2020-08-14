@@ -165,11 +165,6 @@
               <source>1.8</source>
               <target>1.8</target>
 
-              <compilerArgs>
-                <arg>-h</arg>
-                <arg>${project.build.directory}/generated-sources/include</arg>
-              </compilerArgs>
-
               <excludes>
                 <exclude>module-info.java</exclude>
               </excludes>
@@ -194,11 +189,6 @@
 
             <configuration>
               <release>11</release>
-
-              <compilerArgs>
-                <arg>-h</arg>
-                <arg>${project.build.directory}/generated-sources/include</arg>
-              </compilerArgs>
             </configuration>
           </plugin>
         </plugins>
@@ -291,11 +281,15 @@
               <compileSourceRoots>
                 <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
               </compileSourceRoots>
+
+              <compilerArgs>
+                <arg>-h</arg>
+                <arg>${project.build.directory}/generated-sources/include</arg>
+              </compilerArgs>
             </configuration>
           </execution>
         </executions>
       </plugin>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -19,12 +19,13 @@ cmake_minimum_required(VERSION 3.10)
 
 project(JNativeHook VERSION 2.2.0 LANGUAGES C)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "")
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "")
+    string(TOLOWER ${CMAKE_SYSTEM_NAME} TARGET_OS)
+    set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/src/main/resources/org/jnativehook/lib/${TARGET_OS}" CACHE PATH "Internal var" FORCE)
+else()
     message(FATAL_ERROR "Could not determine target system.  Please set CMAKE_SYSTEM_NAME to the desired resource folder.")
 endif()
 
-string(TOLOWER ${CMAKE_SYSTEM_NAME} TARGET_OS)
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/src/main/resources/org/jnativehook/lib/${TARGET_OS}" CACHE PATH "Internal var" FORCE)
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL amd64)
     set(CMAKE_INSTALL_LIBDIR "x86_64" CACHE PATH "Internal var" FORCE)
@@ -45,14 +46,6 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc" OR CMAKE_SYSTEM_PROCESSOR MATCHES "
 else()
     message(FATAL_ERROR "Could not determine target architecture.  Please set CMAKE_SYSTEM_PROCESSOR to the desired resource folder.")
 endif()
-
-
-set(UIOHOOK_ENABLE_DEMO OFF CACHE INTERNAL "Internal var")
-set(UIOHOOK_ENABLE_TEST OFF CACHE INTERNAL "Internal var")
-set(UIOHOOK_ENABLE_SHARED OFF CACHE INTERNAL "Internal var")
-set(UIOHOOK_ENABLE_STATIC OFF CACHE INTERNAL "Internal var")
-
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/external/libuiohook)
 
 
 find_package(JNI)
@@ -79,7 +72,6 @@ target_include_directories(jnativehook
         $<BUILD_INTERFACE:${JNI_INCLUDE_DIRS}>
 
     PRIVATE
-        $<TARGET_PROPERTY:uiohook,INTERFACE_INCLUDE_DIRECTORIES>
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni/include
         ${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/include
@@ -88,11 +80,20 @@ target_include_directories(jnativehook
 add_library(jnativehook_shared SHARED $<TARGET_OBJECTS:jnativehook>)
 set_target_properties(jnativehook_shared PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 install(TARGETS jnativehook_shared DESTINATION ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(jnativehook_shared uiohook)
+
+#if (UNIX)
+#    find_package(PkgConfig REQUIRED)
+#    pkg_check_modules(UIOHOOK REQUIRED IMPORTED_TARGET uiohook)
+#    target_link_libraries(jnativehook_shared PkgConfig::UIOHOOK)
+#else()
+    find_library(UIOHOOK_LIBRARY NAMES uiohook libuiohook REQUIRED)
+    target_link_libraries(jnativehook ${UIOHOOK_LIBRARY})
+#endif()
+
 
 if (UNIX)
     find_package(Threads REQUIRED)
-    target_link_libraries(jnativehook "${CMAKE_THREAD_LIBS_INIT}")
+    target_link_libraries(jnativehook_shared "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
 set_target_properties(jnativehook PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
