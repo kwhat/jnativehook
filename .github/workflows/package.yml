@@ -2,7 +2,7 @@ name: Nightly Build
 on:
   push:
     branches:
-      - maven
+      - 2.2
 
 jobs:
   generate-headers:
