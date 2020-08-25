@@ -50,30 +50,34 @@ jobs:
           LDFLAGS: '-Wl,-dead_strip_dylibs'
         shell: bash
         run: |
-          mkdir -p target/build/libuiohook/
-          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+          mkdir -p target/build/uiohook/
+          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
             -G "Unix Makefiles" \
-            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-            -D CMAKE_VERBOSE_MAKEFILE=true \
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/libuiohook/ \
+          cmake --build target/build/uiohook/ \
             --parallel 2 \
+            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/libuiohook/
+          cmake --install target/build/uiohook/ \
+            --config RelWithDebInfo
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
-            -DCMAKE_PREFIX_PATH=target/generated-sources/ \
-            -DCMAKE_VERBOSE_MAKEFILE=ON
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
+            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/
+          cmake --install target/build/jni/ \
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -132,30 +136,34 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/arm-linux-gnueabihf/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/libuiohook/
-          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+          mkdir -p target/build/uiohook/
+          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
             -G "Unix Makefiles" \
-            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-            -D CMAKE_VERBOSE_MAKEFILE=true \
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/libuiohook/ \
+          cmake --build target/build/uiohook/ \
             --parallel 2 \
+            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/libuiohook/
+          cmake --install target/build/uiohook/ \
+            --config RelWithDebInfo
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
-            -DCMAKE_PREFIX_PATH=target/generated-sources/ \
-            -DCMAKE_VERBOSE_MAKEFILE=ON
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
+            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/
+          cmake --install target/build/jni/ \
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -209,30 +217,34 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/i386-linux-gnu/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/libuiohook/
-          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+          mkdir -p target/build/uiohook/
+          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
             -G "Unix Makefiles" \
-            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-            -D CMAKE_VERBOSE_MAKEFILE=true \
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/libuiohook/ \
+          cmake --build target/build/uiohook/ \
             --parallel 2 \
+            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/libuiohook/
+          cmake --install target/build/uiohook/ \
+            --config RelWithDebInfo
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
-            -DCMAKE_PREFIX_PATH=target/generated-sources/ \
-            -DCMAKE_VERBOSE_MAKEFILE=ON
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
+            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/
+          cmake --install target/build/jni/ \
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -272,30 +284,34 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/x86_64-linux-gnu/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/libuiohook/
-          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+          mkdir -p target/build/uiohook/
+          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
             -G "Unix Makefiles" \
             -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-            -D CMAKE_VERBOSE_MAKEFILE=true \
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/libuiohook/ \
+          cmake --build target/build/uiohook/ \
             --parallel 2 \
+            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/libuiohook/
+          cmake --install target/build/uiohook/ \
+            --config RelWithDebInfo
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
-            -DCMAKE_PREFIX_PATH=target/generated-sources/ \
-            -DCMAKE_VERBOSE_MAKEFILE=ON
+            -D CMAKE_PREFIX_PATH=target/generated-sources/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
+            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/jni/
+          cmake --install target/build/jni/ \
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -323,33 +339,36 @@ jobs:
       - name: Compile
         shell: cmd
         run: |
-          md target\build\libuiohook\
-          cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
+          md target\build\uiohook\
+          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
             -G "Visual Studio 16 2019" -A ARM ^
-            -D CMAKE_INSTALL_PREFIX=target\generated-sources\ ^
-            -D CMAKE_VERBOSE_MAKEFILE=OFF ^
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target\ ^
+            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target\build\libuiohook\ ^
+          cmake --build target\build\uiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install target\build\libuiohook\ --config RelWithDebInfo
+          cmake --install target\build\uiohook\ ^
+            --config RelWithDebInfo
 
           md target\build\jni\
           cmake -B target\build\jni\ ^
             -G "Visual Studio 16 2019" -A ARM ^
-            -D CMAKE_PREFIX_PATH=target\generated-sources\ ^
+            -D CMAKE_PREFIX_PATH=target\ ^
             -D CMAKE_SYSTEM_NAME=windows ^
             -D CMAKE_SYSTEM_PROCESSOR=arm ^
-            -D CMAKE_VERBOSE_MAKEFILE=OFF
+            -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target\build\jni\ ^
             --parallel 2 ^
+            --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install target\build\jni\
+          cmake --install target\build\jni\ ^
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -376,18 +395,36 @@ jobs:
       - name: Compile
         shell: cmd
         run: |
-          cmake -B ${{github.workspace}}\build ^
+          md target\build\uiohook\
+          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
             -G "Visual Studio 16 2019" -A Win32 ^
-            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}\dist\windows\x86 ^
-            -D CMAKE_VERBOSE_MAKEFILE=true ^
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target\ ^
+            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build ${{github.workspace}}\build ^
+          cmake --build target\build\uiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install ${{github.workspace}}\build --config RelWithDebInfo
+          cmake --install target\build\uiohook\ ^
+            --config RelWithDebInfo
+
+          md target\build\jni\
+          cmake -B target\build\jni\ ^
+            -G "Visual Studio 16 2019" -A Win32 ^
+            -D CMAKE_PREFIX_PATH=target\ ^
+            -D CMAKE_SYSTEM_NAME=windows ^
+            -D CMAKE_SYSTEM_PROCESSOR=x86 ^
+            -D CMAKE_VERBOSE_MAKEFILE=ON
+
+          cmake --build target\build\jni\ ^
+            --parallel 2 ^
+            --config RelWithDebInfo ^
+            --clean-first
+
+          cmake --install target\build\jni\ ^
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -414,18 +451,36 @@ jobs:
       - name: Compile
         shell: cmd
         run: |
-          cmake -B ${{github.workspace}}\build ^
+          md target\build\uiohook\
+          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
             -G "Visual Studio 16 2019" -A x64 ^
-            -D CMAKE_INSTALL_PREFIX=${{github.workspace}}\dist\windows\x86_64 ^
-            -D CMAKE_VERBOSE_MAKEFILE=true ^
-            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+            -D CMAKE_INSTALL_PREFIX=target\ ^
+            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+            -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build ${{github.workspace}}\build ^
+          cmake --build target\build\uiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install ${{github.workspace}}\build --config RelWithDebInfo
+          cmake --install target\build\uiohook\ ^
+            --config RelWithDebInfo
+
+          md target\build\jni\
+          cmake -B target\build\jni\ ^
+            -G "Visual Studio 16 2019" -A x64 ^
+            -D CMAKE_PREFIX_PATH=target\ ^
+            -D CMAKE_SYSTEM_NAME=windows ^
+            -D CMAKE_SYSTEM_PROCESSOR=x86_64 ^
+            -D CMAKE_VERBOSE_MAKEFILE=ON
+
+          cmake --build target\build\jni\ ^
+            --parallel 2 ^
+            --config RelWithDebInfo ^
+            --clean-first
+
+          cmake --install target\build\jni\ ^
+            --config RelWithDebInfo
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -453,9 +508,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-apple-x86_64/
 #          cmake -B target/build-apple-x86_64/ \
-#            -DCMAKE_VERBOSE_MAKEFILE=ON \
-#            -DCMAKE_SYSTEM_NAME=darwin \
-#            -DCMAKE_SYSTEM_PROCESSOR=x86_64
+#            -D CMAKE_VERBOSE_MAKEFILE=ON \
+#            -D CMAKE_SYSTEM_NAME=darwin \
+#            -D CMAKE_SYSTEM_PROCESSOR=x86_64
 #
 #          cmake --build target/build-apple-x86_64/ \
 #            --parallel 2 \
@@ -555,9 +610,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-jni/
 #          cmake -B target/build-jni/ \
-#            -DCMAKE_VERBOSE_MAKEFILE=ON \
-#            -DCMAKE_SYSTEM_NAME=linux \
-#            -DCMAKE_SYSTEM_PROCESSOR=arm
+#            -D CMAKE_VERBOSE_MAKEFILE=ON \
+#            -D CMAKE_SYSTEM_NAME=linux \
+#            -D CMAKE_SYSTEM_PROCESSOR=arm
 #
 #          cmake --build target/build-jni/ \
 #            --parallel 2 \
@@ -574,9 +629,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-jni/
 #          cmake -B target/build-jni/ \
-#            -DCMAKE_VERBOSE_MAKEFILE=ON \
-#            -DCMAKE_SYSTEM_NAME=linux \
-#            -DCMAKE_SYSTEM_PROCESSOR=x86
+#            -D CMAKE_VERBOSE_MAKEFILE=ON \
+#            -D CMAKE_SYSTEM_NAME=linux \
+#            -D CMAKE_SYSTEM_PROCESSOR=x86
 #
 #          cmake --build target/build-jni/ \
 #            --parallel 2 \
@@ -591,25 +646,25 @@ jobs:
 #          CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
 #          LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
 #        run: |
-#          mkdir -p target/build/libuiohook/
-#          cmake -B target/build/libuiohook/ -S src/external/libuiohook \
+#          mkdir -p target/build/uiohook/
+#          cmake -B target/build/uiohook/ -S src/external/uiohook \
 #            -G "Unix Makefiles" \
 #            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=true \
-#            -D ENABLE_DEMO=OFF -D ENABLE_STATIC=ON -D ENABLE_SHARED=OFF
+#            -D CMAKE_VERBOSE_MAKEFILE=ON \
+#            -D BUILD_SHARED_LIBS=OFF
 #
-#          cmake --build target/build/libuiohook/ \
+#          cmake --build target/build/uiohook/ \
 #            --parallel 2 \
 #            --clean-first
 #
-#          cmake --install target/build/libuiohook/
+#          cmake --install target/build/uiohook/
 #
 #
 #          mkdir -p target/build/jni/
 #          cmake -B target/build/jni/ \
 #            -G "Unix Makefiles" \
-#            -DCMAKE_PREFIX_PATH=target/generated-sources/ \
-#            -DCMAKE_VERBOSE_MAKEFILE=ON
+#            -D CMAKE_PREFIX_PATH=target/generated-sources/ \
+#            -D CMAKE_VERBOSE_MAKEFILE=ON
 #
 #          cmake --build target/build/jni/ \
 #            --parallel 2 \
@@ -648,9 +703,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-jni/
 #          cmake -B target/build-jni/ ^
-#            -DCMAKE_VERBOSE_MAKEFILE=ON ^
-#            -DCMAKE_SYSTEM_NAME=windows ^
-#            -DCMAKE_SYSTEM_PROCESSOR=arm
+#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+#            -D CMAKE_SYSTEM_NAME=windows ^
+#            -D CMAKE_SYSTEM_PROCESSOR=arm
 #
 #          cmake --build target/build-jni/ ^
 #            --parallel 2 ^
@@ -672,9 +727,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-jni/
 #          cmake -B target/build-jni/ ^
-#            -DCMAKE_VERBOSE_MAKEFILE=ON ^
-#            -DCMAKE_SYSTEM_NAME=windows ^
-#            -DCMAKE_SYSTEM_PROCESSOR=x86
+#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+#            -D CMAKE_SYSTEM_NAME=windows ^
+#            -D CMAKE_SYSTEM_PROCESSOR=x86
 #
 #          cmake --build target/build-jni/ ^
 #            --parallel 2 ^
@@ -696,9 +751,9 @@ jobs:
 #        run: |
 #          mkdir -p target/build-jni/
 #          cmake -B target/build-jni/ ^
-#            -DCMAKE_VERBOSE_MAKEFILE=ON ^
-#            -DCMAKE_SYSTEM_NAME=windows ^
-#            -DCMAKE_SYSTEM_PROCESSOR=x86_64
+#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
+#            -D CMAKE_SYSTEM_NAME=windows ^
+#            -D CMAKE_SYSTEM_PROCESSOR=x86_64
 #
 #          cmake --build target/build-jni/ ^
 #            --parallel 2 ^

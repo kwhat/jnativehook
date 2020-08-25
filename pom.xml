@@ -120,7 +120,7 @@
             <version>1.0-alpha-11</version>
 
             <configuration>
-              <javahOutputDirectory>${project.build.directory}/generated-sources/include</javahOutputDirectory>
+              <javahOutputDirectory>${project.build.directory}/include</javahOutputDirectory>
               <javahClassNames>
                 <javahClassName>org.jnativehook.GlobalScreen</javahClassName>
               </javahClassNames>
@@ -284,7 +284,7 @@
 
               <compilerArgs>
                 <arg>-h</arg>
-                <arg>${project.build.directory}/generated-sources/include</arg>
+                <arg>${project.build.directory}/include</arg>
               </compilerArgs>
             </configuration>
           </execution>

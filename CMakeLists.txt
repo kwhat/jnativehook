@@ -49,11 +49,11 @@ endif()
 
 
 find_package(JNI)
-if (NOT JNI_FOUND)
+if(NOT JNI_FOUND)
     message(FATAL_ERROR "Could not determine Java include path.  Please set your JAVA_HOME environment variable to the location of the desired JDK.")
 endif()
 
-add_library(jnativehook OBJECT
+add_library(jnativehook SHARED
     "./src/main/jni/jni_Converter.c"
     "./src/main/jni/jni_Errors.c"
     "./src/main/jni/jni_EventDispatcher.c"
@@ -63,9 +63,14 @@ add_library(jnativehook OBJECT
     "./src/main/jni/org_jnativehook_GlobalScreen.c"
 )
 
-set_property(TARGET jnativehook PROPERTY POSITION_INDEPENDENT_CODE 1)
-set_property(TARGET jnativehook PROPERTY C_STANDARD 99)
-set_property(TARGET jnativehook PROPERTY C_STANDARD_REQUIRED ON)
+set_target_properties(jnativehook PROPERTIES
+    PROPERTY C_STANDARD 99
+    PROPERTY C_STANDARD_REQUIRED ON
+    OUTPUT_NAME ${CMAKE_PROJECT_NAME}
+)
+
+find_package(uiohook REQUIRED)
+target_link_libraries(jnativehook uiohook)
 
 target_include_directories(jnativehook
     PUBLIC
@@ -74,26 +79,11 @@ target_include_directories(jnativehook
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/include
 )
 
-add_library(jnativehook_shared SHARED $<TARGET_OBJECTS:jnativehook>)
-set_target_properties(jnativehook_shared PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
-install(TARGETS jnativehook_shared DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-#if (UNIX)
-#    find_package(PkgConfig REQUIRED)
-#    pkg_check_modules(UIOHOOK REQUIRED IMPORTED_TARGET uiohook)
-#    target_link_libraries(jnativehook_shared PkgConfig::UIOHOOK)
-#else()
-    find_library(UIOHOOK_LIBRARY NAMES uiohook libuiohook REQUIRED)
-    target_link_libraries(jnativehook ${UIOHOOK_LIBRARY})
-#endif()
-
-
-if (UNIX)
+if(UNIX)
     find_package(Threads REQUIRED)
-    target_link_libraries(jnativehook_shared "${CMAKE_THREAD_LIBS_INIT}")
+    target_link_libraries(jnativehook "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
-set_target_properties(jnativehook PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+install(TARGETS jnativehook DESTINATION ${CMAKE_INSTALL_LIBDIR})
