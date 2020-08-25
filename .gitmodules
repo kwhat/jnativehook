@@ -2,6 +2,6 @@
 	path = wiki
 	url = git@github.com:kwhat/jnativehook.wiki.git
 [submodule "libuiohook"]
-	path = src/external/libuiohook
+	path = src/external/uiohook
 	url = git@github.com:kwhat/libuiohook.git
 	branch = 1.2

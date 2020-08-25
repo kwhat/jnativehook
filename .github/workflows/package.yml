@@ -29,7 +29,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
 
   apple-x86_64:
@@ -59,11 +62,9 @@ jobs:
 
           cmake --build target/build/uiohook/ \
             --parallel 2 \
-            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/uiohook/ \
-            --config RelWithDebInfo
+          cmake --install target/build/uiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
@@ -73,17 +74,18 @@ jobs:
 
           cmake --build target/build/jni/ \
             --parallel 2 \
-            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/ \
-            --config RelWithDebInfo
+          cmake --install target/build/jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/src/main/resources/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
 
   linux-arm:
@@ -145,31 +147,32 @@ jobs:
 
           cmake --build target/build/uiohook/ \
             --parallel 2 \
-            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/uiohook/ \
-            --config RelWithDebInfo
+          cmake --install target/build/uiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
             -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=linux \
+            -D CMAKE_SYSTEM_PROCESSOR=arm \
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
-            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/ \
-            --config RelWithDebInfo
+          cmake --install target/build/jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/src/main/resources/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
   linux-x86:
     needs: generate-headers
@@ -226,31 +229,32 @@ jobs:
 
           cmake --build target/build/uiohook/ \
             --parallel 2 \
-            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/uiohook/ \
-            --config RelWithDebInfo
+          cmake --install target/build/uiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
             -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=linux \
+            -D CMAKE_SYSTEM_PROCESSOR=x86 \
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
-            --config RelWithDebInfo
             --clean-first
 
-          cmake --install target/build/jni/ \
-            --config RelWithDebInfo
+          cmake --install target/build/jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/src/main/resources/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
   linux-x86_64:
     needs: generate-headers
@@ -287,37 +291,38 @@ jobs:
           mkdir -p target/build/uiohook/
           cmake -B target/build/uiohook/ -S src/external/uiohook/ \
             -G "Unix Makefiles" \
-            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
+            -D CMAKE_INSTALL_PREFIX=target/ \
             -D CMAKE_VERBOSE_MAKEFILE=ON \
             -D BUILD_SHARED_LIBS=OFF
 
           cmake --build target/build/uiohook/ \
             --parallel 2 \
-            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/uiohook/ \
-            --config RelWithDebInfo
+          cmake --install target/build/uiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
-            -D CMAKE_PREFIX_PATH=target/generated-sources/ \
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=linux \
+            -D CMAKE_SYSTEM_PROCESSOR=x86_64 \
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
             --parallel 2 \
-            --config RelWithDebInfo \
             --clean-first
 
-          cmake --install target/build/jni/ \
-            --config RelWithDebInfo
+          cmake --install target/build/jni/
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/src/main/resources/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
 
   windows-arm:
@@ -337,6 +342,8 @@ jobs:
           arch: amd64_arm
 
       - name: Compile
+        env:
+          CFLAGS: '/arch:ARMv7VE /O1 /Oy'
         shell: cmd
         run: |
           md target\build\uiohook\
@@ -374,7 +381,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/src/main/resources/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
   windows-x86:
     needs: generate-headers
@@ -430,7 +440,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/dist/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
   windows-x86_64:
     needs: generate-headers
@@ -486,313 +499,52 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: nightly-build
-          path: ${{github.workspace}}/dist/**/*
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
 
+  package:
+    needs: [
+      apple-x86_64,
+      linux-arm,
+      linux-x86,
+      linux-x86_64,
+      windows-arm,
+      windows-x86,
+      windows-x86_64
+    ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: nightly-build
+          path: ${{github.workspace}}
 
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          java-package: jdk
+          architecture: x64
+          server-id: ossrh-snapshots
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
-#  build-apple-x86_64:
-#    needs: generate-headers
-#    runs-on: macos-latest
-#    steps:
-#      - name: Download
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}
-#
-#      - name: Compile x86_64
-#        shell: bash
-#        env:
-#          CC: clang
-#          CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
-#        run: |
-#          mkdir -p target/build-apple-x86_64/
-#          cmake -B target/build-apple-x86_64/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=ON \
-#            -D CMAKE_SYSTEM_NAME=darwin \
-#            -D CMAKE_SYSTEM_PROCESSOR=x86_64
-#
-#          cmake --build target/build-apple-x86_64/ \
-#            --parallel 2 \
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-#
-#
-#      - name: Upload
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}/**/*
-#
-#  build-linux:
-#    needs: generate-headers
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}
-#
-#      - name: Setup
-#        shell: bash
-#        run: |
-#          sudo bash -c 'source /etc/lsb-release && echo "
-#          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME} main universe
-#          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-updates main universe
-#          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-backports main universe
-#
-#          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME} main universe
-#          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-updates main universe
-#          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-backports main universe
-#          " > /etc/apt/sources.list'
-#
-#          sudo rm -Rf /etc/apt/sources.list.d
-#
-#          sudo dpkg --add-architecture i386
-#          sudo dpkg --add-architecture armhf
-#
-#          sudo apt-get update -m
-#
-#          sudo apt-get install cmake
-#
-#          #sudo apt-get install \
-#            #binutils-x86-64-linux-gnu:amd64  \
-#            #gcc-x86-64-linux-gnu:amd64
-#
-#          sudo apt-get install \
-#            libx11-dev:amd64 \
-#            libxtst-dev:amd64 \
-#            libxt-dev:amd64 \
-#            libxinerama-dev:amd64 \
-#            libx11-xcb-dev:amd64 \
-#            libxkbcommon-dev:amd64 \
-#            libxkbcommon-x11-dev:amd64 \
-#            libxkbfile-dev:amd64
-#
-#
-#          sudo apt-get install \
-#            binutils-i686-linux-gnu \
-#            gcc-i686-linux-gnu
-#
-#          sudo apt-get install \
-#            libx11-dev:i386 \
-#            libxtst-dev:i386 \
-#            libxt-dev:i386 \
-#            libxinerama-dev:i386 \
-#            libx11-xcb-dev:i386 \
-#            libxkbcommon-dev:i386 \
-#            libxkbcommon-x11-dev:i386 \
-#            libxkbfile-dev:i386
-#
-#
-#          sudo apt-get install \
-#            binutils-arm-linux-gnueabihf \
-#            gcc-arm-linux-gnueabihf
-#
-#          sudo apt-get install \
-#            libx11-dev:armhf \
-#            libxtst-dev:armhf \
-#            libxt-dev:armhf \
-#            libxinerama-dev:armhf \
-#            libx11-xcb-dev:armhf \
-#            libxkbcommon-dev:armhf \
-#            libxkbcommon-x11-dev:armhf \
-#            libxkbfile-dev:armhf
+      - name: Package
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        shell: bash
+        run: |
+          mvn -B --no-transfer-progress deploy
 
-#      - name: Compile armv7ve
-#        shell: bash
-#        env:
-#          CC: arm-linux-gnueabihf-gcc
-#          CFLAGS: '-Os -march=armv7ve -mfpu=vfp -mfloat-abi=hard -flto -fomit-frame-pointer -fno-stack-protector -g -pipe'
-#          LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-#        run: |
-#          mkdir -p target/build-jni/
-#          cmake -B target/build-jni/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=ON \
-#            -D CMAKE_SYSTEM_NAME=linux \
-#            -D CMAKE_SYSTEM_PROCESSOR=arm
-#
-#          cmake --build target/build-jni/ \
-#            --parallel 2 \
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-#
-#      - name: Compile i586
-#        shell: bash
-#        env:
-#          CC: i686-linux-gnu-gcc
-#          CFLAGS: '-O2 -march=i586 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
-#          LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-#        run: |
-#          mkdir -p target/build-jni/
-#          cmake -B target/build-jni/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=ON \
-#            -D CMAKE_SYSTEM_NAME=linux \
-#            -D CMAKE_SYSTEM_PROCESSOR=x86
-#
-#          cmake --build target/build-jni/ \
-#            --parallel 2 \
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-
-#      - name: Compile x86_64
-#        shell: bash
-#        env:
-#          CC: x86_64-linux-gnu-gcc
-#          CFLAGS: '-O2 -march=x86-64 -mtune=generic -fomit-frame-pointer -flto -fno-stack-protector -pipe'
-#          LDFLAGS: '-Wl,-O1 -Wl,--as-needed'
-#        run: |
-#          mkdir -p target/build/uiohook/
-#          cmake -B target/build/uiohook/ -S src/external/uiohook \
-#            -G "Unix Makefiles" \
-#            -D CMAKE_INSTALL_PREFIX=target/generated-sources/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=ON \
-#            -D BUILD_SHARED_LIBS=OFF
-#
-#          cmake --build target/build/uiohook/ \
-#            --parallel 2 \
-#            --clean-first
-#
-#          cmake --install target/build/uiohook/
-#
-#
-#          mkdir -p target/build/jni/
-#          cmake -B target/build/jni/ \
-#            -G "Unix Makefiles" \
-#            -D CMAKE_PREFIX_PATH=target/generated-sources/ \
-#            -D CMAKE_VERBOSE_MAKEFILE=ON
-#
-#          cmake --build target/build/jni/ \
-#            --parallel 2 \
-#            --clean-first
-#
-#          cmake --install target/build/jni/
-#
-#      - name: Upload
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}/**/*
-
-#
-#  build_windows:
-#    needs: generate_headers
-#    runs-on: windows-latest
-#    steps:
-#      - name: Download
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}
-#
-#      - name: Setup arm7ve
-#        uses: ilammy/msvc-dev-cmd@v1
-#        with:
-#          arch: amd64_arm
-#
-#      - name: Compile arm7ve
-#        env:
-#          CFLAGS: '/arch:ARMv7VE /O1 /Oy'
-#          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-#          CMAKE_GENERATOR_PLATFORM: 'ARM'
-#        shell: cmd
-#        run: |
-#          mkdir -p target/build-jni/
-#          cmake -B target/build-jni/ ^
-#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
-#            -D CMAKE_SYSTEM_NAME=windows ^
-#            -D CMAKE_SYSTEM_PROCESSOR=arm
-#
-#          cmake --build target/build-jni/ ^
-#            --parallel 2 ^
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-#
-#      - name: Setup i586
-#        uses: ilammy/msvc-dev-cmd@v1
-#        with:
-#          arch: amd64_x86
-#
-#      - name: Compile i586
-#        env:
-#          CFLAGS: '/O2 /Oy'
-#          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-#          CMAKE_GENERATOR_PLATFORM: 'Win32'
-#        shell: cmd
-#        run: |
-#          mkdir -p target/build-jni/
-#          cmake -B target/build-jni/ ^
-#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
-#            -D CMAKE_SYSTEM_NAME=windows ^
-#            -D CMAKE_SYSTEM_PROCESSOR=x86
-#
-#          cmake --build target/build-jni/ ^
-#            --parallel 2 ^
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-#
-#      - name: Setup x86_64
-#        uses: ilammy/msvc-dev-cmd@v1
-#        with:
-#          arch: x64
-#
-#      - name: Compile x86_64
-#        env:
-#          CFLAGS: '/O2 /Oy'
-#          CMAKE_GENERATOR: 'Visual Studio 16 2019'
-#          CMAKE_GENERATOR_PLATFORM: 'x64'
-#        shell: cmd
-#        run: |
-#          mkdir -p target/build-jni/
-#          cmake -B target/build-jni/ ^
-#            -D CMAKE_VERBOSE_MAKEFILE=ON ^
-#            -D CMAKE_SYSTEM_NAME=windows ^
-#            -D CMAKE_SYSTEM_PROCESSOR=x86_64
-#
-#          cmake --build target/build-jni/ ^
-#            --parallel 2 ^
-#            --clean-first
-#
-#          cmake --install target/build-jni/
-#
-#      - name: Upload
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}/**/*
-
-#
-#  package:
-##    needs: [build_apple, build_linux, build_windows]
-#    needs: [build-linux]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: nightly-build
-#          path: ${{github.workspace}}
-#
-#      - name: Setup Java
-#        uses: actions/setup-java@v1
-#        with:
-#          java-version: 11
-#          java-package: jdk
-#          architecture: x64
-#
-#      - name: Package
-#        shell: bash
-#        run: |
-#          mvn -B --no-transfer-progress deploy
-#
-#      - name: Upload
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: nightly-jars
-#          path: ${{github.workspace}}/**/*
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: nightly-build
+          path: |
+            ${{github.workspace}}/**/*
+            !${{github.workspace}}/target/build/
+          if-no-files-found: error
