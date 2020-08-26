@@ -1,4 +1,7 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
+JNativeHook: Global keyboard and mouse hooking for Java.
+========================================================
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.kwhat/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
 ![Nightly Build](https://github.com/kwhat/jnativehook/workflows/Nightly%20Build/badge.svg)
 
 ## About
