@@ -221,6 +221,9 @@ public class NativeKeyEvent extends NativeInputEvent {
 	/** Begin Numeric Zone */
 	public static final int VC_NUM_LOCK						= 0x0045;
 	public static final int VC_SEPARATOR					= 0x0053;
+	public static final int VC_ADD							= 0x0E4E;
+	public static final int VC_SUBTRACT						= 0x0E4A;
+	public static final int VC_MULTIPLY						= 0x0E37;
 
 
 	/**  Modifier and Control Keys */
