@@ -29,13 +29,13 @@ import java.awt.event.MouseWheelListener;
 public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener,
     MouseWheelListener {
 
+    @Override
     public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
         this.mouseWheelMoved(this.getJavaMouseWheelEvent(nativeEvent));
     }
 
-    public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
-        // Do Nothing.
-    }
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {}
 
     protected MouseWheelEvent getJavaMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
         int scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;

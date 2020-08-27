@@ -17,9 +17,8 @@
  */
 package org.jnativehook.mouse;
 
-public class NativeMouseWheelAdapter implements NativeMouseWheelListener {
-
-    public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
-        // Do Nothing.
-    }
-}
+/**
+ * @deprecated No need to extend this class, implement the {@code NativeMouseWheelListener} interface instead
+ */
+@Deprecated
+public class NativeMouseWheelAdapter implements NativeMouseWheelListener {}

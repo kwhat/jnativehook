@@ -21,15 +21,8 @@ package org.jnativehook.mouse;
  * Adapter implementation of the NativeMouseMotionListener interface. The methods are empty so the
  * super call is obsolete.
  *
+ * @deprecated No need to extend this class, implement the {@code NativeMouseMotionListener} interface instead
  * @author Johannes Boczek
  */
-public class NativeMouseMotionAdapter implements NativeMouseMotionListener {
-
-    public void nativeMouseDragged(NativeMouseEvent nativeEvent) {
-        // Do Nothing.
-    }
-
-    public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
-        // Do Nothing.
-    }
-}
+@Deprecated
+public class NativeMouseMotionAdapter implements NativeMouseMotionListener {}
