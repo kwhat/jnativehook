@@ -42,8 +42,7 @@ public interface NativeMouseMotionListener extends EventListener {
      *
      * @param nativeEvent the native mouse event.
      */
-    public void nativeMouseMoved(NativeMouseEvent nativeEvent);
-
+    default void nativeMouseMoved(NativeMouseEvent nativeEvent) {}
 
     /**
      * Invoked when the mouse has been moved while a button is depressed.
@@ -51,5 +50,5 @@ public interface NativeMouseMotionListener extends EventListener {
      * @param nativeEvent the native mouse event
      * @since 1.1
      */
-    public void nativeMouseDragged(NativeMouseEvent nativeEvent);
+    default void nativeMouseDragged(NativeMouseEvent nativeEvent) {}
 }
