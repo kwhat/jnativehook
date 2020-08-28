@@ -2,7 +2,7 @@ name: Nightly Build
 on:
   push:
     branches:
-      - 2.2
+      - '**'
 
 jobs:
   generate-headers:
@@ -28,10 +28,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-headers
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/target/include
           if-no-files-found: error
 
 
@@ -40,11 +39,16 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Compile
         env:
@@ -81,10 +85,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
 
@@ -93,11 +96,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         shell: bash
@@ -168,10 +176,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
   linux-x86:
@@ -179,11 +186,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         shell: bash
@@ -250,10 +262,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
   linux-x86_64:
@@ -261,11 +272,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         shell: bash
@@ -318,10 +334,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
 
@@ -330,11 +345,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -380,10 +400,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
   windows-x86:
@@ -391,11 +410,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -439,10 +463,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
   windows-x86_64:
@@ -450,11 +473,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-headers
+          path: ${{github.workspace}}/target/include
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -498,10 +526,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: native-libraries
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
   package:
@@ -516,19 +543,24 @@ jobs:
     ]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: nightly-build
-          path: ${{github.workspace}}
+          name: native-libraries
+          path: ${{github.workspace}}/src/main/resources
 
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
           java-package: jdk
           architecture: x64
-          server-id: ossrh-snapshots
+          server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
@@ -546,5 +578,5 @@ jobs:
           name: nightly-build
           path: |
             ${{github.workspace}}/**/*
-            !${{github.workspace}}/target/build/
+            !${{github.workspace}}/target
           if-no-files-found: error
