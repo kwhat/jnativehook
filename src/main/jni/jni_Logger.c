@@ -39,7 +39,7 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
         va_end(args);
 
         if (size >= 0) {
-            jstring name = (*env)->NewStringUTF(env, "org.jnativehook");
+            jstring name = (*env)->NewStringUTF(env, "com.github.kwhat.jnativehook");
             jstring message = (*env)->NewStringUTF(env, buffer);
 
             jobject object = (*env)->CallStaticObjectMethod(

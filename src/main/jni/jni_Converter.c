@@ -20,10 +20,10 @@
 #include <uiohook.h>
 
 #include "jni_Converter.h"
-#include "org_jnativehook_NativeInputEvent.h"
-#include "org_jnativehook_keyboard_NativeKeyEvent.h"
-#include "org_jnativehook_mouse_NativeMouseEvent.h"
-#include "org_jnativehook_mouse_NativeMouseWheelEvent.h"
+#include "com_github_kwhat_jnativehook_NativeInputEvent.h"
+#include "com_github_kwhat_jnativehook_keyboard_NativeKeyEvent.h"
+#include "com_github_kwhat_jnativehook_mouse_NativeMouseEvent.h"
+#include "com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent.h"
 
 
 jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
@@ -35,7 +35,7 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
             case EVENT_KEY_PRESSED:
             case EVENT_KEY_RELEASED:
                 // 3 = EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
-                *javaType = org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST + (nativeType - 3);
+                *javaType = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST + (nativeType - 3);
                 status = JNI_OK;
                 break;
 
@@ -46,7 +46,7 @@ jint jni_ConvertToJavaType(event_type nativeType, jint *javaType) {
             case EVENT_MOUSE_DRAGGED:
             case EVENT_MOUSE_WHEEL:
                 // 6 = (NATIVE_KEY_LAST - NATIVE_KEY_FIRST) + EVENT_HOOK_ENABLED + EVENT_HOOK_DISABLED + UNDEFINED.
-                *javaType = org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST + (nativeType - 6);
+                *javaType = com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST + (nativeType - 6);
                 status = JNI_OK;
                 break;
 
@@ -65,20 +65,20 @@ jint jni_ConvertToNativeType(jint javaType, event_type *nativeType) {
 
     if (nativeType != NULL) {
         switch (javaType) {
-            case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-            case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
-            case org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
-                *nativeType = (javaType + 3) - org_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST;
+            case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
+            case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
+            case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
+                *nativeType = (javaType + 3) - com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_FIRST;
                 status = JNI_OK;
                 break;
 
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-            case org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-                *nativeType = (javaType + 6) - org_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_CLICKED:
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
+            case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
+                *nativeType = (javaType + 6) - com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_FIRST;
                 status = JNI_OK;
                 break;
 
@@ -100,19 +100,19 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
             case VC_CONTROL_L:
             case VC_ALT_L:
             case VC_META_L:
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_LEFT;
                 break;
 
             case VC_SHIFT_R:
             case VC_CONTROL_R:
             case VC_ALT_R:
                 *nativeKeyCode ^= 0x0E00;
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
                 break;
 
             case VC_META_R:
                 *nativeKeyCode -= 1;
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_RIGHT;
                 break;
 
             case VC_KP_COMMA:
@@ -121,7 +121,7 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
 
             case VC_NUM_LOCK:
             case VC_KP_SEPARATOR:
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
                 break;
 
             case VC_KP_ENTER:
@@ -136,12 +136,12 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
             case VC_KP_RIGHT:
             case VC_KP_UP:
                 *nativeKeyCode ^= 0x0E00;
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
                 break;
 
             case VC_KP_0:
                 *nativeKeyCode = VC_0;
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
                 break;
 
             case VC_KP_1:
@@ -162,7 +162,7 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
             case VC_KP_8:
             case VC_KP_9:
                 *nativeKeyCode -= (VC_KP_7 - VC_7); // 0x3F
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
                 break;
 
             case VC_KP_END:
@@ -172,11 +172,11 @@ jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyL
             case VC_KP_INSERT:
             case VC_KP_DELETE:
                 *nativeKeyCode ^= 0xE000;
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_NUMPAD;
                 break;
 
             default:
-                *javaKeyLocation = org_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
+                *javaKeyLocation = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_STANDARD;
                 break;
         }
 
