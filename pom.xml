@@ -75,7 +75,7 @@
     </repository>
 
     <snapshotRepository>
-      <id>ossrh-snapshots</id>
+      <id>ossrh</id>
       <name>Central Repository OSSRH Snapshots</name>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
