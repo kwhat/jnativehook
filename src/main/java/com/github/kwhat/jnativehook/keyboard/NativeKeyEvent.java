@@ -17,9 +17,9 @@
  */
 package com.github.kwhat.jnativehook.keyboard;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeInputEvent;
 import java.awt.Toolkit;
-import com.github.kwhat.jnativehook.GlobalScreen;
 
 /**
  * An event which indicates that a keystroke occurred at global scope.

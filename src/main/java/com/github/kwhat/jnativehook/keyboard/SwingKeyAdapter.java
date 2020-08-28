@@ -17,9 +17,9 @@
  */
 package com.github.kwhat.jnativehook.keyboard;
 
+import com.github.kwhat.jnativehook.AbstractSwingInputAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import com.github.kwhat.jnativehook.AbstractSwingInputAdapter;
 
 /**
  * Adapter to convert NativeKeyEvents to Java KeyEvents. The methods are empty so the super call is

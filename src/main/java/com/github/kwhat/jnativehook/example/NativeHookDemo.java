@@ -17,6 +17,7 @@
  */
 package com.github.kwhat.jnativehook.example;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.dispatcher.SwingDispatchService;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -26,6 +27,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelEvent;
+import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -52,8 +54,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.text.BadLocationException;
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
  * A demonstration of how to use the JNativeHook library.

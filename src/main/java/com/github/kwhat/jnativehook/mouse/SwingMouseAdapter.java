@@ -17,9 +17,9 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
+import com.github.kwhat.jnativehook.AbstractSwingInputAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import com.github.kwhat.jnativehook.AbstractSwingInputAdapter;
 
 /**
  * Adapter to convert NativeKeyEvents to Java KeyEvents. The methods are empty so the super call is

@@ -364,7 +364,7 @@
 
             <manifestSections>
               <manifestSection>
-                <name>com.github.kwhat.jnativehook</name>
+                <name>com/github/kwhat/jnativehook</name>
                 <manifestEntries>
                   <Specification-Title>${project.name} Library"</Specification-Title>
                   <Specification-Version>${maven.version.majorVersion}.${maven.version.minorVersion}</Specification-Version>

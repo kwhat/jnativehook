@@ -17,9 +17,9 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeInputEvent;
 import java.awt.Point;
-import com.github.kwhat.jnativehook.GlobalScreen;
 
 /**
  * An event which indicates that a mouse action occurred on the system. This event is not limited to

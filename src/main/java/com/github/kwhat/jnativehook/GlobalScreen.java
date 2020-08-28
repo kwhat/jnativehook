@@ -24,12 +24,12 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelEvent;
+import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
-import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 
 /**
  * GlobalScreen is used to represent the native screen area that Java does not usually have access
@@ -71,7 +71,7 @@ public class GlobalScreen {
             // Try to load the native library assuming the java.library.path was set correctly at launch.
             System.loadLibrary(libName);
         } catch (UnsatisfiedLinkError linkError) {
-            String libLoader = System.getProperty("jnativehook.lib.locator", "DefaultLibraryLocator");
+            String libLoader = System.getProperty("jnativehook.lib.locator", DefaultLibraryLocator.class.getCanonicalName());
 
             try {
                 // Use the specified class to locator the native library.

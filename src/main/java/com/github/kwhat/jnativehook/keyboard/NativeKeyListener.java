@@ -17,8 +17,8 @@
  */
 package com.github.kwhat.jnativehook.keyboard;
 
-import java.util.EventListener;
 import com.github.kwhat.jnativehook.GlobalScreen;
+import java.util.EventListener;
 
 /**
  * The listener interface for receiving global <code>NativeKeyEvents</code>.

@@ -17,8 +17,8 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import java.util.EventListener;
 import com.github.kwhat.jnativehook.GlobalScreen;
+import java.util.EventListener;
 
 /**
  * The listener interface for receiving native mouse motion events. (For clicks and other mouse
