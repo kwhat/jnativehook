@@ -32,27 +32,27 @@ extern JavaVMAttachArgs jvm_attach_args;
  * available methods for each class; only methods used in native code are
  * included.
  */
-typedef struct _org_jnativehook_GlobalScreen {
+typedef struct _com_github_kwhat_jnativehook_GlobalScreen {
     jclass cls;
     jfieldID hookThread;
 } GlobalScreen;
 
-typedef struct org_jnativehook_GlobalScreen$NativeHookThread {
+typedef struct com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread {
     jclass cls;
     jmethodID dispatchEvent;
 } NativeHookThread;
 
-typedef struct _org_jnativehook_NativeHookException {
+typedef struct _com_github_kwhat_jnativehook_NativeHookException {
     jclass cls;
     jmethodID init;
 } NativeHookException;
 
-typedef struct _org_jnativehook_NativeMonitorInfo {
+typedef struct _com_github_kwhat_jnativehook_NativeMonitorInfo {
     jclass cls;
     jmethodID init;
 } NativeMonitorInfo;
 
-typedef struct _org_jnativehook_NativeInputEvent {
+typedef struct _com_github_kwhat_jnativehook_NativeInputEvent {
     jclass cls;
     jfieldID when;
     jfieldID reserved;
@@ -61,7 +61,7 @@ typedef struct _org_jnativehook_NativeInputEvent {
     jmethodID getModifiers;
 } NativeInputEvent;
 
-typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
+typedef struct _com_github_kwhat_jnativehook_keyboard_NativeKeyEvent {
     jclass cls;
     jmethodID init;
     NativeInputEvent *parent;
@@ -70,7 +70,7 @@ typedef struct _org_jnativehook_keyboard_NativeKeyEvent {
     jmethodID getKeyChar;
 } NativeKeyEvent;
 
-typedef struct _org_jnativehook_mouse_NativeMouseEvent {
+typedef struct _com_github_kwhat_jnativehook_mouse_NativeMouseEvent {
     jclass cls;
     jmethodID init;
     NativeInputEvent *parent;
@@ -80,7 +80,7 @@ typedef struct _org_jnativehook_mouse_NativeMouseEvent {
     jmethodID getY;
 } NativeMouseEvent;
 
-typedef struct _org_jnativehook_mouse_NativeMouseWheelEvent {
+typedef struct _com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent {
     jclass cls;
     jmethodID init;
     NativeMouseEvent *parent;
@@ -115,14 +115,14 @@ typedef struct _java_util_logging_Logger {
 } Logger;
 
 // Global variables for Java object struct representation.
-extern GlobalScreen *org_jnativehook_GlobalScreen;
-extern NativeHookThread *org_jnativehook_GlobalScreen$NativeHookThread;
-extern NativeHookException *org_jnativehook_NativeHookException;
-extern NativeMonitorInfo *org_jnativehook_NativeMonitorInfo;
-extern NativeInputEvent *org_jnativehook_NativeInputEvent;
-extern NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent;
-extern NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent;
-extern NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent;
+extern GlobalScreen *com_github_kwhat_jnativehook_GlobalScreen;
+extern NativeHookThread *com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread;
+extern NativeHookException *com_github_kwhat_jnativehook_NativeHookException;
+extern NativeMonitorInfo *com_github_kwhat_jnativehook_NativeMonitorInfo;
+extern NativeInputEvent *com_github_kwhat_jnativehook_NativeInputEvent;
+extern NativeKeyEvent *com_github_kwhat_jnativehook_keyboard_NativeKeyEvent;
+extern NativeMouseEvent *com_github_kwhat_jnativehook_mouse_NativeMouseEvent;
+extern NativeMouseWheelEvent *com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent;
 extern Object *java_lang_Object;
 extern Integer *java_lang_Integer;
 extern System *java_lang_System;

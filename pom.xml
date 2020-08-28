@@ -122,7 +122,7 @@
             <configuration>
               <javahOutputDirectory>${project.build.directory}/include</javahOutputDirectory>
               <javahClassNames>
-                <javahClassName>org.jnativehook.GlobalScreen</javahClassName>
+                <javahClassName>com.github.kwhat.jnativehook.GlobalScreen</javahClassName>
               </javahClassNames>
             </configuration>
 
@@ -352,7 +352,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>org.jnativehook.example.NativeHookDemo</mainClass>
+              <mainClass>com.github.kwhat.jnativehook.example.NativeHookDemo</mainClass>
 
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -364,7 +364,7 @@
 
             <manifestSections>
               <manifestSection>
-                <name>org/jnativehook</name>
+                <name>com/github/kwhat/jnativehook</name>
                 <manifestEntries>
                   <Specification-Title>${project.name} Library"</Specification-Title>
                   <Specification-Version>${maven.version.majorVersion}.${maven.version.minorVersion}</Specification-Version>

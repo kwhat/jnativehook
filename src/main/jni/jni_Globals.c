@@ -23,14 +23,14 @@
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 
-GlobalScreen *org_jnativehook_GlobalScreen = NULL;
-NativeHookThread *org_jnativehook_GlobalScreen$NativeHookThread = NULL;
-NativeHookException *org_jnativehook_NativeHookException = NULL;
-NativeMonitorInfo *org_jnativehook_NativeMonitorInfo = NULL;
-NativeInputEvent *org_jnativehook_NativeInputEvent = NULL;
-NativeKeyEvent *org_jnativehook_keyboard_NativeKeyEvent = NULL;
-NativeMouseEvent *org_jnativehook_mouse_NativeMouseEvent = NULL;
-NativeMouseWheelEvent *org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
+GlobalScreen *com_github_kwhat_jnativehook_GlobalScreen = NULL;
+NativeHookThread *com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = NULL;
+NativeHookException *com_github_kwhat_jnativehook_NativeHookException = NULL;
+NativeMonitorInfo *com_github_kwhat_jnativehook_NativeMonitorInfo = NULL;
+NativeInputEvent *com_github_kwhat_jnativehook_NativeInputEvent = NULL;
+NativeKeyEvent *com_github_kwhat_jnativehook_keyboard_NativeKeyEvent = NULL;
+NativeMouseEvent *com_github_kwhat_jnativehook_mouse_NativeMouseEvent = NULL;
+NativeMouseWheelEvent *com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = NULL;
 Object *java_lang_Object = NULL;
 Integer *java_lang_Integer = NULL;
 System *java_lang_System = NULL;
@@ -40,17 +40,17 @@ static int create_GlobalScreen(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the GlobalScreen Object.
-    jclass GlobalScreen_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen");
+    jclass GlobalScreen_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/GlobalScreen");
     if (GlobalScreen_class != NULL) {
         // Get the field ID for hookThread.
-        jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lorg/jnativehook/GlobalScreen$NativeHookThread;");
+        jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lcom/github/kwhat/jnativehook/GlobalScreen$NativeHookThread;");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
-            if (org_jnativehook_GlobalScreen != NULL) {
+            com_github_kwhat_jnativehook_GlobalScreen = malloc(sizeof(GlobalScreen));
+            if (com_github_kwhat_jnativehook_GlobalScreen != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
-                org_jnativehook_GlobalScreen->hookThread = hookThread;
+                com_github_kwhat_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
+                com_github_kwhat_jnativehook_GlobalScreen->hookThread = hookThread;
 
                 status = JNI_OK;
             } else {
@@ -64,15 +64,15 @@ static int create_GlobalScreen(JNIEnv *env) {
 }
 
 static void destroy_GlobalScreen(JNIEnv *env) {
-    if (org_jnativehook_GlobalScreen != NULL) {
+    if (com_github_kwhat_jnativehook_GlobalScreen != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_GlobalScreen->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen->cls);
+        if (com_github_kwhat_jnativehook_GlobalScreen->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_GlobalScreen->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_GlobalScreen);
-        org_jnativehook_GlobalScreen = NULL;
+        free(com_github_kwhat_jnativehook_GlobalScreen);
+        com_github_kwhat_jnativehook_GlobalScreen = NULL;
     }
 }
 
@@ -81,17 +81,17 @@ static int create_NativeHookThread(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the GlobalScreen Object.
-    jclass NativeHookThread_class = (*env)->FindClass(env, "org/jnativehook/GlobalScreen$NativeHookThread");
+    jclass NativeHookThread_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/GlobalScreen$NativeHookThread");
     if (NativeHookThread_class != NULL) {
         // Get the method ID for GlobalScreen.dispatchEvent().
-        jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, NativeHookThread_class, "dispatchEvent", "(Lorg/jnativehook/NativeInputEvent;)V");
+        jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, NativeHookThread_class, "dispatchEvent", "(Lcom/github/kwhat/jnativehook/NativeInputEvent;)V");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_GlobalScreen$NativeHookThread = malloc(sizeof(NativeHookThread));
-            if (org_jnativehook_GlobalScreen$NativeHookThread != NULL) {
+            com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = malloc(sizeof(NativeHookThread));
+            if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_GlobalScreen$NativeHookThread->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookThread_class);
-                org_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent = dispatchEvent;
+                com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookThread_class);
+                com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent = dispatchEvent;
 
                 status = JNI_OK;
             } else {
@@ -105,15 +105,15 @@ static int create_NativeHookThread(JNIEnv *env) {
 }
 
 static void destroy_NativeHookThread(JNIEnv *env) {
-    if (org_jnativehook_GlobalScreen != NULL) {
+    if (com_github_kwhat_jnativehook_GlobalScreen != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_GlobalScreen$NativeHookThread->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_GlobalScreen$NativeHookThread->cls);
+        if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_GlobalScreen$NativeHookThread);
-        org_jnativehook_GlobalScreen$NativeHookThread = NULL;
+        free(com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread);
+        com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = NULL;
     }
 }
 
@@ -122,17 +122,17 @@ static int create_NativeHookException(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeHookException Object.
-    jclass NativeHookException_class = (*env)->FindClass(env, "org/jnativehook/NativeHookException");
+    jclass NativeHookException_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/NativeHookException");
     if (NativeHookException_class != NULL) {
         // Get the method ID for NativeInputEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeHookException_class, "<init>", "(ILjava/lang/String;)V");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_NativeHookException = malloc(sizeof(NativeInputEvent));
-            if (org_jnativehook_NativeHookException != NULL) {
+            com_github_kwhat_jnativehook_NativeHookException = malloc(sizeof(NativeInputEvent));
+            if (com_github_kwhat_jnativehook_NativeHookException != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_NativeHookException->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookException_class);
-                org_jnativehook_NativeHookException->init = init;
+                com_github_kwhat_jnativehook_NativeHookException->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookException_class);
+                com_github_kwhat_jnativehook_NativeHookException->init = init;
 
                 status = JNI_OK;
             } else {
@@ -146,15 +146,15 @@ static int create_NativeHookException(JNIEnv *env) {
 }
 
 static void destroy_NativeHookException(JNIEnv *env) {
-    if (org_jnativehook_NativeHookException != NULL) {
+    if (com_github_kwhat_jnativehook_NativeHookException != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_NativeHookException->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_NativeHookException->cls);
+        if (com_github_kwhat_jnativehook_NativeHookException->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_NativeHookException->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_NativeHookException);
-        org_jnativehook_NativeHookException = NULL;
+        free(com_github_kwhat_jnativehook_NativeHookException);
+        com_github_kwhat_jnativehook_NativeHookException = NULL;
     }
 }
 
@@ -163,17 +163,17 @@ static int create_NativeMonitorInfo(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeMonitorInfo Object.
-    jclass NativeMonitorInfo_class = (*env)->FindClass(env, "org/jnativehook/NativeMonitorInfo");
+    jclass NativeMonitorInfo_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/NativeMonitorInfo");
     if (NativeMonitorInfo_class != NULL) {
         // Get the method ID for NativeInputEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMonitorInfo_class, "<init>", "(SIISS)V");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_NativeMonitorInfo = malloc(sizeof(NativeMonitorInfo));
-            if (org_jnativehook_NativeMonitorInfo != NULL) {
+            com_github_kwhat_jnativehook_NativeMonitorInfo = malloc(sizeof(NativeMonitorInfo));
+            if (com_github_kwhat_jnativehook_NativeMonitorInfo != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_NativeMonitorInfo->cls = (jclass) (*env)->NewGlobalRef(env, NativeMonitorInfo_class);
-                org_jnativehook_NativeMonitorInfo->init = init;
+                com_github_kwhat_jnativehook_NativeMonitorInfo->cls = (jclass) (*env)->NewGlobalRef(env, NativeMonitorInfo_class);
+                com_github_kwhat_jnativehook_NativeMonitorInfo->init = init;
 
                 status = JNI_OK;
             } else {
@@ -187,15 +187,15 @@ static int create_NativeMonitorInfo(JNIEnv *env) {
 }
 
 static void destroy_NativeMonitorInfo(JNIEnv *env) {
-    if (org_jnativehook_NativeMonitorInfo != NULL) {
+    if (com_github_kwhat_jnativehook_NativeMonitorInfo != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_NativeMonitorInfo->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_NativeMonitorInfo->cls);
+        if (com_github_kwhat_jnativehook_NativeMonitorInfo->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_NativeMonitorInfo->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_NativeMonitorInfo);
-        org_jnativehook_NativeMonitorInfo = NULL;
+        free(com_github_kwhat_jnativehook_NativeMonitorInfo);
+        com_github_kwhat_jnativehook_NativeMonitorInfo = NULL;
     }
 }
 
@@ -203,7 +203,7 @@ static int create_NativeInputEvent(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeInputEvent Object.
-    jclass NativeInputEvent_class = (*env)->FindClass(env, "org/jnativehook/NativeInputEvent");
+    jclass NativeInputEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/NativeInputEvent");
     if (NativeInputEvent_class != NULL) {
         // Get the field ID for NativeInputEvent.when.
         jfieldID when = (*env)->GetFieldID(env, NativeInputEvent_class, "when", "J");
@@ -221,15 +221,15 @@ static int create_NativeInputEvent(JNIEnv *env) {
         jmethodID getModifiers = (*env)->GetMethodID(env, NativeInputEvent_class, "getModifiers", "()I");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_NativeInputEvent = malloc(sizeof(NativeInputEvent));
-            if (org_jnativehook_NativeInputEvent != NULL) {
+            com_github_kwhat_jnativehook_NativeInputEvent = malloc(sizeof(NativeInputEvent));
+            if (com_github_kwhat_jnativehook_NativeInputEvent != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
-                org_jnativehook_NativeInputEvent->when = when;
-                org_jnativehook_NativeInputEvent->reserved = reserved;
-                org_jnativehook_NativeInputEvent->init = init;
-                org_jnativehook_NativeInputEvent->getID = getID;
-                org_jnativehook_NativeInputEvent->getModifiers = getModifiers;
+                com_github_kwhat_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
+                com_github_kwhat_jnativehook_NativeInputEvent->when = when;
+                com_github_kwhat_jnativehook_NativeInputEvent->reserved = reserved;
+                com_github_kwhat_jnativehook_NativeInputEvent->init = init;
+                com_github_kwhat_jnativehook_NativeInputEvent->getID = getID;
+                com_github_kwhat_jnativehook_NativeInputEvent->getModifiers = getModifiers;
 
                 status = JNI_OK;
             } else {
@@ -243,15 +243,15 @@ static int create_NativeInputEvent(JNIEnv *env) {
 }
 
 static void destroy_NativeInputEvent(JNIEnv *env) {
-    if (org_jnativehook_NativeInputEvent != NULL) {
+    if (com_github_kwhat_jnativehook_NativeInputEvent != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_NativeInputEvent->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_NativeInputEvent->cls);
+        if (com_github_kwhat_jnativehook_NativeInputEvent->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_NativeInputEvent->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_NativeInputEvent);
-        org_jnativehook_NativeInputEvent = NULL;
+        free(com_github_kwhat_jnativehook_NativeInputEvent);
+        com_github_kwhat_jnativehook_NativeInputEvent = NULL;
     }
 }
 
@@ -260,7 +260,7 @@ static int create_NativeKeyEvent(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeKeyEvent Object.
-    jclass NativeKeyEvent_class = (*env)->FindClass(env, "org/jnativehook/keyboard/NativeKeyEvent");
+    jclass NativeKeyEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/keyboard/NativeKeyEvent");
     if (NativeKeyEvent_class != NULL) {
         // Get the method ID for NativeKeyEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeKeyEvent_class, "<init>", "(IIIICI)V");
@@ -275,15 +275,15 @@ static int create_NativeKeyEvent(JNIEnv *env) {
         jmethodID getKeyChar = (*env)->GetMethodID(env, NativeKeyEvent_class, "getKeyChar", "()C");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_keyboard_NativeKeyEvent = malloc(sizeof(NativeKeyEvent));
-            if (org_jnativehook_keyboard_NativeKeyEvent != NULL) {
+            com_github_kwhat_jnativehook_keyboard_NativeKeyEvent = malloc(sizeof(NativeKeyEvent));
+            if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_keyboard_NativeKeyEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeKeyEvent_class);
-                org_jnativehook_keyboard_NativeKeyEvent->parent = org_jnativehook_NativeInputEvent;
-                org_jnativehook_keyboard_NativeKeyEvent->init = init;
-                org_jnativehook_keyboard_NativeKeyEvent->getKeyCode = getKeyCode;
-                org_jnativehook_keyboard_NativeKeyEvent->getKeyLocation = getKeyLocation;
-                org_jnativehook_keyboard_NativeKeyEvent->getKeyChar = getKeyChar;
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeKeyEvent_class);
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->parent = com_github_kwhat_jnativehook_NativeInputEvent;
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->init = init;
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyCode = getKeyCode;
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyLocation = getKeyLocation;
+                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyChar = getKeyChar;
 
                 status = JNI_OK;
             } else {
@@ -297,15 +297,15 @@ static int create_NativeKeyEvent(JNIEnv *env) {
 }
 
 static void destroy_NativeKeyEvent(JNIEnv *env) {
-    if (org_jnativehook_keyboard_NativeKeyEvent != NULL) {
+    if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_keyboard_NativeKeyEvent->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_keyboard_NativeKeyEvent->cls);
+        if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_keyboard_NativeKeyEvent);
-        org_jnativehook_keyboard_NativeKeyEvent = NULL;
+        free(com_github_kwhat_jnativehook_keyboard_NativeKeyEvent);
+        com_github_kwhat_jnativehook_keyboard_NativeKeyEvent = NULL;
     }
 }
 
@@ -314,7 +314,7 @@ static int create_NativeMouseEvent(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeMouseEvent Object.
-    jclass NativeMouseEvent_class = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseEvent");
+    jclass NativeMouseEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/mouse/NativeMouseEvent");
     if (NativeMouseEvent_class != NULL) {
         // Get the method ID for NativeMouseEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IIIIII)V");
@@ -332,16 +332,16 @@ static int create_NativeMouseEvent(JNIEnv *env) {
         jmethodID getY = (*env)->GetMethodID(env, NativeMouseEvent_class, "getY", "()I");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_mouse_NativeMouseEvent = malloc(sizeof(NativeMouseEvent));
-            if (org_jnativehook_mouse_NativeMouseEvent != NULL) {
+            com_github_kwhat_jnativehook_mouse_NativeMouseEvent = malloc(sizeof(NativeMouseEvent));
+            if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_mouse_NativeMouseEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseEvent_class);
-                org_jnativehook_mouse_NativeMouseEvent->parent = org_jnativehook_NativeInputEvent;
-                org_jnativehook_mouse_NativeMouseEvent->init = init;
-                org_jnativehook_mouse_NativeMouseEvent->getButton = getButton;
-                org_jnativehook_mouse_NativeMouseEvent->getClickCount = getClickCount;
-                org_jnativehook_mouse_NativeMouseEvent->getX = getX;
-                org_jnativehook_mouse_NativeMouseEvent->getY = getY;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseEvent_class);
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->parent = com_github_kwhat_jnativehook_NativeInputEvent;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->init = init;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton = getButton;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getClickCount = getClickCount;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX = getX;
+                com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY = getY;
 
                 status = JNI_OK;
             } else {
@@ -355,15 +355,15 @@ static int create_NativeMouseEvent(JNIEnv *env) {
 }
 
 static void destroy_NativeMouseEvent(JNIEnv *env) {
-    if (org_jnativehook_mouse_NativeMouseEvent != NULL) {
+    if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_mouse_NativeMouseEvent->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseEvent->cls);
+        if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_mouse_NativeMouseEvent);
-        org_jnativehook_mouse_NativeMouseEvent = NULL;
+        free(com_github_kwhat_jnativehook_mouse_NativeMouseEvent);
+        com_github_kwhat_jnativehook_mouse_NativeMouseEvent = NULL;
     }
 }
 
@@ -372,7 +372,7 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
     int status = JNI_ERR;
 
     // Class and Constructor for the NativeMouseWheelEvent Object.
-    jclass NativeMouseWheelEvent_class = (*env)->FindClass(env, "org/jnativehook/mouse/NativeMouseWheelEvent");
+    jclass NativeMouseWheelEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/mouse/NativeMouseWheelEvent");
     if (NativeMouseWheelEvent_class != NULL) {
         // Get the method ID for NativeMouseWheelEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIIII)V");
@@ -387,15 +387,15 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
         jmethodID getWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getWheelRotation", "()I");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            org_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
-            if (org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
+            com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
+            if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
                 // Populate our structure for later use.
-                org_jnativehook_mouse_NativeMouseWheelEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseWheelEvent_class);
-                org_jnativehook_mouse_NativeMouseWheelEvent->parent = org_jnativehook_mouse_NativeMouseEvent;
-                org_jnativehook_mouse_NativeMouseWheelEvent->init = init;
-                org_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = getScrollAmount;
-                org_jnativehook_mouse_NativeMouseWheelEvent->getScrollType = getScrollType;
-                org_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation = getWheelRotation;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseWheelEvent_class);
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent = com_github_kwhat_jnativehook_mouse_NativeMouseEvent;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->init = init;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = getScrollAmount;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType = getScrollType;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation = getWheelRotation;
 
                 status = JNI_OK;
             } else {
@@ -409,15 +409,15 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
 }
 
 static void destroy_NativeMouseWheelEvent(JNIEnv *env) {
-    if (org_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
+    if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
         // The class *should* never be null if the struct was allocated, but we will check anyway.
-        if (org_jnativehook_mouse_NativeMouseWheelEvent->cls != NULL) {
-            (*env)->DeleteGlobalRef(env, org_jnativehook_mouse_NativeMouseWheelEvent->cls);
+        if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls);
         }
 
         // Free struct memory.
-        free(org_jnativehook_mouse_NativeMouseWheelEvent);
-        org_jnativehook_mouse_NativeMouseWheelEvent = NULL;
+        free(com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent);
+        com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = NULL;
     }
 }
 

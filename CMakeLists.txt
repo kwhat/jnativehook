@@ -21,7 +21,7 @@ project(JNativeHook VERSION 2.2.0 LANGUAGES C)
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "")
     string(TOLOWER ${CMAKE_SYSTEM_NAME} TARGET_OS)
-    set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/src/main/resources/org/jnativehook/lib/${TARGET_OS}" CACHE PATH "Internal var" FORCE)
+    set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/src/main/resources/com/github/kwhat/jnativehook/lib/${TARGET_OS}" CACHE PATH "Internal var" FORCE)
 else()
     message(FATAL_ERROR "Could not determine target system.  Please set CMAKE_SYSTEM_NAME to the desired resource folder.")
 endif()
@@ -60,7 +60,7 @@ add_library(jnativehook SHARED
     "./src/main/jni/jni_Globals.c"
     "./src/main/jni/jni_Load.c"
     "./src/main/jni/jni_Logger.c"
-    "./src/main/jni/org_jnativehook_GlobalScreen.c"
+    "./src/main/jni/com_github_kwhat_jnativehook_GlobalScreen.c"
 )
 
 set_target_properties(jnativehook PROPERTIES
