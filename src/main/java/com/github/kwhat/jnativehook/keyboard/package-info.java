@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module com.github.kwhat.jnativehook {
-	exports com.github.kwhat.jnativehook;
-	exports com.github.kwhat.jnativehook.dispatcher;
-	exports com.github.kwhat.jnativehook.keyboard;
-	exports com.github.kwhat.jnativehook.mouse;
-
-	requires transitive java.desktop;
-	requires transitive java.logging;
-}
+/**
+ * Classes used for native keyboard events.
+ *
+ * @version 2.0
+ * @since 1.0
+ */
+package com.github.kwhat.jnativehook.keyboard;
