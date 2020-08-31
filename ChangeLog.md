@@ -9,9 +9,9 @@
  * Added support for Swing event conversion.
  * Relaxed GlobalScreen scope restrictions.
  * Fixed a major issue with UTF-16 support on Linux.
- * Fixed key mapping for the numberpad on Linux.
+ * Fixed key mapping for the number pad on Linux.
  * Fixed language support on X11 platforms.
- * Code refactroing and orginization.
+ * Code refactoring and organization.
  
 **JNativeHook 2.0.3 (Nov 02, 2015)**
  * Added support for media keys on OS X.
@@ -29,7 +29,7 @@
  * Added modifier polling to hook start procedure.
  * Fixed a bug on OS X where the hook would always succeed.
  * Fixed event timing issues for all platforms.
- * Fixed issue with build.property file being included in the release package.
+ * Fixed issue with build.property file included in the release package.
  * Various cleanups throughout the code base.
 
 **JNativeHook 2.0.1 (Mar 21, 2015)**
@@ -38,15 +38,15 @@
  * Changed hard coded dlsym() paths to RTLD_DEFAULT on OS X.
  * Fixed a memory leak in event posting on OS X.
  * Fixed an LTO related crash on Linux.
- * Fixed missing button number for mouse pressed events on Windows.
+ * Fixed missing button number of mouse pressed events on Windows.
 
 **JNativeHook 2.0.0 (Jan 27, 2015)**
  * Total rewrite and fork of the native code to its own [standalone project](https://github.com/kwhat/libuiohook).
- * Transitioned to virutal keycodes backed by scancode set 1.
+ * Transitioned to virtual keycodes backed by scancode set 1.
  * Added Java's ExecutorService support for event delivery.
  * Added the ability to post NativeInputEvent's back to the Operating System.
  * Added support for multi-head hosts.
- * Countless bug fixes and perfomance improvments.
+ * Countless bug fixes and performance improvements.
  * Fixed a long-standing RDP capture issue.
  * More flexible library loading.
  * More accurate event timestamps.
@@ -83,15 +83,15 @@
  * Various cleanups throughout the native code base.
 
 **JNativeHook 1.1.1 (Oct 17, 2012)**
- * Added an explicit exception if the native library was not found.
+ * Added an explicit exception if the native library not found.
  * Added safety checks to the Windows unicode helper function.
- * Changed to a listen only tap for OS X.
+ * Changed to listen only tap for OS X.
  * Fixed a few small memory leaks for OS X.
  * Fixed click count for OS X.
  * Fixed free() on static memory pointer for Unix and OS X.
  * Fixed potential sscanf overflow on Unix.
  * Fixed potential use of a null pointer in rare circumstances for Unix and OS X.
- * Fixed several invalid unicode conversions for Unix.
+ * Fixed several unicode conversions for Unix.
  * Fixed ant run target java library path.
  * Improved ant platform compatibility.
  * Removed unneeded ActionListener from the NativeHookDemo.
@@ -120,7 +120,7 @@
  * Fixed an issue with Linux mouse buttons 4 and 5.  Switched to using the standard virtual button codes for events.
  * Fixed various typos.
  * Fixed the termination order for Unix/Linux XRecord connection.
- * Fixed an issue with the MouseEvent constructor id for all platforms. Separate id's are required for button and motion events.
+ * Fixed an issue with the MouseEvent constructor id for all platforms. Used a separate id for mouse button and motion events.
  * Fixed the double event registration issue with the demo.
  * Fixed issue with Makefile error message not displaying if run outside of ant.
  * Fixed issues with null pointer VM crashes due to garbage collection for all platforms.
@@ -131,7 +131,7 @@
  * Removed Carbon code from the keyboard rate and delay functions on OS X.
  * Removed the Carbon HIToolbox requirement for key constants on OS X.
  * Switch to async XRecord connection.
- * Switch from Carbon to AplicationServices framework for keyboard hooking on OS X.
+ * Switch from Carbon to ApplicationServices framework for key hooking on OS X.
 
 **JNativeHook 1.0.1950 (Aug 30, 2011)**
  * Fixed a problem with the 32-bit OS X binary.

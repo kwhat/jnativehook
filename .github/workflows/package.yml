@@ -577,6 +577,5 @@ jobs:
         with:
           name: nightly-build
           path: |
-            ${{github.workspace}}/**/*
-            !${{github.workspace}}/target
+            ${{github.workspace}}/target/*.jar
           if-no-files-found: error

@@ -40,7 +40,7 @@ Binary distribution for JNativeHook can be found at the
 [project page](https://github.com/kwhat/jnativehook/).  Maven users can 
 use the `<groupId>com.1stleg</groupId>` and `<artifactId>jnativehook</artifactId>` 
 to include this library automatically.  The nightly builds can be found at the maven 
-[snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/).
+[snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT/).
 
 ## Software and Hardware Requirements
 * Java 1.5 - 1.8

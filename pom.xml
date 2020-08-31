@@ -31,6 +31,7 @@
 
     <maven.compiler.debug>true</maven.compiler.debug>
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
+    <maven.compiler.multi-release>false</maven.compiler.multi-release>
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
 
     <maven.test.skip>true</maven.test.skip>
@@ -91,12 +92,17 @@
   </dependencies>
 
 
+
   <profiles>
     <profile>
-      <id>target-jdk5</id>
+      <id>target-jdk8</id>
       <activation>
-        <jdk>[1.5,1.7]</jdk>
+        <jdk>[1.8,)</jdk>
       </activation>
+
+      <properties>
+        <maven.compiler.multi-release>true</maven.compiler.multi-release>
+      </properties>
 
       <build>
         <plugins>
@@ -104,72 +110,44 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
 
-            <configuration>
-              <source>1.5</source>
-              <target>1.5</target>
-
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-            <version>1.0-alpha-11</version>
-
-            <configuration>
-              <javahOutputDirectory>${project.build.directory}/include</javahOutputDirectory>
-              <javahClassNames>
-                <javahClassName>com.github.kwhat.jnativehook.GlobalScreen</javahClassName>
-              </javahClassNames>
-            </configuration>
-
             <executions>
               <execution>
-                <id>compile-javah</id>
-                <phase>compile</phase>
+                <id>compile-jdk8</id>
                 <goals>
-                  <goal>javah</goal>
+                  <goal>compile</goal>
                 </goals>
+
+                <configuration>
+                  <source>1.8</source>
+                  <target>1.8</target>
+
+                  <excludes>
+                    <exclude>module-info.java</exclude>
+                  </excludes>
+                </configuration>
               </execution>
             </executions>
           </plugin>
 
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
+            <artifactId>maven-javadoc-plugin</artifactId>
 
-            <configuration>
-              <classifier>jdk5</classifier>
-            </configuration>
+            <executions>
+              <execution>
+                <id>package-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+
+                <configuration>
+                  <detectJavaApiLink>false</detectJavaApiLink>
+                  <source>1.8</source>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
-        </plugins>
-      </build>
-    </profile>
 
-    <profile>
-      <id>target-jdk8</id>
-      <activation>
-        <jdk>[1.8, 11)</jdk>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-
-            <configuration combine.self="append">
-              <source>1.8</source>
-              <target>1.8</target>
-
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -187,9 +165,42 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
 
-            <configuration>
-              <release>11</release>
-            </configuration>
+            <executions>
+              <execution>
+                <id>compile-jdk11</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+
+                <configuration>
+                  <multiReleaseOutput>${maven.compiler.multi-release}</multiReleaseOutput>
+                  <release>11</release>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>package-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+
+                <configuration combine.self="override">
+                  <detectJavaApiLink>true</detectJavaApiLink>
+                  <release>11</release>
+
+                  <sourceFileExcludes>
+                    <sourceFileInclude>**/module-info.java</sourceFileInclude>
+                  </sourceFileExcludes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -266,27 +277,25 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
 
+        <configuration>
+          <verbose>true</verbose>
+          <fork>true</fork>
+
+          <compileSourceRoots>
+            <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
+          </compileSourceRoots>
+
+          <compilerArgs>
+            <!-- Create javah headers for native code -->
+            <arg>-h</arg>
+            <arg>${project.build.directory}/include</arg>
+          </compilerArgs>
+        </configuration>
+
         <executions>
           <execution>
-            <id>compile-java</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-
-            <configuration>
-              <verbose>true</verbose>
-              <fork>true</fork>
-
-              <compileSourceRoots>
-                <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
-              </compileSourceRoots>
-
-              <compilerArgs>
-                <arg>-h</arg>
-                <arg>${project.build.directory}/include</arg>
-              </compilerArgs>
-            </configuration>
+            <id>default-compile</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
@@ -328,17 +337,13 @@
         <version>3.2.0</version>
 
         <configuration>
-          <sourceFileExcludes>
-            <sourceFileExclude>**/module-info.java</sourceFileExclude>
-          </sourceFileExcludes>
+          <sourcepath>${project.build.sourceDirectory}</sourcepath>
         </configuration>
-        
+
         <executions>
           <execution>
-            <id>package-javadoc</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
+            <id>default-javadoc</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
