@@ -43,7 +43,7 @@ to include this library automatically.  The nightly builds can be found at the m
 [snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT).
 
 ## Software and Hardware Requirements
-* Java 1.5 - 1.8
+* Java 1.5 - 11
 * 256 MB of RAM
 * Apple OS X 10.5 - 10.12
   * i586, amd64
