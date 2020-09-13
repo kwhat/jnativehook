@@ -88,13 +88,13 @@ application simply execute the jar file provided. Source code available at
 [src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
-* [Global Keyboard Listener](wiki/Keyboard)
-* [Global Mouse Listener](wiki/Mouse)
-* [Global Mouse Wheel Listener](wiki/MouseWheel)
-* [Thread Safety for AWT, Swing and JavaFX](wiki/ThreadSafety)
-* [Logging and Console Output](wiki/ConsoleOutput)
-* [Advanced Library Loading](wiki/LibraryLoading)
-* [Consuming Events (Unsupported)](wiki/ConsumingEvents)
+* [Global Keyboard Listener](wiki/examples/Keyboard.md)
+* [Global Mouse Listener](wiki/examples/Mouse.md)
+* [Global Mouse Wheel Listener](wiki/examples/MouseWheel.md)
+* [Thread Safety for AWT, Swing and JavaFX](wiki/examples/Swing.md)
+* [Logging and Console Output](wiki/examples/ConsoleOutput.md)
+* [Advanced Library Loading](wiki/examples/LibraryLoading.md)
+* [Consuming Events (Unsupported)](wiki/examples/ConsumingEvents.md)
 
 ## Additional Information
 Up to date source code and documentation available at:
