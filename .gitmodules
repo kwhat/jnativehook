@@ -1,6 +1,3 @@
-[submodule "wiki"]
-	path = wiki
-	url = git@github.com:kwhat/jnativehook.wiki.git
 [submodule "uiohook"]
 	path = src/external/uiohook
 	url = git@github.com:kwhat/uiohook.git

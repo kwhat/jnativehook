@@ -27,7 +27,7 @@ In addition to global event listners, this library has the ability to post nativ
 system.
 
 ## Licensing
-JNativeHook is covered under *both* the [GNU General Public](LESSER.md) *and* 
+JNativeHook is covered under *both* the [GNU General Public](COPYING.md) *and* 
 [GNU Lesser General Public](COPYING.LESSER.md) Licenses as the latter is an extension of the former granting you 
 additional distribution rights.  As I understand it, you may use this library in proprietary projects so long as it 
 remains an external library with the same binary interface.  You may modify the source code of this library to fulfill 
@@ -37,10 +37,10 @@ licenced attorney if you have licence compatibility questions or concerns.
 ## Download
 Binary distribution for JNativeHook can be found at the 
 [releases](https://github.com/kwhat/jnativehook/releases) section of the 
-[project page](https://github.com/kwhat/jnativehook/).  Maven users can 
+[project page](https://github.com/kwhat/jnativehook).  Maven users can 
 use the `<groupId>com.1stleg</groupId>` and `<artifactId>jnativehook</artifactId>` 
 to include this library automatically.  The nightly builds can be found at the maven 
-[snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT/).
+[snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT).
 
 ## Software and Hardware Requirements
 * Java 1.5 - 1.8
@@ -79,7 +79,7 @@ If you have found this library useful, please consider making a donation.
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UPMHT4ZFBTCBL)
 
 ## Compiling Instructions
-Detailed instructions to [compile from source](wiki/Compiling) are available in the wiki.
+Detailed instructions to [compile from source](doc/Compiling.md) are available in the doc folder.
 
 ## Demo Applicaiton
 The graphical example application was created to provided a real-time
@@ -88,13 +88,13 @@ application simply execute the jar file provided. Source code available at
 [src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
-* [Global Keyboard Listener](wiki/examples/Keyboard.md)
-* [Global Mouse Listener](wiki/examples/Mouse.md)
-* [Global Mouse Wheel Listener](wiki/examples/MouseWheel.md)
-* [Thread Safety for AWT, Swing and JavaFX](wiki/examples/Swing.md)
-* [Logging and Console Output](wiki/examples/ConsoleOutput.md)
-* [Advanced Library Loading](wiki/examples/LibraryLoading.md)
-* [Consuming Events (Unsupported)](wiki/examples/ConsumingEvents.md)
+* [Global Keyboard Listener](doc/examples/Keyboard.md)
+* [Global Mouse Listener](doc/examples/Mouse.md)
+* [Global Mouse Wheel Listener](doc/examples/MouseWheel.md)
+* [Thread Safety for AWT, Swing and JavaFX](doc/examples/Swing.md)
+* [Logging and Console Output](doc/examples/ConsoleOutput.md)
+* [Advanced Library Loading](doc/examples/LibraryLoading.md)
+* [Consuming Events (Unsupported)](doc/examples/ConsumingEvents.md)
 
 ## Additional Information
 Up to date source code and documentation available at:
