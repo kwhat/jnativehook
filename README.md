@@ -85,7 +85,7 @@ Detailed instructions to [compile from source](wiki/Compiling) are available in 
 The graphical example application was created to provided a real-time
 demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided. Source code available at 
-[src/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
+[src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
 
 ## Example Code
 * [Global Keyboard Listener](wiki/Keyboard)
