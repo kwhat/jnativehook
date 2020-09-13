@@ -286,6 +286,8 @@ jobs:
       - name: Setup
         shell: bash
         run: |
+          sudo apt-get update -m
+
           sudo apt-get install \
             libx11-dev:amd64 \
             libxtst-dev:amd64 \
