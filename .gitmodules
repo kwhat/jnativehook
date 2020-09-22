@@ -1,4 +1,4 @@
 [submodule "uiohook"]
-	path = src/external/uiohook
+	path = src/external/libuiohook
 	url = git@github.com:kwhat/uiohook.git
 	branch = 1.2
