@@ -57,18 +57,18 @@ jobs:
           LDFLAGS: '-Wl,-dead_strip_dylibs'
         shell: bash
         run: |
-          mkdir -p target/build/uiohook/
-          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
             -G "Unix Makefiles" \
             -D CMAKE_INSTALL_PREFIX=target/ \
             -D CMAKE_VERBOSE_MAKEFILE=ON \
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/uiohook/ \
+          cmake --build target/build/libuiohook/ \
             --parallel 2 \
             --clean-first
 
-          cmake --install target/build/uiohook/
+          cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
@@ -146,18 +146,18 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/arm-linux-gnueabihf/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/uiohook/
-          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
             -G "Unix Makefiles" \
             -D CMAKE_INSTALL_PREFIX=target/ \
             -D CMAKE_VERBOSE_MAKEFILE=ON \
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/uiohook/ \
+          cmake --build target/build/libuiohook/ \
             --parallel 2 \
             --clean-first
 
-          cmake --install target/build/uiohook/
+          cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
@@ -232,18 +232,18 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/i386-linux-gnu/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/uiohook/
-          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
             -G "Unix Makefiles" \
             -D CMAKE_INSTALL_PREFIX=target/ \
             -D CMAKE_VERBOSE_MAKEFILE=ON \
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/uiohook/ \
+          cmake --build target/build/libuiohook/ \
             --parallel 2 \
             --clean-first
 
-          cmake --install target/build/uiohook/
+          cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
@@ -306,18 +306,18 @@ jobs:
           PKG_CONFIG_PATH: '/usr/lib/x86_64-linux-gnu/pkgconfig'
         shell: bash
         run: |
-          mkdir -p target/build/uiohook/
-          cmake -B target/build/uiohook/ -S src/external/uiohook/ \
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
             -G "Unix Makefiles" \
             -D CMAKE_INSTALL_PREFIX=target/ \
             -D CMAKE_VERBOSE_MAKEFILE=ON \
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target/build/uiohook/ \
+          cmake --build target/build/libuiohook/ \
             --parallel 2 \
             --clean-first
 
-          cmake --install target/build/uiohook/
+          cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
           cmake -B target/build/jni/ \
@@ -368,19 +368,19 @@ jobs:
           CFLAGS: '/arch:ARMv7VE /O1 /Oy'
         shell: cmd
         run: |
-          md target\build\uiohook\
-          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
+          md target\build\libuiohook\
+          cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
             -G "Visual Studio 16 2019" -A ARM ^
             -D CMAKE_INSTALL_PREFIX=target\ ^
             -D CMAKE_VERBOSE_MAKEFILE=ON ^
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target\build\uiohook\ ^
+          cmake --build target\build\libuiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install target\build\uiohook\ ^
+          cmake --install target\build\libuiohook\ ^
             --config RelWithDebInfo
 
           md target\build\jni\
@@ -431,19 +431,19 @@ jobs:
       - name: Compile
         shell: cmd
         run: |
-          md target\build\uiohook\
-          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
+          md target\build\libuiohook\
+          cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
             -G "Visual Studio 16 2019" -A Win32 ^
             -D CMAKE_INSTALL_PREFIX=target\ ^
             -D CMAKE_VERBOSE_MAKEFILE=ON ^
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target\build\uiohook\ ^
+          cmake --build target\build\libuiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install target\build\uiohook\ ^
+          cmake --install target\build\libuiohook\ ^
             --config RelWithDebInfo
 
           md target\build\jni\
@@ -494,19 +494,19 @@ jobs:
       - name: Compile
         shell: cmd
         run: |
-          md target\build\uiohook\
-          cmake -B target\build\uiohook\  -S src\external\uiohook\ ^
+          md target\build\libuiohook\
+          cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
             -G "Visual Studio 16 2019" -A x64 ^
             -D CMAKE_INSTALL_PREFIX=target\ ^
             -D CMAKE_VERBOSE_MAKEFILE=ON ^
             -D BUILD_SHARED_LIBS=OFF
 
-          cmake --build target\build\uiohook\ ^
+          cmake --build target\build\libuiohook\ ^
             --parallel 2 ^
             --config RelWithDebInfo ^
             --clean-first
 
-          cmake --install target\build\uiohook\ ^
+          cmake --install target\build\libuiohook\ ^
             --config RelWithDebInfo
 
           md target\build\jni\

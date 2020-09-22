@@ -1,4 +1,4 @@
-[submodule "uiohook"]
+[submodule "libuiohook"]
 	path = src/external/libuiohook
-	url = git@github.com:kwhat/uiohook.git
+	url = git@github.com:kwhat/libuiohook.git
 	branch = 1.2
