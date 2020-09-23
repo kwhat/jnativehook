@@ -181,6 +181,96 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
+  linux-arm64:
+    needs: generate-headers
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: native-headers
+          path: ${{github.workspace}}/target/include
+
+      - name: Setup
+        shell: bash
+        run: |
+          sudo rm -Rf /etc/apt/sources.list.d
+          sudo bash -c 'source /etc/lsb-release && echo "
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME} main universe
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-updates main universe
+          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-backports main universe
+
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME} main universe
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-updates main universe
+          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-backports main universe
+          " > /etc/apt/sources.list'
+
+          sudo dpkg --add-architecture arm64
+          sudo apt-get update -m
+
+          sudo apt-get install \
+            binutils-aarch64-linux-gnu \
+            gcc-aarch64-linux-gnu
+
+          sudo apt-get install \
+            libx11-dev:arm64 \
+            libxtst-dev:arm64 \
+            libxt-dev:arm64 \
+            libxinerama-dev:arm64 \
+            libx11-xcb-dev:arm64 \
+            libxkbcommon-dev:arm64 \
+            libxkbcommon-x11-dev:arm64 \
+            libxkbfile-dev:arm64
+
+      - name: Compile
+        env:
+          CC: aarch64-linux-gnu-gcc
+          CFLAGS: '-Os -march=armv8-a+crc -mtune=cortex-a53 -g -flto -fomit-frame-pointer -fno-stack-protector -pipe'
+          LDFLAGS: '-fuse-ld=gold -Wl,-O1 -Wl,--as-needed'
+          PKG_CONFIG_PATH: '/usr/lib/aarch64-linux-gnu/pkgconfig'
+        shell: bash
+        run: |
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+            -G "Unix Makefiles" \
+            -D CMAKE_INSTALL_PREFIX=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
+
+          cmake --build target/build/libuiohook/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build/libuiohook/
+
+          mkdir -p target/build/jni/
+          cmake -B target/build/jni/ \
+            -G "Unix Makefiles" \
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=linux \
+            -D CMAKE_SYSTEM_PROCESSOR=arm64 \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
+
+          cmake --build target/build/jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build/jni/
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: native-libraries
+          path: |
+            ${{github.workspace}}/src/main/resources
+          if-no-files-found: error
+
   linux-x86:
     needs: generate-headers
     runs-on: ubuntu-latest
@@ -537,6 +627,7 @@ jobs:
     needs: [
       apple-x86_64,
       linux-arm,
+      linux-arm64,
       linux-x86,
       linux-x86_64,
       windows-arm,

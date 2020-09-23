@@ -117,6 +117,8 @@ public class NativeSystem {
 
         if (osArch.equals("arm")) {
             arch = Arch.ARM;
+        } else if (osArch.equals("aarch64")) {
+            arch = Arch.ARM64;
         } else if (osArch.equals("sparc")) {
             arch = Arch.SPARC;
         } else if (osArch.equals("sparc64")) {
