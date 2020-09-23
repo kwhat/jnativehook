@@ -86,4 +86,4 @@ if(UNIX)
     target_link_libraries(jnativehook "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
-install(TARGETS jnativehook DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS jnativehook RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR})
