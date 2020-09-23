@@ -144,7 +144,7 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
 
     switch (javaType) {
         case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_TYPED:
-            virtualEvent.data.keyboard.keychar = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
+            virtualEvent.data.keyboard.keychar = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
             virtualEvent.data.keyboard.keycode = VC_UNDEFINED;
             virtualEvent.data.keyboard.rawcode = 0x00;
             break;
@@ -152,7 +152,7 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
         case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED:
         case com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED:
             virtualEvent.data.keyboard.keychar = CHAR_UNDEFINED;
-            virtualEvent.data.keyboard.keycode = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
+            virtualEvent.data.keyboard.keycode = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyCode);
             virtualEvent.data.keyboard.rawcode = 0x00;
             break;
 
@@ -160,26 +160,26 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_PRESSED:
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_RELEASED:
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_DRAGGED:
-            virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY);
-            virtualEvent.data.mouse.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getClickCount);
-            virtualEvent.data.mouse.button = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton);
+            virtualEvent.data.mouse.x = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent.data.mouse.y = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY);
+            virtualEvent.data.mouse.clicks = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getClickCount);
+            virtualEvent.data.mouse.button = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton);
             break;
 
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_MOVED:
-            virtualEvent.data.mouse.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX);
-            virtualEvent.data.mouse.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY);
+            virtualEvent.data.mouse.x = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX);
+            virtualEvent.data.mouse.y = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY);
             virtualEvent.data.mouse.button = MOUSE_NOBUTTON;
             virtualEvent.data.mouse.clicks = 0;
             break;
 
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
-            virtualEvent.data.wheel.x = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
-            virtualEvent.data.wheel.y = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
-            virtualEvent.data.wheel.clicks = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
-            virtualEvent.data.wheel.type = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
-            virtualEvent.data.wheel.amount = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
-            virtualEvent.data.wheel.rotation = (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
+            virtualEvent.data.wheel.x = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
+            virtualEvent.data.wheel.y = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
+            virtualEvent.data.wheel.clicks = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
+            virtualEvent.data.wheel.type = (uint8_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
+            virtualEvent.data.wheel.amount = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
+            virtualEvent.data.wheel.rotation = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
             break;
 
         default:
