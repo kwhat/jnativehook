@@ -394,15 +394,11 @@ public class GlobalScreen {
             }
 
             while (!eventExecutor.isTerminated()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    log.warning(e.getMessage());
-                    break;
-                }
+                Thread.yield();
             }
+        } else {
+            eventExecutor = new DefaultDispatchService();
         }
-        eventExecutor = new DefaultDispatchService();
 
         if (hookThread == null || !hookThread.isAlive()) {
             hookThread = new NativeHookThread();
@@ -555,18 +551,18 @@ public class GlobalScreen {
         private void processKeyEvent(NativeKeyEvent nativeEvent) {
             NativeKeyListener[] listeners = eventListeners.getListeners(NativeKeyListener.class);
 
-            for (int i = 0; i < listeners.length; i++) {
+            for (NativeKeyListener listener : listeners) {
                 switch (nativeEvent.getID()) {
                     case NativeKeyEvent.NATIVE_KEY_PRESSED:
-                        listeners[i].nativeKeyPressed(nativeEvent);
+                        listener.nativeKeyPressed(nativeEvent);
                         break;
 
                     case NativeKeyEvent.NATIVE_KEY_TYPED:
-                        listeners[i].nativeKeyTyped(nativeEvent);
+                        listener.nativeKeyTyped(nativeEvent);
                         break;
 
                     case NativeKeyEvent.NATIVE_KEY_RELEASED:
-                        listeners[i].nativeKeyReleased(nativeEvent);
+                        listener.nativeKeyReleased(nativeEvent);
                         break;
                 }
             }
@@ -585,18 +581,18 @@ public class GlobalScreen {
             NativeMouseListener[] listeners = eventListeners
                 .getListeners(NativeMouseListener.class);
 
-            for (int i = 0; i < listeners.length; i++) {
+            for (NativeMouseListener listener : listeners) {
                 switch (nativeEvent.getID()) {
                     case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
-                        listeners[i].nativeMouseClicked(nativeEvent);
+                        listener.nativeMouseClicked(nativeEvent);
                         break;
 
                     case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
-                        listeners[i].nativeMousePressed(nativeEvent);
+                        listener.nativeMousePressed(nativeEvent);
                         break;
 
                     case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
-                        listeners[i].nativeMouseReleased(nativeEvent);
+                        listener.nativeMouseReleased(nativeEvent);
                         break;
                 }
             }
@@ -615,14 +611,14 @@ public class GlobalScreen {
             NativeMouseMotionListener[] listeners = eventListeners
                 .getListeners(NativeMouseMotionListener.class);
 
-            for (int i = 0; i < listeners.length; i++) {
+            for (NativeMouseMotionListener listener : listeners) {
                 switch (nativeEvent.getID()) {
                     case NativeMouseEvent.NATIVE_MOUSE_MOVED:
-                        listeners[i].nativeMouseMoved(nativeEvent);
+                        listener.nativeMouseMoved(nativeEvent);
                         break;
 
                     case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
-                        listeners[i].nativeMouseDragged(nativeEvent);
+                        listener.nativeMouseDragged(nativeEvent);
                         break;
                 }
             }
@@ -641,8 +637,8 @@ public class GlobalScreen {
         private void processMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
             NativeMouseWheelListener[] listeners = eventListeners.getListeners(NativeMouseWheelListener.class);
 
-            for (int i = 0; i < listeners.length; i++) {
-                listeners[i].nativeMouseWheelMoved(nativeEvent);
+            for (NativeMouseWheelListener listener : listeners) {
+                listener.nativeMouseWheelMoved(nativeEvent);
             }
         }
     }
