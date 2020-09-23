@@ -22,22 +22,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.swing.SwingUtilities;
 
 /**
- * Swing compatible implementation of the <code>ExecutorService</code> used to dispatch native
- * events.  This wraps event dispatching with {@link java.awt.EventQueue#invokeLater}.
+ * Void implementation of the <code>ExecutorService</code> used to dispatch native events directly on the operating
+ * system's event delivery thread.  Because this queue does not hand off events to a different thread, it is important
+ * that you do not block on native event callback functions as it will delay or prevent subsequent events from being
+ * delivered by the operating system.  This dispatcher should only be used by those attempting to consume native events.
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
- * @version 2.0
- * @since 2.0
+ * @version 2.2
  * @see java.util.concurrent.ExecutorService
  * @see GlobalScreen#setEventDispatcher
+ * @since 2.2
  */
-public class SwingDispatchService extends AbstractExecutorService {
-    private boolean running;
+public class VoidDispatchService extends AbstractExecutorService {
+    private boolean running = false;
 
-    public SwingDispatchService() {
+    public VoidDispatchService() {
         running = true;
     }
 
@@ -47,7 +48,7 @@ public class SwingDispatchService extends AbstractExecutorService {
 
     public List<Runnable> shutdownNow() {
         running = false;
-        return new ArrayList<>(0);
+        return new ArrayList<Runnable>(0);
     }
 
     public boolean isShutdown() {
@@ -63,6 +64,6 @@ public class SwingDispatchService extends AbstractExecutorService {
     }
 
     public void execute(Runnable r) {
-        SwingUtilities.invokeLater(r);
+        r.run();
     }
 }
