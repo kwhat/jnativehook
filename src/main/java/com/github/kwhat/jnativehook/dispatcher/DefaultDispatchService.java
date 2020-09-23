@@ -41,7 +41,7 @@ public class DefaultDispatchService extends ThreadPoolExecutor {
     public DefaultDispatchService() {
         super(
             1, 1, 0L,
-            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
             new ThreadFactory() {
                 public Thread newThread(Runnable r) {
                     Thread t = new Thread(r);
