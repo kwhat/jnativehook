@@ -43,15 +43,15 @@ to include this library automatically.  The nightly builds can be found at the m
 [snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT).
 
 ## Software and Hardware Requirements
-* Java 1.5 - 11
+* Java 1.8 - 11
 * 256 MB of RAM
 * Apple OS X 10.5 - 10.12
-  * i586, amd64
+  * amd64
   * Enable Access for Assistive Devices
 * Windows 2000 - 10
   * i586, amd64
 * X11 Linux
-  * i586, amd64, arm6j
+  * i586, amd64, arm7, aarch64
   * libxkbfile.so.1
   * libxkbcommon-x11.so.0
   * libxkbcommon.so.0
@@ -88,9 +88,8 @@ If you have found this library useful, please consider making a donation.
 * [Consuming Events (Unsupported)](doc/examples/ConsumingEvents.md)
 
 ## Demo Application
-The graphical example application was created to provided a real-time
-demonstration of raw output for all available native events.  To run the
-application simply execute the jar file provided. Source code available at 
+The graphical example application exists to provide a real-time demonstration of raw output for all available native 
+events.  To run the application simply execute the jar file provided. Source code available at 
 [src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
 
 ## Additional Information
