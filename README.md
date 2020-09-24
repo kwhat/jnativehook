@@ -1,5 +1,5 @@
-JNativeHook: Global keyboard and mouse hooking for Java.
-========================================================
+JNativeHook: Global keyboard and mouse listeners for Java.
+==========================================================
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.kwhat/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
 ![Nightly Build](https://github.com/kwhat/jnativehook/workflows/Nightly%20Build/badge.svg)
@@ -78,23 +78,20 @@ to include this library automatically.  The nightly builds can be found at the m
 If you have found this library useful, please consider making a donation.
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UPMHT4ZFBTCBL)
 
-## Compiling Instructions
-Detailed instructions to [compile from source](doc/Compiling.md) are available in the doc folder.
+## Documentation
+* [Global Keyboard Listener](doc/Keyboard.md)
+* [Global Mouse Listener](doc/Mouse.md)
+* [Global Mouse Wheel Listener](doc/MouseWheel.md)
+* [Thread Safety for AWT, Swing and JavaFX](doc/Swing.md)
+* [Logging and Console Output](doc/examples/ConsoleOutput.md)
+* [Advanced Library Loading](doc/examples/LibraryLoading.md)
+* [Consuming Events (Unsupported)](doc/examples/ConsumingEvents.md)
 
-## Demo Applicaiton
+## Demo Application
 The graphical example application was created to provided a real-time
 demonstration of raw output for all available native events.  To run the
 application simply execute the jar file provided. Source code available at 
 [src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java](src/main/java/com/github/kwhat/jnativehook/example/NativeHookDemo.java).
-
-## Example Code
-* [Global Keyboard Listener](doc/examples/Keyboard.md)
-* [Global Mouse Listener](doc/examples/Mouse.md)
-* [Global Mouse Wheel Listener](doc/examples/MouseWheel.md)
-* [Thread Safety for AWT, Swing and JavaFX](doc/examples/Swing.md)
-* [Logging and Console Output](doc/examples/ConsoleOutput.md)
-* [Advanced Library Loading](doc/examples/LibraryLoading.md)
-* [Consuming Events (Unsupported)](doc/examples/ConsumingEvents.md)
 
 ## Additional Information
 Up to date source code and documentation available at:

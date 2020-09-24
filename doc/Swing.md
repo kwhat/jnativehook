@@ -1,5 +1,10 @@
 ### Working with Swing
-JNativeHook does *NOT* operate on the event dispatch thread.  Because Swing components are not thread safe, you *MUST* wrap access to Swing components using the [SwingUtilities.invokeLater()](http://docs.oracle.com/javase/1.5.0/docs/api/javax/swing/SwingUtilities.html#invokeLater(java.lang.Runnable)) or [EventQueue.invokeLater()](http://docs.oracle.com/javase/1.5.0/docs/api/java/awt/EventQueue.html#invokeLater(java.lang.Runnable)) methods.  As of version 2.0, the `SwingDispatchService` class maybe used to automatically use Swing's event dispatch thread for all native event delivery.
+JNativeHook does *NOT* operate on the event dispatch thread.  Because Swing components are not thread safe, you *MUST* 
+wrap access to Swing components using the 
+[SwingUtilities.invokeLater()](https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingUtilities.html#invokeLater-java.lang.Runnable-) 
+or [EventQueue.invokeLater()](https://docs.oracle.com/javase/8/docs/api/java/awt/EventQueue.html#invokeLater-java.lang.Runnable-) 
+methods.  As of version 2.0, the `SwingDispatchService` class maybe used to automatically use Swing's event dispatch 
+thread for all native event delivery.
 
 ```java
 import java.awt.event.WindowEvent;

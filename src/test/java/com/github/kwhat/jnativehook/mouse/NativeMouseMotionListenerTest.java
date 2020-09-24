@@ -1,4 +1,4 @@
-/* JNativeHook: Global keyboard and mouse hooking for Java.
+/* JNativeHook: Global keyboard and mouse listeners for Java.
  * Copyright (C) 2006-2018 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnativehook/
  *
@@ -17,7 +17,6 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-// Imports.
 import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
