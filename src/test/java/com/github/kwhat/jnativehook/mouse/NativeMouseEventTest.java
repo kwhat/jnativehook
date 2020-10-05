@@ -17,117 +17,87 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.awt.Point;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class NativeMouseEventTest {
-	/**
-	 * Test of getButton method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testGetButton() {
-		System.out.println("getButton");
+    @Test
+    public void testGetButton() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+        assertEquals(NativeMouseEvent.BUTTON1, event.getButton());
+    }
 
-		assertEquals(NativeMouseEvent.BUTTON1, event.getButton());
-	}
+    @Test
+    public void testGetClickCount() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-	/**
-	 * Test of getClickCount method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testGetClickCount() {
-		System.out.println("getClickCount");
+        assertEquals(1, event.getClickCount());
+    }
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+    @Test
+    public void testGetPoint() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		assertEquals(1, event.getClickCount());
-	}
+        assertEquals(new Point(50, 75), event.getPoint());
+    }
 
-	/**
-	 * Test of getPoint method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testGetPoint() {
-		System.out.println("getPoint");
+    @Test
+    public void testGetX() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+        assertEquals(50, event.getX());
+    }
 
-		assertEquals(new Point(50, 75), event.getPoint());
-	}
+    @Test
+    public void testGetY() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-	/**
-	 * Test of getX method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testGetX() {
-		System.out.println("getX");
+        assertEquals(75, event.getY());
+    }
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+    @Test
+    public void testParamString() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		assertEquals(50, event.getX());
-	}
-
-	/**
-	 * Test of getY method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testGetY() {
-		System.out.println("getY");
-
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
-
-		assertEquals(75, event.getY());
-	}
-
-	/**
-	 * Test of paramString method, of class NativeMouseEvent.
-	 */
-	@Test
-	public void testParamString() {
-		System.out.println("paramString");
-
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
-
-		assertFalse(event.paramString().equals(""));
-	}
+        assertNotEquals("", event.paramString());
+    }
 }

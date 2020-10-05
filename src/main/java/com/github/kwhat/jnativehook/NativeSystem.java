@@ -30,12 +30,6 @@ import java.util.Locale;
  */
 public class NativeSystem {
     /**
-     * According to the docs, Locale.ROOT is the same as the locale whose language, country, and
-     * variant are empty ("") strings.  This is required to maintain Java 1.5 compatibility.
-     */
-    protected static final Locale ROOT_LOCALE = new Locale("", "", "");
-
-    /**
      * The operating system family enum.
      *
      * @see NativeSystem
@@ -52,7 +46,7 @@ public class NativeSystem {
 
         @Override
         public String toString() {
-            return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
+            return super.toString().toLowerCase(Locale.ROOT);
         }
     }
 
@@ -75,7 +69,7 @@ public class NativeSystem {
 
         @Override
         public String toString() {
-            return super.toString().toLowerCase(NativeSystem.ROOT_LOCALE);
+            return super.toString().toLowerCase(Locale.ROOT);
         }
     }
 
@@ -85,7 +79,7 @@ public class NativeSystem {
      * @return The current operating system family enum item.
      */
     public static Family getFamily() {
-        final String osName = System.getProperty("os.name").toLowerCase(NativeSystem.ROOT_LOCALE);
+        final String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         Family family = Family.UNSUPPORTED;
 
         if (osName.equals("freebsd")) {
@@ -112,10 +106,10 @@ public class NativeSystem {
      * @return The current system architecture.
      */
     public static Arch getArchitecture() {
-        final String osArch = System.getProperty("os.arch").toLowerCase(NativeSystem.ROOT_LOCALE);
+        final String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
         Arch arch = Arch.UNSUPPORTED;
 
-        if (osArch.equals("arm")) {
+        if (osArch.startsWith("arm")) {
             arch = Arch.ARM;
         } else if (osArch.equals("aarch64")) {
             arch = Arch.ARM64;

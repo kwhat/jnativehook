@@ -17,33 +17,23 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseWheelListenerImpl;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- *
- * @author abarker
- */
 public class NativeMouseWheelListenerTest {
-	/**
-	 * Test of nativeMouseWheelMoved method, of class NativeMouseWheelListener.
-	 */
 	@Test
 	public void testNativeMouseWheelMoved() {
-		System.out.println("nativeMouseWheelMoved");
-
 		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
 				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
+				0x00,
+				50,
+				75,
+				1,
 				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
-				3,		// Scroll Amount
-				-1);	// Wheel Rotation
+				3,
+				-1);
 
-		NativeMouseWheelListenerImpl listener = new NativeMouseWheelListenerImpl();
+		com.github.kwhat.jnativehook.mouse.listeners.NativeMouseWheelListenerTest listener = new com.github.kwhat.jnativehook.mouse.listeners.NativeMouseWheelListenerTest();
 		listener.nativeMouseWheelMoved(event);
 
 		assertEquals(event, listener.getLastEvent());

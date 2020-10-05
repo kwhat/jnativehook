@@ -33,8 +33,6 @@
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
     <maven.compiler.multi-release>false</maven.compiler.multi-release>
     <maven.compiler.compilerId>javac</maven.compiler.compilerId>
-
-    <maven.test.skip>true</maven.test.skip>
   </properties>
 
   <name>JNativeHook</name>
@@ -82,15 +80,26 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.7.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.7.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 
 
   <profiles>
@@ -152,7 +161,6 @@
       </build>
     </profile>
 
-
     <profile>
       <id>target-jdk11</id>
       <activation>
@@ -207,6 +215,7 @@
     </profile>
   </profiles>
 
+
   <build>
     <plugins>
       <plugin>
@@ -234,7 +243,6 @@
         </executions>
       </plugin>
 
-      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -271,7 +279,6 @@
         </executions>
       </plugin>
 
-      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -281,15 +288,13 @@
           <verbose>true</verbose>
           <fork>true</fork>
 
-          <compileSourceRoots>
-            <compileSourceRoot>${basedir}/src/main/java</compileSourceRoot>
-          </compileSourceRoots>
-
           <compilerArgs>
             <!-- Create javah headers for native code -->
             <arg>-h</arg>
             <arg>${project.build.directory}/include</arg>
           </compilerArgs>
+          <source>6</source>
+          <target>6</target>
         </configuration>
 
         <executions>
@@ -327,8 +332,37 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M4</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.6</version>
+
+        <configuration>
+          <excludes>
+            <exclude>META-INF/**</exclude>
+          </excludes>
+        </configuration>
+          
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

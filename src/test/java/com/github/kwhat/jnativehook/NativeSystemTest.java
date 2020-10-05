@@ -17,27 +17,124 @@
  */
 package com.github.kwhat.jnativehook;
 
-import org.junit.Test;
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NativeSystemTest {
-	/**
-	 * Test of getFamily method, of class NativeSystem.
-	 */
 	@Test
 	public void testGetFamily() {
-		System.out.println("getFamily");
+	    System.setProperty("os.name", "FreeBSD");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.FREEBSD);
 
-		assertFalse(NativeSystem.getFamily().equals(NativeSystem.Family.UNSUPPORTED));
+        System.setProperty("os.name", "OpenBSD");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.OPENBSD);
+
+        System.setProperty("os.name", "Mac OS X");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.DARWIN);
+
+        System.setProperty("os.name", "SunOS");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.SOLARIS);
+
+        System.setProperty("os.name", "Solaris");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.SOLARIS);
+
+        System.setProperty("os.name", "Linux");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.LINUX);
+
+        System.setProperty("os.name", "Windows 2000");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2003");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2008");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2008 R2");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2012");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2012 R2");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2016");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 2019");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows XP");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 7");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 8");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Windows 8.1");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.WINDOWS);
+
+        System.setProperty("os.name", "Something Else");
+        assertEquals(NativeSystem.getFamily(), NativeSystem.Family.UNSUPPORTED);
 	}
 
-	/**
-	 * Test of getArchitecture method, of class NativeSystem.
-	 */
 	@Test
 	public void testGetArchitecture() {
-		System.out.println("getArchitecture");
+	    System.setProperty("os.arch", "arm");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.ARM);
 
-		assertFalse(NativeSystem.getArchitecture().equals(NativeSystem.Arch.UNSUPPORTED));
+        System.setProperty("os.arch", "arm7a");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.ARM);
+
+        System.setProperty("os.arch", "aarch64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.ARM64);
+
+        System.setProperty("os.arch", "sparc");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.SPARC);
+
+        System.setProperty("os.arch", "sparc64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.SPARC64);
+
+        System.setProperty("os.arch", "ppc");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.PPC);
+
+        System.setProperty("os.arch", "powerpc");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.PPC);
+
+        System.setProperty("os.arch", "ppc64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.PPC64);
+
+        System.setProperty("os.arch", "powerpc64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.PPC64);
+
+        System.setProperty("os.arch", "x86");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86);
+
+        System.setProperty("os.arch", "i386");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86);
+
+        System.setProperty("os.arch", "i486");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86);
+
+        System.setProperty("os.arch", "i586");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86);
+
+        System.setProperty("os.arch", "i686");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86);
+
+        System.setProperty("os.arch", "x86_64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86_64);
+
+        System.setProperty("os.arch", "amd64");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86_64);
+
+        System.setProperty("os.arch", "k8");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.x86_64);
+
+        System.setProperty("os.arch", "Something Else");
+        assertEquals(NativeSystem.getArchitecture(), NativeSystem.Arch.UNSUPPORTED);
 	}
 }

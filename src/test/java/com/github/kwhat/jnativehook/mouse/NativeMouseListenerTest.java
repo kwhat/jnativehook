@@ -17,75 +17,58 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseInputListenerTest;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- *
- * @author abarker
- */
 public class NativeMouseListenerTest {
-	/**
-	 * Test of nativeMouseClicked method, of class NativeMouseListener.
-	 */
-	@Test
-	public void testNativeMouseClicked() {
-		System.out.println("nativeMouseClicked");
+    @Test
+    public void testNativeMouseClicked() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_CLICKED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_CLICKED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+        NativeMouseInputListenerTest listener = new NativeMouseInputListenerTest();
+        listener.nativeMouseClicked(event);
 
-		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		listener.nativeMouseClicked(event);
+        assertEquals(event, listener.getLastEvent());
+    }
 
-		assertEquals(event, listener.getLastEvent());
-	}
+    @Test
+    public void testNativeMousePressed() {
+        System.out.println("nativeMousePressed");
 
-	/**
-	 * Test of nativeMousePressed method, of class NativeMouseListener.
-	 */
-	@Test
-	public void testNativeMousePressed() {
-		System.out.println("nativeMousePressed");
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_PRESSED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_PRESSED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
+        NativeMouseInputListenerTest listener = new NativeMouseInputListenerTest();
+        listener.nativeMousePressed(event);
 
-		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		listener.nativeMousePressed(event);
+        assertEquals(event, listener.getLastEvent());
+    }
 
-		assertEquals(event, listener.getLastEvent());
-	}
+    @Test
+    public void testNativeMouseReleased() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_RELEASED,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseEvent.BUTTON1);
 
-	/**
-	 * Test of nativeMouseReleased method, of class NativeMouseListener.
-	 */
-	@Test
-	public void testNativeMouseReleased() {
-		System.out.println("nativeMouseReleased");
+        NativeMouseInputListenerTest listener = new NativeMouseInputListenerTest();
+        listener.nativeMouseReleased(event);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_RELEASED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseEvent.BUTTON1);
-
-		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		listener.nativeMouseReleased(event);
-
-		assertEquals(event, listener.getLastEvent());
-	}
+        assertEquals(event, listener.getLastEvent());
+    }
 }

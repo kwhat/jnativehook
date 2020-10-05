@@ -18,111 +18,81 @@
 package com.github.kwhat.jnativehook;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class NativeInputEventTest {
-	/**
-	 * Test of getID method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testGetID() {
-		System.out.println("getID");
+    @Test
+    public void testGetID() {
+        NativeInputEvent event = new NativeInputEvent(
+            GlobalScreen.class,
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            0x00);
 
-		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.class,
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				0x00);
+        assertEquals(event.getID(), NativeKeyEvent.NATIVE_KEY_PRESSED);
+    }
 
-		assertEquals(event.getID(), NativeKeyEvent.NATIVE_KEY_PRESSED);
-	}
+    @Test
+    public void testGetWhen() {
+        long when = 0;
 
-	/**
-	 * Test of getWhen method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testGetWhen() {
-		System.out.println("getWhen");
+        NativeInputEvent event = new NativeInputEvent(
+            GlobalScreen.class,
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            0x00);
 
-		long when = 0;
+        assertEquals(event.getWhen(), when);
+    }
 
-		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.class,
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				0x00);
+    @Test
+    public void testGetModifiers() {
+        int mask = NativeInputEvent.ALT_MASK
+            | NativeInputEvent.CTRL_MASK
+            | NativeInputEvent.META_MASK
+            | NativeInputEvent.SHIFT_MASK;
 
-		assertEquals(event.getWhen(), when);
-	}
+        NativeInputEvent event = new NativeInputEvent(
+            GlobalScreen.class,
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            mask);
 
-	/**
-	 * Test of getModifiers method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testGetModifiers() {
-		System.out.println("getModifiers");
+        assertEquals(event.getModifiers(), mask);
+    }
 
-		int mask =	NativeInputEvent.ALT_MASK |
-					NativeInputEvent.CTRL_MASK |
-					NativeInputEvent.META_MASK |
-					NativeInputEvent.SHIFT_MASK;
+    @Test
+    public void testSetModifiers() {
+        int mask = NativeInputEvent.BUTTON1_MASK
+            | NativeInputEvent.BUTTON2_MASK
+            | NativeInputEvent.BUTTON3_MASK
+            | NativeInputEvent.BUTTON4_MASK
+            | NativeInputEvent.BUTTON5_MASK;
 
-		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.class,
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				mask);
+        NativeInputEvent event = new NativeInputEvent(
+            GlobalScreen.class,
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            0x00);
 
-		assertEquals(event.getModifiers(), mask);
-	}
+        event.setModifiers(mask);
+        assertEquals(event.getModifiers(), mask);
+    }
 
-	/**
-	 * Test of setModifiers method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testSetModifiers() {
-		System.out.println("setModifiers");
+    @Test
+    public void testGetModifiersText() {
+        int mask = NativeInputEvent.ALT_MASK
+            | NativeInputEvent.BUTTON1_MASK;
 
-		int mask =	NativeInputEvent.BUTTON1_MASK |
-					NativeInputEvent.BUTTON2_MASK |
-					NativeInputEvent.BUTTON3_MASK |
-					NativeInputEvent.BUTTON4_MASK |
-					NativeInputEvent.BUTTON5_MASK;
+        assertNotEquals("", NativeInputEvent.getModifiersText(mask));
+    }
 
-		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.class,
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				0x00);
+    @Test
+    public void testParamString() {
+        NativeInputEvent event = new NativeInputEvent(
+            GlobalScreen.class,
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            NativeInputEvent.SHIFT_MASK
+                | NativeInputEvent.BUTTON5_MASK);
 
-		event.setModifiers(mask);
-		assertEquals(event.getModifiers(), mask);
-	}
-
-	/**
-	 * Test of getModifiersText method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testGetModifiersText() {
-		System.out.println("getModifiersText");
-
-		int mask =	NativeInputEvent.ALT_MASK |
-					NativeInputEvent.BUTTON1_MASK;
-
-		assertFalse(NativeInputEvent.getModifiersText(mask).equals(""));
-	}
-
-	/**
-	 * Test of paramString method, of class NativeInputEvent.
-	 */
-	@Test
-	public void testParamString() {
-		System.out.println("paramString");
-
-		NativeInputEvent event = new NativeInputEvent(
-				GlobalScreen.class,
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				NativeInputEvent.SHIFT_MASK |
-				NativeInputEvent.BUTTON5_MASK);
-
-		assertFalse(event.paramString().equals(""));
-	}
+        assertNotEquals("", event.paramString());
+    }
 }
