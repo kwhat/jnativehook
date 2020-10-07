@@ -780,6 +780,8 @@ public class NativeKeyEvent extends NativeInputEvent {
                 return Toolkit.getProperty("AWT.sun_find", "Sun Find");
             case VC_SUN_AGAIN:
                 return Toolkit.getProperty("AWT.sun_again", "Sun Again");
+            case VC_SUN_UNDO:
+                return Toolkit.getProperty("AWT.sun_undo", "Sun Undo");
             case VC_SUN_COPY:
                 return Toolkit.getProperty("AWT.sun_copy", "Sun Copy");
             case VC_SUN_INSERT:

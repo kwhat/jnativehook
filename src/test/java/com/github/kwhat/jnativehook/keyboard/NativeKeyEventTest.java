@@ -124,8 +124,18 @@ public class NativeKeyEventTest {
     }
 
     @Test
-    public void testGetKeyText() {
-        assertNotEquals("", NativeKeyEvent.getKeyText(NativeKeyEvent.VC_A));
+    public void testGetKeyText() throws IllegalAccessException {
+        Field[] nativeFields = NativeKeyEvent.class.getDeclaredFields();
+        for (Field nativeField : nativeFields) {
+            String name = nativeField.getName();
+            int mod = nativeField.getModifiers();
+
+            if (Modifier.isPublic(mod) && Modifier.isStatic(mod) && Modifier.isFinal(mod) && name.startsWith("VC_")) {
+                assertFalse(NativeKeyEvent.getKeyText(nativeField.getInt(NativeKeyEvent.class)).startsWith("Unknown"));
+            }
+        }
+
+        assertTrue(NativeKeyEvent.getKeyText(Integer.MIN_VALUE).startsWith("Unknown"));
     }
 
     @Test
@@ -162,26 +172,26 @@ public class NativeKeyEventTest {
     @Test
     public void testMissingConstants() throws Exception {
         // Populate all the virtual key codes from NativeKeyEvent
-        HashMap<String, Integer> nativeKeyCodes = new HashMap<String, Integer>();
-        Field nativeFields[] = NativeKeyEvent.class.getDeclaredFields();
-        for (int i = 0; i < nativeFields.length; i++) {
-            String name = nativeFields[i].getName();
-            int mod = nativeFields[i].getModifiers();
+        HashMap<String, Integer> nativeKeyCodes = new HashMap<>();
+        Field[] nativeFields = NativeKeyEvent.class.getDeclaredFields();
+        for (Field nativeField : nativeFields) {
+            String name = nativeField.getName();
+            int mod = nativeField.getModifiers();
 
             if (Modifier.isPublic(mod) && Modifier.isStatic(mod) && Modifier.isFinal(mod) && name.startsWith("VC_")) {
-                nativeKeyCodes.put(name, nativeFields[i].getInt(null));
+                nativeKeyCodes.put(name, nativeField.getInt(null));
             }
         }
 
         // Populate all the virtual key codes from KeyEvent
-        HashMap<String, Integer> javaKeyCodes = new HashMap<String, Integer>();
-        Field javaFields[] = KeyEvent.class.getDeclaredFields();
-        for (int i = 0; i < javaFields.length; i++) {
-            String name = javaFields[i].getName();
-            int mod = javaFields[i].getModifiers();
+        HashMap<String, Integer> javaKeyCodes = new HashMap<>();
+        Field[] javaFields = KeyEvent.class.getDeclaredFields();
+        for (Field javaField : javaFields) {
+            String name = javaField.getName();
+            int mod = javaField.getModifiers();
 
             if (Modifier.isPublic(mod) && Modifier.isStatic(mod) && Modifier.isFinal(mod) && name.startsWith("VC_")) {
-                javaKeyCodes.put(name, javaFields[i].getInt(null));
+                javaKeyCodes.put(name, javaField.getInt(null));
             }
         }
 
@@ -195,7 +205,7 @@ public class NativeKeyEventTest {
 
         for (int i = 0, j = 0; i < nativeSet.length && j < javaSet.length; i++, j++) {
             // Check for key set miss-match.
-            if (nativeSet[i].equals(javaSet[j]) != true) {
+            if (!nativeSet[i].equals(javaSet[j])) {
                 int searchPosition;
 
                 // Search for the next aviable VC_ code.
@@ -220,8 +230,8 @@ public class NativeKeyEventTest {
                     j = searchPosition;
                 }
             }
-            else if (nativeKeyCodes.get(nativeSet[i]).equals(javaKeyCodes.get(javaSet[j])) != true) {
-                System.err.println("Key Code Missmatch for " + nativeSet[i] + ": " + nativeKeyCodes.get(nativeSet[i]) + " != " + javaKeyCodes.get(javaSet[j]));
+            else if (!nativeKeyCodes.get(nativeSet[i]).equals(javaKeyCodes.get(javaSet[j]))) {
+                System.err.println("Key Code Mismatch for " + nativeSet[i] + ": " + nativeKeyCodes.get(nativeSet[i]) + " != " + javaKeyCodes.get(javaSet[j]));
             }
         }
     }
