@@ -18,17 +18,35 @@
 package com.github.kwhat.jnativehook.keyboard;
 
 import org.junit.jupiter.api.Test;
-import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NativeKeyEventTest {
+    @Test
+    public void testIllegalArgConstructor() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            NativeKeyEvent event = new NativeKeyEvent(
+                NativeKeyEvent.NATIVE_KEY_TYPED,
+                0x00,
+                0x41,
+                NativeKeyEvent.VC_UNDEFINED,
+                NativeKeyEvent.CHAR_UNDEFINED);
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            NativeKeyEvent event = new NativeKeyEvent(
+                NativeKeyEvent.NATIVE_KEY_TYPED,
+                0x00,
+                0x41,
+                NativeKeyEvent.VC_A,
+                'A');
+        });
+    }
+
     @Test
     public void testGetRawCode() {
         NativeKeyEvent event = new NativeKeyEvent(
@@ -36,8 +54,7 @@ public class NativeKeyEventTest {
             0x00,
             0x41,
             NativeKeyEvent.VC_UNDEFINED,
-            NativeKeyEvent.CHAR_UNDEFINED,
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            NativeKeyEvent.CHAR_UNDEFINED);
 
         assertEquals(0x41, event.getRawCode());
     }
@@ -49,8 +66,7 @@ public class NativeKeyEventTest {
             0x00,
             0x00,
             NativeKeyEvent.VC_UNDEFINED,
-            NativeKeyEvent.CHAR_UNDEFINED,
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            NativeKeyEvent.CHAR_UNDEFINED);
 
         event.setRawCode(0x41);
         assertEquals(0x41, event.getRawCode());
@@ -63,8 +79,7 @@ public class NativeKeyEventTest {
             0x00,
             0x00,
             NativeKeyEvent.VC_A,
-            NativeKeyEvent.CHAR_UNDEFINED,
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            NativeKeyEvent.CHAR_UNDEFINED);
 
         assertEquals(NativeKeyEvent.VC_A, event.getKeyCode());
     }
@@ -76,8 +91,7 @@ public class NativeKeyEventTest {
             0x00,
             0x00,
             NativeKeyEvent.VC_UNDEFINED,
-            NativeKeyEvent.CHAR_UNDEFINED,
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            NativeKeyEvent.CHAR_UNDEFINED);
 
         event.setKeyCode(NativeKeyEvent.VC_A);
         assertEquals(NativeKeyEvent.VC_A, event.getKeyCode());
@@ -86,12 +100,11 @@ public class NativeKeyEventTest {
     @Test
     public void testGetKeyChar() {
         NativeKeyEvent event = new NativeKeyEvent(
-            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            NativeKeyEvent.NATIVE_KEY_TYPED,
             0x00,
             0x00,
             NativeKeyEvent.VC_UNDEFINED,
-            'A',
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            'A');
 
         assertEquals('A', event.getKeyChar());
     }
@@ -99,15 +112,14 @@ public class NativeKeyEventTest {
     @Test
     public void testSetKeyChar() {
         NativeKeyEvent event = new NativeKeyEvent(
-            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            NativeKeyEvent.NATIVE_KEY_TYPED,
             0x00,
             0x00,
             NativeKeyEvent.VC_UNDEFINED,
-            NativeKeyEvent.CHAR_UNDEFINED,
-            NativeKeyEvent.KEY_LOCATION_UNKNOWN);
+            'A');
 
-        event.setKeyChar('A');
-        assertEquals('A', event.getKeyChar());
+        event.setKeyChar('B');
+        assertEquals('B', event.getKeyChar());
     }
 
     @Test
@@ -155,20 +167,67 @@ public class NativeKeyEventTest {
     }
 
     @Test
-    public void testParamString() {
-        System.out.println("paramString");
-
+    public void testParamString() throws IllegalAccessException {
         NativeKeyEvent event = new NativeKeyEvent(
             NativeKeyEvent.NATIVE_KEY_PRESSED,
-            0x00,
+            NativeKeyEvent.SHIFT_MASK |
+                NativeKeyEvent.CTRL_MASK |
+                NativeKeyEvent.META_MASK |
+                NativeKeyEvent.ALT_MASK |
+                NativeKeyEvent.BUTTON1_MASK |
+                NativeKeyEvent.BUTTON2_MASK |
+                NativeKeyEvent.BUTTON3_MASK |
+                NativeKeyEvent.BUTTON4_MASK |
+                NativeKeyEvent.BUTTON5_MASK |
+                NativeKeyEvent.NUM_LOCK_MASK |
+                NativeKeyEvent.CAPS_LOCK_MASK |
+                NativeKeyEvent.SCROLL_LOCK_MASK,
             0x00,
             NativeKeyEvent.VC_UNDEFINED,
             NativeKeyEvent.CHAR_UNDEFINED,
             NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
-        assertNotEquals("", event.paramString());
+        assertTrue(event.paramString().startsWith("NATIVE_KEY_PRESSED"));
+        assertTrue(event.paramString().contains("modifiers=Shift+Ctrl+Meta+Alt+Button1+Button2+Button3+Button4+Button5+Num Lock+Caps Lock+Scroll Lock,"));
+        assertTrue(event.paramString().contains("KEY_LOCATION_UNKNOWN"));
+
+        event = new NativeKeyEvent(
+            NativeKeyEvent.NATIVE_KEY_RELEASED,
+            0x00,
+            0x00,
+            NativeKeyEvent.VC_TAB,
+            NativeKeyEvent.CHAR_UNDEFINED,
+            NativeKeyEvent.KEY_LOCATION_STANDARD);
+
+        assertTrue(event.paramString().startsWith("NATIVE_KEY_RELEASED"));
+        assertTrue(event.paramString().contains("KEY_LOCATION_STANDARD"));
+
+
+        event = new NativeKeyEvent(
+            NativeKeyEvent.NATIVE_KEY_TYPED,
+            0x00,
+            0x00,
+            NativeKeyEvent.VC_UNDEFINED,
+            'A',
+            NativeKeyEvent.KEY_LOCATION_LEFT);
+
+        assertTrue(event.paramString().startsWith("NATIVE_KEY_TYPED"));
+        assertTrue(event.paramString().contains("KEY_LOCATION_LEFT"));
+
+
+        event = new NativeKeyEvent(
+            Integer.MIN_VALUE,
+            0x00,
+            0x00,
+            NativeKeyEvent.VC_UNDEFINED,
+            NativeKeyEvent.CHAR_UNDEFINED,
+            NativeKeyEvent.KEY_LOCATION_RIGHT);
+
+        assertTrue(event.paramString().startsWith("unknown type"));
+        assertTrue(event.paramString().contains("KEY_LOCATION_RIGHT"));
     }
 
+    /*
     @Test
     public void testMissingConstants() throws Exception {
         // Populate all the virtual key codes from NativeKeyEvent
@@ -235,4 +294,5 @@ public class NativeKeyEventTest {
             }
         }
     }
+    */
 }
