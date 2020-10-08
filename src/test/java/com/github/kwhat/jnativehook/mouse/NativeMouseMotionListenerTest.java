@@ -17,54 +17,43 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseInputListenerImpl;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import com.github.kwhat.jnativehook.mouse.listeners.NativeMouseInputListenerTest;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- *
- * @author abarker
- */
 public class NativeMouseMotionListenerTest {
-	/**
-	 * Test of nativeMouseMoved method, of class NativeMouseMotionListener.
-	 */
-	@Test
-	public void testNativeMouseMoved() {
-		System.out.println("nativeMouseMoved");
+    @Test
+    public void testNativeMouseMoved() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_MOVED,
+            0x00,
+            50,
+            75,
+            0,
+            NativeMouseEvent.NOBUTTON);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_MOVED,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				0,		// Click Count
-				NativeMouseEvent.NOBUTTON);
+        NativeMouseInputListenerTest listener = new NativeMouseInputListenerTest();
+        listener.nativeMouseMoved(event);
 
-		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		listener.nativeMouseMoved(event);
+        assertEquals(event, listener.getLastEvent());
+    }
 
-		assertEquals(event, listener.getLastEvent());
-	}
+    /**
+     * Test of nativeMouseDragged method, of class NativeMouseMotionListener.
+     */
+    @Test
+    public void testNativeMouseDragged() {
+        NativeMouseEvent event = new NativeMouseEvent(
+            NativeMouseEvent.NATIVE_MOUSE_DRAGGED,
+            NativeMouseEvent.BUTTON1_MASK,
+            50,
+            75,
+            0,
+            NativeMouseEvent.NOBUTTON);
 
-	/**
-	 * Test of nativeMouseDragged method, of class NativeMouseMotionListener.
-	 */
-	@Test
-	public void testNativeMouseDragged() {
-		System.out.println("nativeMouseDragged");
+        NativeMouseInputListenerTest listener = new NativeMouseInputListenerTest();
+        listener.nativeMouseDragged(event);
 
-		NativeMouseEvent event = new NativeMouseEvent(
-				NativeMouseEvent.NATIVE_MOUSE_DRAGGED,
-				NativeMouseEvent.BUTTON1_MASK,
-				50,		// X
-				75,		// Y
-				0,		// Click Count
-				NativeMouseEvent.NOBUTTON);
-
-		NativeMouseInputListenerImpl listener = new NativeMouseInputListenerImpl();
-		listener.nativeMouseDragged(event);
-
-		assertEquals(event, listener.getLastEvent());
-	}
+        assertEquals(event, listener.getLastEvent());
+    }
 }

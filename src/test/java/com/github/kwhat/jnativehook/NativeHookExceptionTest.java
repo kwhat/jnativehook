@@ -17,33 +17,38 @@
  */
 package com.github.kwhat.jnativehook;
 
-import org.junit.Test;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class NativeHookExceptionTest {
-	//@Rule
-	//public ExpectedException thrown = ExpectedException.none();
+    @Test
+    public void testCode() {
+        int code = NativeHookException.HOOK_FAILURE;
 
-	@Test
-	public void testNativeHookException() {
-		System.out.println("NativeHookException");
+        try {
+            throw new NativeHookException(code);
+        }
+        catch (NativeHookException e) {
+            assertEquals(code, e.getCode());
+        }
+        catch (Exception e) {
+            fail("Invalid exception type: " + e.getClass());
+        }
+    }
 
-		String message = "Test NativeHookException";
-		//thrown.expect(NativeHookException.class);
-		//thrown.expectMessage(message);
+    @Test
+    public void testMessage() {
+        String message = "Test NativeHookException";
 
-		// Cannot support @rule at this time due to macport junit min version 4.6
-		//throw new NativeHookException(message);
-
-		try {
-			throw new NativeHookException(message);
-		}
-		catch (NativeHookException e) {
-			assertEquals(message, e.getMessage());
-		}
-		catch (Exception e) {
-			fail("Invalid exception type: " + e.getClass());
-		}
-	}
+        try {
+            throw new NativeHookException(message);
+        }
+        catch (NativeHookException e) {
+            assertEquals(message, e.getMessage());
+        }
+        catch (Exception e) {
+            fail("Invalid exception type: " + e.getClass());
+        }
+    }
 }

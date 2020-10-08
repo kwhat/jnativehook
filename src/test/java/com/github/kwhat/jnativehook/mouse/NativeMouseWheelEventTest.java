@@ -17,88 +17,68 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class NativeMouseWheelEventTest {
-	/**
-	 * Test of getScrollAmount method, of class NativeMouseWheelEvent.
-	 */
-	@Test
-	public void testGetScrollAmount() {
-		System.out.println("getScrollAmount");
+    @Test
+    public void testGetScrollAmount() {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(
+            NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
+            3,
+            -1);
 
-		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
-				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
-				3,		// Scroll Amount
-				-1);	// Wheel Rotation
+        assertEquals(3, event.getScrollAmount());
+    }
 
-		assertEquals(3, event.getScrollAmount());
-	}
+    @Test
+    public void testGetScrollType() {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(
+            NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
+            3,
+            -1);
 
-	/**
-	 * Test of getScrollType method, of class NativeMouseWheelEvent.
-	 */
-	@Test
-	public void testGetScrollType() {
-		System.out.println("getScrollType");
+        assertEquals(NativeMouseWheelEvent.WHEEL_UNIT_SCROLL, event.getScrollType());
+    }
 
-		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
-				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
-				3,		// Scroll Amount
-				-1);	// Wheel Rotation
+    @Test
+    public void testGetWheelRotation() {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(
+            NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
+            3,
+            -1);
 
-		assertEquals(NativeMouseWheelEvent.WHEEL_UNIT_SCROLL, event.getScrollType());
-	}
+        assertEquals(-1, event.getWheelRotation());
+    }
 
-	/**
-	 * Test of getWheelRotation method, of class NativeMouseWheelEvent.
-	 */
-	@Test
-	public void testGetWheelRotation() {
-		System.out.println("getWheelRotation");
+    @Test
+    public void testParamString() {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(
+            NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0x00,
+            50,
+            75,
+            1,
+            NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
+            3,
+            -1);
 
-		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
-				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
-				3,		// Scroll Amount
-				-1);	// Wheel Rotation
-
-		assertEquals(-1, event.getWheelRotation());
-	}
-
-	/**
-	 * Test of paramString method, of class NativeMouseWheelEvent.
-	 */
-	@Test
-	public void testParamString() {
-		System.out.println("paramString");
-
-		NativeMouseWheelEvent event = new NativeMouseWheelEvent(
-				NativeMouseEvent.NATIVE_MOUSE_WHEEL,
-				0x00,	// Modifiers
-				50,		// X
-				75,		// Y
-				1,		// Click Count
-				NativeMouseWheelEvent.WHEEL_UNIT_SCROLL,
-				3,		// Scroll Amount
-				-1);	// Wheel Rotation
-
-		assertFalse(event.paramString().equals(""));
-	}
+        assertNotEquals("", event.paramString());
+    }
 }

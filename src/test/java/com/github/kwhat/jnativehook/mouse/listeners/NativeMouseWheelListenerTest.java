@@ -20,24 +20,22 @@ package com.github.kwhat.jnativehook.mouse.listeners;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 
-public class NativeMouseWheelListenerImpl implements NativeMouseWheelListener {
-	private NativeMouseWheelEvent lastEvent;
+public class NativeMouseWheelListenerTest implements NativeMouseWheelListener {
+    private NativeMouseWheelEvent lastEvent;
 
-	public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-		System.out.println("Received " + e.paramString());
+    public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
+        if (e.getID() != NativeMouseWheelEvent.NATIVE_MOUSE_WHEEL) {
+            throw new IllegalArgumentException("Invalid event type received for nativeMouseWheelMoved!");
+        }
 
-		if (e.getID() != NativeMouseWheelEvent.NATIVE_MOUSE_WHEEL) {
-			throw new IllegalArgumentException("Invalid event type received for nativeMouseWheelMoved!");
-		}
+        lastEvent = e;
 
-		lastEvent = e;
+        synchronized (this) {
+            this.notifyAll();
+        }
+    }
 
-		synchronized(this) {
-			this.notifyAll();
-		}
-	}
-
-	public NativeMouseWheelEvent getLastEvent() {
-		return lastEvent;
-	}
+    public NativeMouseWheelEvent getLastEvent() {
+        return lastEvent;
+    }
 }

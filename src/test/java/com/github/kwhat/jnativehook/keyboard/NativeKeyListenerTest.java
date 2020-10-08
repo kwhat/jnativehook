@@ -17,72 +17,55 @@
  */
 package com.github.kwhat.jnativehook.keyboard;
 
-import com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerImpl;
-import org.junit.Assert;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NativeKeyListenerTest {
-	/**
-	 * Test of nativeKeyPressed method, of class NativeKeyListener.
-	 */
-	@Test
-	public void testNativeKeyPressed() {
-		System.out.println("nativeKeyPressed");
+    @Test
+    public void testNativeKeyPressed() {
+        NativeKeyEvent event = new NativeKeyEvent(
+            NativeKeyEvent.NATIVE_KEY_PRESSED,
+            NativeKeyEvent.SHIFT_MASK,
+            0x41,
+            NativeKeyEvent.VC_A,
+            NativeKeyEvent.CHAR_UNDEFINED,
+            NativeKeyEvent.KEY_LOCATION_STANDARD);
 
-		NativeKeyEvent event = new NativeKeyEvent(
-				NativeKeyEvent.NATIVE_KEY_PRESSED,
-				NativeKeyEvent.SHIFT_MASK,
-				0x41,		// Raw Code
-				NativeKeyEvent.VC_A,
-				NativeKeyEvent.CHAR_UNDEFINED,
-				NativeKeyEvent.KEY_LOCATION_STANDARD);
+        com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest listener = new com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest();
+        listener.nativeKeyPressed(event);
 
-		NativeKeyListenerImpl listener = new NativeKeyListenerImpl();
-		listener.nativeKeyPressed(event);
+        assertEquals(event, listener.getLastEvent());
+    }
 
-		Assert.assertEquals(event, listener.getLastEvent());
-	}
+    @Test
+    public void testNativeKeyReleased() {
+        NativeKeyEvent event = new NativeKeyEvent(
+            NativeKeyEvent.NATIVE_KEY_RELEASED,
+            NativeKeyEvent.SHIFT_MASK,
+            0x41,
+            NativeKeyEvent.VC_A,
+            NativeKeyEvent.CHAR_UNDEFINED,
+            NativeKeyEvent.KEY_LOCATION_STANDARD);
 
-	/**
-	 * Test of nativeKeyReleased method, of class NativeKeyListener.
-	 */
-	@Test
-	public void testNativeKeyReleased() {
-		System.out.println("nativeKeyReleased");
+        com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest listener = new com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest();
+        listener.nativeKeyReleased(event);
 
-		NativeKeyEvent event = new NativeKeyEvent(
-				NativeKeyEvent.NATIVE_KEY_RELEASED,
-				NativeKeyEvent.SHIFT_MASK,
-				0x41,		// Raw Code
-				NativeKeyEvent.VC_A,
-				NativeKeyEvent.CHAR_UNDEFINED,
-				NativeKeyEvent.KEY_LOCATION_STANDARD);
+        assertEquals(event, listener.getLastEvent());
+    }
 
-		NativeKeyListenerImpl listener = new NativeKeyListenerImpl();
-		listener.nativeKeyReleased(event);
+    @Test
+    public void testNativeKeyTyped() {
+        NativeKeyEvent event = new NativeKeyEvent(
+            NativeKeyEvent.NATIVE_KEY_TYPED,
+            NativeKeyEvent.SHIFT_MASK,
+            0x41,
+            NativeKeyEvent.VC_UNDEFINED,
+            'A',
+            NativeKeyEvent.KEY_LOCATION_STANDARD);
 
-		Assert.assertEquals(event, listener.getLastEvent());
-	}
+        com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest listener = new com.github.kwhat.jnativehook.keyboard.listeners.NativeKeyListenerTest();
+        listener.nativeKeyTyped(event);
 
-	/**
-	 * Test of nativeKeyTyped method, of class NativeKeyListener.
-	 */
-	@Test
-	public void testNativeKeyTyped() {
-		System.out.println("nativeKeyTyped");
-
-		NativeKeyEvent event = new NativeKeyEvent(
-				NativeKeyEvent.NATIVE_KEY_TYPED,
-				NativeKeyEvent.SHIFT_MASK,
-				0x41,		// Raw Code
-				NativeKeyEvent.VC_UNDEFINED,
-				'A',
-				NativeKeyEvent.KEY_LOCATION_STANDARD);
-
-		NativeKeyListenerImpl listener = new NativeKeyListenerImpl();
-		listener.nativeKeyTyped(event);
-
-		Assert.assertEquals(event, listener.getLastEvent());
-	}
+        assertEquals(event, listener.getLastEvent());
+    }
 }

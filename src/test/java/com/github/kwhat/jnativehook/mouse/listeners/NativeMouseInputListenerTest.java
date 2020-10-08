@@ -20,7 +20,7 @@ package com.github.kwhat.jnativehook.mouse.listeners;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 
-public class NativeMouseInputListenerImpl implements NativeMouseInputListener {
+public class NativeMouseInputListenerTest implements NativeMouseInputListener {
 	private NativeMouseEvent lastEvent;
 
 	public void nativeMouseClicked(NativeMouseEvent e) {
