@@ -176,7 +176,6 @@ public class NativeInputEvent extends EventObject {
         return when;
     }
 
-
     /**
      * Gets the modifier flags for this event.
      *
@@ -190,6 +189,7 @@ public class NativeInputEvent extends EventObject {
      * Sets the modifier flags for this event.
      *
      * @param modifiers the new modifier flags
+     * @deprecated
      */
     public void setModifiers(int modifiers) {
         this.modifiers = modifiers;
@@ -205,10 +205,11 @@ public class NativeInputEvent extends EventObject {
      * Event propagation support for X11 cannot be provided due to an oversight
      * in the way that XRecord currently operates.  No public method will be
      * available until a working cross-platform solution can be provided.
-     * 
+     *
      * @param reserved Non-portable flags for unsupported functionality.
      * 
      * @since 1.1
+     * @deprecated
      */
     @SuppressWarnings("unused")
     private void setReserved(short reserved) {
