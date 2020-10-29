@@ -10,8 +10,12 @@ public class GlobalKeyListenerExample implements NativeKeyListener {
 		System.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
 
 		if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-			GlobalScreen.unregisterNativeHook();
-		}
+            		try {
+                		GlobalScreen.unregisterNativeHook();
+            		} catch (NativeHookException nativeHookException) {
+                		nativeHookException.printStackTrace();
+            		}
+        	}
 	}
 
 	public void nativeKeyReleased(NativeKeyEvent e) {
