@@ -63,7 +63,7 @@ public class SwingMouseAdapter extends AbstractSwingInputAdapter implements Nati
         return new MouseEvent(
             this,
             nativeEvent.getID() - (NativeMouseEvent.NATIVE_MOUSE_FIRST
-                - NativeMouseEvent.NATIVE_MOUSE_FIRST),
+                - MouseEvent.MOUSE_FIRST),
             System.currentTimeMillis(),
             this.getJavaModifiers(nativeEvent.getModifiers()),
             nativeEvent.getX(),
