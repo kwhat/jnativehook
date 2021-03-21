@@ -83,9 +83,9 @@ If you have found this library useful, please consider making a donation.
 * [Global Mouse Listener](doc/Mouse.md)
 * [Global Mouse Wheel Listener](doc/MouseWheel.md)
 * [Thread Safety for AWT, Swing and JavaFX](doc/Swing.md)
-* [Logging and Console Output](doc/examples/ConsoleOutput.md)
-* [Advanced Library Loading](doc/examples/LibraryLoading.md)
-* [Consuming Events (Unsupported)](doc/examples/ConsumingEvents.md)
+* [Logging and Console Output](doc/ConsoleOutput.md)
+* [Advanced Library Loading](doc/LibraryLoading.md)
+* [Consuming Events (Unsupported)](doc/ConsumingEvents.md)
 
 ## Demo Application
 The graphical example application exists to provide a real-time demonstration of raw output for all available native 
