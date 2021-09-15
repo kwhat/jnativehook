@@ -47,6 +47,11 @@ else()
     message(FATAL_ERROR "Could not determine target architecture.  Please set CMAKE_SYSTEM_PROCESSOR to the desired resource folder.")
 endif()
 
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH 1)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
+endif()
+
 
 find_package(JNI)
 if(NOT JNI_FOUND)
