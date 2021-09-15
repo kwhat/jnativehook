@@ -34,6 +34,62 @@ jobs:
           if-no-files-found: error
 
 
+  apple-arm64:
+    needs: generate-headers
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: native-headers
+          path: ${{github.workspace}}/target/include
+
+      - name: Compile
+        env:
+          CC: clang
+          CFLAGS: '-O2 -g -target arm64-apple-macos10.5 -flto -fomit-frame-pointer -fno-stack-protector -pipe'
+          LDFLAGS: '-Wl,-dead_strip_dylibs'
+        shell: bash
+        run: |
+          mkdir -p target/build/libuiohook/
+          cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
+            -G "Unix Makefiles" \
+            -D CMAKE_INSTALL_PREFIX=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON \
+            -D BUILD_SHARED_LIBS=OFF
+
+          cmake --build target/build/libuiohook/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build/libuiohook/
+
+          mkdir -p target/build/jni/
+          cmake -B target/build/jni/ \
+            -G "Unix Makefiles" \
+            -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_VERBOSE_MAKEFILE=ON
+
+          cmake --build target/build/jni/ \
+            --parallel 2 \
+            --clean-first
+
+          cmake --install target/build/jni/
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: native-libraries
+          path: |
+            ${{github.workspace}}/src/main/resources
+          if-no-files-found: error
+
   apple-x86_64:
     needs: generate-headers
     runs-on: macos-latest
@@ -53,7 +109,7 @@ jobs:
       - name: Compile
         env:
           CC: clang
-          CFLAGS: '-O2 -g -march=x86-64 -mtune=generic -flto -fomit-frame-pointer -fno-stack-protector -pipe'
+          CFLAGS: '-O2 -g -target x86_64-apple-macos10.5 -flto -fomit-frame-pointer -fno-stack-protector -pipe'
           LDFLAGS: '-Wl,-dead_strip_dylibs'
         shell: bash
         run: |
@@ -625,6 +681,7 @@ jobs:
 
   package:
     needs: [
+      apple-arm64,
       apple-x86_64,
       linux-arm,
       linux-arm64,
