@@ -74,6 +74,8 @@ jobs:
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
             -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=darwin \
+            -D CMAKE_SYSTEM_PROCESSOR=arm64 \
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
@@ -130,6 +132,8 @@ jobs:
           cmake -B target/build/jni/ \
             -G "Unix Makefiles" \
             -D CMAKE_PREFIX_PATH=target/ \
+            -D CMAKE_SYSTEM_NAME=darwin \
+            -D CMAKE_SYSTEM_PROCESSOR=x86_64 \
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target/build/jni/ \
