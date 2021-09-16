@@ -1,7 +1,7 @@
 JNativeHook: Global keyboard and mouse listeners for Java.
 ==========================================================
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.kwhat/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.1stleg/jnativehook)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.kwhat/jnativehook/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.kwhat/jnativehook)
 ![Nightly Build](https://github.com/kwhat/jnativehook/workflows/Nightly%20Build/badge.svg)
 
 ## About
@@ -38,7 +38,7 @@ licenced attorney if you have licence compatibility questions or concerns.
 Binary distribution for JNativeHook can be found at the 
 [releases](https://github.com/kwhat/jnativehook/releases) section of the 
 [project page](https://github.com/kwhat/jnativehook).  Maven users can 
-use the `<groupId>com.1stleg</groupId>` and `<artifactId>jnativehook</artifactId>` 
+use the `<groupId>com.github.kwhat</groupId>` and `<artifactId>jnativehook</artifactId>` 
 to include this library automatically.  The nightly builds can be found at the maven 
 [snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/github/kwhat/jnativehook/2.2-SNAPSHOT).
 
