@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -436,7 +436,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
     public static void main(String[] args) {
         String copyright = "\n"
             + "JNativeHook: Global keyboard and mouse listeners for Java.\n"
-            + "Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.\n"
+            + "Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.\n"
             + "https://github.com/kwhat/jnativehook/\n"
             + "\n"
             + "JNativeHook is free software: you can redistribute it and/or modify\n"

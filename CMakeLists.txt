@@ -1,5 +1,5 @@
 # JNativeHook: Global keyboard and mouse listeners for Java.
-# Copyright (C) 2006-2020 Alexander Barker.  All Rights Received.
+# Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
 # https://github.com/kwhat/jnativehook/
 
 # JNativeHook is free software: you can redistribute it and/or modify
