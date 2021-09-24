@@ -388,8 +388,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
         requestFocusInWindow();
 
         // Please note that these properties are not available until after the GlobalScreen class is initialized.
-        txtEventInfo.setText("JNativeHook Version " + System.getProperty("jnativehook.lib.version"));
-        appendDisplay("Auto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
+        txtEventInfo.setText("Auto Repeat Rate: " + System.getProperty("jnativehook.key.repeat.rate"));
         appendDisplay("Auto Repeat Delay: " + System.getProperty("jnativehook.key.repeat.delay"));
         appendDisplay("Double Click Time: " + System.getProperty("jnativehook.button.multiclick.iterval"));
         appendDisplay("Pointer Sensitivity: " + System.getProperty("jnativehook.pointer.sensitivity"));
