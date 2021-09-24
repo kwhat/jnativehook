@@ -24,9 +24,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.kwhat</groupId>
   <artifactId>jnativehook</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>${revision}</version>
 
   <properties>
+    <revision>2.2-SNAPSHOT</revision>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <maven.compiler.debug>true</maven.compiler.debug>
@@ -96,7 +98,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.7.0</version>
+      <version>5.8.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -222,25 +224,6 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
         <version>2.7</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.1.0</version>
-
-        <executions>
-          <execution>
-            <id>parse-version</id>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
-
-            <configuration>
-              <propertyPrefix>maven.version</propertyPrefix>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
@@ -408,23 +391,8 @@
             </manifest>
 
             <manifestEntries>
-              <url>${project.scm.url}</url>
+              <Project-Url>${project.scm.url}</Project-Url>
             </manifestEntries>
-
-            <manifestSections>
-              <manifestSection>
-                <name>com/github/kwhat/jnativehook</name>
-                <manifestEntries>
-                  <Specification-Title>${project.name} Library"</Specification-Title>
-                  <Specification-Version>${maven.version.majorVersion}.${maven.version.minorVersion}</Specification-Version>
-                  <Specification-Vendor>Alexander Barker (alex@1stleg.com)</Specification-Vendor>
-
-                  <Implementation-Title>${project.groupId}</Implementation-Title>
-                  <Implementation-Version>${maven.version.incrementalVersion}${maven.version.qualifier?}</Implementation-Version>
-                  <Implementation-Vendor>${project.build.version}</Implementation-Vendor>
-                </manifestEntries>
-              </manifestSection>
-            </manifestSections>
           </archive>
         </configuration>
       </plugin>
