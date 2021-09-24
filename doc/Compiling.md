@@ -9,9 +9,13 @@ Alternatively, [OpenJDK](https://jdk.java.net/) maybe used.  You will also need 
 or MSVC), [CMake](https://cmake.org/download/) and [Maven](https://maven.apache.org/download.cgi).  
 
 ## Building
+Compile Java classes and generate JNI headers.
 ```                                      
 mvn compile
+```
 
+Compile libuiohook external dependency.
+```
 mkdir -p target/build/libuiohook/
 cmake -B target/build/libuiohook/ -S src/external/libuiohook/ \
     -D CMAKE_INSTALL_PREFIX=target/ \
@@ -23,7 +27,10 @@ cmake --build target/build/libuiohook/ \
     --clean-first
 
 cmake --install target/build/libuiohook/
+```
 
+Compile JNI source files.
+```
 mkdir -p target/build/jni/
 cmake -B target/build/jni/ \
     -D CMAKE_PREFIX_PATH=target/ \
@@ -34,6 +41,9 @@ cmake --build target/build/jni/ \
     --clean-first
 
 cmake --install target/build/jni/
+```
 
+Create the JAR file.
+```
 mvn package
 ```

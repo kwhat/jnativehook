@@ -1,5 +1,24 @@
 ## ChangeLog
 
+**JNativeHook 2.2.0 (Pending, 2021)**
+ * Complete CI/CD overhaul using GitHub Actions.
+ * Dropping Ant support in favor of CMake and Maven.
+ * Changed Maven group id to com.github.kwhat.
+ * Namespace migration due to Maven group id change. 
+ * Added support for Arm 64 on OS X.
+ * Added support for multi-release jars.
+ * Added wiki docs to the project.
+ * Added VoidDispatcher class.
+ * Fixed logging to be less verbose by default.
+ * Fixed native library extraction location.
+ * Fixed issue with unregistering the hook.
+ * Fixed could not find keyboard map for locale on Windows.
+ * Fixed issue with setEventDispatcher being overridden on hook registration.
+ * Fixed issue with dead keys not working in some situations.
+ * Deprecated all adaptor classes.
+ * Deprecated NativeInputEvent.setModifiers() and NativeInputEvent.setReserved().
+ * Removed support for Java 1.5.
+
 **JNativeHook 2.1.0 (Jan 25, 2015)**
  * All events now use the native time source instead of the Unix epoch.
  * Added adapter classes.
