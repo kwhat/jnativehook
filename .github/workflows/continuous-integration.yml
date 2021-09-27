@@ -759,4 +759,6 @@ jobs:
           name: nightly-build
           path: |
             ${{github.workspace}}/target/*.jar
+            ${{github.workspace}}/target/*.asc
+            ${{github.workspace}}/target/*.pom
           if-no-files-found: error
