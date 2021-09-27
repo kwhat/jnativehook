@@ -721,6 +721,11 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
+      - name: Setup GPG
+        run: |
+          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
       - name: Package Snapshot
         if: ${{ github.event_name == 'push' }}
         env:
@@ -728,7 +733,11 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         shell: bash
         run: |
-          mvn -B --no-transfer-progress deploy
+          mvn \
+            -Dgpg.passphrase=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }} \
+            --batch-mode \
+            --no-transfer-progress \
+            deploy
 
       - name: Package Release
         if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
@@ -737,7 +746,12 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         shell: bash
         run: |
-          mvn -Drevision="${GITHUB_REF#refs/tags/}" -B --no-transfer-progress deploy
+          mvn \
+            -Drevision="${GITHUB_REF#refs/tags/}" \
+            -Dgpg.passphrase="${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}" \
+            --batch-mode \
+            --no-transfer-progress \
+            deploy
 
       - name: Upload
         uses: actions/upload-artifact@v2
