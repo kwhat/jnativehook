@@ -1,11 +1,14 @@
-name: Nightly Build
+name: Continuous Integration
 on:
   push:
     branches:
-      - '**'
+      - '2.2'
+
+  release:
+    types: [ created ]
 
 jobs:
-  generate-headers:
+  compile-java:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,7 +23,7 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Generate
+      - name: Compile
         shell: bash
         run: |
           mvn -B --no-transfer-progress compile
@@ -34,8 +37,8 @@ jobs:
           if-no-files-found: error
 
 
-  apple-arm64:
-    needs: generate-headers
+  compile-apple-arm64:
+    needs: compile-java
     runs-on: macos-latest
 
     steps:
@@ -92,8 +95,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  apple-x86_64:
-    needs: generate-headers
+  compile-apple-x86_64:
+    needs: compile-java
     runs-on: macos-latest
 
     steps:
@@ -151,8 +154,8 @@ jobs:
           if-no-files-found: error
 
 
-  linux-arm:
-    needs: generate-headers
+  compile-linux-arm:
+    needs: compile-java
     runs-on: ubuntu-latest
 
     steps:
@@ -241,8 +244,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  linux-arm64:
-    needs: generate-headers
+  compile-linux-arm64:
+    needs: compile-java
     runs-on: ubuntu-latest
 
     steps:
@@ -331,8 +334,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  linux-x86:
-    needs: generate-headers
+  compile-linux-x86:
+    needs: compile-java
     runs-on: ubuntu-latest
 
     steps:
@@ -417,8 +420,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  linux-x86_64:
-    needs: generate-headers
+  compile-linux-x86_64:
+    needs: compile-java
     runs-on: ubuntu-latest
 
     steps:
@@ -492,8 +495,8 @@ jobs:
           if-no-files-found: error
 
 
-  windows-arm:
-    needs: generate-headers
+  compile-windows-arm:
+    needs: compile-java
     runs-on: windows-latest
 
     steps:
@@ -557,8 +560,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  windows-x86:
-    needs: generate-headers
+  compile-windows-x86:
+    needs: compile-java
     runs-on: windows-latest
 
     steps:
@@ -620,8 +623,8 @@ jobs:
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
 
-  windows-x86_64:
-    needs: generate-headers
+  compile-windows-x86_64:
+    needs: compile-java
     runs-on: windows-latest
 
     steps:
@@ -685,15 +688,15 @@ jobs:
 
   package:
     needs: [
-      apple-arm64,
-      apple-x86_64,
-      linux-arm,
-      linux-arm64,
-      linux-x86,
-      linux-x86_64,
-      windows-arm,
-      windows-x86,
-      windows-x86_64
+      compile-apple-arm64,
+      compile-apple-x86_64,
+      compile-linux-arm,
+      compile-linux-arm64,
+      compile-linux-x86,
+      compile-linux-x86_64,
+      compile-windows-arm,
+      compile-windows-x86,
+      compile-windows-x86_64
     ]
     runs-on: ubuntu-latest
     steps:
@@ -718,13 +721,23 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
-      - name: Package
+      - name: Package Snapshot
+        if: ${{ github.event_name == 'push' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         shell: bash
         run: |
           mvn -B --no-transfer-progress deploy
+
+      - name: Package Release
+        if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        shell: bash
+        run: |
+          mvn -Drevision="${GITHUB_REF#refs/tags/}" -B --no-transfer-progress deploy
 
       - name: Upload
         uses: actions/upload-artifact@v2
