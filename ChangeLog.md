@@ -1,11 +1,12 @@
 ## ChangeLog
 
-**JNativeHook 2.2.0 (Pending, 2021)**
+**JNativeHook 2.2.0 (Sep 27, 2021)**
  * Complete CI/CD overhaul using GitHub Actions.
  * Dropping Ant support in favor of CMake and Maven.
  * Changed Maven group id to com.github.kwhat.
- * Namespace migration due to Maven group id change. 
- * Added support for Arm 64 on OS X.
+ * Namespace migration due to Maven group id change.
+ * Added support for Arm on Windows.
+ * Added support for Arm 64 on OS X and Linux.
  * Added support for multi-release jars.
  * Added wiki docs to the project.
  * Added VoidDispatcher class.

@@ -43,7 +43,7 @@ to include this library automatically.  The nightly builds can be found at the m
 ## Software and Hardware Requirements
 * Java 1.8 - 17
 * 256 MB of RAM
-* Apple OS X 10.5 - 11.6
+* Apple OS X 10.5 - 10.15
     * amd64, aarch64
     * Enable Access for Assistive Devices
 * Windows 2000 - 10
