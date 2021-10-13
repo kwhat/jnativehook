@@ -96,7 +96,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.8.0</version>
+      <version>5.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -350,6 +350,38 @@
       </plugin>
 
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.2.2</version>
+
+        <configuration>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <inherited>true</inherited>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M4</version>
@@ -385,23 +417,6 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
-
-        <configuration>
-          <sourcepath>${project.build.sourceDirectory}</sourcepath>
-        </configuration>
-
-        <executions>
-          <execution>
-            <id>default-javadoc</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.2.0</version>
 
@@ -424,13 +439,30 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+
+        <configuration>
+          <sourcepath>${project.build.sourceDirectory}</sourcepath>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>default-javadoc</id>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <version>3.2.0</version>
         
         <executions>
           <execution>
             <id>attach-sources</id>
-            <phase>verify</phase>
+            <phase>package</phase>
             <goals>
               <goal>jar-no-fork</goal>
             </goals>
