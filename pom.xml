@@ -27,6 +27,8 @@
   <version>${revision}</version>
 
   <properties>
+    <revision>2.2-SNAPSHOT</revision>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <maven.compiler.debug>true</maven.compiler.debug>
