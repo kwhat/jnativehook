@@ -4,6 +4,10 @@ on:
     branches:
       - '2.2'
 
+  pull_request:
+    branches:
+    - '2.2'
+
   release:
     types: [ created ]
 
@@ -756,7 +760,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: ci-build
           path: |
             ${{github.workspace}}/target/*.jar
             ${{github.workspace}}/target/*.asc
