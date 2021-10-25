@@ -242,6 +242,59 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>target-jdk17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>compile-jdk17</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+
+                <configuration>
+                  <multiReleaseOutput>${maven.compiler.multi-release}</multiReleaseOutput>
+                  <release>17</release>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>package-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+
+                <configuration combine.self="override">
+                  <detectJavaApiLink>true</detectJavaApiLink>
+                  <release>17</release>
+
+                  <sourceFileExcludes>
+                    <sourceFileInclude>**/module-info.java</sourceFileInclude>
+                  </sourceFileExcludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 
