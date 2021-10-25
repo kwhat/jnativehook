@@ -732,7 +732,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
-      - name:  Package
+      - name: Package
         run: |
           mvn \
             --batch-mode \
@@ -745,7 +745,7 @@ jobs:
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG
 
-      - name: Create Snapshot
+      - name: Snapshot
         if: ${{ github.event_name == 'push' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -758,7 +758,7 @@ jobs:
             --no-transfer-progress \
             deploy
 
-      - name: Create Release
+      - name: Release
         if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
