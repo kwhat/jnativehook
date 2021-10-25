@@ -4,8 +4,16 @@ on:
     branches:
       - '2.2'
 
+  pull_request:
+    branches:
+      - '2.2'
+
   release:
     types: [ created ]
+
+concurrency:
+  group:  ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   compile-java:
@@ -19,14 +27,17 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
           java-package: jdk
           architecture: x64
 
       - name: Compile
         shell: bash
         run: |
-          mvn -B --no-transfer-progress compile
+          mvn \
+            --batch-mode \
+            --no-transfer-progress \
+            compile
 
       - name: Upload
         uses: actions/upload-artifact@v2
@@ -714,19 +725,27 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
           java-package: jdk
           architecture: x64
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
+      - name: Package
+        run: |
+          mvn \
+            --batch-mode \
+            --no-transfer-progress \
+            package
+
       - name: Setup GPG
+        if: ${{ github.event_name == 'push' || github.event_name == 'release' }}
         run: |
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG
 
-      - name: Package Snapshot
+      - name: Snapshot
         if: ${{ github.event_name == 'push' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -739,7 +758,7 @@ jobs:
             --no-transfer-progress \
             deploy
 
-      - name: Package Release
+      - name: Release
         if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -756,7 +775,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-build
+          name: ci-build
           path: |
             ${{github.workspace}}/target/*.jar
             ${{github.workspace}}/target/*.asc
