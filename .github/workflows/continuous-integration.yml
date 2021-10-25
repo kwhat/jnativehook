@@ -731,7 +731,7 @@ jobs:
           gpg --list-secret-keys --keyid-format LONG
 
       - name: Package Snapshot
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
