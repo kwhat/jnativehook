@@ -154,7 +154,7 @@ public class NativeKeyEvent extends NativeInputEvent {
     public static final int VC_BACKQUOTE = 0x0029;
 
     /**
-     * VC_0 thru VC_9
+     * Constants for the 0 through 9 keys.
      */
     public static final int VC_1 = 0x0002;
     public static final int VC_2 = 0x0003;
@@ -175,7 +175,7 @@ public class NativeKeyEvent extends NativeInputEvent {
     public static final int VC_CAPS_LOCK = 0x003A;
 
     /**
-     * VC_A thru VC_Z
+     * Constants for the A through Z keys.
      */
     public static final int VC_A = 0x001E;
     public static final int VC_B = 0x0030;

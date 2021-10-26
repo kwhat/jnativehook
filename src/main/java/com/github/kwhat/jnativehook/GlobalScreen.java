@@ -125,7 +125,9 @@ public class GlobalScreen {
         }
     }
 
-
+    /**
+     * Disable direct object construction.
+     */
     protected GlobalScreen() {
     }
 
