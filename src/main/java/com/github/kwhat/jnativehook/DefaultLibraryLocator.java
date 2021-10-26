@@ -78,14 +78,24 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
         File libFile = null;
         if (classFile.isFile()) {
             // Jar Archive
-            String libPath = classFile.getParentFile().getPath();
+            String libPath = System.getProperty("jnativehook.lib.path", classFile.getParentFile().getPath());
 
-            InputStream jarInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath);
-            if (jarInputStream == null) {
+            InputStream resourceInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath);
+            if (resourceInputStream == null) {
                 throw new RuntimeException("Unable to extract the native library " + libResourcePath + "!\n");
             }
 
-            libFile = new File(libPath, libNativeName);
+            String version = GlobalScreen.class.getPackage().getImplementationVersion();
+            if (version != null) {
+                version = '-' + version;
+            } else {
+                version = "";
+            }
+
+            libFile = new File(
+                libPath,
+                libNativeName.replaceAll("^(.*)\\.(.*)$", "$1" + version + '.' + libNativeArch + ".$2")
+            );
             if (!libFile.exists()) {
                 try {
                     // Check and see if a copy of the native lib already exists.
@@ -94,12 +104,12 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
                     // Read from the digest stream and write to the file steam.
                     int size;
                     byte[] buffer = new byte[4 * 1024];
-                    while ((size = jarInputStream.read(buffer)) != -1) {
+                    while ((size = resourceInputStream.read(buffer)) != -1) {
                         libOutputStream.write(buffer, 0, size);
                     }
 
                     // Close all the streams.
-                    jarInputStream.close();
+                    resourceInputStream.close();
                     libOutputStream.close();
                 }
                 catch (IOException e) {
