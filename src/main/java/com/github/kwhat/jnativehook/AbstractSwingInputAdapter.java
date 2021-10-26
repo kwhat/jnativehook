@@ -21,7 +21,7 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 /**
- * Adapter to convert convert native modifiers to java modifiers and to provide an anchor point for
+ * Adapter to convert native modifiers to java modifiers and to provide an anchor point for
  * native events. The methods are empty so the super call is obsolete.
  *
  * @since 2.1
