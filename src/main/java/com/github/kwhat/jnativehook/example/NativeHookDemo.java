@@ -175,7 +175,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
         // Disable parent logger and set the desired level.
         log.setUseParentHandlers(false);
-        log.setLevel(Level.INFO);
+        log.setLevel(Level.ALL);
 
         // Setup a generic ConsoleHandler
         ConsoleHandler handler = new ConsoleHandler();
