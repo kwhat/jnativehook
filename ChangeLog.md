@@ -1,5 +1,12 @@
 ## ChangeLog
 
+**JNativeHook 2.2.1 (Nov 19, 2021)**
+ * Added support for Java 17
+ * Fixed crash on Linux with xkb-file and pc105.
+ * Fixed crash on OSX with capslock and media keys.
+ * Fixed pom versioning issue with revision property.
+ * Fixed library location issues with folders that contain spaces.
+
 **JNativeHook 2.2.0 (Sep 27, 2021)**
  * Complete CI/CD overhaul using GitHub Actions.
  * Dropping Ant support in favor of CMake and Maven.
