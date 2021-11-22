@@ -735,7 +735,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Package
-        if: ${{ github.event_name != 'push' || github.event_name != 'release' }}
+        if: ${{ github.event_name != 'push' && github.event_name != 'release' }}
         run: |
           mvn \
             --batch-mode \
