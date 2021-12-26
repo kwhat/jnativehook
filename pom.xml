@@ -98,7 +98,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.8.1</version>
+      <version>5.8.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -445,6 +445,7 @@
             </manifest>
 
             <manifestEntries>
+              <Multi-Release>${maven.compiler.multi-release}</Multi-Release>
               <Project-Url>${project.scm.url}</Project-Url>
             </manifestEntries>
           </archive>
