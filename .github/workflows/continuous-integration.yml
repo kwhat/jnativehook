@@ -43,9 +43,9 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-headers
+          name: target-cache
           path: |
-            ${{github.workspace}}/target/include
+            ${{github.workspace}}/target
           if-no-files-found: error
 
 
@@ -62,8 +62,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Compile
         env:
@@ -103,7 +103,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -121,8 +121,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Compile
         env:
@@ -162,7 +162,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -181,8 +181,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         shell: bash
@@ -254,7 +254,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -272,8 +272,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         shell: bash
@@ -345,7 +345,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -363,8 +363,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         shell: bash
@@ -432,7 +432,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -450,8 +450,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         shell: bash
@@ -507,7 +507,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -526,8 +526,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -574,7 +574,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -592,8 +592,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -638,7 +638,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -656,8 +656,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: native-headers
-          path: ${{github.workspace}}/target/include
+          name: target-cache
+          path: ${{github.workspace}}/target
 
       - name: Setup
         uses: ilammy/msvc-dev-cmd@v1
@@ -702,7 +702,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: native-libraries
+          name: library-resources
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -726,10 +726,16 @@ jobs:
         with:
           submodules: true
 
-      - name: Download
+      - name: Download Cache
         uses: actions/download-artifact@v2
         with:
-          name: native-libraries
+          name: target-cache
+          path: ${{github.workspace}}/target
+
+      - name: Download Libraries
+        uses: actions/download-artifact@v2
+        with:
+          name: library-resources
           path: ${{github.workspace}}/src/main/resources
 
       - name: Setup Java
@@ -757,7 +763,7 @@ jobs:
           cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
           gpg --list-secret-keys --keyid-format LONG
 
-      - name: Snapshot
+      - name: Sonatype Snapshot
         if: ${{ github.event_name == 'push' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -770,7 +776,7 @@ jobs:
             --no-transfer-progress \
             deploy
 
-      - name: Release
+      - name: Sonatype Release
         if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -784,12 +790,26 @@ jobs:
             --no-transfer-progress \
             deploy
 
-      - name: Upload
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ci-build
+          name: build-artifacts
           path: |
             ${{github.workspace}}/target/*.jar
             ${{github.workspace}}/target/*.asc
             ${{github.workspace}}/target/*.pom
           if-no-files-found: error
+
+      - name: Release Artifacts
+        if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{github.workspace}}/target/*.jar
+            ${{github.workspace}}/target/*.asc
+            ${{github.workspace}}/target/*.pom
+
+      - name: Delete Cache
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: target-cache
