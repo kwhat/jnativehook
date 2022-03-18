@@ -1,5 +1,19 @@
 ## ChangeLog
 
+**JNativeHook 2.2.2 (Mar 18, 2022)**
+ * Fixed Java module issue.
+ * Fixed crash when using getNativeMonitors on Windows.
+ * Fixed deadlock issue on Windows.
+ * Fixed deadlock issue on OS X.
+ * Fixed event posting issues on all platforms.
+ * Fixed mouse button issues on Linux.
+ * Fixed mouse horizontal scroll direction on Windows.
+ * Fixed key character issues on Linux.
+ * Fixed key typed event issues on Windows.
+ * Fixed invalid system properties on OS X.
+ * Updating system property sources on OS X.
+ * Updated compile documentation.
+
 **JNativeHook 2.2.1 (Nov 19, 2021)**
  * Added support for Java 17
  * Fixed crash on Linux with xkb-file and pc105.
