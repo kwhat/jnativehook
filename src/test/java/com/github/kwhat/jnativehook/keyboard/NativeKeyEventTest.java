@@ -17,6 +17,7 @@
  */
 package com.github.kwhat.jnativehook.keyboard;
 
+import com.github.kwhat.jnativehook.NativeInputEvent;
 import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -188,7 +189,20 @@ public class NativeKeyEventTest {
             NativeKeyEvent.KEY_LOCATION_UNKNOWN);
 
         assertTrue(event.paramString().startsWith("NATIVE_KEY_PRESSED"));
-        assertTrue(event.paramString().contains("modifiers=Shift+Ctrl+Meta+Alt+Button1+Button2+Button3+Button4+Button5+Num Lock+Caps Lock+Scroll Lock,"));
+        assertTrue(event.paramString().contains("modifiers="
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.SHIFT_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.CTRL_MASK) + '+'
+            + NativeInputEvent.getModifiersText(NativeKeyEvent.META_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.ALT_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.BUTTON1_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.BUTTON2_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.BUTTON3_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.BUTTON4_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.BUTTON5_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.NUM_LOCK_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.CAPS_LOCK_MASK) + '+'
+            + NativeKeyEvent.getModifiersText(NativeKeyEvent.SCROLL_LOCK_MASK))
+        );
         assertTrue(event.paramString().contains("KEY_LOCATION_UNKNOWN"));
 
         event = new NativeKeyEvent(

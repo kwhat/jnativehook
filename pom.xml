@@ -366,7 +366,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.7</version>
 
         <configuration>
           <outputDirectory>${project.build.directory}</outputDirectory>
@@ -404,7 +404,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.6</version>
+        <version>0.8.7</version>
 
         <configuration>
           <excludes>
@@ -472,7 +472,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
         
         <executions>
           <execution>
