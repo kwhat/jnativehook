@@ -220,7 +220,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                     GlobalScreen.unregisterNativeHook();
                 }
             } catch (NativeHookException ex) {
-                txtEventInfo.append("Error: " + ex.getMessage() + "\n");
+                appendDisplay("Error: " + ex.getMessage());
             }
 
             // Set the enable menu item to the state of the hook.
