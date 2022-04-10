@@ -38,7 +38,7 @@ public abstract class AbstractSwingInputAdapter extends Component {
             modifiers |= KeyEvent.META_MASK;
             modifiers |= KeyEvent.META_DOWN_MASK;
         }
-        if ((nativeModifiers & NativeInputEvent.META_MASK) != 0) {
+        if ((nativeModifiers & NativeInputEvent.CTRL_MASK) != 0) {
             modifiers |= KeyEvent.CTRL_MASK;
             modifiers |= KeyEvent.CTRL_DOWN_MASK;
         }
