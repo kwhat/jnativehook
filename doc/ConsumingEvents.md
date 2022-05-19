@@ -5,6 +5,7 @@ Starting with version 2.0 it is now possible to prevent event propagation by con
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.NativeInputEvent;
+import com.github.kwhat.jnativehook.dispatcher.VoidDispatchService;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import java.lang.reflect.Field;
@@ -25,39 +26,6 @@ public class ConsumeEvent implements NativeKeyListener {
 		GlobalScreen.registerNativeHook();
 
 		GlobalScreen.addNativeKeyListener(this);
-	}
-
-	private class VoidDispatchService extends AbstractExecutorService {
-		private boolean running = false;
-
-		public VoidDispatchService() {
-			running = true;
-		}
-
-		public void shutdown() {
-			running = false;
-		}
-
-		public List<Runnable> shutdownNow() {
-			running = false;
-			return new ArrayList<Runnable>(0);
-		}
-
-		public boolean isShutdown() {
-			return !running;
-		}
-
-		public boolean isTerminated() {
-			return !running;
-		}
-
-		public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-			return true;
-		}
-
-		public void execute(Runnable r) {
-			r.run();
-		}
 	}
 
 	public void nativeKeyPressed(NativeKeyEvent e) {
