@@ -87,6 +87,7 @@ typedef struct _com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent {
     jmethodID getScrollAmount;
     jmethodID getScrollType;
     jmethodID getWheelRotation;
+    jmethodID getPreciseWheelRotation;
 } NativeMouseWheelEvent;
 
 typedef struct _java_lang_Object {

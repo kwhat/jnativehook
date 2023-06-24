@@ -22,6 +22,6 @@
 #include <uiohook.h>
 
 // This is a simple forwarding function to the Java event dispatcher.
-extern void jni_EventDispatcher(uiohook_event * const event);
+extern void jni_EventDispatcher(uiohook_event * const event, void *user_data);
 
 #endif

@@ -18,6 +18,7 @@
 
 #include <jni.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <uiohook.h>
 
 #include "jni_Converter.h"
@@ -48,7 +49,7 @@ static inline void notifyHookThread(JNIEnv *env) {
 
 // NOTE: This function executes on the hook thread!  If you need to block
 // please do so on another thread via your own event dispatcher.
-void jni_EventDispatcher(uiohook_event * const event) {
+void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
     JNIEnv *env;
     if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
         jobject NativeInputEvent_obj = NULL;
@@ -180,11 +181,12 @@ void jni_EventDispatcher(uiohook_event * const event) {
                         (jint) event->mask,
                         (jint) event->data.wheel.x,
                         (jint) event->data.wheel.y,
-                        (jint) event->data.wheel.clicks,
+                        (jint) 1, // clicks
                         (jint) event->data.wheel.type,
-                        (jint) event->data.wheel.amount,
-                        (jint) event->data.wheel.rotation,
-                        (jint) event->data.wheel.direction);
+                        (jint) abs(event->data.wheel.rotation * -1 / event->data.wheel.delta),
+                        (jint) event->data.wheel.rotation * -1 / event->data.wheel.delta,
+                        (jint) event->data.wheel.direction,
+                        (jdouble) event->data.wheel.rotation * -1 / (float) event->data.wheel.delta);
                 break;
 
             default:

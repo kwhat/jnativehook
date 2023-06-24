@@ -2,11 +2,11 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - '2.2'
+      - '2.3'
 
   pull_request:
     branches:
-      - '2.2'
+      - '2.3'
 
   release:
     types: [ created ]

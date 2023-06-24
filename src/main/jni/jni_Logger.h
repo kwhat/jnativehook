@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <uiohook.h>
 
-extern bool jni_Logger(unsigned int level, const char *format, ...);
+extern void jni_Logger(unsigned int level, const char *format, ...);
+extern void jni_LoggerProc(unsigned int level, void *user_data, const char *format, va_list args);
 
 #endif

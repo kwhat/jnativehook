@@ -27,16 +27,18 @@
 
 static char buffer[1024];
 
-bool jni_Logger(unsigned int level, const char *format, ...) {
-    bool status = false;
+void jni_Logger(unsigned int level, const char *format, ...) {
+    va_list args;
 
+    va_start(args, format);
+    jni_Logger(level, NULL, format, args);
+    va_end(args);
+}
+
+void jni_LoggerProc(unsigned int level, void *user_data, const char *format, va_list args) {
     JNIEnv *env = NULL;
     if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-
-        va_list args;
-        va_start(args, format);
         int size = vsnprintf(buffer, sizeof(buffer), format, args);
-        va_end(args);
 
         if (size >= 0) {
             jstring name = (*env)->NewStringUTF(env, "com.github.kwhat.jnativehook");
@@ -85,10 +87,6 @@ bool jni_Logger(unsigned int level, const char *format, ...) {
             (*env)->DeleteLocalRef(env, name);
             (*env)->DeleteLocalRef(env, message);
             (*env)->DeleteLocalRef(env, object);
-
-            status = true;
         }
     }
-
-    return status;
 }

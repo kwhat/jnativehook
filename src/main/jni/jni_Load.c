@@ -43,10 +43,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         // issues with JNLP and some IDE's.
         if (jni_CreateGlobals(env) == JNI_OK) {
             // Set Java logger for native code messages.
-            hook_set_logger_proc(&jni_Logger);
+            hook_set_logger_proc(&jni_LoggerProc, NULL);
 
             // Set the hook callback function to dispatch events.
-            hook_set_dispatch_proc(&jni_EventDispatcher);
+            hook_set_dispatch_proc(&jni_EventDispatcher, NULL);
         }
     } else {
         jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
@@ -58,10 +58,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 // JNI exit point, This is executed when the Java virtual machine detaches from the native library.
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     // Unset the hook callback function to dispatch events.
-    hook_set_dispatch_proc(NULL);
+    hook_set_dispatch_proc(NULL, NULL);
 
     // Unset Java logger for native code messages.
-    hook_set_logger_proc(NULL);
+    hook_set_logger_proc(NULL, NULL);
 
     // Grab the currently JNI interface pointer so we can cleanup the
     // system properties set on load.

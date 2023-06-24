@@ -43,7 +43,7 @@ import java.util.EventObject;
  */
 public class NativeInputEvent extends EventObject {
     /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 2306729722565226621L;
+    private static final long serialVersionUID = 7172837644708242760L;
 
     /** The type of event. */
     private final int id;
@@ -185,37 +185,6 @@ public class NativeInputEvent extends EventObject {
         return this.modifiers;
     }
 
-    /**
-     * Sets the modifier flags for this event.
-     *
-     * @param modifiers the new modifier flags
-     * @deprecated
-     */
-    public void setModifiers(int modifiers) {
-        this.modifiers = modifiers;
-    }
-
-    /**
-     * Sets the reserved flags for this event.
-     * <p>
-     *
-     * Note the use of this method may not be supported by all native platforms.
-     * <p>
-     *
-     * Event propagation support for X11 cannot be provided due to an oversight
-     * in the way that XRecord currently operates.  No public method will be
-     * available until a working cross-platform solution can be provided.
-     *
-     * @param reserved Non-portable flags for unsupported functionality.
-     * 
-     * @since 1.1
-     * @deprecated
-     */
-    @SuppressWarnings("unused")
-    private void setReserved(short reserved) {
-        this.reserved = reserved;
-    }
-    
     /**
      * Gets a <code>String</code> describing the modifier flags, such as
      * "Button1", or "Ctrl+Alt". These strings can be localized by changing the

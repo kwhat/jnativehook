@@ -50,7 +50,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
     /**
      * The Constant serialVersionUID.
      */
-    private static final long serialVersionUID = 2112217673594181259L;
+    private static final long serialVersionUID = 1568146880251274192L;
 
     /**
      * Constant representing scrolling by "units" (like scrolling with the arrow keys).
@@ -112,6 +112,13 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
     private final int wheelDirection;
 
     /**
+     * Indicates how far the mouse wheel was rotated as a double.
+     *
+     * @see #getPreciseWheelRotation()
+     */
+    private final double preciseWheelRotation;
+
+    /**
      * Instantiates a new <code>NativeMouseWheelEvent</code> object with a vertical direction.
      *
      * @param id            an integer that identifies the native event type.
@@ -130,13 +137,12 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @param scrollAmount  for scrollType <code>WHEEL_UNIT_SCROLL</code>, the number of units to be
      *                      scrolled.
      * @param wheelRotation the amount that the mouse wheel was rotated (the number of "clicks")
-     * @see #NativeMouseWheelEvent(int, int, int, int, int, int, int, int, int)
+     * @see NativeMouseWheelEvent(int, int, int, int, int, int, int, int, int)
      * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
      */
     public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount,
-        int scrollType, int scrollAmount, int wheelRotation) {
-        this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation,
-            WHEEL_VERTICAL_DIRECTION);
+                                 int scrollType, int scrollAmount, int wheelRotation) {
+        this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation, WHEEL_VERTICAL_DIRECTION);
     }
 
     /**
@@ -165,13 +171,46 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @since 2.1
      */
     public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount,
-        int scrollType, int scrollAmount, int wheelRotation, int wheelDirection) {
+                                 int scrollType, int scrollAmount, int wheelRotation, int wheelDirection) {
+        this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation, wheelDirection, wheelRotation);
+    }
+
+    /**
+     * Instantiates a new <code>NativeMouseWheelEvent</code> object.
+     *
+     * @param id                      an integer that identifies the native event type.
+     * @param modifiers            a modifier mask describing the modifier keys and mouse buttons active
+     *                             for the event.
+     *                             <code>NativeInputEvent _MASK</code> modifiers should be used as they
+     *                             are
+     *                             not compatible with the extended _DOWN_MASK or the old _MASK
+     *                             <code>InputEvent</code> modifiers.
+     * @param x                    the x coordinate of the native pointer.
+     * @param y                    the y coordinate of the native pointer.
+     * @param clickCount           the number of button clicks associated with this event.
+     * @param scrollType           the type of scrolling which should take place in response to this
+     *                             event;  valid values are <code>WHEEL_UNIT_SCROLL</code> and
+     *                             <code>WHEEL_BLOCK_SCROLL</code>.
+     * @param scrollAmount         for scrollType <code>WHEEL_UNIT_SCROLL</code>, the number of units to
+     *                             be scrolled.
+     * @param wheelRotation        the amount that the mouse wheel was rotated (the number of "clicks")
+     * @param wheelDirection       the direction of scrolling which should take place in response to this
+     *                             event;  valid values are <code>WHEEL_VERTICAL_DIRECTION</code> and
+     *                             <code>WHEEL_HORIZONTAL_DIRECTION</code>.
+     * @param preciseWheelRotation the amount that the mouse wheel was rotated (the number of "clicks") as a double.
+     * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
+     * @since 2.3
+     */
+    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount,
+                                 int scrollType, int scrollAmount, int wheelRotation, int wheelDirection,
+                                 double preciseWheelRotation) {
         super(id, modifiers, x, y, clickCount);
 
         this.scrollType = scrollType;
         this.scrollAmount = scrollAmount;
         this.wheelRotation = wheelRotation;
         this.wheelDirection = wheelDirection;
+        this.preciseWheelRotation = preciseWheelRotation;
     }
 
     /**
@@ -212,7 +251,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * Returns the number of "clicks" the mouse wheel was rotated.
      *
      * @return negative values if the mouse wheel was rotated up/away from the user, and positive
-     * values if the mouse wheel was rotated down/ toward(s) the user.
+     * values if the mouse wheel was rotated down / toward(s) the user.
      */
     public int getWheelRotation() {
         return wheelRotation;
@@ -235,6 +274,15 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
         return wheelDirection;
     }
 
+    /**
+     * Returns the number of "clicks" the mouse wheel was rotated as a double.
+     *
+     * @return negative values if the mouse wheel was rotated up/away from the user, and positive
+     * values if the mouse wheel was rotated down / toward(s) the user.
+     */
+    public double getPreciseWheelRotation() {
+        return this.preciseWheelRotation;
+    }
 
     /**
      * Returns a parameter string identifying the native event. This method is useful for
@@ -266,6 +314,9 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
 
         param.append(",wheelRotation=");
         param.append(getWheelRotation());
+
+        param.append(",preciseWheelRotation=");
+        param.append(getPreciseWheelRotation());
 
         param.append(",wheelDirection=");
         switch (getWheelDirection()) {

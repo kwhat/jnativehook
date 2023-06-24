@@ -375,7 +375,7 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
     jclass NativeMouseWheelEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/mouse/NativeMouseWheelEvent");
     if (NativeMouseWheelEvent_class != NULL) {
         // Get the method ID for NativeMouseWheelEvent constructor.
-        jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIIII)V");
+        jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIIIID)V");
 
         // Get the method ID for NativeMouseWheelEvent.getScrollAmount().
         jmethodID getScrollAmount = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getScrollAmount", "()I");
@@ -385,6 +385,9 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
 
         // Get the method ID for NativeMouseWheelEvent.getWheelRotation().
         jmethodID getWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getWheelRotation", "()I");
+
+        // Get the method ID for NativeMouseWheelEvent.getPreciseWheelRotation().
+        jmethodID getPreciseWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getPreciseWheelRotation", "()D");
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
@@ -396,6 +399,7 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = getScrollAmount;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType = getScrollType;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation = getWheelRotation;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getPreciseWheelRotation = getPreciseWheelRotation;
 
                 status = JNI_OK;
             } else {
