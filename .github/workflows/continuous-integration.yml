@@ -60,7 +60,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -119,7 +119,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -179,7 +179,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -270,7 +270,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -361,7 +361,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -448,7 +448,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -524,7 +524,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -590,7 +590,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -654,7 +654,7 @@ jobs:
           submodules: true
 
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
@@ -727,13 +727,13 @@ jobs:
           submodules: true
 
       - name: Download Cache
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: target-cache
           path: ${{github.workspace}}/target
 
       - name: Download Libraries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: library-resources
           path: ${{github.workspace}}/src/main/resources
