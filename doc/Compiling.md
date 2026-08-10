@@ -246,7 +246,7 @@ cmake --install target/build/jni/
 ```
 md target\build\libuiohook\
 cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
-    -G "Visual Studio 17 2022" -A ARM ^
+    -G "Visual Studio 18 2026" -A ARM ^
     -D CMAKE_INSTALL_PREFIX=target\ ^
     -D CMAKE_VERBOSE_MAKEFILE=ON ^
     -D BUILD_SHARED_LIBS=OFF ^
@@ -264,7 +264,7 @@ cmake --install target\build\libuiohook\ ^
 ```
 md target\build\jni\
 cmake -B target\build\jni\ ^
-    -G "Visual Studio 17 2022" -A ARM ^
+    -G "Visual Studio 18 2026" -A ARM ^
     -D CMAKE_PREFIX_PATH=target\ ^
     -D CMAKE_SYSTEM_NAME=windows ^
     -D CMAKE_SYSTEM_PROCESSOR=arm ^
@@ -283,7 +283,7 @@ cmake --install target\build\jni\ ^
 ```
 md target\build\libuiohook\
 cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
-    -G "Visual Studio 17 2022" -A Win32 ^
+    -G "Visual Studio 18 2026" -A Win32 ^
     -D CMAKE_INSTALL_PREFIX=target\ ^
     -D CMAKE_VERBOSE_MAKEFILE=ON ^
     -D BUILD_SHARED_LIBS=OFF ^
@@ -301,7 +301,7 @@ cmake --install target\build\libuiohook\ ^
 ```
 md target\build\jni\
 cmake -B target\build\jni\ ^
-    -G "Visual Studio 17 2022" -A Win32 ^
+    -G "Visual Studio 18 2026" -A Win32 ^
     -D CMAKE_PREFIX_PATH=target\ ^
     -D CMAKE_SYSTEM_NAME=windows ^
     -D CMAKE_SYSTEM_PROCESSOR=x86 ^
@@ -320,7 +320,7 @@ cmake --install target\build\jni\ ^
 ```
 md target\build\libuiohook\
 cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
-    -G "Visual Studio 17 2022" -A x64 ^
+    -G "Visual Studio 18 2026" -A x64 ^
     -D CMAKE_INSTALL_PREFIX=target\ ^
     -D CMAKE_VERBOSE_MAKEFILE=ON ^
     -D BUILD_SHARED_LIBS=OFF ^
@@ -338,7 +338,7 @@ cmake --install target\build\libuiohook\ ^
 ```
 md target\build\jni\
 cmake -B target\build\jni\ ^
-    -G "Visual Studio 17 2022" -A x64 ^
+    -G "Visual Studio 18 2026" -A x64 ^
     -D CMAKE_PREFIX_PATH=target\ ^
     -D CMAKE_SYSTEM_NAME=windows ^
     -D CMAKE_SYSTEM_PROCESSOR=x86_64 ^
