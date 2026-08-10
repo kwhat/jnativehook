@@ -511,7 +511,7 @@ jobs:
           if-no-files-found: error
 
 
-  compile-windows-arm:
+  compile-windows-arm64:
     needs: compile-java
     runs-on: windows-latest
 
@@ -529,12 +529,12 @@ jobs:
 
       - name: Compile
         env:
-          CFLAGS: '/arch:ARMv7VE /O1 /Oy'
+          CFLAGS: '/arch:armv8.0 /O1 /Oy'
         shell: cmd
         run: |
           md target\build\libuiohook\
           cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
-            -G "Visual Studio 18 2026" -A ARM ^
+            -G "Visual Studio 18 2026" -A ARM64 ^
             -D CMAKE_INSTALL_PREFIX=target\ ^
             -D CMAKE_VERBOSE_MAKEFILE=ON ^
             -D BUILD_SHARED_LIBS=OFF ^
@@ -550,10 +550,10 @@ jobs:
 
           md target\build\jni\
           cmake -B target\build\jni\ ^
-            -G "Visual Studio 18 2026" -A ARM ^
+            -G "Visual Studio 18 2026" -A ARM64 ^
             -D CMAKE_PREFIX_PATH=target\ ^
             -D CMAKE_SYSTEM_NAME=windows ^
-            -D CMAKE_SYSTEM_PROCESSOR=arm ^
+            -D CMAKE_SYSTEM_PROCESSOR=ARM64 ^
             -D CMAKE_VERBOSE_MAKEFILE=ON
 
           cmake --build target\build\jni\ ^
@@ -698,7 +698,7 @@ jobs:
       compile-linux-arm64,
       compile-linux-x86,
       compile-linux-x86_64,
-      compile-windows-arm,
+      compile-windows-arm64,
       compile-windows-x86,
       compile-windows-x86_64
     ]

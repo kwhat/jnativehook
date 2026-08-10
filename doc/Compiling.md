@@ -242,11 +242,11 @@ cmake --build target/build/jni/ \
 cmake --install target/build/jni/
 ```
 
-#### Compile Windows ARM
+#### Compile Windows ARM64
 ```
 md target\build\libuiohook\
 cmake -B target\build\libuiohook\  -S src\external\libuiohook\ ^
-    -G "Visual Studio 18 2026" -A ARM ^
+    -G "Visual Studio 18 2026" -A ARM64 ^
     -D CMAKE_INSTALL_PREFIX=target\ ^
     -D CMAKE_VERBOSE_MAKEFILE=ON ^
     -D BUILD_SHARED_LIBS=OFF ^
@@ -264,10 +264,10 @@ cmake --install target\build\libuiohook\ ^
 ```
 md target\build\jni\
 cmake -B target\build\jni\ ^
-    -G "Visual Studio 18 2026" -A ARM ^
+    -G "Visual Studio 18 2026" -A ARM64 ^
     -D CMAKE_PREFIX_PATH=target\ ^
     -D CMAKE_SYSTEM_NAME=windows ^
-    -D CMAKE_SYSTEM_PROCESSOR=arm ^
+    -D CMAKE_SYSTEM_PROCESSOR=ARM64 ^
     -D CMAKE_VERBOSE_MAKEFILE=ON
 
 cmake --build target\build\jni\ ^
