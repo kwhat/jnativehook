@@ -527,11 +527,6 @@ jobs:
           name: target-cache
           path: ${{github.workspace}}/target
 
-      - name: Setup
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_arm
-
       - name: Compile
         env:
           CFLAGS: '/arch:ARMv7VE /O1 /Oy'
@@ -593,11 +588,6 @@ jobs:
           name: target-cache
           path: ${{github.workspace}}/target
 
-      - name: Setup
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
-
       - name: Compile
         shell: cmd
         run: |
@@ -656,11 +646,6 @@ jobs:
         with:
           name: target-cache
           path: ${{github.workspace}}/target
-
-      - name: Setup
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
 
       - name: Compile
         shell: cmd
