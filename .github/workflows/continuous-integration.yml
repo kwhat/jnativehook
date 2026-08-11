@@ -108,7 +108,7 @@ jobs:
 
   compile-apple-x86_64:
     needs: compile-java
-    runs-on: macos-latest
+    runs-on: macos-26-intel
 
     steps:
       - name: Checkout
