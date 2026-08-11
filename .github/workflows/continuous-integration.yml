@@ -101,7 +101,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-apple-arm64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -160,7 +160,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-apple-x86_64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -252,7 +252,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-linux-arm
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -343,7 +343,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-linux-arm64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -430,7 +430,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-linux-x86
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -505,7 +505,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-linux-x86_64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -572,7 +572,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-windows-arm64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -636,7 +636,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-windows-x86
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -700,7 +700,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: library-resources
+          name: library-resources-windows-x86_64
           path: |
             ${{github.workspace}}/src/main/resources
           if-no-files-found: error
@@ -733,8 +733,9 @@ jobs:
       - name: Download Libraries
         uses: actions/download-artifact@v8
         with:
-          name: library-resources
           path: ${{github.workspace}}/src/main/resources
+          pattern: 'library-resources-*'
+          merge-multiple: true
 
       - name: Setup Java
         uses: actions/setup-java@v5
