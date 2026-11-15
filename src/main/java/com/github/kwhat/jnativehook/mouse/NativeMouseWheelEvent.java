@@ -77,15 +77,6 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
     public static final int WHEEL_HORIZONTAL_DIRECTION = 4;
 
     /**
-     * Only valid for scrollType WHEEL_UNIT_SCROLL. Indicates number of units that should be
-     * scrolled per click of mouse wheel rotation, based on platform settings.
-     *
-     * @see #getScrollType
-     * @see #getScrollAmount
-     */
-    private final int scrollAmount;
-
-    /**
      * Indicates what sort of scrolling should take place in response to this event, based on
      * platform settings.  Legal values are:
      * <ul>
@@ -109,14 +100,7 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      *
      * @see #getWheelDirection
      */
-    private final int wheelDirection;
-
-    /**
-     * Indicates how far the mouse wheel was rotated as a double.
-     *
-     * @see #getPreciseWheelRotation()
-     */
-    private final double preciseWheelRotation;
+    private final int wheelDelta;
 
     /**
      * Instantiates a new <code>NativeMouseWheelEvent</code> object with a vertical direction.
@@ -130,9 +114,8 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      *                      <code>InputEvent</code> modifiers.
      * @param x             the x coordinate of the native pointer.
      * @param y             the y coordinate of the native pointer.
-     * @param clickCount    the number of button clicks associated with this event.
      * @param scrollType    the type of scrolling which should take place in response to this event;
-     *                       valid values are <code>WHEEL_UNIT_SCROLL</code> and
+     *                      valid values are <code>WHEEL_UNIT_SCROLL</code> and
      *                      <code>WHEEL_BLOCK_SCROLL</code>.
      * @param scrollAmount  for scrollType <code>WHEEL_UNIT_SCROLL</code>, the number of units to be
      *                      scrolled.
@@ -140,12 +123,11 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @see NativeMouseWheelEvent(int, int, int, int, int, int, int, int, int)
      * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
      */
-    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount,
-                                 int scrollType, int scrollAmount, int wheelRotation) {
-        this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation, WHEEL_VERTICAL_DIRECTION);
+    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int scrollType, int wheelRotation, int wheelDelta) {
+        this(id, modifiers, x, y, scrollType, wheelRotation, WHEEL_VERTICAL_DIRECTION);
     }
 
-    /**
+    /**                                                                                                                                                                         issue
      * Instantiates a new <code>NativeMouseWheelEvent</code> object.
      *
      * @param id             an integer that identifies the native event type.
