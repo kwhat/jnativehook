@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -41,6 +41,14 @@ import java.util.logging.Logger;
  */
 public class DefaultLibraryLocator implements NativeLibraryLocator {
     private static final Logger log = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+
+    /**
+     * Creates a locator that finds the appropriate native library and extracts it
+     * from the distribution JAR when necessary.
+     */
+    public DefaultLibraryLocator() {
+        super();
+    }
 
     /**
      * Perform default procedures to interface with the native library. These procedures include

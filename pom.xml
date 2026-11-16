@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   JNativeHook: Global keyboard and mouse listeners for Java.
-  Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+  Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
   https://github.com/kwhat/jnativehook/
 
   JNativeHook is free software: you can redistribute it and/or modify
@@ -455,10 +455,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.1</version>
 
         <configuration>
           <sourcepath>${project.build.sourceDirectory}</sourcepath>
+          <quiet>true</quiet>
+          <sourceFileExcludes>
+            <sourceFileExclude>**/module-info.java</sourceFileExclude>
+          </sourceFileExcludes>
         </configuration>
 
         <executions>

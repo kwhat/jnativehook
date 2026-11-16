@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -26,8 +26,13 @@ import java.awt.event.MouseWheelListener;
  *
  * @since 2.1
  */
-public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener,
-    MouseWheelListener {
+public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeMouseWheelListener, MouseWheelListener {
+    /**
+     * Creates an adapter for forwarding native wheel events to AWT listeners.
+     */
+    public SwingMouseWheelAdapter() {
+        super();
+    }
 
     @Override
     public void nativeMouseWheelMoved(NativeMouseWheelEvent nativeEvent) {
@@ -37,6 +42,13 @@ public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeM
     @Override
     public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {}
 
+    /**
+     * Converts a native wheel event while preserving fractional rotation.
+     *
+     * @param nativeEvent the native wheel event
+     *
+     * @return the corresponding AWT mouse wheel event
+     */
     protected MouseWheelEvent getJavaMouseWheelEvent(NativeMouseWheelEvent nativeEvent) {
         int scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL;
         if (nativeEvent.getScrollType() == NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL) {

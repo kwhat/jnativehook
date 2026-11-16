@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -27,6 +27,20 @@ import java.awt.event.KeyEvent;
  * @since 2.1
  */
 public abstract class AbstractSwingInputAdapter extends Component {
+    /**
+     * Creates an adapter for converting native input to AWT events.
+     */
+    public AbstractSwingInputAdapter() {
+        super();
+    }
+
+    /**
+     * Converts native modifier flags to the corresponding AWT modifier masks.
+     *
+     * @param nativeModifiers native keyboard and mouse modifier flags
+     *
+     * @return the combined legacy and extended AWT masks
+     */
     @SuppressWarnings("deprecation")
     protected int getJavaModifiers(int nativeModifiers) {
         int modifiers = 0x00;

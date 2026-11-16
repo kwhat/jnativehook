@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -28,6 +28,12 @@ import java.awt.event.KeyListener;
  * @since 2.1
  */
 public class SwingKeyAdapter extends AbstractSwingInputAdapter implements NativeKeyListener, KeyListener {
+    /**
+     * Creates an adapter for forwarding native key events to AWT listeners.
+     */
+    public SwingKeyAdapter() {
+        super();
+    }
 
     @Override
     public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
@@ -53,6 +59,13 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
     @Override
     public void keyReleased(KeyEvent keyEvent) {}
 
+    /**
+     * Converts a native key event to its AWT equivalent.
+     *
+     * @param nativeEvent the native key event
+     *
+     * @return the corresponding AWT key event
+     */
     protected KeyEvent getJavaKeyEvent(NativeKeyEvent nativeEvent) {
         int eventID;
         switch (nativeEvent.getID()) {
