@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Default implementation of the <code>ExecutorService</code> used to dispatch native events.  This
  * is effectively the same as calling {@link java.util.concurrent.Executors#newSingleThreadExecutor}.
- * <p>
  *
  * @author Alexander Barker (<a href="mailto:alex@1stleg.com">alex@1stleg.com</a>)
  * @version 2.0

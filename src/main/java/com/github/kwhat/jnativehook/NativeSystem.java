@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -30,18 +30,32 @@ import java.util.Locale;
  */
 public class NativeSystem {
     /**
+     * Creates a native-system information helper.
+     */
+    public NativeSystem() {
+        super();
+    }
+
+    /**
      * The operating system family enum.
      *
      * @see NativeSystem
      */
     public enum Family {
+        /** The FreeBSD operating system family. */
         FREEBSD,
+        /** The OpenBSD operating system family. */
         OPENBSD,
+        /** The macOS operating system family. */
         DARWIN,
+        /** The Solaris operating system family. */
         SOLARIS,
+        /** The Linux operating system family. */
         LINUX,
+        /** The Windows operating system family. */
         WINDOWS,
 
+        /** Unrecognized platform or architecture. */
         UNSUPPORTED;
 
         @Override
@@ -56,15 +70,24 @@ public class NativeSystem {
      * @see NativeSystem
      */
     public enum Arch {
+        /** The 32-bit ARM architecture. */
         ARM,
+        /** The 64-bit ARM architecture. */
         ARM64,
+        /** The 32-bit SPARC architecture. */
         SPARC,
+        /** The 64-bit SPARC architecture. */
         SPARC64,
+        /** The 32-bit PowerPC architecture. */
         PPC,
+        /** The 64-bit PowerPC architecture. */
         PPC64,
+        /** The 32-bit x86 architecture. */
         x86,
+        /** The 64-bit x86 architecture. */
         x86_64,
 
+        /** Unrecognized platform or architecture. */
         UNSUPPORTED;
 
         @Override

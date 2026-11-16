@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -75,8 +75,20 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
      * Menu Items
      */
     private final JMenu menuSubListeners;
-    private final JMenuItem menuItemQuit, menuItemClear;
-    private final JCheckBoxMenuItem menuItemEnable, menuItemKeyboardEvents, menuItemButtonEvents, menuItemMotionEvents, menuItemWheelEvents;
+    /** Menu item that closes the demo. */
+    private final JMenuItem menuItemQuit;
+    /** Menu item that clears the event log. */
+    private final JMenuItem menuItemClear;
+    /** Menu item that enables the native hook. */
+    private final JCheckBoxMenuItem menuItemEnable;
+    /** Menu item that toggles keyboard event logging. */
+    private final JCheckBoxMenuItem menuItemKeyboardEvents;
+    /** Menu item that toggles mouse button event logging. */
+    private final JCheckBoxMenuItem menuItemButtonEvents;
+    /** Menu item that toggles mouse motion event logging. */
+    private final JCheckBoxMenuItem menuItemMotionEvents;
+    /** Menu item that toggles mouse wheel event logging. */
+    private final JCheckBoxMenuItem menuItemWheelEvents;
 
     /**
      * The text area to display event info.

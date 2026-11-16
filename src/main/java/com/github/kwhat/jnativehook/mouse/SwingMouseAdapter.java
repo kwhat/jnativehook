@@ -1,5 +1,5 @@
 /* JNativeHook: Global keyboard and mouse listeners for Java.
- * Copyright (C) 2006-2021 Alexander Barker.  All Rights Reserved.
+ * Copyright (C) 2006-2026 Alexander Barker.  All Rights Reserved.
  * https://github.com/kwhat/jnativehook/
  *
  * JNativeHook is free software: you can redistribute it and/or modify
@@ -28,6 +28,12 @@ import java.awt.event.MouseListener;
  * @since 2.1
  */
 public class SwingMouseAdapter extends AbstractSwingInputAdapter implements NativeMouseListener, MouseListener {
+    /**
+     * Creates an adapter for forwarding native mouse button events to AWT listeners.
+     */
+    public SwingMouseAdapter() {
+        super();
+    }
 
     @Override
     public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
@@ -59,6 +65,13 @@ public class SwingMouseAdapter extends AbstractSwingInputAdapter implements Nati
     @Override
     public void mouseExited(MouseEvent mouseEvent) {}
 
+    /**
+     * Converts a native mouse button event to its AWT equivalent.
+     *
+     * @param nativeEvent the native mouse event
+     *
+     * @return the corresponding AWT mouse event
+     */
     protected MouseEvent getJavaKeyEvent(NativeMouseEvent nativeEvent) {
         int eventID;
         switch (nativeEvent.getID()) {
