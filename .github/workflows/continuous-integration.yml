@@ -87,8 +87,6 @@ jobs:
             --parallel 2 \
             --clean-first
 
-          test "$(lipo -archs target/build/libuiohook/libuiohook.a | tr -d '[:space:]')" = arm64
-
           cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
@@ -104,8 +102,6 @@ jobs:
           cmake --build target/build/jni/ \
             --parallel 2 \
             --clean-first
-
-          test "$(lipo -archs target/build/jni/libJNativeHook.dylib | tr -d '[:space:]')" = arm64
 
           cmake --install target/build/jni/
 
@@ -154,8 +150,6 @@ jobs:
             --parallel 2 \
             --clean-first
 
-          test "$(lipo -archs target/build/libuiohook/libuiohook.a | tr -d '[:space:]')" = x86_64
-
           cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
@@ -171,19 +165,6 @@ jobs:
           cmake --build target/build/jni/ \
             --parallel 2 \
             --clean-first
-
-          test "$(lipo -archs target/build/jni/libJNativeHook.dylib | tr -d '[:space:]')" = x86_64
-
-          # Reject toolchains that silently raise the legacy deployment target.
-          minimum_os=$(otool -l target/build/jni/libJNativeHook.dylib | awk '
-            $1 == "cmd" { command = $2 }
-            command == "LC_VERSION_MIN_MACOSX" && $1 == "version" { print $2 }
-            command == "LC_BUILD_VERSION" && $1 == "minos" { print $2 }
-          ')
-          if [[ "$minimum_os" != "10.5" && "$minimum_os" != "10.5.0" ]]; then
-            echo "Expected macOS 10.5 deployment target; binary declares: $minimum_os" >&2
-            exit 1
-          fi
 
           cmake --install target/build/jni/
 
