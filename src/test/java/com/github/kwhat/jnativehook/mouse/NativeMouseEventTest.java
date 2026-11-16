@@ -17,8 +17,8 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import org.junit.jupiter.api.Test;
 import java.awt.Point;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 

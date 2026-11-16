@@ -2,10 +2,10 @@ import com.github.kwhat.jnativehook.*;
 import com.github.kwhat.jnativehook.dispatcher.VoidDispatchService;
 import com.github.kwhat.jnativehook.keyboard.*;
 import com.github.kwhat.jnativehook.mouse.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.*;
 import java.awt.event.MouseWheelEvent;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.*;
 
 /** Exercises the JNI bridge against api_stub.c without accessing system input. */
 public class ApiSmokeTest {

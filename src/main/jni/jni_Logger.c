@@ -41,28 +41,46 @@ void jni_LoggerProc(unsigned int level, void *user_data, const char *format, va_
     char buffer[1024];
     JNIEnv *env = NULL;
     jboolean attached;
-    if (jni_GetCallbackEnv(&env, &attached) != JNI_OK) return;
-    if ((*env)->ExceptionCheck(env)) return;
+    if (jni_GetCallbackEnv(&env, &attached) != JNI_OK) {
+        return;
+    }
+    if ((*env)->ExceptionCheck(env)) {
+        return;
+    }
     if ((*env)->PushLocalFrame(env, 16) != JNI_OK) {
         jni_ReleaseCallbackEnv(env, attached);
         return;
     }
     int size = vsnprintf(buffer, sizeof(buffer), format, args);
-    if (size < 0) goto cleanup;
+    if (size < 0) {
+        goto cleanup;
+    }
     // Native log strings use UTF-8, whereas NewStringUTF expects modified UTF-8.
     jsize length = (jsize) (size < (int) sizeof(buffer) ? size : (int) sizeof(buffer) - 1);
     jbyteArray bytes = (*env)->NewByteArray(env, length);
-    if (bytes == NULL) goto cleanup;
+    if (bytes == NULL) {
+        goto cleanup;
+    }
     (*env)->SetByteArrayRegion(env, bytes, 0, length, (const jbyte *) buffer);
-    if ((*env)->ExceptionCheck(env)) goto cleanup;
+    if ((*env)->ExceptionCheck(env)) {
+        goto cleanup;
+    }
     jclass stringClass = (*env)->FindClass(env, "java/lang/String");
-    if (stringClass == NULL) goto cleanup;
+    if (stringClass == NULL) {
+        goto cleanup;
+    }
     jmethodID constructor = (*env)->GetMethodID(env, stringClass, "<init>", "([BLjava/lang/String;)V");
-    if (constructor == NULL) goto cleanup;
+    if (constructor == NULL) {
+        goto cleanup;
+    }
     jstring charset = (*env)->NewStringUTF(env, "UTF-8");
-    if (charset == NULL) goto cleanup;
+    if (charset == NULL) {
+        goto cleanup;
+    }
     jstring message = (*env)->NewObject(env, stringClass, constructor, bytes, charset);
-    if (message == NULL) goto cleanup;
+    if (message == NULL) {
+        goto cleanup;
+    }
     // Logger.getLogger is caller-sensitive and fails on native-created threads.
     jobject logger = java_util_logging_Logger->object;
     jmethodID method = NULL;

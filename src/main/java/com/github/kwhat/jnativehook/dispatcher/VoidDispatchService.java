@@ -20,10 +20,10 @@ package com.github.kwhat.jnativehook.dispatcher;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.Objects;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Void implementation of the <code>ExecutorService</code> used to dispatch native events directly on the operating
@@ -70,7 +70,9 @@ public class VoidDispatchService extends AbstractExecutorService {
         long remaining = unit.toNanos(timeout);
         long last = System.nanoTime();
         while (!isTerminated()) {
-            if (remaining <= 0) return false;
+            if (remaining <= 0) {
+                return false;
+            }
             TimeUnit.NANOSECONDS.timedWait(this, remaining);
             long now = System.nanoTime();
             remaining -= now - last;
@@ -82,7 +84,9 @@ public class VoidDispatchService extends AbstractExecutorService {
     public void execute(Runnable task) {
         Objects.requireNonNull(task, "task");
         synchronized (this) {
-            if (!running) throw new RejectedExecutionException("Dispatcher is shut down.");
+            if (!running) {
+                throw new RejectedExecutionException("Dispatcher is shut down.");
+            }
             active++;
         }
         try {

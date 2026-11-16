@@ -32,7 +32,9 @@ void jni_ThrowFatalError(JNIEnv *env, const char *message) {
 }
 
 void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
-    if ((*env)->ExceptionCheck(env)) return;
+    if ((*env)->ExceptionCheck(env)) {
+        return;
+    }
     jclass exception = (*env)->FindClass(env, classname);
     if (exception != NULL) {
         (*env)->ThrowNew(env, exception, message);
@@ -41,9 +43,13 @@ void jni_ThrowException(JNIEnv *env, const char *classname, const char *message)
 }
 
 void jni_ThrowNativeHookException(JNIEnv *env, jint code, const char *message) {
-    if ((*env)->ExceptionCheck(env)) return;
+    if ((*env)->ExceptionCheck(env)) {
+        return;
+    }
     jstring text = (*env)->NewStringUTF(env, message);
-    if (text == NULL) return;
+    if (text == NULL) {
+        return;
+    }
     jobject exception = (*env)->NewObject(env, com_github_kwhat_jnativehook_NativeHookException->cls,
             com_github_kwhat_jnativehook_NativeHookException->init, (jint) code, text);
     (*env)->DeleteLocalRef(env, text);

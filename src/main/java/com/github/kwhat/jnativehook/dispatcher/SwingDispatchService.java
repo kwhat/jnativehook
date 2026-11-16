@@ -19,13 +19,13 @@ package com.github.kwhat.jnativehook.dispatcher;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.Objects;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
 
 /**
@@ -72,7 +72,9 @@ public class SwingDispatchService extends AbstractExecutorService {
         long remaining = unit.toNanos(timeout);
         long last = System.nanoTime();
         while (!isTerminated()) {
-            if (remaining <= 0) return false;
+            if (remaining <= 0) {
+                return false;
+            }
             TimeUnit.NANOSECONDS.timedWait(this, remaining);
             long now = System.nanoTime();
             remaining -= now - last;
@@ -86,7 +88,9 @@ public class SwingDispatchService extends AbstractExecutorService {
         Runnable task = new Runnable() {
             public void run() {
                 synchronized (SwingDispatchService.this) {
-                    if (pending.remove(this) == null) return;
+                    if (pending.remove(this) == null) {
+                        return;
+                    }
                     active++;
                 }
                 try {
@@ -100,7 +104,9 @@ public class SwingDispatchService extends AbstractExecutorService {
             }
         };
         synchronized (this) {
-            if (!running) throw new RejectedExecutionException("Dispatcher is shut down.");
+            if (!running) {
+                throw new RejectedExecutionException("Dispatcher is shut down.");
+            }
             pending.put(task, command);
             try {
                 SwingUtilities.invokeLater(task);

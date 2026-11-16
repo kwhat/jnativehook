@@ -162,7 +162,9 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
         return;
     }
     jint type, modifiers;
-    if (!readInt(env, event, com_github_kwhat_jnativehook_NativeInputEvent->getID, &type)) return;
+    if (!readInt(env, event, com_github_kwhat_jnativehook_NativeInputEvent->getID, &type)) {
+        return;
+    }
     uiohook_event native = {0};
     if (jni_ConvertToNativeType(type, &native.type) != JNI_OK) {
         jni_ThrowException(env, "java/lang/IllegalArgumentException", "Unsupported native event type.");
@@ -177,18 +179,24 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
         jni_ThrowException(env, "java/lang/IllegalArgumentException", "Event class does not match its event type.");
         return;
     }
-    if (!readInt(env, event, com_github_kwhat_jnativehook_NativeInputEvent->getModifiers, &modifiers)) return;
+    if (!readInt(env, event, com_github_kwhat_jnativehook_NativeInputEvent->getModifiers, &modifiers)) {
+        return;
+    }
     // Consumption is a callback response, not an instruction for event injection.
     native.mask = (uint32_t) modifiers & ~MASK_CONSUMED;
 
     if (native.type == EVENT_KEY_TYPED) {
         native.data.keyboard.keychar = (*env)->CallCharMethod(env, event,
                 com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyChar);
-        if ((*env)->ExceptionCheck(env)) return;
+        if ((*env)->ExceptionCheck(env)) {
+            return;
+        }
     } else if (native.type == EVENT_KEY_PRESSED || native.type == EVENT_KEY_RELEASED) {
         jint code, location;
         if (!readInt(env, event, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyCode, &code) ||
-                !readInt(env, event, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyLocation, &location)) return;
+                !readInt(env, event, com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyLocation, &location)) {
+            return;
+        }
         if (jni_ConvertToNativeKeycode(code, location, &native.data.keyboard.keycode) != JNI_OK) {
             jni_ThrowException(env, "java/lang/IllegalArgumentException", "Unsupported keycode or key location.");
             return;
@@ -197,18 +205,28 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
     } else {
         jint x, y;
         if (!readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getX, &x) ||
-                !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY, &y)) return;
+                !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getY, &y)) {
+            return;
+        }
         if (!requireRange(env, x, INT16_MIN, INT16_MAX, "Pointer x is outside the native range.") ||
-                !requireRange(env, y, INT16_MIN, INT16_MAX, "Pointer y is outside the native range.")) return;
+                !requireRange(env, y, INT16_MIN, INT16_MAX, "Pointer y is outside the native range.")) {
+            return;
+        }
         if (native.type == EVENT_MOUSE_WHEEL) {
             jint scrollType, direction;
             if (!readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType, &scrollType) ||
-                    !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelDirection, &direction)) return;
+                    !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelDirection, &direction)) {
+                return;
+            }
             if (!requireRange(env, scrollType, WHEEL_UNIT_SCROLL, WHEEL_BLOCK_SCROLL, "Invalid scroll type.") ||
-                    !requireRange(env, direction, WHEEL_VERTICAL_DIRECTION, WHEEL_HORIZONTAL_DIRECTION, "Invalid wheel direction.")) return;
+                    !requireRange(env, direction, WHEEL_VERTICAL_DIRECTION, WHEEL_HORIZONTAL_DIRECTION, "Invalid wheel direction.")) {
+                return;
+            }
             double rotation = (*env)->CallDoubleMethod(env, event,
                     com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getPreciseWheelRotation);
-            if ((*env)->ExceptionCheck(env)) return;
+            if ((*env)->ExceptionCheck(env)) {
+                return;
+            }
             if (!isfinite(rotation) || rotation < -32767 || rotation > 32768) {
                 jni_ThrowException(env, "java/lang/IllegalArgumentException", "Wheel rotation is outside the native range.");
                 return;
@@ -219,7 +237,9 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
             double maxDelta = magnitude == 0 ? UINT16_MAX : limit / magnitude;
             uint16_t delta = maxDelta >= UINT16_MAX ? UINT16_MAX : (uint16_t) maxDelta;
             // Multiples of 120 retain exact conventional wheel fractions.
-            if (delta >= 120) delta -= delta % 120;
+            if (delta >= 120) {
+                delta -= delta % 120;
+            }
             double scaled = -rotation * delta;
             int32_t rounded = (int32_t) (scaled + (scaled < 0 ? -0.5 : 0.5));
             if (rotation != 0 && rounded == 0) {
@@ -238,9 +258,13 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
             if (native.type != EVENT_MOUSE_MOVED) {
                 jint clicks, button;
                 if (!readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getClickCount, &clicks) ||
-                        !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton, &button)) return;
+                        !readInt(env, event, com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton, &button)) {
+                    return;
+                }
                 if (!requireRange(env, clicks, 0, UINT16_MAX, "Click count is outside the native range.") ||
-                        !requireRange(env, button, MOUSE_NOBUTTON, MOUSE_BUTTON5, "Invalid mouse button.")) return;
+                        !requireRange(env, button, MOUSE_NOBUTTON, MOUSE_BUTTON5, "Invalid mouse button.")) {
+                    return;
+                }
                 native.data.mouse.clicks = (uint16_t) clicks;
                 native.data.mouse.button = (uint16_t) button;
             }
@@ -248,7 +272,9 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
     }
     int status = hook_post_event(&native);
     // A synchronous callback may have raised an exception while posting.
-    if ((*env)->ExceptionCheck(env)) return;
+    if ((*env)->ExceptionCheck(env)) {
+        return;
+    }
     if (status != UIOHOOK_SUCCESS) {
         jni_ThrowNativeHookException(env, status, "Failed to post native input event.");
     }
@@ -264,7 +290,9 @@ JNIEXPORT jobjectArray JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_ge
     unsigned char count = 0;
     screen_data *screens = hook_create_screen_info(&count);
 
-    if (screens == NULL) count = 0;
+    if (screens == NULL) {
+        count = 0;
+    }
     jobjectArray result = (*env)->NewObjectArray(env, (jsize) count, com_github_kwhat_jnativehook_NativeMonitorInfo->cls, NULL);
      if (result != NULL) {
         for (int i = 0; i < count; i++) {
@@ -278,10 +306,14 @@ JNIEXPORT jobjectArray JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_ge
                     (jshort) screens[i].width,
                     (jshort) screens[i].height);
 
-            if (monitor == NULL) break;
+            if (monitor == NULL) {
+                break;
+            }
             (*env)->SetObjectArrayElement(env, result, (jsize) i, monitor);
             (*env)->DeleteLocalRef(env, monitor);
-            if ((*env)->ExceptionCheck(env)) break;
+            if ((*env)->ExceptionCheck(env)) {
+                break;
+            }
         }
      } else {
          jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");

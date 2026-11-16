@@ -49,11 +49,15 @@ static void notifyHookThread(JNIEnv *env, jboolean enabled) {
 void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
     JNIEnv *env;
     jboolean attached;
-    if (event == NULL) return;
+    if (event == NULL) {
+        return;
+    }
     // Java's char API uses UTF-16; wchar_t may contain a full scalar on Unix.
     if (event->type == EVENT_KEY_TYPED && (uint32_t) event->data.keyboard.keychar > 0xFFFF) {
         uint32_t scalar = (uint32_t) event->data.keyboard.keychar;
-        if (scalar > 0x10FFFF) return;
+        if (scalar > 0x10FFFF) {
+            return;
+        }
         uiohook_event unit = *event;
         scalar -= 0x10000;
         unit.data.keyboard.keychar = (wchar_t) (0xD800 + (scalar >> 10));
@@ -68,7 +72,9 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
         keycode = event->data.keyboard.keycode;
     }
     if (jni_GetCallbackEnv(&env, &attached) == JNI_OK) {
-        if ((*env)->ExceptionCheck(env)) return;
+        if ((*env)->ExceptionCheck(env)) {
+            return;
+        }
         if ((*env)->PushLocalFrame(env, 16) != JNI_OK) {
             jni_ReleaseCallbackEnv(env, attached);
             return;
@@ -243,7 +249,9 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
                     NativeInputEvent_obj);
 
-            if ((*env)->ExceptionCheck(env)) goto cleanup;
+            if ((*env)->ExceptionCheck(env)) {
+                goto cleanup;
+            }
 
             // Set the propagate flag from java.
             jshort reserved = (*env)->GetShortField(

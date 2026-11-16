@@ -46,14 +46,18 @@ static int create_GlobalScreen(JNIEnv *env) {
     if (GlobalScreen_class != NULL) {
         // Get the field ID for hookThread.
         jfieldID hookThread = (*env)->GetStaticFieldID(env, GlobalScreen_class, "hookThread", "Lcom/github/kwhat/jnativehook/GlobalScreen$NativeHookThread;");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_GlobalScreen = calloc(1, sizeof(GlobalScreen));
             if (com_github_kwhat_jnativehook_GlobalScreen != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_GlobalScreen->cls = (jclass) (*env)->NewGlobalRef(env, GlobalScreen_class);
-                if (com_github_kwhat_jnativehook_GlobalScreen->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_GlobalScreen->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_GlobalScreen->hookThread = hookThread;
 
                 status = JNI_OK;
@@ -89,16 +93,22 @@ static int create_NativeHookThread(JNIEnv *env) {
     if (NativeHookThread_class != NULL) {
         // Get the method ID for GlobalScreen.dispatchEvent().
         jmethodID dispatchEvent = (*env)->GetStaticMethodID(env, NativeHookThread_class, "dispatchEvent", "(Lcom/github/kwhat/jnativehook/NativeInputEvent;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         jmethodID setNativeHookState = (*env)->GetMethodID(env, NativeHookThread_class, "setNativeHookState", "(Z)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = calloc(1, sizeof(NativeHookThread));
             if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookThread_class);
-                if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent = dispatchEvent;
                 com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->setNativeHookState = setNativeHookState;
 
@@ -135,14 +145,18 @@ static int create_NativeHookException(JNIEnv *env) {
     if (NativeHookException_class != NULL) {
         // Get the method ID for NativeInputEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeHookException_class, "<init>", "(ILjava/lang/String;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_NativeHookException = calloc(1, sizeof(NativeInputEvent));
             if (com_github_kwhat_jnativehook_NativeHookException != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_NativeHookException->cls = (jclass) (*env)->NewGlobalRef(env, NativeHookException_class);
-                if (com_github_kwhat_jnativehook_NativeHookException->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_NativeHookException->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_NativeHookException->init = init;
 
                 status = JNI_OK;
@@ -178,14 +192,18 @@ static int create_NativeMonitorInfo(JNIEnv *env) {
     if (NativeMonitorInfo_class != NULL) {
         // Get the method ID for NativeInputEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMonitorInfo_class, "<init>", "(SIISS)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_NativeMonitorInfo = calloc(1, sizeof(NativeMonitorInfo));
             if (com_github_kwhat_jnativehook_NativeMonitorInfo != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_NativeMonitorInfo->cls = (jclass) (*env)->NewGlobalRef(env, NativeMonitorInfo_class);
-                if (com_github_kwhat_jnativehook_NativeMonitorInfo->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_NativeMonitorInfo->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_NativeMonitorInfo->init = init;
 
                 status = JNI_OK;
@@ -220,30 +238,42 @@ static int create_NativeInputEvent(JNIEnv *env) {
     if (NativeInputEvent_class != NULL) {
         // Get the field ID for NativeInputEvent.when.
         jfieldID when = (*env)->GetFieldID(env, NativeInputEvent_class, "when", "J");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the field ID for NativeInputEvent.reserved.
         jfieldID reserved = (*env)->GetFieldID(env, NativeInputEvent_class, "reserved", "S");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeInputEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeInputEvent_class, "<init>", "(Ljava/lang/Class;II)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeInputEvent.getID().
         jmethodID getID = (*env)->GetMethodID(env, NativeInputEvent_class, "getID", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeInputEvent.getModifiers().
         jmethodID getModifiers = (*env)->GetMethodID(env, NativeInputEvent_class, "getModifiers", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_NativeInputEvent = calloc(1, sizeof(NativeInputEvent));
             if (com_github_kwhat_jnativehook_NativeInputEvent != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_NativeInputEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeInputEvent_class);
-                if (com_github_kwhat_jnativehook_NativeInputEvent->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_NativeInputEvent->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_NativeInputEvent->when = when;
                 com_github_kwhat_jnativehook_NativeInputEvent->reserved = reserved;
                 com_github_kwhat_jnativehook_NativeInputEvent->init = init;
@@ -283,26 +313,36 @@ static int create_NativeKeyEvent(JNIEnv *env) {
     if (NativeKeyEvent_class != NULL) {
         // Get the method ID for NativeKeyEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeKeyEvent_class, "<init>", "(IIIICI)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeKeyEvent.getKeyCode().
         jmethodID getKeyCode = (*env)->GetMethodID(env, NativeKeyEvent_class, "getKeyCode", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeKeyEvent.getKeyLocation().
         jmethodID getKeyLocation = (*env)->GetMethodID(env, NativeKeyEvent_class, "getKeyLocation", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeKeyEvent.getKeyChar().
         jmethodID getKeyChar = (*env)->GetMethodID(env, NativeKeyEvent_class, "getKeyChar", "()C");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_keyboard_NativeKeyEvent = calloc(1, sizeof(NativeKeyEvent));
             if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeKeyEvent_class);
-                if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->parent = com_github_kwhat_jnativehook_NativeInputEvent;
                 com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->init = init;
                 com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->getKeyCode = getKeyCode;
@@ -342,30 +382,42 @@ static int create_NativeMouseEvent(JNIEnv *env) {
     if (NativeMouseEvent_class != NULL) {
         // Get the method ID for NativeMouseEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IIIIIIII)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseEvent.getButton().
         jmethodID getButton = (*env)->GetMethodID(env, NativeMouseEvent_class, "getButton", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseEvent.getClickCount().
         jmethodID getClickCount = (*env)->GetMethodID(env, NativeMouseEvent_class, "getClickCount", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseEvent.getX().
         jmethodID getX = (*env)->GetMethodID(env, NativeMouseEvent_class, "getX", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseEvent.getY().
         jmethodID getY = (*env)->GetMethodID(env, NativeMouseEvent_class, "getY", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_mouse_NativeMouseEvent = calloc(1, sizeof(NativeMouseEvent));
             if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseEvent_class);
-                if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_mouse_NativeMouseEvent->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_mouse_NativeMouseEvent->parent = com_github_kwhat_jnativehook_NativeInputEvent;
                 com_github_kwhat_jnativehook_mouse_NativeMouseEvent->init = init;
                 com_github_kwhat_jnativehook_mouse_NativeMouseEvent->getButton = getButton;
@@ -406,32 +458,46 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
     if (NativeMouseWheelEvent_class != NULL) {
         // Get the method ID for NativeMouseWheelEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "<init>", "(IIIIIIIIID)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseWheelEvent.getScrollAmount().
         jmethodID getScrollAmount = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getScrollAmount", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseWheelEvent.getScrollType().
         jmethodID getScrollType = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getScrollType", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseWheelEvent.getWheelRotation().
         jmethodID getWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getWheelRotation", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for NativeMouseWheelEvent.getPreciseWheelRotation().
         jmethodID getPreciseWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getPreciseWheelRotation", "()D");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         jmethodID getWheelDirection = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getWheelDirection", "()I");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = calloc(1, sizeof(NativeMouseWheelEvent));
             if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
                 // Populate our structure for later use.
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls = (jclass) (*env)->NewGlobalRef(env, NativeMouseWheelEvent_class);
-                if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls == NULL) return JNI_ENOMEM;
+                if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent = com_github_kwhat_jnativehook_mouse_NativeMouseEvent;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->init = init;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = getScrollAmount;
@@ -473,14 +539,18 @@ static int create_Object(JNIEnv *env) {
     if (Object_class != NULL) {
         // Get the method ID for Object.notify().
         jmethodID notify = (*env)->GetMethodID(env, Object_class, "notify", "()V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             java_lang_Object = calloc(1, sizeof(Object));
             if (java_lang_Object != NULL) {
                 // Populate our structure for later use.
                 java_lang_Object->cls = (jclass) (*env)->NewGlobalRef(env, Object_class);
-                if (java_lang_Object->cls == NULL) return JNI_ENOMEM;
+                if (java_lang_Object->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 java_lang_Object->notify = notify;
 
                 status = JNI_OK;
@@ -515,14 +585,18 @@ static int create_Integer(JNIEnv *env) {
     if (Integer_class != NULL) {
         // Get the method ID for NativeMouseWheelEvent constructor.
         jmethodID init = (*env)->GetMethodID(env, Integer_class, "<init>", "(I)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             java_lang_Integer = calloc(1, sizeof(Integer));
             if (java_lang_Integer != NULL) {
                 // Populate our structure for later use.
                 java_lang_Integer->cls = (jclass) (*env)->NewGlobalRef(env, Integer_class);
-                if (java_lang_Integer->cls == NULL) return JNI_ENOMEM;
+                if (java_lang_Integer->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 java_lang_Integer->init = init;
 
                 status = JNI_OK;
@@ -557,18 +631,24 @@ static inline int create_System(JNIEnv *env) {
     if (System_class != NULL) {
         // Get the method ID for System.setProperty().
         jmethodID setProperty = (*env)->GetStaticMethodID(env, System_class, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for System.clearProperty().
         jmethodID clearProperty = (*env)->GetStaticMethodID(env, System_class, "clearProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             java_lang_System = calloc(1, sizeof(System));
             if (java_lang_System != NULL) {
                 // Populate our structure for later use.
                 java_lang_System->cls = (jclass) (*env)->NewGlobalRef(env, System_class);
-                if (java_lang_System->cls == NULL) return JNI_ENOMEM;
+                if (java_lang_System->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 java_lang_System->setProperty = setProperty;
                 java_lang_System->clearProperty = clearProperty;
 
@@ -606,38 +686,56 @@ static inline int create_Logger(JNIEnv *env) {
     if (Logger_class != NULL) {
         // Get the method ID for Logger.getLogger().
         jmethodID getLogger = (*env)->GetStaticMethodID(env, Logger_class, "getLogger", "(Ljava/lang/String;)Ljava/util/logging/Logger;");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.fine().
         jmethodID fine = (*env)->GetMethodID(env, Logger_class, "fine", "(Ljava/lang/String;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.info().
         jmethodID info = (*env)->GetMethodID(env, Logger_class, "info", "(Ljava/lang/String;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.warning().
         jmethodID warning = (*env)->GetMethodID(env, Logger_class, "warning", "(Ljava/lang/String;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.severe().
         jmethodID severe = (*env)->GetMethodID(env, Logger_class, "severe", "(Ljava/lang/String;)V");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         jfieldID loggerField = (*env)->GetStaticFieldID(env,
                 com_github_kwhat_jnativehook_GlobalScreen->cls, "log", "Ljava/util/logging/Logger;");
-        if ((*env)->ExceptionCheck(env)) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
         jobject logger = (*env)->GetStaticObjectField(env,
                 com_github_kwhat_jnativehook_GlobalScreen->cls, loggerField);
-        if ((*env)->ExceptionCheck(env) || logger == NULL) return JNI_ERR;
+        if ((*env)->ExceptionCheck(env) || logger == NULL) {
+            return JNI_ERR;
+        }
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             java_util_logging_Logger = calloc(1, sizeof(Logger));
             if (java_util_logging_Logger != NULL) {
                 // Populate our structure for later use.
                 java_util_logging_Logger->cls = (jclass) (*env)->NewGlobalRef(env, Logger_class);
-                if (java_util_logging_Logger->cls == NULL) return JNI_ENOMEM;
+                if (java_util_logging_Logger->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
                 java_util_logging_Logger->object = (*env)->NewGlobalRef(env, logger);
-                if (java_util_logging_Logger->object == NULL) return JNI_ENOMEM;
+                if (java_util_logging_Logger->object == NULL) {
+                    return JNI_ENOMEM;
+                }
                 java_util_logging_Logger->getLogger = getLogger;
                 java_util_logging_Logger->fine = fine;
                 java_util_logging_Logger->info = info;
@@ -671,7 +769,9 @@ static inline void destroy_Logger(JNIEnv *env) {
 
 
 int jni_CreateGlobals(JNIEnv *env) {
-    if ((*env)->PushLocalFrame(env, 32) != JNI_OK) return JNI_ENOMEM;
+    if ((*env)->PushLocalFrame(env, 32) != JNI_OK) {
+        return JNI_ENOMEM;
+    }
     int status = create_GlobalScreen(env);
 
     if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {

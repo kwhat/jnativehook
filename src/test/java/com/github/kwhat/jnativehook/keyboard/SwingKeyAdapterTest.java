@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class SwingKeyAdapterTest {
     static Stream<Arguments> keypadOperators() {
         return Stream.of(
-            Arguments.of(NativeKeyEvent.VC_KP_MULTIPLY, KeyEvent.VK_MULTIPLY),
-            Arguments.of(NativeKeyEvent.VC_KP_ADD, KeyEvent.VK_ADD),
-            Arguments.of(NativeKeyEvent.VC_KP_SUBTRACT, KeyEvent.VK_SUBTRACT),
-            Arguments.of(NativeKeyEvent.VC_KP_DIVIDE, KeyEvent.VK_DIVIDE),
-            Arguments.of(NativeKeyEvent.VC_KP_EQUALS, KeyEvent.VK_EQUALS),
-            Arguments.of(NativeKeyEvent.VC_KP_SEPARATOR, KeyEvent.VK_SEPARATOR));
+            Arguments.of(NativeKeyEvent.VC_MULTIPLY, KeyEvent.VK_MULTIPLY),
+            Arguments.of(NativeKeyEvent.VC_ADD, KeyEvent.VK_ADD),
+            Arguments.of(NativeKeyEvent.VC_MINUS, KeyEvent.VK_SUBTRACT),
+            Arguments.of(NativeKeyEvent.VC_SLASH, KeyEvent.VK_DIVIDE),
+            Arguments.of(NativeKeyEvent.VC_EQUALS, KeyEvent.VK_EQUALS),
+            Arguments.of(NativeKeyEvent.VC_SEPARATOR, KeyEvent.VK_SEPARATOR));
     }
 
     @ParameterizedTest
