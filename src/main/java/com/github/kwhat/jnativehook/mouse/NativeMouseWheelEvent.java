@@ -101,7 +101,9 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @see #getWheelDirection
      */
     private final int wheelDirection;
+    /** Number of units per scroll step. */
     private final int scrollAmount;
+    /** Wheel rotation measured in fractional scroll steps. */
     private final double preciseWheelRotation;
 
     /**

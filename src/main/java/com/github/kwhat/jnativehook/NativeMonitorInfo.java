@@ -139,12 +139,18 @@ public class NativeMonitorInfo {
         return width;
     }
 
-    /** @return the unsigned native monitor width, including values above 32767 pixels */
+    /**
+     * Returns the unsigned native monitor width, including values above 32767 pixels.
+     * @return the unsigned native monitor width, including values above 32767 pixels
+     */
     public int getWidthPixels() {
         return Short.toUnsignedInt(width);
     }
 
-    /** @return the unsigned native monitor height, including values above 32767 pixels */
+    /**
+     * Returns the unsigned native monitor height, including values above 32767 pixels.
+     * @return the unsigned native monitor height, including values above 32767 pixels
+     */
     public int getHeightPixels() {
         return Short.toUnsignedInt(height);
     }
