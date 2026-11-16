@@ -20,7 +20,9 @@ package com.github.kwhat.jnativehook.dispatcher;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,7 +38,8 @@ import java.util.concurrent.TimeUnit;
  * @since 2.2
  */
 public class VoidDispatchService extends AbstractExecutorService {
-    private boolean running = false;
+    private boolean running = true;
+    private int active;
 
     /**
      * Creates a event dispatcher that executes on the os delivery thread.
@@ -45,28 +48,59 @@ public class VoidDispatchService extends AbstractExecutorService {
         running = true;
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         running = false;
+        notifyAll();
     }
 
-    public List<Runnable> shutdownNow() {
-        running = false;
-        return new ArrayList<Runnable>(0);
+    public synchronized List<Runnable> shutdownNow() {
+        shutdown();
+        return new ArrayList<>(0);
     }
 
-    public boolean isShutdown() {
+    public synchronized boolean isShutdown() {
         return !running;
     }
 
-    public boolean isTerminated() {
-        return !running;
+    public synchronized boolean isTerminated() {
+        return !running && active == 0;
     }
 
-    public boolean awaitTermination(long timeout, TimeUnit unit) {
+    public synchronized boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        long remaining = unit.toNanos(timeout);
+        long last = System.nanoTime();
+
+        while (!isTerminated()) {
+            if (remaining <= 0) {
+                return false;
+            }
+
+            TimeUnit.NANOSECONDS.timedWait(this, remaining);
+            long now = System.nanoTime();
+            remaining -= now - last;
+            last = now;
+        }
+
         return true;
     }
 
-    public void execute(Runnable r) {
-        r.run();
+    public void execute(Runnable task) {
+        Objects.requireNonNull(task, "task");
+        synchronized (this) {
+            if (!running) {
+                throw new RejectedExecutionException("Dispatcher is shut down.");
+            }
+
+            active++;
+        }
+
+        try {
+            task.run();
+        } finally {
+            synchronized (this) {
+                active--;
+                this.notifyAll();
+            }
+        }
     }
 }

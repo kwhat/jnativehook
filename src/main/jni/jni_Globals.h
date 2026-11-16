@@ -41,6 +41,7 @@ typedef struct _com_github_kwhat_jnativehook_GlobalScreen {
 typedef struct com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread {
     jclass cls;
     jmethodID dispatchEvent;
+    jmethodID setNativeHookState;
 } NativeHookThread;
 
 typedef struct _com_github_kwhat_jnativehook_NativeHookException {
