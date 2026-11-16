@@ -26,6 +26,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -74,21 +76,23 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
             NativeSystem.getFamily().toString().toLowerCase() +
             '/' + libNativeArch + '/' + libNativeName;
 
-        URL classLocation = GlobalScreen.class.getProtectionDomain().getCodeSource().getLocation();
+        ProtectionDomain protectionDomain = GlobalScreen.class.getProtectionDomain();
+        CodeSource codeSource = null;
+        if (protectionDomain != null) {
+            codeSource = protectionDomain.getCodeSource();
+        }
 
-        File classFile = null;
-        try {
-            classFile = new File(classLocation.toURI());
+        URL classLocation = null;
+        if (codeSource != null) {
+            classLocation = codeSource.getLocation();
         }
-        catch (URISyntaxException e) {
-            log.warning(e.getMessage());
-            classFile = new File(classLocation.getPath());
-        }
+
+        File classFile = codeSourceFile(classLocation);
 
         File libFile = null;
-        if (classFile.isFile()) {
+        if (classFile == null || classFile.isFile()) {
             // Jar Archive
-            String libPath = System.getProperty("jnativehook.lib.path", classFile.getParentFile().getPath());
+            String libPath = extractDirectory(classFile).getPath();
 
             String version = GlobalScreen.class.getPackage().getImplementationVersion();
             if (version != null) {
@@ -141,5 +145,59 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
         libraries.add(libFile);
 
         return libraries.iterator();
+    }
+
+    /**
+     * Returns the code-source file for a <code>file:</code> URL, or null for any other location.
+     * <p>
+     * A null location or a non-file protocol, including a <code>jrt:</code> modular image and a
+     * <code>jar:</code> URL, returns null so the native library is copied out of the module
+     * instead of constructing a {@link File} from that URI.
+     *
+     * @param location code-source location, or null.
+     * @return the local file, or null when the location is not a file URL.
+     */
+    static File codeSourceFile(URL location) {
+        if (location == null || !"file".equals(location.getProtocol())) {
+            return null;
+        }
+
+        try {
+            return new File(location.toURI());
+        }
+        catch (URISyntaxException e) {
+            log.warning(e.getMessage());
+            return new File(location.getPath());
+        }
+        catch (IllegalArgumentException e) {
+            log.warning(e.getMessage());
+            return new File(location.getPath());
+        }
+    }
+
+    /**
+     * Directory the native library is extracted into.
+     * <p>
+     * Uses <code>jnativehook.lib.path</code> when that property is set, including when it is
+     * empty. Otherwise uses the parent of a jar <code>classFile</code>, or
+     * <code>java.io.tmpdir</code>.
+     *
+     * @param classFile jar containing this class, or null.
+     * @return extraction directory.
+     */
+    static File extractDirectory(File classFile) {
+        String libPath = System.getProperty("jnativehook.lib.path");
+        if (libPath != null) {
+            return new File(libPath);
+        }
+
+        if (classFile != null && !classFile.isDirectory()) {
+            File parent = classFile.getParentFile();
+            if (parent != null) {
+                return parent;
+            }
+        }
+
+        return new File(System.getProperty("java.io.tmpdir"));
     }
 }
