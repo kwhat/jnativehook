@@ -27,7 +27,7 @@
   <version>${revision}</version>
 
   <properties>
-    <revision>2.2-SNAPSHOT</revision>
+    <revision>2.3-SNAPSHOT</revision>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

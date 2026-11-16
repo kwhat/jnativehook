@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(JNativeHook VERSION 2.2.0 LANGUAGES C)
+project(JNativeHook VERSION 2.3.0 LANGUAGES C)
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "")
     string(TOLOWER ${CMAKE_SYSTEM_NAME} TARGET_OS)
@@ -52,7 +52,9 @@ endif()
 
 if(APPLE)
     set(CMAKE_MACOSX_RPATH 1)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
+    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
+    endif()
 endif()
 
 
@@ -72,8 +74,8 @@ add_library(jnativehook SHARED
 )
 
 set_target_properties(jnativehook PROPERTIES
-    PROPERTY C_STANDARD 99
-    PROPERTY C_STANDARD_REQUIRED ON
+    C_STANDARD 99
+    C_STANDARD_REQUIRED ON
     OUTPUT_NAME ${CMAKE_PROJECT_NAME}
 )
 
@@ -82,7 +84,7 @@ target_link_libraries(jnativehook uiohook)
 
 target_include_directories(jnativehook
     PUBLIC
-        $<BUILD_INTERFACE:${JNI_INCLUDE_DIRS}>
+        "$<BUILD_INTERFACE:${JNI_INCLUDE_DIRS}>"
 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni
