@@ -40,19 +40,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     // functions that are not called from java.
     jvm = vm;
     JNIEnv *env = NULL;
-    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-        // Create all the global class references onload to prevent class loader
-        // issues with JNLP and some IDE's.
-        if (jni_CreateGlobals(env) == JNI_OK) {
-            // Set Java logger for native code messages.
-            hook_set_logger_proc(&jni_LoggerProc, NULL);
-
-            // Set the hook callback function to dispatch events.
-            hook_set_dispatch_proc(&jni_EventDispatcher, NULL);
-        }
-    } else {
-        jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
+    if ((*vm)->GetEnv(vm, (void **) &env, jvm_attach_args.version) != JNI_OK) {
+        return JNI_ERR;
     }
+    if (jni_CreateGlobals(env) != JNI_OK) {
+        jni_DestroyGlobals(env);
+        return JNI_ERR;
+    }
+    hook_set_logger_proc(&jni_LoggerProc, NULL);
+    hook_set_dispatch_proc(&jni_EventDispatcher, NULL);
 
     return jvm_attach_args.version;
 }
@@ -74,5 +70,27 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
         // Cleanup JNI global memory.
         jni_DestroyGlobals(env);
+    }
+}
+
+// Native backends may deliver callbacks from threads not created by Java.
+jint jni_GetCallbackEnv(JNIEnv **env, jboolean *attached) {
+    *attached = JNI_FALSE;
+    jint status = (*jvm)->GetEnv(jvm, (void **) env, jvm_attach_args.version);
+    if (status == JNI_EDETACHED) {
+        status = (*jvm)->AttachCurrentThreadAsDaemon(jvm, (void **) env, &jvm_attach_args);
+        *attached = status == JNI_OK;
+    }
+    return status;
+}
+
+void jni_ReleaseCallbackEnv(JNIEnv *env, jboolean attached) {
+    // An exception escaping a native callback would poison subsequent JNI calls.
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+    if (attached) {
+        (*jvm)->DetachCurrentThread(jvm);
     }
 }

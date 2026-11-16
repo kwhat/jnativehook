@@ -28,6 +28,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 import java.io.File;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Logger;
 import javax.swing.event.EventListenerList;
 
@@ -52,12 +53,16 @@ public class GlobalScreen {
     /**
      * The service to control the hook.
      */
-    protected static NativeHookThread hookThread;
+    protected static volatile NativeHookThread hookThread;
 
     /**
      * The service to dispatch events.
      */
-    protected static ExecutorService eventExecutor;
+    protected static volatile ExecutorService eventExecutor;
+
+    private static final Object hookLock = new Object();
+    private static boolean dispatcherConfigured;
+    private static boolean ownsEventExecutor;
 
     /**
      * The list of event listeners to notify.
@@ -300,7 +305,7 @@ public class GlobalScreen {
         /**
          * Exception thrown by this thread.
          */
-        protected NativeHookException exception;
+        protected volatile NativeHookException exception;
 
         /**
          * Default constructor.
@@ -311,20 +316,41 @@ public class GlobalScreen {
             this.setPriority(Thread.MAX_PRIORITY);
         }
 
+        private boolean startupComplete;
+        private volatile boolean nativeRunning;
+        private boolean stopping;
+
         public void run() {
-            this.exception = null;
-
             try {
-                // NOTE enable() will call notifyAll() on this object after passing exception throwing code.
-                this.enable();
+                enable();
             } catch (NativeHookException e) {
-                this.exception = e;
+                exception = e;
+            } catch (Throwable e) {
+                exception = new NativeHookException(e);
+            } finally {
+                synchronized (this) {
+                    if (!startupComplete && exception == null) {
+                        exception = new NativeHookException("Native hook exited before enabling input delivery.");
+                    }
+                    startupComplete = true;
+                    nativeRunning = false;
+                    notifyAll();
+                }
+                synchronized (hookLock) {
+                    if (hookThread == this && ownsEventExecutor && eventExecutor != null) {
+                        eventExecutor.shutdown();
+                    }
+                }
             }
+        }
 
-            synchronized (this) {
-                // Notify anyone that is still waiting for the hook that it has completed.
-                this.notifyAll();
+        // Called by JNI for explicit enabled/disabled notifications.
+        private synchronized void setNativeHookState(boolean enabled) {
+            nativeRunning = enabled;
+            if (enabled) {
+                startupComplete = true;
             }
+            notifyAll();
         }
 
         /**
@@ -368,8 +394,16 @@ public class GlobalScreen {
          * @param event the <code>NativeInputEvent</code> sent to the registered event listeners.
          */
         protected static void dispatchEvent(NativeInputEvent event) {
-            if (eventExecutor != null) {
-                eventExecutor.execute(new EventDispatchTask(event));
+            ExecutorService executor = eventExecutor;
+            if (executor != null) {
+                try {
+                    executor.execute(new EventDispatchTask(event));
+                } catch (RejectedExecutionException e) {
+                    // A dispatcher may be replaced while an event is being delivered.
+                    if (!executor.isShutdown()) {
+                        throw e;
+                    }
+                }
             }
         }
     }
@@ -390,34 +424,36 @@ public class GlobalScreen {
      * @since 1.1
      */
     public static void registerNativeHook() throws NativeHookException {
-        if (eventExecutor != null) {
-            if (!eventExecutor.isShutdown()) {
-                eventExecutor.shutdown();
+        NativeHookThread thread;
+        synchronized (hookLock) {
+            thread = hookThread;
+            if (thread != null && thread.isAlive() && thread.stopping) {
+                throw new NativeHookException("The native hook is still stopping.");
             }
-
-            while (!eventExecutor.isTerminated()) {
-                Thread.yield();
+            if (thread == null || !thread.isAlive()) {
+                if (!dispatcherConfigured && (eventExecutor == null || eventExecutor.isShutdown())) {
+                    eventExecutor = new DefaultDispatchService();
+                    ownsEventExecutor = true;
+                } else if (eventExecutor != null && eventExecutor.isShutdown()) {
+                    throw new NativeHookException("The configured event dispatcher has been shut down.");
+                }
+                thread = new NativeHookThread();
+                hookThread = thread;
+                thread.start();
             }
-        } else {
-            eventExecutor = new DefaultDispatchService();
         }
 
-        if (hookThread == null || !hookThread.isAlive()) {
-            hookThread = new NativeHookThread();
-
-            synchronized (hookThread) {
-                hookThread.start();
-
-                try {
-                    hookThread.wait();
-                } catch (InterruptedException e) {
-                    throw new NativeHookException(e);
+        synchronized (thread) {
+            try {
+                while (!thread.startupComplete) {
+                    thread.wait();
                 }
-
-                NativeHookException exception = hookThread.getException();
-                if (exception != null) {
-                    throw exception;
-                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new NativeHookException(e);
+            }
+            if (thread.getException() != null) {
+                throw thread.getException();
             }
         }
     }
@@ -430,18 +466,44 @@ public class GlobalScreen {
      * @since 1.1
      */
     public static void unregisterNativeHook() throws NativeHookException {
-        if (isNativeHookRegistered()) {
-
-            synchronized (hookThread) {
-                try {
-                    hookThread.disable();
-                    hookThread.join();
-                } catch (Exception e) {
-                    throw new NativeHookException(e.getCause());
+        NativeHookThread thread = hookThread;
+        if (thread == null || !thread.isAlive()) {
+            return;
+        }
+        // Stopping before native startup finishes can lose the backend's stop request.
+        synchronized (thread) {
+            try {
+                while (!thread.startupComplete) {
+                    thread.wait();
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new NativeHookException(e);
             }
-
-            eventExecutor.shutdown();
+        }
+        boolean requestStop;
+        synchronized (hookLock) {
+            requestStop = thread.nativeRunning && !thread.stopping;
+            thread.stopping = true;
+        }
+        if (requestStop) {
+            try {
+                thread.disable();
+            } catch (NativeHookException e) {
+                synchronized (hookLock) {
+                    thread.stopping = false;
+                }
+                throw e;
+            }
+        }
+        // Synchronous listeners execute on the hook thread and cannot join themselves.
+        if (Thread.currentThread() != thread) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new NativeHookException(e);
+            }
         }
     }
 
@@ -452,7 +514,8 @@ public class GlobalScreen {
      * @since 1.1
      */
     public static boolean isNativeHookRegistered() {
-        return hookThread != null && hookThread.isAlive();
+        NativeHookThread thread = hookThread;
+        return thread != null && thread.nativeRunning && thread.isAlive();
     }
 
 
@@ -496,8 +559,13 @@ public class GlobalScreen {
      * pressed events and will never produce <code>NATIVE_MOUSE_RELEASED</code>,
      * <code>NATIVE_MOUSE_DRAGGED</code> or <code>NATIVE_MOUSE_MOVED</code>
      *
+     * Native backend posting failures raise a {@link NativeHookException}.
+     *
      * @param nativeEvent the <code>NativeInputEvent</code> sent to the native system.
      * @since 2.0
+     * @throws IllegalArgumentException if the event type, key location or wheel rotation
+     *         cannot be represented by the native API
+     * @throws NullPointerException if nativeEvent is null
      */
     public static native void postNativeEvent(NativeInputEvent nativeEvent);
 
@@ -654,16 +722,28 @@ public class GlobalScreen {
      * <b>Note:</b> Using null as an <code>ExecutorService</code> will cause all
      * delivered events to be discarded until a valid <code>ExecutorService</code> is set.
      *
+     * Caller supplied dispatchers remain owned by the caller and are not shut down
+     * when the hook stops or the dispatcher changes.
+     *
      * @param dispatcher The <code>ExecutorService</code> used to dispatch native events.
      * @see java.util.concurrent.ExecutorService
      * @see java.util.concurrent.Executors#newSingleThreadExecutor()
      * @since 2.0
      */
     public static void setEventDispatcher(ExecutorService dispatcher) {
-        if (GlobalScreen.eventExecutor != null) {
-            GlobalScreen.eventExecutor.shutdown();
+        synchronized (hookLock) {
+            if (eventExecutor == dispatcher) {
+                dispatcherConfigured = true;
+                return;
+            }
+            ExecutorService previous = eventExecutor;
+            boolean shutdownPrevious = ownsEventExecutor;
+            eventExecutor = dispatcher;
+            dispatcherConfigured = true;
+            ownsEventExecutor = false;
+            if (shutdownPrevious && previous != null) {
+                previous.shutdown();
+            }
         }
-
-        GlobalScreen.eventExecutor = dispatcher;
     }
 }

@@ -19,8 +19,12 @@ package com.github.kwhat.jnativehook.dispatcher;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
 
@@ -35,35 +39,82 @@ import javax.swing.SwingUtilities;
  * @see GlobalScreen#setEventDispatcher
  */
 public class SwingDispatchService extends AbstractExecutorService {
-    private boolean running;
+    private boolean running = true;
+    private int active;
+    private final Map<Runnable, Runnable> pending = new LinkedHashMap<>();
 
     /** Creates a Swing event dispatcher. */
     public SwingDispatchService() {
         running = true;
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         running = false;
+        notifyAll();
     }
 
-    public List<Runnable> shutdownNow() {
-        running = false;
-        return new ArrayList<>(0);
+    public synchronized List<Runnable> shutdownNow() {
+        shutdown();
+        List<Runnable> cancelled = new ArrayList<>(pending.values());
+        pending.clear();
+        return cancelled;
     }
 
-    public boolean isShutdown() {
+    public synchronized boolean isShutdown() {
         return !running;
     }
 
-    public boolean isTerminated() {
-        return !running;
+    public synchronized boolean isTerminated() {
+        return !running && active == 0 && pending.isEmpty();
     }
 
-    public boolean awaitTermination(long timeout, TimeUnit unit) {
+    public synchronized boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        long remaining = unit.toNanos(timeout);
+        long last = System.nanoTime();
+        while (!isTerminated()) {
+            if (remaining <= 0) {
+                return false;
+            }
+            TimeUnit.NANOSECONDS.timedWait(this, remaining);
+            long now = System.nanoTime();
+            remaining -= now - last;
+            last = now;
+        }
         return true;
     }
 
-    public void execute(Runnable r) {
-        SwingUtilities.invokeLater(r);
+    public void execute(Runnable command) {
+        Objects.requireNonNull(command, "command");
+        Runnable task = new Runnable() {
+            public void run() {
+                synchronized (SwingDispatchService.this) {
+                    if (pending.remove(this) == null) {
+                        return;
+                    }
+                    active++;
+                }
+                try {
+                    command.run();
+                } finally {
+                    synchronized (SwingDispatchService.this) {
+                        active--;
+                        SwingDispatchService.this.notifyAll();
+                    }
+                }
+            }
+        };
+        synchronized (this) {
+            if (!running) {
+                throw new RejectedExecutionException("Dispatcher is shut down.");
+            }
+            pending.put(task, command);
+            try {
+                SwingUtilities.invokeLater(task);
+            } catch (RuntimeException | Error error) {
+                pending.remove(task);
+                notifyAll();
+                throw error;
+            }
+        }
     }
 }

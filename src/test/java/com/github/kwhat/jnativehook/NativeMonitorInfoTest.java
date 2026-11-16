@@ -19,6 +19,8 @@ package com.github.kwhat.jnativehook;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NativeMonitorInfoTest {
@@ -89,4 +91,25 @@ public class NativeMonitorInfoTest {
 
         assertEquals(height, subject.getHeight());
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 32767, 32768, 40000, 65535})
+    public void unsignedDimensionsPreserveAllNativeBits(int size) {
+        subject.setWidth((short) size);
+        subject.setHeight((short) size);
+        assertEquals(size, subject.getWidthPixels());
+        assertEquals(size, subject.getHeightPixels());
+        assertEquals((short) size, subject.getWidth());
+        assertEquals((short) size, subject.getHeight());
+    }
+
+    @Test
+    public void negativeMonitorOriginsArePreserved() {
+        NativeMonitorInfo monitor = new NativeMonitorInfo((short) 2, -3840, -2160, (short) 3840, (short) 2160);
+        assertEquals(-3840, monitor.getX());
+        assertEquals(-2160, monitor.getY());
+        assertEquals(3840, monitor.getWidthPixels());
+        assertEquals(2160, monitor.getHeightPixels());
+    }
+
 }

@@ -31,20 +31,16 @@
 #include "com_github_kwhat_jnativehook_NativeInputEvent.h"
 
 
-// Simple function to notify() the hook thread.
-static inline void notifyHookThread(JNIEnv *env) {
-    jobject hookThread_obj = (*env)->GetStaticObjectField(
-            env,
-            java_lang_Object->cls,
+// Publish explicit lifecycle state instead of treating any wakeup as startup success.
+static void notifyHookThread(JNIEnv *env, jboolean enabled) {
+    jobject thread = (*env)->GetStaticObjectField(env,
+            com_github_kwhat_jnativehook_GlobalScreen->cls,
             com_github_kwhat_jnativehook_GlobalScreen->hookThread);
-
-    if (hookThread_obj != NULL) {
-        (*env)->MonitorEnter(env, hookThread_obj);
-        (*env)->CallVoidMethod(
-                env,
-                hookThread_obj,
-                java_lang_Object->notify);
-        (*env)->MonitorExit(env, hookThread_obj);
+    if (thread != NULL) {
+        (*env)->CallVoidMethod(env, thread,
+                com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->setNativeHookState, enabled);
+        (*env)->ExceptionCheck(env);
+        (*env)->DeleteLocalRef(env, thread);
     }
 }
 
@@ -52,20 +48,44 @@ static inline void notifyHookThread(JNIEnv *env) {
 // please do so on another thread via your own event dispatcher.
 void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
     JNIEnv *env;
-
+    jboolean attached;
+    if (event == NULL) {
+        return;
+    }
+    // Java's char API uses UTF-16; wchar_t may contain a full scalar on Unix.
+    if (event->type == EVENT_KEY_TYPED && (uint32_t) event->data.keyboard.keychar > 0xFFFF) {
+        uint32_t scalar = (uint32_t) event->data.keyboard.keychar;
+        if (scalar > 0x10FFFF) {
+            return;
+        }
+        uiohook_event unit = *event;
+        scalar -= 0x10000;
+        unit.data.keyboard.keychar = (wchar_t) (0xD800 + (scalar >> 10));
+        jni_EventDispatcher(&unit, user_data);
+        unit.data.keyboard.keychar = (wchar_t) (0xDC00 + (scalar & 0x3FF));
+        jni_EventDispatcher(&unit, user_data);
+        event->mask |= unit.mask & MASK_CONSUMED;
+        return;
+    }
     uint16_t keycode = VC_UNDEFINED;
     if (event->type == EVENT_KEY_PRESSED || event->type == EVENT_KEY_RELEASED) {
         keycode = event->data.keyboard.keycode;
     }
-
-    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
+    if (jni_GetCallbackEnv(&env, &attached) == JNI_OK) {
+        if ((*env)->ExceptionCheck(env)) {
+            return;
+        }
+        if ((*env)->PushLocalFrame(env, 16) != JNI_OK) {
+            jni_ReleaseCallbackEnv(env, attached);
+            return;
+        }
         jobject NativeInputEvent_obj = NULL;
         jint location = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
         switch (event->type) {
             case EVENT_HOOK_DISABLED:
             case EVENT_HOOK_ENABLED:
-                notifyHookThread(env);
-                return;
+                notifyHookThread(env, event->type == EVENT_HOOK_ENABLED);
+                goto cleanup;
 
 
             case EVENT_KEY_PRESSED:
@@ -214,7 +234,7 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                 break;
         }
 
-        if (NativeInputEvent_obj != NULL) {
+        if (NativeInputEvent_obj != NULL && !(*env)->ExceptionCheck(env)) {
             // Set the private when field to the native event time.
             (*env)->SetLongField(
                     env,
@@ -228,6 +248,10 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->cls,
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
                     NativeInputEvent_obj);
+
+            if ((*env)->ExceptionCheck(env)) {
+                goto cleanup;
+            }
 
             // Set the propagate flag from java.
             jshort reserved = (*env)->GetShortField(
@@ -244,5 +268,8 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
             // Make sure our object is garbage collected.
             (*env)->DeleteLocalRef(env, NativeInputEvent_obj);
         }
+cleanup:
+        (*env)->PopLocalFrame(env, NULL);
+        jni_ReleaseCallbackEnv(env, attached);
     }
 }

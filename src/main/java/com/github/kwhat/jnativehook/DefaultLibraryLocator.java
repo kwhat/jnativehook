@@ -18,11 +18,13 @@
 package com.github.kwhat.jnativehook;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -88,11 +90,6 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
             // Jar Archive
             String libPath = System.getProperty("jnativehook.lib.path", classFile.getParentFile().getPath());
 
-            InputStream resourceInputStream = GlobalScreen.class.getResourceAsStream(libResourcePath);
-            if (resourceInputStream == null) {
-                throw new RuntimeException("Unable to extract the native library " + libResourcePath + "!\n");
-            }
-
             String version = GlobalScreen.class.getPackage().getImplementationVersion();
             if (version != null) {
                 version = '-' + version;
@@ -105,27 +102,33 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
                 libNativeName.replaceAll("^(.*)\\.(.*)$", "$1" + version + '.' + libNativeArch + ".$2")
             );
             if (!libFile.exists()) {
-                try {
-                    // Check and see if a copy of the native lib already exists.
-                    FileOutputStream libOutputStream = new FileOutputStream(libFile);
-
-                    // Read from the digest stream and write to the file steam.
-                    int size;
-                    byte[] buffer = new byte[4 * 1024];
-                    while ((size = resourceInputStream.read(buffer)) != -1) {
-                        libOutputStream.write(buffer, 0, size);
+                Path extracted = null;
+                try (InputStream input = GlobalScreen.class.getResourceAsStream(libResourcePath)) {
+                    if (input == null) {
+                        throw new IOException("Unable to extract the native library " + libResourcePath);
                     }
-
-                    // Close all the streams.
-                    resourceInputStream.close();
-                    libOutputStream.close();
-                }
-                catch (IOException e) {
+                    // Publish a complete file so failed copies cannot poison later loads.
+                    extracted = Files.createTempFile(libFile.getParentFile().toPath(), libNativeName, ".tmp");
+                    Files.copy(input, extracted, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    try {
+                        Files.move(extracted, libFile.toPath());
+                    } catch (FileAlreadyExistsException e) {
+                        // Another class loader or process completed extraction first.
+                    }
+                } catch (IOException e) {
                     throw new RuntimeException(e.getMessage(), e);
+                } finally {
+                    if (extracted != null) {
+                        try {
+                            Files.deleteIfExists(extracted);
+                        } catch (IOException e) {
+                            log.warning(e.getMessage());
+                        }
+                    }
                 }
-
                 log.fine("Extracted library: " + libFile.getPath() + ".\n");
             }
+
         }  else {
             // Loose Classes
             libFile = Paths.get(classFile.getAbsolutePath(), libResourcePath.toString()).toFile();
