@@ -21,7 +21,8 @@
 
 #include <jni.h>
 
-// Globals for the jvm and jni version, this is set in JNILoad.c
+
+/* Globals for the jvm and jni version, this is set in JNILoad.c */
 extern JavaVM *jvm;
 extern JavaVMAttachArgs jvm_attach_args;
 
@@ -87,6 +88,7 @@ typedef struct _com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent {
     jmethodID getScrollAmount;
     jmethodID getScrollType;
     jmethodID getWheelRotation;
+    jmethodID getWheelDirection;
     jmethodID getPreciseWheelRotation;
 } NativeMouseWheelEvent;
 
@@ -115,7 +117,7 @@ typedef struct _java_util_logging_Logger {
     jmethodID severe;
 } Logger;
 
-// Global variables for Java object struct representation.
+/* Global variables for Java object struct representation. */
 extern GlobalScreen *com_github_kwhat_jnativehook_GlobalScreen;
 extern NativeHookThread *com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread;
 extern NativeHookException *com_github_kwhat_jnativehook_NativeHookException;
@@ -129,10 +131,11 @@ extern Integer *java_lang_Integer;
 extern System *java_lang_System;
 extern Logger *java_util_logging_Logger;
 
-// Create all of the JNI global references used throughout the native library.
+
+/* Create all of the JNI global references used throughout the native library. */
 extern int jni_CreateGlobals(JNIEnv *env);
 
-// Free all of the JNI globals created by the CreateJNIGlobals() function.
+/* Free all of the JNI globals created by the CreateJNIGlobals() function. */
 extern int jni_DestroyGlobals(JNIEnv *env);
 
 #endif

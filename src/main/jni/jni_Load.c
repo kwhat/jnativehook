@@ -24,6 +24,7 @@
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 
+
 // JNI Related global references.
 JavaVM *jvm;
 JavaVMAttachArgs jvm_attach_args = {
@@ -31,6 +32,7 @@ JavaVMAttachArgs jvm_attach_args = {
     .name = "JNativeHook Library",
     .group = NULL
 };
+
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {

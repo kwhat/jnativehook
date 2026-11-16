@@ -54,6 +54,24 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
     public void keyReleased(KeyEvent keyEvent) {}
 
     protected KeyEvent getJavaKeyEvent(NativeKeyEvent nativeEvent) {
+        int eventID;
+        switch (nativeEvent.getID()) {
+            case NativeKeyEvent.NATIVE_KEY_TYPED:
+                eventID = KeyEvent.KEY_TYPED;
+                break;
+
+            case NativeKeyEvent.NATIVE_KEY_PRESSED:
+                eventID = KeyEvent.KEY_PRESSED;
+                break;
+
+            case NativeKeyEvent.NATIVE_KEY_RELEASED:
+                eventID = KeyEvent.KEY_RELEASED;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unsupported native event type: " + nativeEvent.getID());
+        }
+
         int keyLocation = KeyEvent.KEY_LOCATION_UNKNOWN;
         switch (nativeEvent.getKeyLocation()) {
             case NativeKeyEvent.KEY_LOCATION_STANDARD:
@@ -65,7 +83,7 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
                 break;
 
             case NativeKeyEvent.KEY_LOCATION_LEFT:
-                keyLocation = KeyEvent.KEY_LOCATION_STANDARD;
+                keyLocation = KeyEvent.KEY_LOCATION_LEFT;
                 break;
 
             case NativeKeyEvent.KEY_LOCATION_RIGHT:
@@ -75,6 +93,12 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
 
         int keyCode = KeyEvent.VK_UNDEFINED;
         switch (nativeEvent.getKeyCode()) {
+            case NativeKeyEvent.VC_MULTIPLY:
+                keyCode = KeyEvent.VK_MULTIPLY;
+                break;
+            case NativeKeyEvent.VC_ADD:
+                keyCode = KeyEvent.VK_ADD;
+                break;
             case NativeKeyEvent.VC_ESCAPE:
                 keyCode = KeyEvent.VK_ESCAPE;
                 break;
@@ -182,47 +206,69 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
                 break;
 
             case NativeKeyEvent.VC_1:
-                keyCode = KeyEvent.VK_1;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD1
+                        : KeyEvent.VK_1;
                 break;
 
             case NativeKeyEvent.VC_2:
-                keyCode = KeyEvent.VK_2;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD2
+                        : KeyEvent.VK_2;
                 break;
 
             case NativeKeyEvent.VC_3:
-                keyCode = KeyEvent.VK_3;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD3
+                        : KeyEvent.VK_3;
                 break;
 
             case NativeKeyEvent.VC_4:
-                keyCode = KeyEvent.VK_4;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD4
+                        : KeyEvent.VK_4;
                 break;
 
             case NativeKeyEvent.VC_5:
-                keyCode = KeyEvent.VK_5;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD5
+                        : KeyEvent.VK_5;
                 break;
 
             case NativeKeyEvent.VC_6:
-                keyCode = KeyEvent.VK_6;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD6
+                        : KeyEvent.VK_6;
                 break;
 
             case NativeKeyEvent.VC_7:
-                keyCode = KeyEvent.VK_7;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD7
+                        : KeyEvent.VK_7;
                 break;
 
             case NativeKeyEvent.VC_8:
-                keyCode = KeyEvent.VK_8;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD8
+                        : KeyEvent.VK_8;
                 break;
 
             case NativeKeyEvent.VC_9:
-                keyCode = KeyEvent.VK_9;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD9
+                        : KeyEvent.VK_9;
                 break;
 
             case NativeKeyEvent.VC_0:
-                keyCode = KeyEvent.VK_0;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_NUMPAD0
+                        : KeyEvent.VK_0;
                 break;
 
             case NativeKeyEvent.VC_MINUS:
-                keyCode = KeyEvent.VK_MINUS;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_SUBTRACT
+                        : KeyEvent.VK_MINUS;
                 break;
 
             case NativeKeyEvent.VC_EQUALS:
@@ -374,11 +420,15 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
                 break;
 
             case NativeKeyEvent.VC_PERIOD:
-                keyCode = KeyEvent.VK_PERIOD;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_DECIMAL
+                        : KeyEvent.VK_PERIOD;
                 break;
 
             case NativeKeyEvent.VC_SLASH:
-                keyCode = KeyEvent.VK_SLASH;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_DIVIDE
+                        : KeyEvent.VK_SLASH;
                 break;
 
             case NativeKeyEvent.VC_SPACE:
@@ -426,19 +476,27 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
 
             // Begin Cursor Key Zone
             case NativeKeyEvent.VC_UP:
-                keyCode = KeyEvent.VK_UP;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_KP_UP
+                        : KeyEvent.VK_UP;
                 break;
             case NativeKeyEvent.VC_LEFT:
-                keyCode = KeyEvent.VK_LEFT;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_KP_LEFT
+                        : KeyEvent.VK_LEFT;
                 break;
             case NativeKeyEvent.VC_CLEAR:
                 keyCode = KeyEvent.VK_CLEAR;
                 break;
             case NativeKeyEvent.VC_RIGHT:
-                keyCode = KeyEvent.VK_RIGHT;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_KP_RIGHT
+                        : KeyEvent.VK_RIGHT;
                 break;
             case NativeKeyEvent.VC_DOWN:
-                keyCode = KeyEvent.VK_DOWN;
+                keyCode = keyLocation == KeyEvent.KEY_LOCATION_NUMPAD
+                        ? KeyEvent.VK_KP_DOWN
+                        : KeyEvent.VK_DOWN;
                 break;
             // End Cursor Key Zone
 
@@ -514,7 +572,9 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
                 keyCode = KeyEvent.VK_UNDERSCORE;
                 break;
 
-            //case VC_FURIGANA:
+            case NativeKeyEvent.VC_FURIGANA:
+                keyCode = KeyEvent.VK_KANA;
+                break;
 
             case NativeKeyEvent.VC_KANJI:
                 keyCode = KeyEvent.VK_KANJI;
@@ -552,7 +612,13 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
                 keyCode = KeyEvent.VK_AGAIN;
                 break;
 
-            //case NativeKeyEvent.VC_SUN_INSERT:
+            case NativeKeyEvent.VC_SUN_UNDO:
+                keyCode = KeyEvent.VK_UNDO;
+                break;
+
+            case NativeKeyEvent.VC_SUN_INSERT:
+                keyCode = KeyEvent.VK_PASTE;
+                break;
 
             case NativeKeyEvent.VC_SUN_COPY:
                 keyCode = KeyEvent.VK_COPY;
@@ -566,7 +632,7 @@ public class SwingKeyAdapter extends AbstractSwingInputAdapter implements Native
 
         return new KeyEvent(
             this,
-            nativeEvent.getID() - (NativeKeyEvent.NATIVE_KEY_FIRST - KeyEvent.KEY_FIRST),
+            eventID,
             System.currentTimeMillis(),
             this.getJavaModifiers(nativeEvent.getModifiers()),
             keyCode,

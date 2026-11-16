@@ -25,7 +25,9 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 
+
 static char buffer[1024];
+
 
 void jni_Logger(unsigned int level, const char *format, ...) {
     va_list args;

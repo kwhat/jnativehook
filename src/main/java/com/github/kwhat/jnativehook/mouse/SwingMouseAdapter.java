@@ -60,10 +60,39 @@ public class SwingMouseAdapter extends AbstractSwingInputAdapter implements Nati
     public void mouseExited(MouseEvent mouseEvent) {}
 
     protected MouseEvent getJavaKeyEvent(NativeMouseEvent nativeEvent) {
+        int eventID;
+        switch (nativeEvent.getID()) {
+            case NativeMouseEvent.NATIVE_MOUSE_CLICKED:
+                eventID = MouseEvent.MOUSE_CLICKED;
+                break;
+
+            case NativeMouseEvent.NATIVE_MOUSE_PRESSED:
+                eventID = MouseEvent.MOUSE_PRESSED;
+                break;
+
+            case NativeMouseEvent.NATIVE_MOUSE_RELEASED:
+                eventID = MouseEvent.MOUSE_RELEASED;
+                break;
+
+            case NativeMouseEvent.NATIVE_MOUSE_MOVED:
+                eventID = MouseEvent.MOUSE_MOVED;
+                break;
+
+            case NativeMouseEvent.NATIVE_MOUSE_DRAGGED:
+                eventID = MouseEvent.MOUSE_DRAGGED;
+                break;
+
+            case NativeMouseEvent.NATIVE_MOUSE_WHEEL:
+                eventID = MouseEvent.MOUSE_WHEEL;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unsupported native event type: " + nativeEvent.getID());
+        }
+
         return new MouseEvent(
             this,
-            nativeEvent.getID() - (NativeMouseEvent.NATIVE_MOUSE_FIRST
-                - MouseEvent.MOUSE_FIRST),
+            eventID,
             System.currentTimeMillis(),
             this.getJavaModifiers(nativeEvent.getModifiers()),
             nativeEvent.getX(),

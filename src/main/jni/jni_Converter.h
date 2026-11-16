@@ -22,10 +22,19 @@
 #include <jni.h>
 #include <uiohook.h>
 
+
+/* Converts a libuiohook input event type to a Java event ID. */
 extern jint jni_ConvertToJavaType(event_type nativeType, jint *javaType);
 
+/* Converts a Java event ID to a libuiohook input event type. */
 extern jint jni_ConvertToNativeType(jint javaType, event_type *nativeType);
 
+/* Converts a native keycode in place to its Java keycode and determines its location.
+ * Unmapped keys produce Java VC_UNDEFINED and KEY_LOCATION_UNKNOWN. */
 extern jint jni_ConvertToJavaLocation(unsigned short int *nativeKeyCode, jint *javaKeyLocation);
+
+/* Converts a Java keycode and location to a libuiohook keycode.
+ * KEY_LOCATION_UNKNOWN selects the first matching keycode in the conversion table. */
+extern jint jni_ConvertToNativeKeycode(jint javaKeyCode, jint javaKeyLocation, uint16_t *nativeKeyCode);
 
 #endif

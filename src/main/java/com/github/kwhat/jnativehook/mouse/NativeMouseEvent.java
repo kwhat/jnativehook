@@ -96,6 +96,20 @@ public class NativeMouseEvent extends NativeInputEvent {
     private final int y;
 
     /**
+     * The native horizontal motion since the previous event, or zero if unavailable.
+     *
+     * @see #getDeltaX()
+     */
+    private final int deltaX;
+
+    /**
+     * The native vertical motion since the previous event, or zero if unavailable.
+     *
+     * @see #getDeltaY()
+     */
+    private final int deltaY;
+
+    /**
      * The native mouse event's click count.
      *
      * @see #getClickCount()
@@ -228,10 +242,30 @@ public class NativeMouseEvent extends NativeInputEvent {
      * @since 1.1
      */
     public NativeMouseEvent(int id, int modifiers, int x, int y, int clickCount, int button) {
+        this(id, modifiers, x, y, 0, 0, clickCount, button);
+    }
+
+    /**
+     * Instantiates a new <code>NativeMouseEvent</code> object with relative pointer motion.
+     *
+     * @param id         an integer that identifies the native event type.
+     * @param modifiers  a modifier mask describing the modifier keys and mouse buttons active for
+     *                   the event. <code>NativeInputEvent</code> _MASK modifiers should be used.
+     * @param x          the x coordinate of the native pointer.
+     * @param y          the y coordinate of the native pointer.
+     * @param deltaX     the native horizontal motion since the previous event, or zero if unavailable.
+     * @param deltaY     the native vertical motion since the previous event, or zero if unavailable.
+     * @param clickCount the number of button clicks associated with this event.
+     * @param button     the mouse button that has changed state, or <code>NOBUTTON</code>.
+     * @since 2.3
+     */
+    public NativeMouseEvent(int id, int modifiers, int x, int y, int deltaX, int deltaY, int clickCount, int button) {
         super(GlobalScreen.class, id, modifiers);
 
         this.x = x;
         this.y = y;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
         this.clickCount = clickCount;
         this.button = button;
     }
@@ -287,6 +321,26 @@ public class NativeMouseEvent extends NativeInputEvent {
      */
     public int getY() {
         return y;
+    }
+
+    /**
+     * Returns the native horizontal motion since the previous event.
+     *
+     * @return the native horizontal motion, or zero if unavailable
+     * @since 2.3
+     */
+    public int getDeltaX() {
+        return deltaX;
+    }
+
+    /**
+     * Returns the native vertical motion since the previous event.
+     *
+     * @return the native vertical motion, or zero if unavailable
+     * @since 2.3
+     */
+    public int getDeltaY() {
+        return deltaY;
     }
 
     /**

@@ -17,7 +17,6 @@
  */
 package com.github.kwhat.jnativehook.mouse;
 
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -46,16 +45,18 @@ public class SwingMouseWheelAdapter extends SwingMouseAdapter implements NativeM
 
         return new MouseWheelEvent(
             this,
-            nativeEvent.getID() - (NativeMouseWheelEvent.NATIVE_MOUSE_FIRST
-                    - MouseWheelEvent.MOUSE_FIRST),
+            MouseWheelEvent.MOUSE_WHEEL,
             System.currentTimeMillis(),
             this.getJavaModifiers(nativeEvent.getModifiers()),
+            nativeEvent.getX(),
+            nativeEvent.getY(),
             nativeEvent.getX(),
             nativeEvent.getY(),
             nativeEvent.getClickCount(),
             false,
             scrollType,
             nativeEvent.getScrollAmount(),
-            nativeEvent.getWheelRotation());
+            nativeEvent.getWheelRotation(),
+            nativeEvent.getPreciseWheelRotation());
     }
 }
