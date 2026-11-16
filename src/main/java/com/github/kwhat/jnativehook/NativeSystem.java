@@ -132,10 +132,10 @@ public class NativeSystem {
         final String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
         Arch arch = Arch.UNSUPPORTED;
 
-        if (osArch.startsWith("arm")) {
-            arch = Arch.ARM;
-        } else if (osArch.equals("aarch64")) {
+        if (osArch.equals("aarch64") || osArch.equals("arm64")) {
             arch = Arch.ARM64;
+        } else if (osArch.startsWith("arm")) {
+            arch = Arch.ARM;
         } else if (osArch.equals("sparc")) {
             arch = Arch.SPARC;
         } else if (osArch.equals("sparc64")) {
@@ -144,7 +144,9 @@ public class NativeSystem {
                 || osArch.equals("powerpc")) {
             arch = Arch.PPC;
         } else if (osArch.equals("ppc64")
-                || osArch.equals("powerpc64")) {
+                || osArch.equals("powerpc64")
+                || osArch.equals("ppc64le")
+                || osArch.equals("powerpc64le")) {
             arch = Arch.PPC64;
         } else if (osArch.equals("x86")
                 || osArch.equals("i386")

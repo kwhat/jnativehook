@@ -32,26 +32,23 @@ void jni_ThrowFatalError(JNIEnv *env, const char *message) {
 }
 
 void jni_ThrowException(JNIEnv *env, const char *classname, const char *message) {
-    // Locate our exception class.
-    jclass Exception_class = (*env)->FindClass(env, classname);
-    if (Exception_class != NULL) {
-        (*env)->ThrowNew(env, Exception_class, message);
-        (*env)->DeleteLocalRef(env, Exception_class);
-    } else {
-        // Throw a ClassNotFoundException if we could not locate the exception class above.
-        Exception_class = (*env)->FindClass(env, "java/lang/ClassNotFoundException");
-        if (Exception_class != NULL) {
-            (*env)->ThrowNew(env, Exception_class, classname);
-            (*env)->DeleteLocalRef(env, Exception_class);
-        } else {
-            jni_ThrowFatalError(env, "Failed to locate core class: java.lang.ClassNotFoundException");
-        }
+    if ((*env)->ExceptionCheck(env)) return;
+    jclass exception = (*env)->FindClass(env, classname);
+    if (exception != NULL) {
+        (*env)->ThrowNew(env, exception, message);
+        (*env)->DeleteLocalRef(env, exception);
     }
 }
 
-void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message) {
-    jobject Exception_object = (*env)->NewObject(env, com_github_kwhat_jnativehook_NativeHookException->cls,
-            com_github_kwhat_jnativehook_NativeHookException->init, (jint) code, (*env)->NewStringUTF(env, message));
-    (*env)->Throw(env, (jthrowable) Exception_object);
-    (*env)->DeleteLocalRef(env, Exception_object);
+void jni_ThrowNativeHookException(JNIEnv *env, jint code, const char *message) {
+    if ((*env)->ExceptionCheck(env)) return;
+    jstring text = (*env)->NewStringUTF(env, message);
+    if (text == NULL) return;
+    jobject exception = (*env)->NewObject(env, com_github_kwhat_jnativehook_NativeHookException->cls,
+            com_github_kwhat_jnativehook_NativeHookException->init, (jint) code, text);
+    (*env)->DeleteLocalRef(env, text);
+    if (exception != NULL) {
+        (*env)->Throw(env, (jthrowable) exception);
+        (*env)->DeleteLocalRef(env, exception);
+    }
 }

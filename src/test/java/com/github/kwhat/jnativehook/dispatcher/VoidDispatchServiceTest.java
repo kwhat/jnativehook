@@ -20,9 +20,14 @@ package com.github.kwhat.jnativehook.dispatcher;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RejectedExecutionException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class VoidDispatchServiceTest {
     @Test
@@ -53,9 +58,11 @@ public class VoidDispatchServiceTest {
     }
 
     @Test
-    public void testAwaitTermination() {
+    public void testAwaitTermination() throws InterruptedException {
         VoidDispatchService service = new VoidDispatchService();
 
+        assertFalse(service.awaitTermination(0L, TimeUnit.SECONDS));
+        service.shutdown();
         assertTrue(service.awaitTermination(1L, TimeUnit.SECONDS));
     }
 
@@ -72,5 +79,73 @@ public class VoidDispatchServiceTest {
         });
 
         assertTrue(hasRun[0]);
+    }
+
+    @Test
+    public void executesOnCallingThread() {
+        Thread caller = Thread.currentThread();
+        new VoidDispatchService().execute(() -> assertSame(caller, Thread.currentThread()));
+    }
+
+    @Test
+    public void rejectsWorkAfterBothShutdownVariants() {
+        VoidDispatchService graceful = new VoidDispatchService();
+        graceful.shutdown();
+        assertThrows(RejectedExecutionException.class, () -> graceful.execute(() -> { }));
+        VoidDispatchService immediate = new VoidDispatchService();
+        immediate.shutdownNow();
+        assertThrows(RejectedExecutionException.class, () -> immediate.execute(() -> { }));
+    }
+
+    @Test
+    public void taskFailureDoesNotPreventTermination() throws InterruptedException {
+        VoidDispatchService service = new VoidDispatchService();
+        IllegalStateException failure = new IllegalStateException("task failed");
+        assertSame(failure, assertThrows(IllegalStateException.class, () -> service.execute(() -> {
+            throw failure;
+        })));
+        service.shutdown();
+        assertTrue(service.awaitTermination(0, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void inFlightTaskMustFinishBeforeTermination() throws Exception {
+        VoidDispatchService service = new VoidDispatchService();
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            service.execute(() -> {
+                entered.countDown();
+                try {
+                    if (!release.await(5, TimeUnit.SECONDS)) throw new AssertionError("Task not released");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError(e);
+                }
+            });
+            return null;
+        });
+        Thread worker = new Thread(task, "void-dispatch-test");
+        worker.setDaemon(true);
+        worker.start();
+        try {
+            assertTrue(entered.await(5, TimeUnit.SECONDS));
+            assertTrue(service.shutdownNow().isEmpty());
+            assertFalse(service.isTerminated());
+            assertFalse(service.awaitTermination(0, TimeUnit.SECONDS));
+        } finally {
+            release.countDown();
+            service.shutdownNow();
+        }
+        task.get(5, TimeUnit.SECONDS);
+        assertTrue(service.awaitTermination(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void rejectsNullTasks() throws InterruptedException {
+        VoidDispatchService service = new VoidDispatchService();
+        assertThrows(NullPointerException.class, () -> service.execute(null));
+        service.shutdown();
+        assertTrue(service.awaitTermination(0, TimeUnit.SECONDS));
     }
 }

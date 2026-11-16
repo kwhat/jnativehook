@@ -18,6 +18,8 @@
 package com.github.kwhat.jnativehook.mouse;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -81,4 +83,45 @@ public class NativeMouseWheelEventTest {
 
         assertNotEquals("", event.paramString());
     }
+
+    @Test
+    public void convenienceConstructorsDefaultToVerticalIntegerRotation() {
+        NativeMouseWheelEvent compact = new NativeMouseWheelEvent(NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0, -20, 30, NativeMouseWheelEvent.WHEEL_UNIT_SCROLL, 3, -2);
+        NativeMouseWheelEvent withClicks = new NativeMouseWheelEvent(NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0, -20, 30, 4, NativeMouseWheelEvent.WHEEL_UNIT_SCROLL, 3, -2);
+        for (NativeMouseWheelEvent event : new NativeMouseWheelEvent[] {compact, withClicks}) {
+            assertEquals(-20, event.getX());
+            assertEquals(30, event.getY());
+            assertEquals(3, event.getScrollAmount());
+            assertEquals(-2, event.getWheelRotation());
+            assertEquals(-2.0, event.getPreciseWheelRotation());
+            assertEquals(NativeMouseWheelEvent.WHEEL_VERTICAL_DIRECTION, event.getWheelDirection());
+        }
+        assertEquals(0, compact.getClickCount());
+        assertEquals(4, withClicks.getClickCount());
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.75, -0.25, 0.0, 0.25, 1.75})
+    public void preciseRotationIsIndependentOfIntegerRotation(double rotation) {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0, -20, 30, 1, NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL, 3, 0,
+            NativeMouseWheelEvent.WHEEL_HORIZONTAL_DIRECTION, rotation);
+        assertEquals(rotation, event.getPreciseWheelRotation());
+        assertEquals(0, event.getWheelRotation());
+        assertEquals(3, event.getScrollAmount());
+        assertEquals(NativeMouseWheelEvent.WHEEL_BLOCK_SCROLL, event.getScrollType());
+        assertEquals(NativeMouseWheelEvent.WHEEL_HORIZONTAL_DIRECTION, event.getWheelDirection());
+    }
+
+    @Test
+    public void directionConstructorDefaultsPreciseRotationToIntegerValue() {
+        NativeMouseWheelEvent event = new NativeMouseWheelEvent(NativeMouseEvent.NATIVE_MOUSE_WHEEL,
+            0, 0, 0, 0, NativeMouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -3,
+            NativeMouseWheelEvent.WHEEL_HORIZONTAL_DIRECTION);
+        assertEquals(-3.0, event.getPreciseWheelRotation());
+        assertEquals(NativeMouseWheelEvent.WHEEL_HORIZONTAL_DIRECTION, event.getWheelDirection());
+    }
+
 }

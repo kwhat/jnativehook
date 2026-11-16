@@ -100,4 +100,21 @@ public class NativeMouseEventTest {
 
         assertNotEquals("", event.paramString());
     }
+
+    @Test
+    public void manuallyConstructedEventsHaveNoRelativeMotion() {
+        NativeMouseEvent event = new NativeMouseEvent(NativeMouseEvent.NATIVE_MOUSE_MOVED, 0, -100, 200, 0);
+        assertEquals(0, event.getDeltaX());
+        assertEquals(0, event.getDeltaY());
+        assertEquals(NativeMouseEvent.NOBUTTON, event.getButton());
+        assertEquals(new Point(-100, 200), event.getPoint());
+    }
+
+    @Test
+    public void pointCannotMutateEventCoordinates() {
+        NativeMouseEvent event = new NativeMouseEvent(NativeMouseEvent.NATIVE_MOUSE_MOVED, 0, -100, 200, 0);
+        event.getPoint().translate(1000, 1000);
+        assertEquals(new Point(-100, 200), event.getPoint());
+    }
+
 }

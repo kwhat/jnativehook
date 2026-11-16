@@ -100,7 +100,9 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      *
      * @see #getWheelDirection
      */
-    private final int wheelDelta;
+    private final int wheelDirection;
+    private final int scrollAmount;
+    private final double preciseWheelRotation;
 
     /**
      * Instantiates a new <code>NativeMouseWheelEvent</code> object with a vertical direction.
@@ -123,11 +125,28 @@ public class NativeMouseWheelEvent extends NativeMouseEvent {
      * @see NativeMouseWheelEvent(int, int, int, int, int, int, int, int, int)
      * @see NativeMouseEvent#NativeMouseEvent(int, int, int, int, int)
      */
-    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int scrollType, int wheelRotation, int wheelDelta) {
-        this(id, modifiers, x, y, scrollType, wheelRotation, WHEEL_VERTICAL_DIRECTION);
+    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int scrollType, int scrollAmount, int wheelRotation) {
+        this(id, modifiers, x, y, 0, scrollType, scrollAmount, wheelRotation, WHEEL_VERTICAL_DIRECTION);
     }
 
-    /**                                                                                                                                                                         issue
+    /**
+     * Creates a wheel event using the vertical scrolling direction.
+     * @param id event type
+     * @param modifiers modifier flags
+     * @param x pointer x coordinate
+     * @param y pointer y coordinate
+     * @param clickCount button click count
+     * @param scrollType scrolling type
+     * @param scrollAmount units per scroll step
+     * @param wheelRotation scroll steps
+     */
+    public NativeMouseWheelEvent(int id, int modifiers, int x, int y, int clickCount,
+                                int scrollType, int scrollAmount, int wheelRotation) {
+        this(id, modifiers, x, y, clickCount, scrollType, scrollAmount, wheelRotation,
+                WHEEL_VERTICAL_DIRECTION);
+    }
+
+    /**
      * Instantiates a new <code>NativeMouseWheelEvent</code> object.
      *
      * @param id             an integer that identifies the native event type.
