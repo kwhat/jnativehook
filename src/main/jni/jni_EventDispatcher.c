@@ -25,10 +25,11 @@
 #include "jni_Errors.h"
 #include "jni_Globals.h"
 #include "jni_Logger.h"
-#include "com_github_kwhat_jnativehook_NativeInputEvent.h"
 #include "com_github_kwhat_jnativehook_keyboard_NativeKeyEvent.h"
 #include "com_github_kwhat_jnativehook_mouse_NativeMouseEvent.h"
 #include "com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent.h"
+#include "com_github_kwhat_jnativehook_NativeInputEvent.h"
+
 
 // Simple function to notify() the hook thread.
 static inline void notifyHookThread(JNIEnv *env) {
@@ -51,6 +52,12 @@ static inline void notifyHookThread(JNIEnv *env) {
 // please do so on another thread via your own event dispatcher.
 void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
     JNIEnv *env;
+
+    uint16_t keycode = VC_UNDEFINED;
+    if (event->type == EVENT_KEY_PRESSED || event->type == EVENT_KEY_RELEASED) {
+        keycode = event->data.keyboard.keycode;
+    }
+
     if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
         jobject NativeInputEvent_obj = NULL;
         jint location = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
@@ -62,8 +69,7 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
 
 
             case EVENT_KEY_PRESSED:
-                // FIXME We really shouldnt be wrighting to that memory.
-                if (jni_ConvertToJavaLocation(&(event->data.keyboard.keycode), &location) == JNI_OK) {
+                if (jni_ConvertToJavaLocation(&keycode, &location) == JNI_OK) {
                     NativeInputEvent_obj = (*env)->NewObject(
                             env,
                             com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls,
@@ -71,26 +77,25 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                             com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_PRESSED,
                             (jint) event->mask,
                             (jint) event->data.keyboard.rawcode,
-                            (jint) event->data.keyboard.keycode,
+                            (jint) keycode,
                             (jchar) com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
                             location);
                 }
                 break;
 
             case EVENT_KEY_RELEASED:
-                    // FIXME We really shouldnt be wrighting to that memory.
-                    if (jni_ConvertToJavaLocation(&(event->data.keyboard.keycode), &location) == JNI_OK) {
-                        NativeInputEvent_obj = (*env)->NewObject(
-                                env,
-                                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls,
-                                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->init,
-                                com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
-                                (jint) event->mask,
-                                (jint) event->data.keyboard.rawcode,
-                                (jint) event->data.keyboard.keycode,
-                                (jchar) com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
-                                location);
-                    }
+                if (jni_ConvertToJavaLocation(&keycode, &location) == JNI_OK) {
+                    NativeInputEvent_obj = (*env)->NewObject(
+                            env,
+                            com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->cls,
+                            com_github_kwhat_jnativehook_keyboard_NativeKeyEvent->init,
+                            com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_NATIVE_KEY_RELEASED,
+                            (jint) event->mask,
+                            (jint) event->data.keyboard.rawcode,
+                            (jint) keycode,
+                            (jchar) com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_CHAR_UNDEFINED,
+                            location);
+                }
                 break;
 
             case EVENT_KEY_TYPED:
@@ -116,6 +121,8 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->mask,
                         (jint) event->data.mouse.x,
                         (jint) event->data.mouse.y,
+                        (jint) event->data.mouse.dx,
+                        (jint) event->data.mouse.dy,
                         (jint) event->data.mouse.clicks,
                         (jint) event->data.mouse.button);
                 break;
@@ -129,6 +136,8 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->mask,
                         (jint) event->data.mouse.x,
                         (jint) event->data.mouse.y,
+                        (jint) event->data.mouse.dx,
+                        (jint) event->data.mouse.dy,
                         (jint) event->data.mouse.clicks,
                         (jint) event->data.mouse.button);
                 break;
@@ -142,6 +151,8 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->mask,
                         (jint) event->data.mouse.x,
                         (jint) event->data.mouse.y,
+                        (jint) event->data.mouse.dx,
+                        (jint) event->data.mouse.dy,
                         (jint) event->data.mouse.clicks,
                         (jint) event->data.mouse.button);
                 break;
@@ -155,6 +166,8 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->mask,
                         (jint) event->data.mouse.x,
                         (jint) event->data.mouse.y,
+                        (jint) event->data.mouse.dx,
+                        (jint) event->data.mouse.dy,
                         (jint) event->data.mouse.clicks,
                         (jint) event->data.mouse.button);
                 break;
@@ -168,11 +181,17 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->mask,
                         (jint) event->data.mouse.x,
                         (jint) event->data.mouse.y,
+                        (jint) event->data.mouse.dx,
+                        (jint) event->data.mouse.dy,
                         (jint) event->data.mouse.clicks,
                         (jint) event->data.mouse.button);
                 break;
 
             case EVENT_MOUSE_WHEEL:
+                if (event->data.wheel.delta == 0) {
+                    break;
+                }
+
                 NativeInputEvent_obj = (*env)->NewObject(
                         env,
                         com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls,
@@ -183,10 +202,10 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                         (jint) event->data.wheel.y,
                         (jint) 1, // clicks
                         (jint) event->data.wheel.type,
-                        (jint) abs(event->data.wheel.rotation * -1 / event->data.wheel.delta),
+                        (jint) 1, // libuiohook reports scroll steps rather than platform line counts.
                         (jint) event->data.wheel.rotation * -1 / event->data.wheel.delta,
                         (jint) event->data.wheel.direction,
-                        (jdouble) event->data.wheel.rotation * -1 / (float) event->data.wheel.delta);
+                        (jdouble) event->data.wheel.rotation * -1 / (double) event->data.wheel.delta);
                 break;
 
             default:
@@ -210,11 +229,15 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
                     NativeInputEvent_obj);
 
-            // Preserve native flags and apply Java event consumption.
-            if ((*env)->GetShortField(
+            // Set the propagate flag from java.
+            jshort reserved = (*env)->GetShortField(
                     env,
                     NativeInputEvent_obj,
-                    com_github_kwhat_jnativehook_NativeInputEvent->reserved) & 0x01) {
+                    com_github_kwhat_jnativehook_NativeInputEvent->reserved);
+
+            jint modifiers = (*env)->CallIntMethod(env, NativeInputEvent_obj,
+                    com_github_kwhat_jnativehook_NativeInputEvent->getModifiers);
+            if ((reserved & 0x01) || ((uint32_t) modifiers & MASK_CONSUMED)) {
                 event->mask |= MASK_CONSUMED;
             }
 

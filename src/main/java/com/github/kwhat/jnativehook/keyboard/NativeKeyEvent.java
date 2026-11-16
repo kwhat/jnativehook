@@ -249,6 +249,8 @@ public class NativeKeyEvent extends NativeInputEvent {
      * Begin Numeric Zone
      */
     public static final int VC_NUM_LOCK = 0x0045;
+    public static final int VC_MULTIPLY = 0x0037;
+    public static final int VC_ADD = 0x004E;
     public static final int VC_SEPARATOR = 0x0053;
 
 
@@ -677,6 +679,10 @@ public class NativeKeyEvent extends NativeInputEvent {
             // Begin Numeric Zone
             case VC_NUM_LOCK:
                 return Toolkit.getProperty("AWT.numLock", "Num Lock");
+            case VC_MULTIPLY:
+                return Toolkit.getProperty("AWT.multiply", "NumPad *");
+            case VC_ADD:
+                return Toolkit.getProperty("AWT.add", "NumPad +");
             case VC_SEPARATOR:
                 return Toolkit.getProperty("AWT.separator", "NumPad ,");
             // End Numeric Zone

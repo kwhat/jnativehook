@@ -23,6 +23,7 @@
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 
+
 GlobalScreen *com_github_kwhat_jnativehook_GlobalScreen = NULL;
 NativeHookThread *com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = NULL;
 NativeHookException *com_github_kwhat_jnativehook_NativeHookException = NULL;
@@ -35,6 +36,7 @@ Object *java_lang_Object = NULL;
 Integer *java_lang_Integer = NULL;
 System *java_lang_System = NULL;
 Logger *java_util_logging_Logger = NULL;
+
 
 static int create_GlobalScreen(JNIEnv *env) {
     int status = JNI_ERR;
@@ -317,7 +319,7 @@ static int create_NativeMouseEvent(JNIEnv *env) {
     jclass NativeMouseEvent_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/mouse/NativeMouseEvent");
     if (NativeMouseEvent_class != NULL) {
         // Get the method ID for NativeMouseEvent constructor.
-        jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IIIIII)V");
+        jmethodID init = (*env)->GetMethodID(env, NativeMouseEvent_class, "<init>", "(IIIIIIII)V");
 
         // Get the method ID for NativeMouseEvent.getButton().
         jmethodID getButton = (*env)->GetMethodID(env, NativeMouseEvent_class, "getButton", "()I");
@@ -389,6 +391,8 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
         // Get the method ID for NativeMouseWheelEvent.getPreciseWheelRotation().
         jmethodID getPreciseWheelRotation = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getPreciseWheelRotation", "()D");
 
+        jmethodID getWheelDirection = (*env)->GetMethodID(env, NativeMouseWheelEvent_class, "getWheelDirection", "()I");
+
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = malloc(sizeof(NativeMouseWheelEvent));
             if (com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent != NULL) {
@@ -399,6 +403,7 @@ static int create_NativeMouseWheelEvent(JNIEnv *env) {
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount = getScrollAmount;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType = getScrollType;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation = getWheelRotation;
+                com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelDirection = getWheelDirection;
                 com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getPreciseWheelRotation = getPreciseWheelRotation;
 
                 status = JNI_OK;

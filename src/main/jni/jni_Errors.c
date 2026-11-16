@@ -23,6 +23,7 @@
 #include "jni_Globals.h"
 #include "jni_Logger.h"
 
+
 void jni_ThrowFatalError(JNIEnv *env, const char *message) {
     // Throw a fatal error to the JVM.
     (*env)->FatalError(env, message);

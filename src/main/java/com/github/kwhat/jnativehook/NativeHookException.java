@@ -92,6 +92,12 @@ public class NativeHookException extends Exception {
     public static final int X11_RECORD_GET_CONTEXT        = 0x25;
 
     /**
+     * The Linux input polling instance could not be created.
+     */
+    @SuppressWarnings("unused")
+    public static final int EPOLL_CREATE                  = 0x26;
+
+    /**
      * Windows SetWindowsHookEx function failed to register the low level hook.  See log level debug for details.
      *
      * @since 2.0

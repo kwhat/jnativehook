@@ -23,7 +23,13 @@
 #include <stdbool.h>
 #include <uiohook.h>
 
+
+/* Provides a printf-style logging interface for native JNI code. */
 extern void jni_Logger(unsigned int level, const char *format, ...);
+
+/* Receives libuiohook log messages and forwards them to the Java logger named
+ * com.github.kwhat.jnativehook. Messages are forwarded only when the calling
+ * thread is attached to the JVM. */
 extern void jni_LoggerProc(unsigned int level, void *user_data, const char *format, va_list args);
 
 #endif
