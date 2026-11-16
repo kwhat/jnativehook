@@ -109,7 +109,7 @@ public class NativeSystem {
             family = Family.FREEBSD;
         } else if (osName.equals("openbsd")) {
             family = Family.OPENBSD;
-        } else if (osName.equals("mac os x")) {
+        } else if (osName.startsWith("mac")) {
             family = Family.DARWIN;
         } else if (osName.equals("solaris")
                 || osName.equals("sunos")) {
@@ -132,10 +132,10 @@ public class NativeSystem {
         final String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
         Arch arch = Arch.UNSUPPORTED;
 
-        if (osArch.startsWith("arm")) {
-            arch = Arch.ARM;
-        } else if (osArch.equals("aarch64")) {
+        if (osArch.equals("aarch64") || osArch.equals("arm64")) {
             arch = Arch.ARM64;
+        } else if (osArch.startsWith("arm")) {
+            arch = Arch.ARM;
         } else if (osArch.equals("sparc")) {
             arch = Arch.SPARC;
         } else if (osArch.equals("sparc64")) {
@@ -143,8 +143,8 @@ public class NativeSystem {
         } else if (osArch.equals("ppc")
                 || osArch.equals("powerpc")) {
             arch = Arch.PPC;
-        } else if (osArch.equals("ppc64")
-                || osArch.equals("powerpc64")) {
+        } else if (osArch.startsWith("ppc64")
+                || osArch.startsWith("powerpc64")) {
             arch = Arch.PPC64;
         } else if (osArch.equals("x86")
                 || osArch.equals("i386")
