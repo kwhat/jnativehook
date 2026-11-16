@@ -87,6 +87,8 @@ jobs:
             --parallel 2 \
             --clean-first
 
+          test "$(lipo -archs target/build/libuiohook/libuiohook.a | tr -d '[:space:]')" = arm64
+
           cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
@@ -102,6 +104,8 @@ jobs:
           cmake --build target/build/jni/ \
             --parallel 2 \
             --clean-first
+
+          test "$(lipo -archs target/build/jni/libJNativeHook.dylib | tr -d '[:space:]')" = arm64
 
           cmake --install target/build/jni/
 
@@ -150,6 +154,8 @@ jobs:
             --parallel 2 \
             --clean-first
 
+          test "$(lipo -archs target/build/libuiohook/libuiohook.a | tr -d '[:space:]')" = x86_64
+
           cmake --install target/build/libuiohook/
 
           mkdir -p target/build/jni/
@@ -165,6 +171,8 @@ jobs:
           cmake --build target/build/jni/ \
             --parallel 2 \
             --clean-first
+
+          test "$(lipo -archs target/build/jni/libJNativeHook.dylib | tr -d '[:space:]')" = x86_64
 
           cmake --install target/build/jni/
 
