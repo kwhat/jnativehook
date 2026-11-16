@@ -210,11 +210,13 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
                     NativeInputEvent_obj);
 
-            // Set the propagate flag from java.
-            event->reserved = (unsigned short) (*env)->GetShortField(
+            // Preserve native flags and apply Java event consumption.
+            if ((*env)->GetShortField(
                     env,
                     NativeInputEvent_obj,
-                    com_github_kwhat_jnativehook_NativeInputEvent->reserved);
+                    com_github_kwhat_jnativehook_NativeInputEvent->reserved) & 0x01) {
+                event->mask |= MASK_CONSUMED;
+            }
 
             // Make sure our object is garbage collected.
             (*env)->DeleteLocalRef(env, NativeInputEvent_obj);

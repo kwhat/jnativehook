@@ -61,7 +61,7 @@ public class NativeInputEventTest {
     }
 
     @Test
-    public void testSetModifiers() {
+    public void testConstructorPreservesButtonModifiers() {
         int mask = NativeInputEvent.BUTTON1_MASK
             | NativeInputEvent.BUTTON2_MASK
             | NativeInputEvent.BUTTON3_MASK
@@ -71,9 +71,7 @@ public class NativeInputEventTest {
         NativeInputEvent event = new NativeInputEvent(
             GlobalScreen.class,
             NativeKeyEvent.NATIVE_KEY_PRESSED,
-            0x00);
-
-        event.setModifiers(mask);
+            mask);
         assertEquals(event.getModifiers(), mask);
     }
 

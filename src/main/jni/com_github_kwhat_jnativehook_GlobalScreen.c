@@ -176,9 +176,8 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
         case com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL:
             virtualEvent.data.wheel.x = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getX);
             virtualEvent.data.wheel.y = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
-            virtualEvent.data.wheel.clicks = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getClickCount);
             virtualEvent.data.wheel.type = (uint8_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
-            virtualEvent.data.wheel.amount = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
+            virtualEvent.data.wheel.delta = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollAmount);
             virtualEvent.data.wheel.rotation = (uint16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelRotation);
             break;
 
