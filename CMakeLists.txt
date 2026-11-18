@@ -67,6 +67,7 @@ add_library(jnativehook SHARED
     "./src/main/jni/jni_Converter.c"
     "./src/main/jni/jni_Errors.c"
     "./src/main/jni/jni_EventDispatcher.c"
+    "./src/main/jni/jni_EventPoster.c"
     "./src/main/jni/jni_Globals.c"
     "./src/main/jni/jni_Load.c"
     "./src/main/jni/jni_Logger.c"

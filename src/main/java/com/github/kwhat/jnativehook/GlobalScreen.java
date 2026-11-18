@@ -498,8 +498,12 @@ public class GlobalScreen {
      *
      * @param nativeEvent the <code>NativeInputEvent</code> sent to the native system.
      * @since 2.0
+     * @throws IllegalArgumentException if the event type, key location or wheel rotation
+     *         cannot be represented by the native API
+     * @throws NativeHookException if posting the event fails in the native backend
+     * @throws NullPointerException if nativeEvent is null
      */
-    public static native void postNativeEvent(NativeInputEvent nativeEvent);
+    public static native void postNativeEvent(NativeInputEvent nativeEvent) throws NativeHookException;
 
     /**
      * Internal class to handle event dispatching via the executor service.

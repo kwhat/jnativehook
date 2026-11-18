@@ -284,16 +284,53 @@
             <version>3.5.0</version>
             <executions>
               <execution>
-                <id>run-jni-regression-tests</id>
+                <id>configure-jni-regression-tests</id>
                 <phase>test</phase>
                 <goals>
                   <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <executable>bash</executable>
+                  <executable>cmake</executable>
                   <arguments>
-                    <argument>${project.basedir}/src/test/jni/run-tests.sh</argument>
+                    <argument>-S</argument>
+                    <argument>${project.basedir}/src/test/jni</argument>
+                    <argument>-B</argument>
+                    <argument>${project.build.directory}/jni-regression-tests</argument>
+                    <argument>-DJAVA_HOME=${java.home}</argument>
+                    <argument>-DJAVA_CLASSES_DIR=${project.build.outputDirectory}</argument>
+                    <argument>-DJNI_GENERATED_INCLUDE=${project.build.directory}/include</argument>
+                    <argument>-DLIBUIOHOOK_INCLUDE=${project.basedir}/src/external/libuiohook/include</argument>
                   </arguments>
+                  <skip>${skipTests}</skip>
+                </configuration>
+              </execution>
+              <execution>
+                <id>build-jni-regression-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cmake</executable>
+                  <arguments>
+                    <argument>--build</argument>
+                    <argument>${project.build.directory}/jni-regression-tests</argument>
+                  </arguments>
+                  <skip>${skipTests}</skip>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-jni-regressions</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>ctest</executable>
+                  <arguments>
+                    <argument>--output-on-failure</argument>
+                  </arguments>
+                  <workingDirectory>${project.build.directory}/jni-regression-tests</workingDirectory>
                   <skip>${skipTests}</skip>
                 </configuration>
               </execution>
