@@ -31,7 +31,9 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.zip.CRC32;
 
 /**
  * Default implementation of the <code>NativeLibraryLocator</code> interface.  This will first
@@ -87,18 +89,32 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
             classLocation = codeSource.getLocation();
         }
 
-        File classFile = codeSourceFile(classLocation);
+        File classFile = this.findClassFile(classLocation);
 
         File libFile = null;
         if (classFile == null || classFile.isFile()) {
             // Jar Archive
-            String libPath = extractDirectory(classFile).getPath();
+            String libPath = this.findLibPath(classFile).getPath();
 
             String version = GlobalScreen.class.getPackage().getImplementationVersion();
             if (version != null) {
                 version = '-' + version;
             } else {
-                version = "";
+                // Modular images may lack package versions, so identify the bundled binary instead.
+                CRC32 checksum = new CRC32();
+                try (InputStream input = GlobalScreen.class.getResourceAsStream(libResourcePath)) {
+                    if (input == null) {
+                        throw new IOException("Unable to extract the native library " + libResourcePath);
+                    }
+                    byte[] buffer = new byte[4 * 1024];
+                    int size;
+                    while ((size = input.read(buffer)) != -1) {
+                        checksum.update(buffer, 0, size);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+                version = '.' + String.format(Locale.ROOT, "%08x", checksum.getValue());
             }
 
             libFile = new File(
@@ -156,23 +172,22 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
      *
      * @param location code-source location, or null.
      * @return the local file, or null when the location is not a file URL.
+     * @since 2.3
      */
-    static File codeSourceFile(URL location) {
-        if (location == null || !"file".equals(location.getProtocol())) {
-            return null;
+    protected File findClassFile(URL location) {
+        File path = null;
+
+        if (location != null && location.getProtocol().equals("file")) {
+            try {
+                path = new File(location.toURI());
+            }
+            catch (IllegalArgumentException | URISyntaxException e) {
+                log.warning(e.getMessage());
+                path = new File(location.getPath());
+            }
         }
 
-        try {
-            return new File(location.toURI());
-        }
-        catch (URISyntaxException e) {
-            log.warning(e.getMessage());
-            return new File(location.getPath());
-        }
-        catch (IllegalArgumentException e) {
-            log.warning(e.getMessage());
-            return new File(location.getPath());
-        }
+        return path;
     }
 
     /**
@@ -184,20 +199,22 @@ public class DefaultLibraryLocator implements NativeLibraryLocator {
      *
      * @param classFile jar containing this class, or null.
      * @return extraction directory.
+     * @since 2.3
      */
-    static File extractDirectory(File classFile) {
-        String libPath = System.getProperty("jnativehook.lib.path");
-        if (libPath != null) {
-            return new File(libPath);
+    protected File findLibPath(File classFile) {
+        File libPath = null;
+
+        String path = System.getProperty("jnativehook.lib.path");
+        if (path != null) {
+            libPath = new File(path);
+        } else if (classFile != null && !classFile.isDirectory()) {
+            libPath = classFile.getParentFile();
         }
 
-        if (classFile != null && !classFile.isDirectory()) {
-            File parent = classFile.getParentFile();
-            if (parent != null) {
-                return parent;
-            }
+        if (libPath == null) {
+            libPath = new File(System.getProperty("java.io.tmpdir"));
         }
 
-        return new File(System.getProperty("java.io.tmpdir"));
+        return libPath;
     }
 }
