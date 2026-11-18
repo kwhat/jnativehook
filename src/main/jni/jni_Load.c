@@ -62,16 +62,17 @@ void jni_ReleaseCallbackEnv(JNIEnv *env, jboolean attached) {
 
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    // Grab the currently running virtual machine so we can attach to it in
-    // functions that are not called from java.
-    jvm = vm;
     JNIEnv *env = NULL;
-    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) != JNI_OK) {
+    if ((*vm)->GetEnv(vm, (void **) &env, jvm_attach_args.version) != JNI_OK) {
         return JNI_ERR;
     }
 
+    // Grab the currently running virtual machine so we can attach to it in
+    // functions that are not called from java.
+    jvm = vm;
+
     // Create all the global class references onload to prevent class loader
-    // issues with JNLP and some IDE's.
+    // issues when various Java security models are used.
     if (jni_CreateGlobals(env) != JNI_OK) {
         jni_DestroyGlobals(env);
         return JNI_ERR;
