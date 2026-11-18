@@ -260,7 +260,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_ge
                     (jint) screens[i].width,
                     (jint) screens[i].height);
 
-            if (monitor != NULL) {
+            if (monitor == NULL) {
                 break;
             }
 

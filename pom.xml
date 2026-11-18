@@ -87,7 +87,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.7.0</version>
+        <version>5.8.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -98,7 +98,6 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.8.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -261,6 +260,41 @@
                   <sourceFileExcludes>
                     <sourceFileInclude>**/module-info.java</sourceFileInclude>
                   </sourceFileExcludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>linux-jni-tests</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+        </os>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>run-jni-regression-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>bash</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/jni/run-tests.sh</argument>
+                  </arguments>
+                  <skip>${skipTests}</skip>
                 </configuration>
               </execution>
             </executions>
