@@ -32,6 +32,6 @@ extern void jni_ThrowException(JNIEnv *env, const char *classname, const char *m
 /* Produces a specific NativeHookException containing an error code indicating what might
  * have gone wrong.
  */
-extern void jni_ThrowNativeHookException(JNIEnv *env, short code, const char *message);
+extern void jni_ThrowNativeHookException(JNIEnv *env, jint code, const char *message);
 
 #endif

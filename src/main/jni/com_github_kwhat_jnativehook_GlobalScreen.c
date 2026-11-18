@@ -35,6 +35,11 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_00024Nativ
     int status = hook_run();
 
     switch (status) {
+        // Success
+        case UIOHOOK_SUCCESS:
+            break;
+
+
         // System level errors.
         case UIOHOOK_ERROR_OUT_OF_MEMORY:
             jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
@@ -95,7 +100,7 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_00024Nativ
 
 
         // Default error.
-        case UIOHOOK_FAILURE:
+        default:
             jni_ThrowNativeHookException(env, status, "An unknown hook error occurred.");
             break;
     }
@@ -106,6 +111,11 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_00024Nativ
 
     // Only a handful of the total errors are possible on stop.
     switch (status) {
+        // Success
+        case UIOHOOK_SUCCESS:
+            break;
+
+
         // System level errors.
         case UIOHOOK_ERROR_OUT_OF_MEMORY:
             jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
@@ -125,7 +135,7 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_00024Nativ
         // There are no Darwin specific errors at this time.
 
         // Default error.
-        case UIOHOOK_FAILURE:
+        default:
             jni_ThrowNativeHookException(env, status, "An unknown hook error occurred.");
             break;
     }
