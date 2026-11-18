@@ -196,27 +196,44 @@ jobs:
       - name: Setup
         shell: bash
         run: |
-          sudo rm -Rf /etc/apt/sources.list.d/*
-          sudo bash -c 'source /etc/lsb-release && echo "
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME} main universe
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-updates main universe
-          deb [arch=amd64,i386] http://security.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-security main universe
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-backports main universe
-
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME} main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-updates main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-security main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-backports main universe
-          " > /etc/apt/sources.list'
+          # Keep native repositories so installed host packages retain matching candidates.
+          host_arch=$(dpkg --print-architecture)
+          for source_file in /etc/apt/sources.list.d/*.sources; do
+            if [ -f "$source_file" ]; then
+              sudo sed -i -E "/^Architectures(-Add|-Remove)?:/d; /^Types:/a Architectures: $host_arch" "$source_file"
+            fi
+          done
+          for source_file in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+            if [ -f "$source_file" ]; then
+              sudo sed -i -E "/^[[:space:]]*deb(-src)?[[:space:]]/ {
+                s/arch(\+|-)?=[^][:space:]]+/arch=$host_arch/g
+                /\[/ {
+                  /arch=/!s/\[/[arch=$host_arch /
+                  b
+                }
+                s/^([[:space:]]*deb(-src)?[[:space:]]+)/\1[arch=$host_arch] /
+              }" "$source_file"
+            fi
+          done
+          sudo bash -c 'source /etc/os-release && cat > /etc/apt/sources.list.d/jnativehook-armhf.list <<SOURCES
+          deb [arch=armhf signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME} main universe
+          deb [arch=armhf signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-updates main universe
+          deb [arch=armhf signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-security main universe
+          deb [arch=armhf signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-backports main universe
+          SOURCES'
 
           sudo dpkg --add-architecture armhf
           sudo apt-get update -m
 
-          sudo apt-get install -y --no-install-recommends \
+          apt-cache policy gcc binutils binutils-common gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
+
+          # APT can classify same-version metadata replacements as downgrades.
+          # https://bugs.debian.org/1149125
+          sudo apt-get install -y --allow-downgrades --no-install-recommends \
             binutils-arm-linux-gnueabihf \
             gcc-arm-linux-gnueabihf
 
-          sudo apt-get install -y --no-install-recommends \
+          sudo apt-get install -y --allow-downgrades --no-install-recommends \
             libglib2.0-dev-bin:amd64 \
             libevdev-dev:armhf \
             libinput-dev:armhf \
@@ -233,7 +250,14 @@ jobs:
             libxkbcommon-x11-dev:armhf \
             libxkbfile-dev:armhf
 
-          sudo apt-get install -y --no-install-recommends binutils-gold
+          # Newer Ubuntu releases package Gold separately for each cross target.
+          gold_package=binutils-gold-arm-linux-gnueabihf
+          if ! apt-cache show "$gold_package" >/dev/null 2>&1; then
+            # Older cross-binutils packages include Gold themselves.
+            gold_package=binutils-arm-linux-gnueabihf
+          fi
+          sudo apt-get install -y --allow-downgrades --no-install-recommends "$gold_package"
+          arm-linux-gnueabihf-ld.gold --version
 
       - name: Compile
         env:
@@ -298,27 +322,42 @@ jobs:
       - name: Setup
         shell: bash
         run: |
-          sudo rm -Rf /etc/apt/sources.list.d/*
-          sudo bash -c 'source /etc/lsb-release && echo "
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME} main universe
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-updates main universe
-          deb [arch=amd64,i386] http://security.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-security main universe
-          deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu ${DISTRIB_CODENAME}-backports main universe
-
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME} main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-updates main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-security main universe
-          deb [arch=arm64,armhf] http://ports.ubuntu.com/ubuntu-ports ${DISTRIB_CODENAME}-backports main universe
-          " > /etc/apt/sources.list'
+          # Keep native repositories so installed host packages retain matching candidates.
+          host_arch=$(dpkg --print-architecture)
+          for source_file in /etc/apt/sources.list.d/*.sources; do
+            if [ -f "$source_file" ]; then
+              sudo sed -i -E "/^Architectures(-Add|-Remove)?:/d; /^Types:/a Architectures: $host_arch" "$source_file"
+            fi
+          done
+          for source_file in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+            if [ -f "$source_file" ]; then
+              sudo sed -i -E "/^[[:space:]]*deb(-src)?[[:space:]]/ {
+                s/arch(\+|-)?=[^][:space:]]+/arch=$host_arch/g
+                /\[/ {
+                  /arch=/!s/\[/[arch=$host_arch /
+                  b
+                }
+                s/^([[:space:]]*deb(-src)?[[:space:]]+)/\1[arch=$host_arch] /
+              }" "$source_file"
+            fi
+          done
+          sudo bash -c 'source /etc/os-release && cat > /etc/apt/sources.list.d/jnativehook-arm64.list <<SOURCES
+          deb [arch=arm64 signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME} main universe
+          deb [arch=arm64 signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-updates main universe
+          deb [arch=arm64 signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-security main universe
+          deb [arch=arm64 signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] http://ports.ubuntu.com/ubuntu-ports ${VERSION_CODENAME}-backports main universe
+          SOURCES'
 
           sudo dpkg --add-architecture arm64
           sudo apt-get update -m
 
-          sudo apt-get install -y --no-install-recommends \
+          # APT can classify same-version metadata replacements as downgrades.
+          # https://bugs.debian.org/1149125
+          sudo apt-get install -y --allow-downgrades --no-install-recommends \
             binutils-aarch64-linux-gnu \
             gcc-aarch64-linux-gnu
 
-          sudo apt-get install -y --no-install-recommends \
+          sudo apt-get install -y --allow-downgrades --no-install-recommends \
             libglib2.0-dev-bin:amd64 \
             libevdev-dev:arm64 \
             libinput-dev:arm64 \
@@ -335,7 +374,14 @@ jobs:
             libxkbcommon-x11-dev:arm64 \
             libxkbfile-dev:arm64
 
-          sudo apt-get install -y --no-install-recommends binutils-gold
+          # Newer Ubuntu releases package Gold separately for each cross target.
+          gold_package=binutils-gold-aarch64-linux-gnu
+          if ! apt-cache show "$gold_package" >/dev/null 2>&1; then
+            # Older cross-binutils packages include Gold themselves.
+            gold_package=binutils-aarch64-linux-gnu
+          fi
+          sudo apt-get install -y --allow-downgrades --no-install-recommends "$gold_package"
+          aarch64-linux-gnu-ld.gold --version
 
       - name: Compile
         env:
@@ -431,7 +477,14 @@ jobs:
             libxkbcommon-x11-dev:i386 \
             libxkbfile-dev:i386
 
-          sudo apt-get install -y --no-install-recommends binutils-gold
+          # Newer Ubuntu releases package Gold separately for each cross target.
+          gold_package=binutils-gold-i686-linux-gnu
+          if ! apt-cache show "$gold_package" >/dev/null 2>&1; then
+            # Older cross-binutils packages include Gold themselves.
+            gold_package=binutils-i686-linux-gnu
+          fi
+          sudo apt-get install -y --no-install-recommends "$gold_package"
+          i686-linux-gnu-ld.gold --version
 
       - name: Compile
         env:

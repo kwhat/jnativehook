@@ -33,6 +33,7 @@ NativeKeyEvent *com_github_kwhat_jnativehook_keyboard_NativeKeyEvent = NULL;
 NativeMouseEvent *com_github_kwhat_jnativehook_mouse_NativeMouseEvent = NULL;
 NativeMouseWheelEvent *com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent = NULL;
 Object *java_lang_Object = NULL;
+String *java_lang_String = NULL;
 Integer *java_lang_Integer = NULL;
 System *java_lang_System = NULL;
 Logger *java_util_logging_Logger = NULL;
@@ -471,6 +472,44 @@ static void destroy_Object(JNIEnv *env) {
     }
 }
 
+static int create_String(JNIEnv *env) {
+    int status = JNI_ERR;
+
+    jclass String_class = (*env)->FindClass(env, "java/lang/String");
+    if (String_class != NULL) {
+        jmethodID init = (*env)->GetMethodID(env, String_class, "<init>", "([BLjava/lang/String;)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
+
+        java_lang_String = calloc(1, sizeof(String));
+        if (java_lang_String != NULL) {
+            java_lang_String->cls = (jclass) (*env)->NewGlobalRef(env, String_class);
+            if (java_lang_String->cls == NULL) {
+                return JNI_ENOMEM;
+            }
+            java_lang_String->init = init;
+            status = JNI_OK;
+        } else {
+            jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
+            status = JNI_ENOMEM;
+        }
+    }
+
+    return status;
+}
+
+static void destroy_String(JNIEnv *env) {
+    if (java_lang_String != NULL) {
+        if (java_lang_String->cls != NULL) {
+            (*env)->DeleteGlobalRef(env, java_lang_String->cls);
+        }
+
+        free(java_lang_String);
+        java_lang_String = NULL;
+    }
+}
+
 static int create_Integer(JNIEnv *env) {
     int status = JNI_ERR;
 
@@ -555,8 +594,6 @@ static inline void destroy_System(JNIEnv *env) {
     }
 }
 
-
-
 static inline int create_Logger(JNIEnv *env) {
     int status = JNI_ERR;
 
@@ -565,24 +602,58 @@ static inline int create_Logger(JNIEnv *env) {
     if (Logger_class != NULL) {
         // Get the method ID for Logger.getLogger().
         jmethodID getLogger = (*env)->GetStaticMethodID(env, Logger_class, "getLogger", "(Ljava/lang/String;)Ljava/util/logging/Logger;");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.fine().
         jmethodID fine = (*env)->GetMethodID(env, Logger_class, "fine", "(Ljava/lang/String;)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.info().
         jmethodID info = (*env)->GetMethodID(env, Logger_class, "info", "(Ljava/lang/String;)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.warning().
         jmethodID warning = (*env)->GetMethodID(env, Logger_class, "warning", "(Ljava/lang/String;)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
 
         // Get the method ID for Logger.severe().
         jmethodID severe = (*env)->GetMethodID(env, Logger_class, "severe", "(Ljava/lang/String;)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
+
+        jfieldID loggerField = (*env)->GetStaticFieldID(env, com_github_kwhat_jnativehook_GlobalScreen->cls, "log", "Ljava/util/logging/Logger;");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
+
+        jobject logger = (*env)->GetStaticObjectField(env, com_github_kwhat_jnativehook_GlobalScreen->cls, loggerField);
+        if ((*env)->ExceptionCheck(env) || logger == NULL) {
+            return JNI_ERR;
+        }
 
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
-            java_util_logging_Logger = malloc(sizeof(Logger));
+            java_util_logging_Logger = calloc(1, sizeof(Logger));
             if (java_util_logging_Logger != NULL) {
                 // Populate our structure for later use.
                 java_util_logging_Logger->cls = (jclass) (*env)->NewGlobalRef(env, Logger_class);
+                if (java_util_logging_Logger->cls == NULL) {
+                    return JNI_ENOMEM;
+                }
+
+                java_util_logging_Logger->object = (*env)->NewGlobalRef(env, logger);
+                if (java_util_logging_Logger->object == NULL) {
+                    return JNI_ENOMEM;
+                }
+                
                 java_util_logging_Logger->getLogger = getLogger;
                 java_util_logging_Logger->fine = fine;
                 java_util_logging_Logger->info = info;
@@ -607,12 +678,13 @@ static inline void destroy_Logger(JNIEnv *env) {
             (*env)->DeleteGlobalRef(env, java_util_logging_Logger->cls);
         }
 
+        (*env)->DeleteGlobalRef(env, java_util_logging_Logger->object);
+
         // Free struct memory.
         free(java_util_logging_Logger);
         java_util_logging_Logger = NULL;
     }
 }
-
 
 int jni_CreateGlobals(JNIEnv *env) {
     int status = create_GlobalScreen(env);
@@ -650,6 +722,10 @@ int jni_CreateGlobals(JNIEnv *env) {
     }
 
     if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
+        status = create_String(env);
+    }
+
+    if (status == JNI_OK && (*env)->ExceptionCheck(env) == JNI_FALSE) {
         status = create_Integer(env);
     }
 
@@ -679,6 +755,7 @@ int jni_DestroyGlobals(JNIEnv *env) {
     destroy_NativeMouseEvent(env);
     destroy_NativeMouseWheelEvent(env);
     destroy_Object(env);
+    destroy_String(env);
     destroy_Integer(env);
     destroy_System(env);
     destroy_Logger(env);

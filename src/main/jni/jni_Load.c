@@ -22,6 +22,7 @@
 #include "jni_Errors.h"
 #include "jni_EventDispathcer.h"
 #include "jni_Globals.h"
+#include "jni_Load.h"
 #include "jni_Logger.h"
 
 
@@ -34,25 +35,53 @@ JavaVMAttachArgs jvm_attach_args = {
 };
 
 
+// Native backends may deliver callbacks from threads not created by Java.
+jint jni_GetCallbackEnv(JNIEnv **env, jboolean *attached) {
+    *attached = JNI_FALSE;
+    
+    jint status = (*jvm)->GetEnv(jvm, (void **) env, jvm_attach_args.version);
+    if (status == JNI_EDETACHED) {
+        status = (*jvm)->AttachCurrentThreadAsDaemon(jvm, (void **) env, &jvm_attach_args);
+        *attached = (status == JNI_OK);
+    }
+
+    return status;
+}
+
+void jni_ReleaseCallbackEnv(JNIEnv *env, jboolean attached) {
+    // An exception escaping a native callback would poison subsequent JNI calls.
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    if (attached) {
+        (*jvm)->DetachCurrentThread(jvm);
+    }
+}
+
 // JNI entry point, This is executed when the Java virtual machine attaches to the native library.
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     // Grab the currently running virtual machine so we can attach to it in
     // functions that are not called from java.
     jvm = vm;
     JNIEnv *env = NULL;
-    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
-        // Create all the global class references onload to prevent class loader
-        // issues with JNLP and some IDE's.
-        if (jni_CreateGlobals(env) == JNI_OK) {
-            // Set Java logger for native code messages.
-            hook_set_logger_proc(&jni_LoggerProc, NULL);
-
-            // Set the hook callback function to dispatch events.
-            hook_set_dispatch_proc(&jni_EventDispatcher, NULL);
-        }
-    } else {
-        jni_ThrowFatalError(env, "Failed to acquire JNI interface pointer");
+    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) != JNI_OK) {
+        return JNI_ERR;
     }
+
+    // Create all the global class references onload to prevent class loader
+    // issues with JNLP and some IDE's.
+    if (jni_CreateGlobals(env) != JNI_OK) {
+        jni_DestroyGlobals(env);
+        return JNI_ERR;
+    }
+
+    // Set Java logger for native code messages.
+    hook_set_logger_proc(&jni_LoggerProc, NULL);
+
+    // Set the hook callback function to dispatch events.
+    hook_set_dispatch_proc(&jni_EventDispatcher, NULL);
 
     return jvm_attach_args.version;
 }

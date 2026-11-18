@@ -21,14 +21,15 @@
 #include <stdlib.h>
 #include <uiohook.h>
 
-#include "jni_Converter.h"
-#include "jni_Errors.h"
-#include "jni_Globals.h"
-#include "jni_Logger.h"
 #include "com_github_kwhat_jnativehook_keyboard_NativeKeyEvent.h"
 #include "com_github_kwhat_jnativehook_mouse_NativeMouseEvent.h"
 #include "com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent.h"
 #include "com_github_kwhat_jnativehook_NativeInputEvent.h"
+#include "jni_Converter.h"
+#include "jni_Errors.h"
+#include "jni_Globals.h"
+#include "jni_Load.h"
+#include "jni_Logger.h"
 
 
 // Simple function to notify() the hook thread.
@@ -51,21 +52,35 @@ static inline void notifyHookThread(JNIEnv *env) {
 // NOTE: This function executes on the hook thread!  If you need to block
 // please do so on another thread via your own event dispatcher.
 void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
-    JNIEnv *env;
+    if (event == NULL) {
+        return;
+    }
 
     uint16_t keycode = VC_UNDEFINED;
     if (event->type == EVENT_KEY_PRESSED || event->type == EVENT_KEY_RELEASED) {
         keycode = event->data.keyboard.keycode;
     }
 
-    if ((*jvm)->GetEnv(jvm, (void **)(&env), jvm_attach_args.version) == JNI_OK) {
+    JNIEnv *env;
+    jboolean attached;
+    if (jni_GetCallbackEnv(&env, &attached) == JNI_OK) {
+        if ((*env)->ExceptionCheck(env)) {
+            jni_ReleaseCallbackEnv(env, attached);
+            return;
+        }
+
+        if ((*env)->PushLocalFrame(env, 16) != JNI_OK) {
+            jni_ReleaseCallbackEnv(env, attached);
+            return;
+        }
+
         jobject NativeInputEvent_obj = NULL;
         jint location = com_github_kwhat_jnativehook_keyboard_NativeKeyEvent_LOCATION_UNKNOWN;
         switch (event->type) {
             case EVENT_HOOK_DISABLED:
             case EVENT_HOOK_ENABLED:
                 notifyHookThread(env);
-                return;
+                break;
 
 
             case EVENT_KEY_PRESSED:
@@ -188,24 +203,22 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                 break;
 
             case EVENT_MOUSE_WHEEL:
-                if (event->data.wheel.delta == 0) {
-                    break;
+                if (event->data.wheel.delta != 0) {
+                        NativeInputEvent_obj = (*env)->NewObject(
+                            env,
+                            com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls,
+                            com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->init,
+                            com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
+                            (jint) event->mask,
+                            (jint) event->data.wheel.x,
+                            (jint) event->data.wheel.y,
+                            (jint) 1, // clicks
+                            (jint) event->data.wheel.type,
+                            (jint) 1, // libuiohook reports scroll steps rather than platform line counts.
+                            (jint) event->data.wheel.rotation * -1 / event->data.wheel.delta,
+                            (jint) event->data.wheel.direction,
+                            (jdouble) event->data.wheel.rotation * -1 / (double) event->data.wheel.delta);
                 }
-
-                NativeInputEvent_obj = (*env)->NewObject(
-                        env,
-                        com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->cls,
-                        com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->init,
-                        com_github_kwhat_jnativehook_mouse_NativeMouseEvent_NATIVE_MOUSE_WHEEL,
-                        (jint) event->mask,
-                        (jint) event->data.wheel.x,
-                        (jint) event->data.wheel.y,
-                        (jint) 1, // clicks
-                        (jint) event->data.wheel.type,
-                        (jint) 1, // libuiohook reports scroll steps rather than platform line counts.
-                        (jint) event->data.wheel.rotation * -1 / event->data.wheel.delta,
-                        (jint) event->data.wheel.direction,
-                        (jdouble) event->data.wheel.rotation * -1 / (double) event->data.wheel.delta);
                 break;
 
             default:
@@ -214,7 +227,7 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                 break;
         }
 
-        if (NativeInputEvent_obj != NULL) {
+        if (NativeInputEvent_obj != NULL && !(*env)->ExceptionCheck(env)) {
             // Set the private when field to the native event time.
             (*env)->SetLongField(
                     env,
@@ -229,20 +242,20 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
                     com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent,
                     NativeInputEvent_obj);
 
-            // Set the propagate flag from java.
-            jshort reserved = (*env)->GetShortField(
-                    env,
+            if (!(*env)->ExceptionCheck(env)) {
+                // Set the propagate flag from java.
+                jint modifiers = (*env)->CallIntMethod(
+                    env, 
                     NativeInputEvent_obj,
-                    com_github_kwhat_jnativehook_NativeInputEvent->reserved);
-
-            jint modifiers = (*env)->CallIntMethod(env, NativeInputEvent_obj,
                     com_github_kwhat_jnativehook_NativeInputEvent->getModifiers);
-            if ((reserved & 0x01) || ((uint32_t) modifiers & MASK_CONSUMED)) {
-                event->mask |= MASK_CONSUMED;
-            }
 
-            // Make sure our object is garbage collected.
-            (*env)->DeleteLocalRef(env, NativeInputEvent_obj);
+                if ((uint32_t) modifiers & MASK_CONSUMED) {
+                    event->mask |= MASK_CONSUMED;
+                }
+            }
         }
+
+        (*env)->PopLocalFrame(env, NULL);
+        jni_ReleaseCallbackEnv(env, attached);
     }
 }

@@ -97,6 +97,11 @@ typedef struct _java_lang_Object {
     jmethodID notify;
 } Object;
 
+typedef struct _java_lang_String {
+    jclass cls;
+    jmethodID init;
+} String;
+
 typedef struct _java_lang_Integer {
     jclass cls;
     jmethodID init;
@@ -110,6 +115,7 @@ typedef struct _java_lang_System {
 
 typedef struct _java_util_logging_Logger {
     jclass cls;
+    jobject object;
     jmethodID getLogger;
     jmethodID fine;
     jmethodID info;
@@ -127,6 +133,7 @@ extern NativeKeyEvent *com_github_kwhat_jnativehook_keyboard_NativeKeyEvent;
 extern NativeMouseEvent *com_github_kwhat_jnativehook_mouse_NativeMouseEvent;
 extern NativeMouseWheelEvent *com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent;
 extern Object *java_lang_Object;
+extern String *java_lang_String;
 extern Integer *java_lang_Integer;
 extern System *java_lang_System;
 extern Logger *java_util_logging_Logger;
