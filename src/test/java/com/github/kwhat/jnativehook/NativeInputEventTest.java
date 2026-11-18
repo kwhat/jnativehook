@@ -19,8 +19,10 @@ package com.github.kwhat.jnativehook;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class NativeInputEventTest {
     @Test
@@ -72,6 +74,7 @@ public class NativeInputEventTest {
             GlobalScreen.class,
             NativeKeyEvent.NATIVE_KEY_PRESSED,
             mask);
+
         assertEquals(event.getModifiers(), mask);
     }
 
@@ -93,4 +96,40 @@ public class NativeInputEventTest {
 
         assertNotEquals("", event.paramString());
     }
+
+    @Test
+    public void consumePreservesModifiersAndIsIdempotent() {
+        int mask = NativeInputEvent.SHIFT_R_MASK | NativeInputEvent.BUTTON5_MASK
+            | NativeInputEvent.CAPS_LOCK_MASK | NativeInputEvent.EMULATED_MASK;
+        NativeInputEvent event = new NativeInputEvent(GlobalScreen.class, NativeKeyEvent.NATIVE_KEY_PRESSED, mask);
+        event.consume();
+        event.consume();
+        assertEquals(mask | NativeInputEvent.CONSUMED_MASK, event.getModifiers());
+    }
+
+    @Test
+    public void modifierTextIncludesEmulatedAndConsumedFlags() {
+        int mask = NativeInputEvent.EMULATED_MASK | NativeInputEvent.CONSUMED_MASK;
+        assertEquals("Emulated+Consumed", NativeInputEvent.getModifiersText(mask));
+    }
+
+    @Test
+    public void serializationPreservesEventFlags() throws Exception {
+        NativeInputEvent original = new NativeInputEvent(GlobalScreen.class, NativeKeyEvent.NATIVE_KEY_PRESSED,
+            NativeInputEvent.EMULATED_MASK | NativeInputEvent.CTRL_L_MASK);
+        original.consume();
+        java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+        try (java.io.ObjectOutputStream output = new java.io.ObjectOutputStream(bytes)) {
+            output.writeObject(original);
+        }
+        try (java.io.ObjectInputStream input = new java.io.ObjectInputStream(
+                new java.io.ByteArrayInputStream(bytes.toByteArray()))) {
+            NativeInputEvent restored = (NativeInputEvent) input.readObject();
+            assertEquals(original.getID(), restored.getID());
+            assertEquals(original.getModifiers(), restored.getModifiers());
+            assertEquals(original.getWhen(), restored.getWhen());
+            assertNull(restored.getSource(), "EventObject source is transient");
+        }
+    }
+
 }

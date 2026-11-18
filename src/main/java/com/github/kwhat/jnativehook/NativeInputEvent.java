@@ -144,6 +144,16 @@ public class NativeInputEvent extends EventObject {
     public static final int CONSUMED_MASK    = 1 << 31;
 
     /**
+     * Requests native suppression. Call from a synchronous event dispatcher before
+     * the native callback returns; support depends on the platform backend.
+     *
+     * @since 2.3
+     */
+    public void consume() {
+        modifiers |= CONSUMED_MASK;
+    }
+
+    /**
      * Instantiates a new native input event.
      *
      * @param source The source of the event.
@@ -260,6 +270,16 @@ public class NativeInputEvent extends EventObject {
 
         if ((modifiers & NativeInputEvent.SCROLL_LOCK_MASK) != 0) {
             param.append(Toolkit.getProperty("AWT.scrollLock", "Scroll Lock"));
+            param.append('+');
+        }
+
+        if ((modifiers & NativeInputEvent.EMULATED_MASK) != 0) {
+            param.append(Toolkit.getProperty("AWT.emulated", "Emulated"));
+            param.append('+');
+        }
+
+        if ((modifiers & NativeInputEvent.CONSUMED_MASK) != 0) {
+            param.append(Toolkit.getProperty("AWT.consumed", "Consumed"));
             param.append('+');
         }
 
