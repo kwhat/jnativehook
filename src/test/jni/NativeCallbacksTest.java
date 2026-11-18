@@ -61,11 +61,18 @@ public class NativeCallbacksTest {
             throw new AssertionError("Native callback or UTF-8 log was lost");
         }
         GlobalScreen.removeNativeMouseMotionListener(listener);
+        AtomicInteger callbackFailures = new AtomicInteger();
         NativeMouseMotionListener throwing = new NativeMouseMotionListener() {
-            public void nativeMouseMoved(NativeMouseEvent event) { throw new IllegalStateException("expected callback failure"); }
+            public void nativeMouseMoved(NativeMouseEvent event) {
+                callbackFailures.incrementAndGet();
+                throw new IllegalStateException("expected callback failure");
+            }
         };
         GlobalScreen.addNativeMouseMotionListener(throwing);
         emit();
+        if (callbackFailures.get() != 1) {
+            throw new AssertionError("Expected callback failure was not exercised");
+        }
         GlobalScreen.removeNativeMouseMotionListener(throwing);
         GlobalScreen.addNativeMouseMotionListener(listener);
         emit();

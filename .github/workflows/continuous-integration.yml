@@ -49,6 +49,30 @@ jobs:
             ${{github.workspace}}/target
           if-no-files-found: error
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          cache: maven
+          java-version: 17
+          java-package: jdk
+          architecture: x64
+
+      - name: Test
+        run: |
+          mvn \
+            --batch-mode \
+            --no-transfer-progress \
+            test
+
 
   compile-apple-arm64:
     needs: compile-java
@@ -793,6 +817,7 @@ jobs:
 
   package:
     needs: [
+      test,
       compile-apple-arm64,
       compile-apple-x86_64,
       compile-linux-arm,
@@ -841,6 +866,7 @@ jobs:
           mvn \
             --batch-mode \
             --no-transfer-progress \
+            -DskipTests \
             package
 
       - name: Setup GPG
