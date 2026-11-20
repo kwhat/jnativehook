@@ -50,12 +50,12 @@ public class NativeMonitorInfo {
     /**
      * The horizontal size of the current display.
      */
-    private short width;
+    private int width;
 
     /**
      * The vertical size of the current display.
      */
-    private short height;
+    private int height;
 
     /**
      * Instantiates a new monitor info class.
@@ -65,10 +65,10 @@ public class NativeMonitorInfo {
      * @param number an integer that identifies the display.
      * @param x the x coordate of this display.
      * @param y the y coordate of this display.
-     * @param width the width coordate of this display.
-     * @param height the height coordate of this display.
+     * @param width the width in pixels of this display.
+     * @param height the height in pixels of this display.
      */
-    public NativeMonitorInfo(short number, int x, int y, short width, short height) {
+    public NativeMonitorInfo(short number, int x, int y, int width, int height) {
         this.number = number;
         this.x = x;
         this.y = y;
@@ -135,7 +135,7 @@ public class NativeMonitorInfo {
      *
      * @return the width in pixels of this display.
      */
-    public short getWidth() {
+    public int getWidth() {
         return width;
     }
 
@@ -144,16 +144,16 @@ public class NativeMonitorInfo {
      *
      * @param width the pixel width of this monitor.
      */
-    public void setWidth(short width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
     /**
-     * Returns the hight of this naitve monitor.
+     * Returns the height of this native monitor.
      *
-     * @return the hight in pixels of this display.
+     * @return the height in pixels of this display.
      */
-    public short getHeight() {
+    public int getHeight() {
         return height;
     }
 
@@ -162,7 +162,7 @@ public class NativeMonitorInfo {
      *
      * @param height the pixel height of this display.
      */
-    public void setHeight(short height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 }

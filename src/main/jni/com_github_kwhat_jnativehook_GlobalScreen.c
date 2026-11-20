@@ -198,13 +198,14 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
             virtualEvent.data.wheel.y = (int16_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->parent->getY);
             virtualEvent.data.wheel.type = (uint8_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getScrollType);
             virtualEvent.data.wheel.direction = (uint8_t) (*env)->CallIntMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getWheelDirection);
-            double rotation = (*env)->CallDoubleMethod(env, NativeInputEvent_obj,
-                    com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getPreciseWheelRotation);
+
             // libuiohook 1.3 represents wheel steps as rotation / delta, with the opposite sign.
+            double rotation = (*env)->CallDoubleMethod(env, NativeInputEvent_obj, com_github_kwhat_jnativehook_mouse_NativeMouseWheelEvent->getPreciseWheelRotation);
             if (!isfinite(rotation) || rotation < -32767 || rotation > 32768) {
                 jni_ThrowException(env, "java/lang/IllegalArgumentException", "Wheel rotation is outside the native range.");
                 return;
             }
+
             double magnitude = rotation < 0 ? -rotation : rotation;
             double limit = rotation < 0 ? INT16_MAX : -(double) INT16_MIN;
             double maxDelta = magnitude == 0 ? UINT16_MAX : limit / magnitude;
@@ -243,7 +244,7 @@ JNIEXPORT void JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_postNative
  * Signature: ()[Lcom/github/kwhat/jnativehook/MonitorInfo;
  */
 JNIEXPORT jobjectArray JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_getNativeMonitors(JNIEnv *env, jclass GlobalScreen_cls) {
-    unsigned char count;
+    unsigned char count = 0;
     screen_data *screens = hook_create_screen_info(&count);
 
     jobjectArray result = (*env)->NewObjectArray(env, (jsize) count, com_github_kwhat_jnativehook_NativeMonitorInfo->cls, NULL);
@@ -256,15 +257,25 @@ JNIEXPORT jobjectArray JNICALL Java_com_github_kwhat_jnativehook_GlobalScreen_ge
                     (jshort) screens[i].number,
                     (jint) screens[i].x,
                     (jint) screens[i].y,
-                    (jshort) screens[i].width,
-                    (jshort) screens[i].height);
+                    (jint) screens[i].width,
+                    (jint) screens[i].height);
+
+            if (monitor != NULL) {
+                break;
+            }
 
             (*env)->SetObjectArrayElement(env, result, (jsize) i, monitor);
+            (*env)->DeleteLocalRef(env, monitor);
+
+            if ((*env)->ExceptionCheck(env)) {
+                break;
+            }
         }
      } else {
          jni_ThrowException(env, "java/lang/OutOfMemoryError", "Failed to allocate native memory.");
      }
 
+     free(screens);
      return result;
 }
 
