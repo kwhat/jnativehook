@@ -190,7 +190,7 @@ static int create_NativeMonitorInfo(JNIEnv *env) {
     jclass NativeMonitorInfo_class = (*env)->FindClass(env, "com/github/kwhat/jnativehook/NativeMonitorInfo");
     if (NativeMonitorInfo_class != NULL) {
         // Get the method ID for NativeInputEvent constructor.
-        jmethodID init = (*env)->GetMethodID(env, NativeMonitorInfo_class, "<init>", "(SIISS)V");
+        jmethodID init = (*env)->GetMethodID(env, NativeMonitorInfo_class, "<init>", "(SIIII)V");
         if ((*env)->ExceptionCheck(env)) {
             return JNI_ERR;
         }
