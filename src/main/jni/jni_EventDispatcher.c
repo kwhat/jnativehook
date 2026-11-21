@@ -33,20 +33,17 @@
 #include "jni_Logger.h"
 
 
-// Simple function to notify() the hook thread.
-static void jni_notifyHookThread(JNIEnv *env) {
+// Publish hook lifecycle state to the Java hook thread.
+static void jni_notifyHookThread(JNIEnv *env, jboolean enabled) {
     jobject hookThread_obj = (*env)->GetStaticObjectField(
             env,
-            java_lang_Object->cls,
+            com_github_kwhat_jnativehook_GlobalScreen->cls,
             com_github_kwhat_jnativehook_GlobalScreen->hookThread);
 
     if (hookThread_obj != NULL) {
-        (*env)->MonitorEnter(env, hookThread_obj);
-        (*env)->CallVoidMethod(
-                env,
-                hookThread_obj,
-                java_lang_Object->notify);
-        (*env)->MonitorExit(env, hookThread_obj);
+        (*env)->CallVoidMethod(env, hookThread_obj,
+                com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->setNativeHookState, enabled);
+        (*env)->DeleteLocalRef(env, hookThread_obj);
     }
 }
 
@@ -259,7 +256,7 @@ void jni_EventDispatcher(uiohook_event * const event, void *user_data) {
         switch (event->type) {
             case EVENT_HOOK_DISABLED:
             case EVENT_HOOK_ENABLED:
-                jni_notifyHookThread(env);
+                jni_notifyHookThread(env, event->type == EVENT_HOOK_ENABLED);
                 break;
 
             case EVENT_KEY_PRESSED:

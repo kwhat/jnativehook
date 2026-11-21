@@ -99,6 +99,12 @@ static int create_NativeHookThread(JNIEnv *env) {
             return JNI_ERR;
         }
 
+        // Get the method ID for NativeHookThread.setNativeHookState().
+        jmethodID setNativeHookState = (*env)->GetMethodID(env, NativeHookThread_class, "setNativeHookState", "(Z)V");
+        if ((*env)->ExceptionCheck(env)) {
+            return JNI_ERR;
+        }
+
         if ((*env)->ExceptionCheck(env) == JNI_FALSE) {
             com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread = calloc(1, sizeof(NativeHookThread));
             if (com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread != NULL) {
@@ -109,6 +115,7 @@ static int create_NativeHookThread(JNIEnv *env) {
                 }
 
                 com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->dispatchEvent = dispatchEvent;
+                com_github_kwhat_jnativehook_GlobalScreen$NativeHookThread->setNativeHookState = setNativeHookState;
 
                 status = JNI_OK;
             } else {
